@@ -62,4 +62,5 @@
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
 
-static/* linguist-vendored
+* linguist-vendored
+*.cs linguist-vendored=false
