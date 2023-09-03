@@ -6,8 +6,7 @@ services:
     build:
       context: .
       dockerfile: TechnicalAnalysis.Infrastructure.Host/Dockerfile
-    volumes:
-      - /src/DcaTrader
+    user: root
 
   redis:
     image: redis

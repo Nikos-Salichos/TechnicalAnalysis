@@ -17,7 +17,6 @@ namespace TechnicalAnalysis.Application.Services
     {
         private readonly IMediator _mediator;
         private readonly ILogger<AnalysisService> _logger;
-
         public delegate IAdapter AdapterResolver(string key);
 
         public AnalysisService(ILogger<AnalysisService> logger, IMediator mediator)
@@ -104,7 +103,7 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var indicator in indicatorReports)
             {
-                const string baseDirectory = "/src/DcaTrader";  // This path is accessible within the container
+                const string baseDirectory = "/app/BacktestData";  // This path is accessible within the container
 
                 var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
