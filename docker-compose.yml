@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: TechnicalAnalysis.Infrastructure.Host/Dockerfile
     volumes:
-      - app-data:/app/data  # Mount the shared volume
+      - /src/DcaTrader
 
   redis:
     image: redis

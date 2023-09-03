@@ -109,7 +109,7 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var indicator in indicatorReports)
             {
-                const string baseDirectory = "/app/data";  // This path is within the Docker container
+                const string baseDirectory = "/src/DcaTrader";  // This path is accessible within the container
 
                 var outputPair = pairs.FirstOrDefault()?.ToOutputContract();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
