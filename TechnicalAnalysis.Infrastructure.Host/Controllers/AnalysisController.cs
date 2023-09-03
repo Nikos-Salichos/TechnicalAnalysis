@@ -19,9 +19,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("SynchronizeProviders")]
-        public async Task<IActionResult> SynchronizeProvidersAsync()
+        public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider)
         {
-            await _syncService.SynchronizeProvidersAsync();
+            await _syncService.SynchronizeProvidersAsync(provider);
             return Ok();
         }
 

@@ -16,23 +16,42 @@ namespace TechnicalAnalysis.Application.Services
             _adapterFactory = adapterFactory;
         }
 
-        public async Task SynchronizeProvidersAsync()
+        public async Task SynchronizeProvidersAsync(Provider provider)
         {
-            var wallStreetZenAdapter = _adapterFactory(Provider.WallStreetZen);
-            //await wallStreetZenAdapter.Sync(Provider.WallStreetZen);
+            _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
 
-            _logger.LogInformation("Synchronization started for {Alpaca}, {Binance}, {Uniswap}, {Pancakeswap}",
-                nameof(Provider.Alpaca), nameof(Provider.Binance), nameof(Provider.Uniswap), nameof(Provider.Pancakeswap));
+            var adaptersToSync = new List<Task>();
 
-            var binanceAdapter = _adapterFactory(Provider.Binance);
-            var alpacaAdapter = _adapterFactory(Provider.Alpaca);
-            var uniswapAdapter = _adapterFactory(Provider.Uniswap);
-            var pancakeswapAdapter = _adapterFactory(Provider.Pancakeswap);
+            if (provider == Provider.Binance || provider == Provider.All)
+            {
+                adaptersToSync.Add(GetAndSyncAdapter(Provider.Binance));
+            }
 
-            await Task.WhenAll(alpacaAdapter.Sync(Provider.Alpaca),
-                   binanceAdapter.Sync(Provider.Binance),
-                 uniswapAdapter.Sync(Provider.Uniswap),
-                 pancakeswapAdapter.Sync(Provider.Pancakeswap));
+            if (provider == Provider.Alpaca || provider == Provider.All)
+            {
+                adaptersToSync.Add(GetAndSyncAdapter(Provider.Alpaca));
+            }
+
+            if (provider == Provider.Uniswap || provider == Provider.All)
+            {
+                adaptersToSync.Add(GetAndSyncAdapter(Provider.Uniswap));
+            }
+
+            if (provider == Provider.Pancakeswap || provider == Provider.All)
+            {
+                adaptersToSync.Add(GetAndSyncAdapter(Provider.Pancakeswap));
+            }
+
+            if (adaptersToSync.Count > 0)
+            {
+                await Task.WhenAll(adaptersToSync);
+            }
+        }
+
+        private Task GetAndSyncAdapter(Provider provider)
+        {
+            var adapter = _adapterFactory(provider);
+            return adapter.Sync(provider);
         }
     }
 }

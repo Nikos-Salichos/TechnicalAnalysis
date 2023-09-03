@@ -28,7 +28,7 @@ namespace TechnicalAnalysis.Application.Services
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(Provider provider)
         {
-            var pairs = (await FormatCexAssetsPairsCandlesticks()).ToList();
+            var pairs = (await FormatAssetsPairsCandlesticks()).ToList();
 
             pairs = provider switch
             {
@@ -77,22 +77,17 @@ namespace TechnicalAnalysis.Application.Services
 
         public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName)
         {
-            List<PairExtended> pairs = (await FormatCexAssetsPairsCandlesticks()).ToList();
-
-            //TODO NA FTIAKSW TIN LOGIKI TO EPOMENO SIGNAL NA EINAI SE XAMILOTERI TIMI APO TO PROIGOUMENO ALLIWS IGNORE -> BUY STRATEGY
+            var pairs = await FormatAssetsPairsCandlesticks();
             var selectedPairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
             CalculateIndicators(selectedPairs);
 
-            pairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-            var positionsCloseOneByOne = pairs.AverageDownStrategyCloseOneByOne();
-            var positionsCloseAll = pairs.AverageDownStrategyCloseAll();
+            var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOne();
+            var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAll();
 
             //Indicator enhancedScan = CalculateStrongSignal(positionsCloseOneByOne);
             List<Indicator> indicatorReports = new();
 
-            foreach (var pair in pairs)
+            foreach (var pair in selectedPairs)
             {
                 pair.Candlesticks = pair.Candlesticks.OrderBy(c => c.OpenDate).ToList();
 
@@ -111,14 +106,14 @@ namespace TechnicalAnalysis.Application.Services
             {
                 const string baseDirectory = "/src/DcaTrader";  // This path is accessible within the container
 
-                var outputPair = pairs.FirstOrDefault()?.ToOutputContract();
+                var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
                 await JsonHelper.SerializeToJson(outputPair, candlestickFileName);
                 string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-signals.json");
                 await JsonHelper.SerializeToJsonArray(indicator, signalFileName);
             }
 
-            return pairs;
+            return selectedPairs;
         }
 
         private static Indicator CalculateStrongSignal(List<Position> positionsCloseOneByOne)
@@ -489,12 +484,6 @@ namespace TechnicalAnalysis.Application.Services
             BasicIndicatorExtension.Logger = _logger;
             AdvancedIndicatorExtension.Logger = _logger;
 
-            /*            foreach (var pair in pairs)
-                        {
-                            pair.CalculateBasicIndicators();
-                            pair.CalculateSignalIndicators();
-                        }*/
-
             ParallelOptions options = new ParallelOptions
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount / 4
@@ -503,25 +492,10 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, options, pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, options, pair => pair.CalculateSignalIndicators());
 
-            /*            // Create a dataflow block for basic indicators calculation
-                        var basicIndicatorsBlock = new ActionBlock<PairExtended>(
-                            pair => pair.CalculateBasicIndicators(),
-                            new ExecutionDataflowBlockOptions
-                            {
-                                MaxDegreeOfParallelism = 4
-                            });
-
-                        foreach (var pair in pairs)
-                        {
-                            await basicIndicatorsBlock.SendAsync(pair);
-                        }
-                        basicIndicatorsBlock.Complete();
-                        await basicIndicatorsBlock.Completion;*/
-
             return pairs;
         }
 
-        private async Task<IEnumerable<PairExtended>> FormatCexAssetsPairsCandlesticks()
+        private async Task<IEnumerable<PairExtended>> FormatAssetsPairsCandlesticks()
         {
             var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
             var fetchedPairsTask = _mediator.Send(new GetPairsQuery());
