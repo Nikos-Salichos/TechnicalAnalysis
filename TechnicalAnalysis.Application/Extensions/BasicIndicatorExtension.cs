@@ -238,8 +238,9 @@ namespace TechnicalAnalysis.Application.Extensions
                                 Overbought = 70,
                                 Oversold = 30,
                                 Value = rsiResult.Rsi,
-                                NumberOfRsiLowerThanOtherRsis = numberOfRsiLower
+                                NumberOfRsiLowerThanPreviousRsis = numberOfRsiLower
                             });
+                            break;
                         }
                     }
                 }

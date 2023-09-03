@@ -103,7 +103,7 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var indicator in indicatorReports)
             {
-                const string baseDirectory = "/app/BacktestData";  // This path is accessible within the container
+                const string baseDirectory = "/app/BacktestData";  //todo set it in appsettings the path, this path is accessible within the container
 
                 var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
@@ -111,6 +111,17 @@ namespace TechnicalAnalysis.Application.Services
                 string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-signals.json");
                 await JsonHelper.SerializeToJsonArray(indicator, signalFileName);
             }
+
+            selectedPairs = selectedPairs.OrderByDescending(pair => pair.CreatedAt)
+                .Select(pair =>
+                {
+                    pair.Candlesticks = pair.Candlesticks
+                                        .OrderByDescending(c => c.CloseDate)
+                                        .GroupBy(c => c.PoolOrPairId)
+                                        .SelectMany(c => c.OrderByDescending(x => x.CloseDate).Take(1))
+                                        .ToList();
+                    return pair;
+                }).ToList();
 
             return selectedPairs;
         }
