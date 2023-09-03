@@ -218,30 +218,32 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 var rsiResult = rsiResults[i];
 
-                if (candlestickLookup.TryGetValue(rsiResult.Date, out var candlestick))
+                if (!candlestickLookup.TryGetValue(rsiResult.Date, out var candlestick))
                 {
-                    int numberOfRsiLower = 0;
+                    continue;
+                }
 
-                    for (int j = i - 1; j >= 0; j--)
+                int numberOfRsiLower = 0;
+
+                for (int j = i - 1; j >= 0; j--)
+                {
+                    var pastRsiResult = rsiResults[j];
+
+                    if (rsiResult.Rsi < pastRsiResult.Rsi)
                     {
-                        var pastRsiResult = rsiResults[j];
-
-                        if (rsiResult.Rsi < pastRsiResult.Rsi)
+                        numberOfRsiLower++;
+                    }
+                    else
+                    {
+                        candlestick.Rsis.Add(new Rsi(candlestick.PrimaryId)
                         {
-                            numberOfRsiLower++;
-                        }
-                        else
-                        {
-                            candlestick.Rsis.Add(new Rsi(candlestick.PrimaryId)
-                            {
-                                Period = 14,
-                                Overbought = 70,
-                                Oversold = 30,
-                                Value = rsiResult.Rsi,
-                                NumberOfRsiLowerThanPreviousRsis = numberOfRsiLower
-                            });
-                            break;
-                        }
+                            Period = 14,
+                            Overbought = 70,
+                            Oversold = 30,
+                            Value = rsiResult.Rsi,
+                            NumberOfRsiLowerThanPreviousRsis = numberOfRsiLower
+                        });
+                        break;
                     }
                 }
             }
