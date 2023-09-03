@@ -24,7 +24,7 @@ I've incorporated Swagger to facilitate easy testing of endpoints, ensuring a us
 ### Startup Configuration
 To set up the project, you'll need to populate the `appsettings.json` file with your specific configuration details.
 
-
+### Architecture, technologies & tools
 I have follow the principals of Clean Architecture with some personal changes.
 Architecture Diagram: https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723
 
