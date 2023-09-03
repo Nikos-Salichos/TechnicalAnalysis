@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+  infrastructurehost:
+    image: ${DOCKER_REGISTRY-}infrastructurehost
+    build:
+      context: .
+      dockerfile: TechnicalAnalysis.Infrastructure.Host/Dockerfile
+    volumes:
+      - app-data:/app/data  # Mount the shared volume
+
+  redis:
+    image: redis
+    container_name: technical-analysis-redis
+    restart: always
+    ports:
+     - "6379:6379"
+    environment:
+     - ALLOW_EMPTY_PASSWORD=yes
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: technical-analysis-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  postgresql:
+    image: postgres:latest
+    container_name: technical-analysis-postgresql
+    restart: always
+    ports:
+     - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "admin"
+      ACCEPT_EULA: "Y"
+    volumes: 
+       - ./postgres-data:/var/lib/postgresql/data
+       # copy the sql script to create tables
+       - ../TechnicalAnalysis/createTables.sql:/docker-entrypoint-initdb.d/createTables.sql
+
+  seq:
+    container_name: technical-analysis-seq
+    image: datalust/seq:latest
+    ports:
+      - 5341:80
+    environment:
+      - ACCEPT_EULA=Y 
+
+volumes:
+  app-data:  # Define the shared volume

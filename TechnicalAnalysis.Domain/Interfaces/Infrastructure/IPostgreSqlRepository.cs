@@ -1,0 +1,25 @@
+﻿using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.Domain.Entities;
+using TechnicalAnalysis.Domain.Interfaces.Utilities;
+
+namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
+{
+    public interface IPostgreSqlRepository
+    {
+        Task<IResult<IEnumerable<Exchange>, string>> GetExchanges();
+        Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticks();
+        Task<IResult<IEnumerable<Pair>, string>> GetPairs();
+        Task<IResult<IEnumerable<Asset>, string>> GetAssets();
+        Task<IResult<IEnumerable<Pool>, string>> GetPools();
+        Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlesticks();
+        Task InsertPairs(IEnumerable<Pair> pairs);
+        Task InsertCandlesticks(IEnumerable<Candlestick> candlesticks);
+        Task InsertAssets(IEnumerable<Asset> assets);
+        Task UpdateProvider(Exchange provider);
+        Task InsertPools(IEnumerable<Pool> pools);
+        Task InsertCandlesticks(IEnumerable<DexCandlestick> candlesticks);
+        Task DeletePoolsByIds(IEnumerable<long> ids);
+        Task DeleteDexCandlesticksByIds(IEnumerable<long> ids);
+        Task DeleteTokensByIds(IEnumerable<long> ids);
+    }
+}

@@ -1,0 +1,278 @@
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
+using TechnicalAnalysis.Application.Extensions;
+using TechnicalAnalysis.Application.Mappers;
+using TechnicalAnalysis.Application.Mediatr.Commands;
+using TechnicalAnalysis.Application.Mediatr.Queries;
+using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
+using TechnicalAnalysis.Domain.Builders;
+using TechnicalAnalysis.Domain.Contracts.Input.DexV3;
+using TechnicalAnalysis.Domain.Extensions;
+using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
+using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
+
+namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
+{
+    public class DexV3Adapter : IAdapter
+    {
+        private readonly IDexV3HttpClient _dexV3HttpClient;
+        private readonly ILogger<DexV3Adapter> _logger;
+        private readonly IMediator _mediator;
+
+        public DexV3Adapter(IDexV3HttpClient dexV3HttpClient, ILogger<DexV3Adapter> logger,
+             IMediator mediator)
+        {
+            _dexV3HttpClient = dexV3HttpClient;
+            _logger = logger;
+            _mediator = mediator;
+        }
+
+        public async Task Sync(Provider provider)
+        {
+            var exchanges = await _mediator.Send(new GetExchangesQuery());
+            var dexV3Provider = exchanges.FirstOrDefault(p => p.Code == (int)provider);
+
+            if (dexV3Provider == null)
+            {
+                _logger.LogInformation("Provider could not be found", provider);
+                return;
+            }
+
+            if (dexV3Provider?.LastAssetSync.Date == DateTime.UtcNow.Date
+                && dexV3Provider?.LastPairSync.Date == DateTime.UtcNow.Date
+                && dexV3Provider?.LastCandlestickSync.Date == DateTime.UtcNow.Date)
+            {
+                _logger.LogInformation("Provider synchronized for today", provider);
+                return;
+            }
+
+            var pairs = await FormatDexAssetsPoolsCandlesticks(provider);
+            var candlestickIds = pairs.SelectMany(p => p.Candlesticks.Select(c => c.PrimaryId)).ToList();
+            var poolIds = pairs.Select(p => p.PrimaryId).ToList();
+
+            await Task.WhenAll(_mediator.Send(new DeleteDexCandlesticksCommand(candlestickIds)),
+              _mediator.Send(new DeletePoolsCommand(poolIds)));
+
+            DexV3ApiResponse apiResponse = await _dexV3HttpClient.GetMostActivePools(100, 1000, provider);
+
+            if (apiResponse.PoolResponse.Pools.Count == 0)
+            {
+                return;
+            }
+
+            var poolsWithStables = FilterPoolsBasedOnStable(apiResponse.PoolResponse);
+
+            await SaveTokens(poolsWithStables);
+            dexV3Provider.LastAssetSync = DateTime.UtcNow;
+
+            await SavePools(poolsWithStables, provider);
+            dexV3Provider.LastPairSync = DateTime.UtcNow;
+
+            await SaveCandlesticks(apiResponse.PoolResponse, provider);
+            dexV3Provider.LastCandlestickSync = DateTime.UtcNow;
+
+            await _mediator.Send(new UpdateExchangeCommand(dexV3Provider));
+
+            //var poolsOrderByTotalValueLocked = pools.Where(p => p.TotalValueLocked > 0).GetTop100PoolsByOrdering(p => p.TotalValueLocked);
+            //var poolsOrderByLiquidity = pools.Where(p => p.Liquidity > 0).GetTop100PoolsByOrdering(p => p.Liquidity);
+            //var poolsOrderByVolume = pools.Where(p => p.Volume > 0).GetTop100PoolsByOrdering(p => p.Volume);
+            //var poolsOrderByVolumeToTvlRatio = pools.Where(p => p.VolumeToTVLRatio > 0).GetTop100PoolsByOrdering(p => p.VolumeToTVLRatio);
+            //var poolsOrderByLiquidityToTvlRatio = pools.Where(p => p.LiquidityToTVLRatio > 0).GetTop100PoolsByOrdering(p => p.LiquidityToTVLRatio);
+            //var poolsOrderByTxCount = pools.Where(p => p.TxCount > 0).GetTop100PoolsByOrdering(p => p.TxCount, false);
+            //var poolsOrderByFees = pools.Where(p => p.Fees > 0).GetTop100PoolsByOrdering(p => p.Fees, false);
+
+            //Top Pools based on Max Volume of Pool Data
+            //var poolsOrderByMaxVolumeInPoolData = pools.Where(p => p.ConsecutiveHigherTvlPoolData > 0 && p.Liquidity > 0).GetTop100PoolsByOrdering(p => p.ConsecutiveHigherTvlPoolData, false);
+        }
+
+        private async Task<IEnumerable<PairExtended>> FormatDexAssetsPoolsCandlesticks(Provider provider)
+        {
+            var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
+            var fetchedPoolsTask = _mediator.Send(new GetPoolsQuery());
+            var fetchedCandlesticksTask = _mediator.Send(new GetDexCandlesticksQuery());
+
+            await Task.WhenAll(fetchedAssetsTask, fetchedPoolsTask, fetchedCandlesticksTask);
+
+            var assetsResult = await fetchedAssetsTask;
+            var poolsResult = await fetchedPoolsTask;
+            var candlesticksResult = await fetchedCandlesticksTask;
+
+            var pairs = poolsResult.Where(p => p.Provider == provider).PoolToDomain();
+            var candlesticks = candlesticksResult.DexCandlestickToDomain();
+            pairs.MapPairsToAssets(assetsResult);
+            pairs.MapPairsToCandlesticks(candlesticks);
+
+            return pairs;
+        }
+
+        private async Task SaveTokens(IEnumerable<Pool> pools)
+        {
+            var fetchedTokensResult = await _mediator.Send(new GetAssetsQuery());
+
+            HashSet<string> existingSymbols = new HashSet<string>(fetchedTokensResult.Select(t => t.Symbol));
+            List<Asset> newAssets = new List<Asset>();
+
+            foreach (var pool in pools)
+            {
+                if (!existingSymbols.Contains(pool.Token0.Symbol))
+                {
+                    existingSymbols.Add(pool.Token0.Symbol);
+                    newAssets.Add(new Asset { Symbol = pool.Token0.Symbol });
+                }
+
+                if (!existingSymbols.Contains(pool.Token1.Symbol))
+                {
+                    existingSymbols.Add(pool.Token1.Symbol);
+                    newAssets.Add(new Asset { Symbol = pool.Token1.Symbol });
+                }
+            }
+
+            if (newAssets.Count > 0)
+            {
+                await _mediator.Send(new InsertAssetsCommand(newAssets));
+            }
+        }
+
+        private static IEnumerable<Pool> FilterPoolsBasedOnStable(PoolResponse poolResponse)
+        {
+            return poolResponse.Pools.Where(p =>
+                p.Token0.Symbol == Constants.Usdt ||
+                p.Token0.Symbol == Constants.Usdc ||
+                p.Token0.Symbol == Constants.Busd ||
+                p.Token0.Symbol == Constants.Dai ||
+                p.Token1.Symbol == Constants.Usdt ||
+                p.Token1.Symbol == Constants.Usdc ||
+                p.Token1.Symbol == Constants.Busd ||
+                p.Token1.Symbol == Constants.Dai
+            );
+        }
+
+        private async Task SavePools(IEnumerable<Pool> pools, Provider provider)
+        {
+            List<PairExtended> newPairs = new();
+
+            var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
+            var fetchedPoolsTask = _mediator.Send(new GetPoolsQuery());
+
+            await Task.WhenAll(fetchedAssetsTask, fetchedPoolsTask);
+
+            var tokens = await fetchedAssetsTask;
+            var pairs = (await fetchedPoolsTask).PoolToDomain().Where(d => d.Provider == provider);
+
+            foreach (var pair in pools.ToDomain())
+            {
+                pair.Provider = provider;
+
+                var token0Id = tokens.FirstOrDefault(p => p.Symbol == pair.BaseAssetName);
+                var token1Id = tokens.FirstOrDefault(p => p.Symbol == pair.QuoteAssetName);
+
+                if (token0Id != null)
+                {
+                    pair.BaseAssetId = token0Id.PrimaryId;
+                }
+
+                if (token1Id != null)
+                {
+                    pair.QuoteAssetId = token1Id.PrimaryId;
+                }
+
+                pair.Symbol = pair.BaseAssetName + "-" + pair.QuoteAssetName;
+
+                if (pair.BaseAssetId != 0 && pair.QuoteAssetId != 0)
+                {
+                    pair.IsActive = true;
+                    newPairs.Add(pair);
+                }
+            }
+
+            var pairsHashSet = new HashSet<(string poolContractAddress, Provider Provider)>(pairs.Select(p => (p.ContractAddress, p.Provider)));
+            List<PairExtended> uniquePairs = newPairs.Where(np => !pairsHashSet.Contains((np.ContractAddress, np.Provider))).ToList();
+
+            await _mediator.Send(new InsertPoolsCommand(uniquePairs.DexToEntityPool()));
+        }
+
+        private async Task SaveCandlesticks(PoolResponse poolResponse, Provider provider)
+        {
+            var fetchedPoolsTask = await _mediator.Send(new GetPoolsQuery());
+
+            var pools = fetchedPoolsTask.Where(p => p.Provider == provider);
+
+            List<CandlestickExtended> newCandlesticks = new();
+            foreach (var pool in poolResponse.Pools)
+            {
+                var fetchedPoolFound = pools.FirstOrDefault(x => string.Equals(x.PoolContract, pool.PoolId));
+
+                if (fetchedPoolFound == null)
+                {
+                    continue;
+                }
+
+                var firstTokenIsStable = false;
+
+                if (pool.Token0.Symbol == Constants.Usdt ||
+                    pool.Token0.Symbol == Constants.Usdc ||
+                    pool.Token0.Symbol == Constants.Busd ||
+                    pool.Token0.Symbol == Constants.Dai)
+                {
+                    foreach (var tokenDayData in pool.Token1.TokenDayData)
+                    {
+                        var candlestickBuilder = new CandlestickBuilder();
+
+                        var openDate = DateTimeOffset.FromUnixTimeSeconds(tokenDayData.Date).UtcDateTime.Date;
+                        var closeDate = openDate.Date.Add(new TimeSpan(23, 59, 59));
+
+                        var candlestick = candlestickBuilder.WithPoolOrPairId(fetchedPoolFound.PrimaryId)
+                                  .WithPoolOrPairName(pool.PoolId)
+                                  .WithOpenPrice(tokenDayData?.Open?.ReduceDigitsToFitDecimalLength())
+                                  .WithHighPrice(tokenDayData?.High?.ReduceDigitsToFitDecimalLength())
+                                  .WithLowPrice(tokenDayData?.Low?.ReduceDigitsToFitDecimalLength())
+                                  .WithClosePrice(tokenDayData?.Close?.ReduceDigitsToFitDecimalLength())
+                                  .WithOpenDate(openDate)
+                                  .WithCloseDate(closeDate)
+                                  .WithTimeframe(Timeframe.Daily)
+                                  .Build();
+
+                        newCandlesticks.Add(candlestick);
+                    }
+                    firstTokenIsStable = true;
+                }
+
+                if (firstTokenIsStable)
+                {
+                    continue;
+                }
+
+                if (pool.Token1.Symbol == Constants.Usdt ||
+                    pool.Token1.Symbol == Constants.Usdc ||
+                    pool.Token1.Symbol == Constants.Busd ||
+                    pool.Token1.Symbol == Constants.Dai)
+                {
+                    foreach (var tokenDayData in pool.Token0.TokenDayData)
+                    {
+                        var candlestickBuilder = new CandlestickBuilder();
+
+                        var openDate = DateTimeOffset.FromUnixTimeSeconds(tokenDayData.Date).UtcDateTime.Date;
+                        var closeDate = openDate.Date.Add(new TimeSpan(23, 59, 59));
+
+                        var candlestick = candlestickBuilder.WithPoolOrPairId(fetchedPoolFound.PrimaryId)
+                                  .WithPoolOrPairName(pool.PoolId)
+                                  .WithOpenPrice(tokenDayData?.Open?.ReduceDigitsToFitDecimalLength())
+                                  .WithHighPrice(tokenDayData?.High?.ReduceDigitsToFitDecimalLength())
+                                  .WithLowPrice(tokenDayData?.Low?.ReduceDigitsToFitDecimalLength())
+                                  .WithClosePrice(tokenDayData?.Close?.ReduceDigitsToFitDecimalLength())
+                                  .WithOpenDate(openDate)
+                                  .WithCloseDate(closeDate)
+                                  .WithTimeframe(Timeframe.Daily)
+                                  .Build();
+
+                        newCandlesticks.Add(candlestick);
+                    }
+                }
+            }
+
+            await _mediator.Send(new InsertDexCandlesticksCommand(newCandlesticks.DexToEntityCandlestick()));
+        }
+
+    }
+}

@@ -1,0 +1,12 @@
+You can generate this file by completing the following steps:
+
+1)Run cmd as admin
+
+2)cd C:\Program Files\PostgreSQL\15\bin
+
+These commands back up object definitions + data
+3) pg_dump -U postgres -h localhost -p 5432 TechnicalAnalysis > C:\Users\Nikos\source\repos\TechnicalAnalysis\createTables.sql
+
+
+This command can be used to back up schema only:
+pg_dump -U postgres -h localhost -p 5432 --schema-only TechnicalAnalysis > C:\Users\Nikos\source\repos\TechnicalAnalysis\createTables_schemaonly.sql

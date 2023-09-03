@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>1950bd76-2da9-4a60-a634-3409e1577845</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
+		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+		<PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TechnicalAnalysis.Application\TechnicalAnalysis.Application.csproj" />
+		<ProjectReference Include="..\TechnicalAnalysis.Infrastructure.Adapters\TechnicalAnalysis.Infrastructure.Adapters.csproj" />
+		<ProjectReference Include="..\TechnicalAnalysis.Persistence\TechnicalAnalysis.Infrastructure.Persistence.csproj" />
+	</ItemGroup>
+
+</Project>
