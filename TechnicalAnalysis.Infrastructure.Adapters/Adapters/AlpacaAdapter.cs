@@ -34,7 +34,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (alpacaProvider == null)
             {
-                _logger.LogInformation("Provider could not be found", provider);
+                _logger.LogWarning("Method {Method}: {Provider} could not be found", nameof(Sync), provider);
                 return;
             }
 
@@ -200,6 +200,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     var stockData = await _alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
                     if (stockData.IsError)
                     {
+                        _logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(SyncCandlesticks), stockData.IsError);
                         continue;
                     }
                     mergedItems.AddRange(stockData.SuccessValue.Items.Select(kvp => new KeyValuePair<string, List<IBar>>(kvp.Key, kvp.Value.ToList())));

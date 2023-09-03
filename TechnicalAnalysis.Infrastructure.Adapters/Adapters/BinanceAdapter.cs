@@ -211,6 +211,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                         if (response.IsError)
                         {
+                            _logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(SyncCandlesticks), response.IsError);
                             return;
                         }
 

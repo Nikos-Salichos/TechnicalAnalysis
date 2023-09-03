@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Polly.Retry;
 using Polly.Timeout;
-using System.Reflection;
 using System.Text.Json;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 using TechnicalAnalysis.Domain.Interfaces;
@@ -47,7 +46,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                _logger.LogError("{Method}: {httpResponseMessage.StatusCode}", MethodBase.GetCurrentMethod()?.Name, httpResponseMessage.StatusCode);
+                _logger.LogError("Method: {Method} {httpResponseMessage.StatusCode}", nameof(GetBinanceAssetsAndPairs), httpResponseMessage.StatusCode);
                 return Result<BinanceExchangeInfoResponse, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
@@ -59,11 +58,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
                 }
-                return Result<BinanceExchangeInfoResponse, string>.Fail($"{MethodBase.GetCurrentMethod()?.Name} Deserialization Failed");
+
+                _logger.LogWarning("Method: {Method} Deserialization Failed", nameof(GetBinanceAssetsAndPairs));
+                return Result<BinanceExchangeInfoResponse, string>.Fail($"{nameof(GetBinanceAssetsAndPairs)} Deserialization Failed");
             }
             catch (Exception exception)
             {
-                _logger.LogError("{Method}: {exception}", MethodBase.GetCurrentMethod()?.Name, exception);
+                _logger.LogError("Method: {Method} {exception}", nameof(GetBinanceAssetsAndPairs), exception);
                 return Result<BinanceExchangeInfoResponse, string>.Fail(exception.ToString());
             }
         }
@@ -89,7 +90,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                _logger.LogError("{Method}: {httpResponseMessage.StatusCode}", MethodBase.GetCurrentMethod()?.Name, httpResponseMessage.StatusCode);
+                _logger.LogWarning("Method: {Method}: {httpResponseMessage.StatusCode}", nameof(GetBinanceCandlesticks), httpResponseMessage.StatusCode);
                 return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
             }
 
@@ -101,11 +102,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     return Result<object[][], string>.Success(deserializedData);
                 }
-                return Result<object[][], string>.Fail($"{MethodBase.GetCurrentMethod()?.Name} Deserialization Failed");
+                _logger.LogWarning("Method: {Method} {Deserialization Failed}", nameof(GetBinanceCandlesticks));
+                return Result<object[][], string>.Fail($"{nameof(GetBinanceCandlesticks)} Deserialization Failed");
             }
             catch (Exception exception)
             {
-                _logger.LogError("{Method}: {exception}", MethodBase.GetCurrentMethod()?.Name, exception);
+                _logger.LogWarning("Method: {Method} {exception}", nameof(GetBinanceCandlesticks), exception);
                 return Result<object[][], string>.Fail(exception.ToString());
             }
         }

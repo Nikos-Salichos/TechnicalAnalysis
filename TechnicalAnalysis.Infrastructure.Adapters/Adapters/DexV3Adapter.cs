@@ -54,14 +54,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await Task.WhenAll(_mediator.Send(new DeleteDexCandlesticksCommand(candlestickIds)),
               _mediator.Send(new DeletePoolsCommand(poolIds)));
 
-            DexV3ApiResponse apiResponse = await _dexV3HttpClient.GetMostActivePools(100, 1000, provider);
+            var apiResponse = await _dexV3HttpClient.GetMostActivePoolsAsync(100, 1000, provider);
 
-            if (apiResponse.PoolResponse.Pools.Count == 0)
+            if (apiResponse.IsError)
             {
+                _logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(Sync), apiResponse.IsError);
                 return;
             }
 
-            var poolsWithStables = FilterPoolsBasedOnStable(apiResponse.PoolResponse);
+            var poolsWithStables = FilterPoolsBasedOnStable(apiResponse.SuccessValue.PoolResponse);
 
             await SaveTokens(poolsWithStables);
             dexV3Provider.LastAssetSync = DateTime.UtcNow;
@@ -69,7 +70,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await SavePools(poolsWithStables, provider);
             dexV3Provider.LastPairSync = DateTime.UtcNow;
 
-            await SaveCandlesticks(apiResponse.PoolResponse, provider);
+            await SaveCandlesticks(apiResponse.SuccessValue.PoolResponse, provider);
             dexV3Provider.LastCandlestickSync = DateTime.UtcNow;
 
             await _mediator.Send(new UpdateExchangeCommand(dexV3Provider));

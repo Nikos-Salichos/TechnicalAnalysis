@@ -15,7 +15,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
     {
         private readonly IOptionsMonitor<AlpacaSetting> _alpacaSettings;
         private readonly ILogger<AlpacaHttpClient> _logger;
-
         private readonly AsyncRetryPolicy _retryPolicy;
         private readonly AsyncTimeoutPolicy _asyncTimeoutPolicy;
 
@@ -38,7 +37,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
             catch (Exception exception)
             {
-                _logger.LogCritical("{exception}", exception);
+                _logger.LogWarning("Method: {Method} {exception}", nameof(GetAlpacaData), exception);
                 return Result<IMultiPage<IBar>, string>.Fail(exception.ToString());
             }
         }
