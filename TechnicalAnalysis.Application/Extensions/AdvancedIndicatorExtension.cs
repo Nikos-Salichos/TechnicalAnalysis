@@ -480,6 +480,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateResistanceBreakout(PairExtended pair)
         {
+            const int initialInvestment = 1000;
             for (int i = 0; i < pair?.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
@@ -501,7 +502,7 @@ namespace TechnicalAnalysis.Application.Extensions
                             OrderOfSignal = 1,
                             IsBuy = true,
                             FlagPoleCandlestickId = candlestickFlagPole?.PrimaryId,
-                            PurchaseAmount = 1000 / candlestick.ClosePrice //Assume 1000 dollar initial investment
+                            PurchaseAmount = initialInvestment / candlestick.ClosePrice
                         });
                     }
                 }
