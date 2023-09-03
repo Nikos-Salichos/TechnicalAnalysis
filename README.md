@@ -39,10 +39,9 @@ Technologies & Tools:
 - Multiple nugets(HttpClient,  Serilog, Polly, Fluent Validation, MailKit, HtmlAgilityPack, Moq, Xunit, .NetArchTest.Rules, TestContainers)
 
 
-Roadmap:
+### Roadmap:
 - Develop client endpoints
 - Endpoint that consumer can pass the candlestick data and we will produce indicators on this data
-- Script to create table  in docker composer and in new project with DbUp
-Add integration tests:
-  -Test containers: https://dotnet.testcontainers.org/
-  -Wiremock: https://wiremock.org/
+- Implement WallStreetZen
+- Add tests using Wiremock: https://wiremock.org/
+- Export to Nuget (Client + Common models only)
