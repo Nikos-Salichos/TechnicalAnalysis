@@ -4,7 +4,7 @@
 My project's primary objective is to download financial data from various providers and apply technical indicators to analyze this data comprehensively.
 
 ### Design Highlights
-I have designed a versatile system that seamlessly connects with multiple cryptocurrency exchanges to obtain essential financial data. Here are some key exchange integrations and design details:
+I have designed a versatile system that seamlessly connects with multiple financial providers to obtain essential financial data. I have integrated with the following providers:
 
 - **Binance**: Utilizing the REST API for data retrieval.
 - **Alpaca**: Employing the C# SDK for Alpaca for streamlined integration.
