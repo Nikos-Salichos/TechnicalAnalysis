@@ -27,7 +27,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpGet("PaisIndicators")]
+        [HttpGet("PairsIndicators")]
         public async Task<IActionResult> GetPairsIndicators([FromQuery] Provider provider = Provider.All)
         {
             var pairs = await _analysisService.GetPairsIndicatorsAsync(provider);
