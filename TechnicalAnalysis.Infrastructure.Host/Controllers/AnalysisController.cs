@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
 
@@ -31,17 +30,15 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public async Task<IActionResult> GetPairsIndicators([FromQuery] Provider provider = Provider.All)
         {
             var pairs = await _analysisService.GetPairsIndicatorsAsync(provider);
-            var contractPairs = pairs.ToOutputContract();
-            return Ok(contractPairs);
+            return Ok(pairs);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("IndicatorsByPairName")]
         public async Task<IActionResult> GetIndicatorsByPairName([FromQuery] string pairName)
         {
-            var pairs = await _analysisService.GetIndicatorsByPairNamesAsync(pairName);
-            var contractPair = pairs.ToOutputContract();
-            return Ok(contractPair);
+            var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName);
+            return Ok(pair);
         }
     }
 }
