@@ -493,6 +493,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             BasicIndicatorExtension.Logger = _logger;
             AdvancedIndicatorExtension.Logger = _logger;
+            PairStatisticsExtension.Logger = _logger;
 
             ParallelOptions options = new ParallelOptions
             {
@@ -501,6 +502,8 @@ namespace TechnicalAnalysis.Application.Services
 
             Parallel.ForEach(pairs, options, pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, options, pair => pair.CalculateSignalIndicators());
+
+            pairs.CalculatePairStatistics();
 
             return pairs;
         }

@@ -1,5 +1,4 @@
-﻿using MathNet.Numerics.Statistics;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using OoplesFinance.StockIndicators;
 using OoplesFinance.StockIndicators.Enums;
 using OoplesFinance.StockIndicators.Models;
@@ -66,8 +65,6 @@ namespace TechnicalAnalysis.Application.Extensions
 
             CalculateVolatility(pair);
             CalculateAverageRange(pair);
-
-            //  CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(pair, pair);       
         }
 
         private static void CalculateBollingerBands(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
@@ -477,42 +474,6 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        public static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(List<PairExtended> pairs, PairExtended pair)
-        {
-            foreach (var correlatedPair in pairs)
-            {
-                if (correlatedPair.PrimaryId == pair.PrimaryId)
-                {
-                    continue;
-                }
-
-                var otherPairCandlesticks = correlatedPair.Candlesticks.OrderByDescending(c => c.CloseDate);
-                var otherPairandlestickClosePrices = otherPairCandlesticks.Select(c => c.ClosePrice);
-
-                var candlestickCloses = pair.Candlesticks.OrderByDescending(c => c.CloseDate).Select(c => c.ClosePrice);
-                int desiredLength = Math.Min(otherPairandlestickClosePrices.Count(), candlestickCloses.Count());
-
-                List<double> closeOfCandlesticksInDouble = candlestickCloses
-                    .Where(d => d.HasValue)
-                    .Select(d => (double)d.Value)
-                    .Take(desiredLength).ToList();
-
-                List<double> btcCloseCandlesticks = otherPairandlestickClosePrices
-                    .Where(d => d.HasValue)
-                    .Select(d => (double)d.Value)
-                    .Take(desiredLength).ToList();
-
-                for (int i = 0; i < closeOfCandlesticksInDouble.Count; i++)
-                {
-                    List<double> currentCandlestickSubset = closeOfCandlesticksInDouble.Take(i + 1).ToList();
-                    List<double> currentBtcCandlestickSubset = btcCloseCandlesticks.Take(i + 1).ToList();
-
-                    var correlation = Correlation.Pearson(currentBtcCandlestickSubset, currentCandlestickSubset);
-                    pair.Candlesticks?.ElementAtOrDefault(i)?.CorrelationPerPair.TryAdd(correlatedPair.BaseAssetName, correlation);
-                }
-            }
-        }
-
         private static void CalculateLowestLow(PairExtended pair)
         {
             const int period = 5;
@@ -543,7 +504,6 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
             }
         }
-
 
         private static void CalculateHighestHigh(PairExtended pair)
         {
