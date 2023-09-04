@@ -375,3 +375,4 @@ FodyWeavers.xsd
 /postgres-data
 /TechnicalAnalysis.Infrastructure.Host/BacktestData
 /TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json
+/TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json

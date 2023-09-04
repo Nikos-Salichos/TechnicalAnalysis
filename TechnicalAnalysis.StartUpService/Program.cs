@@ -6,7 +6,11 @@ using TechnicalAnalysis.Infrastructure.Persistence.Modules;
 using TechnicalAnalysis.StartUpService;
 
 IHost host = Host.CreateDefaultBuilder(args)
-    .UseSerilog(SerilogRegistration.SerilogConfiguration)
+     .ConfigureAppConfiguration((hostingContext, config) =>
+     {
+         var env = hostingContext.HostingEnvironment;
+         config.AddJsonFile("appsettings.prod.json", optional: true, reloadOnChange: true);
+     }).UseSerilog(SerilogRegistration.SerilogConfiguration)
     .ConfigureServices((hostContext, services) =>
     {
         services.AddSingleton(hostContext.Configuration);
