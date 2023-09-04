@@ -518,19 +518,17 @@ namespace TechnicalAnalysis.Application.Services
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask, fetchedPoolsTask, fetchedDexCandlesticksTask);
 
-            var assets = (await fetchedAssetsTask).ToList();
+            var assets = await fetchedAssetsTask;
             var pairs = (await fetchedPairsTask).Where(s => s.IsActive).ToList();
             var candlesticks = (await fetchedCandlesticksTask).ToList();
-            var pools = (await fetchedPoolsTask).PoolToDomain().Where(p => p.IsActive).ToList();
+            var pools = (await fetchedPoolsTask).PoolToDomain().Where(p => p.IsActive);
             var dexCandlesticks = (await fetchedDexCandlesticksTask).DexCandlestickToDomain();
+
+            pairs.AddRange(pools);
+            candlesticks.AddRange(dexCandlesticks);
 
             pairs.MapPairsToAssets(assets);
             pairs.MapPairsToCandlesticks(candlesticks);
-
-            pools.MapPairsToAssets(assets);
-            pools.MapPairsToCandlesticks(dexCandlesticks);
-
-            pairs.AddRange(pools);
 
             return pairs;
         }
