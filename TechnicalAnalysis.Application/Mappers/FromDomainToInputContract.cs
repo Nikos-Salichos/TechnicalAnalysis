@@ -25,7 +25,7 @@ namespace TechnicalAnalysis.Application.Mappers
             return pairs.Select(p => p.ToContract()).ToList();
         }
 
-        public static BinancePair ToContract(this PairExtended pair)
+        private static BinancePair ToContract(this PairExtended pair)
         {
             return new BinancePair
             {
@@ -41,7 +41,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
         }
 
-        public static BinanceAsset ToContract(this Asset asset)
+        private static BinanceAsset ToContract(this Asset asset)
         {
             return new BinanceAsset
             {

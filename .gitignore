@@ -374,3 +374,4 @@ FodyWeavers.xsd
 /TechnicalAnalysis.Infrastructure.Host/.Logslogs-20230828.txt
 /postgres-data
 /TechnicalAnalysis.Infrastructure.Host/BacktestData
+/TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json

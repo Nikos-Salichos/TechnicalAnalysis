@@ -102,7 +102,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
                 {
                     await smtp.ConnectAsync(_mailSettings.CurrentValue.Host, _mailSettings.CurrentValue.Port, SecureSocketOptions.StartTls, ct);
                 }
-                await smtp.AuthenticateAsync(_mailSettings.CurrentValue.UserName, _mailSettings.CurrentValue.Password, ct);
+                await smtp.AuthenticateAsync(_mailSettings.CurrentValue.EmailAddress, _mailSettings.CurrentValue.Password, ct);
                 await smtp.SendAsync(mail, ct);
                 await smtp.DisconnectAsync(true, ct);
 
