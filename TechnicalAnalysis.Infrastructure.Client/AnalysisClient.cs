@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using TechnicalAnalysis.CommonModels;
+using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.Infrastructure.Client
@@ -11,36 +12,63 @@ namespace TechnicalAnalysis.Infrastructure.Client
             PropertyNameCaseInsensitive = true
         };
 
-        public async Task<IEnumerable<PartialPair>> GetPairsIndicators(Provider provider = Provider.All)
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public AnalysisClient(IHttpClientFactory httpClientFactory)
         {
-            var client = new HttpClient();
-            client.BaseAddress = new Uri("https://your-api-base-url.com/");
-            var response = await client.GetAsync("api/v1/analysis/SynchronizeProviders");
+            _httpClientFactory = httpClientFactory;
+        }
+
+        public async Task SynchronizeAsync(Provider provider = Provider.All)
+        {
+            var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
+            var apiUrl = $"SynchronizeProviders?provider={provider}";
+            var response = await httpClient.GetAsync(apiUrl);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Failed to synchronize providers. Status code: {response.StatusCode}, Content: {content}");
+            }
+        }
+
+        public async Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(Provider provider = Provider.All)
+        {
+            var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
+            var apiUrl = $"PairsIndicators?provider={provider}";
+            var response = await httpClient.GetAsync(apiUrl);
+
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Providers Synchronize completed successfully.");
+                using var jsonStream = await response.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<IEnumerable<PartialPair>>(jsonStream, _jsonSerializerOptions)
+                    ?? Enumerable.Empty<PartialPair>();
             }
             else
             {
-                Console.WriteLine($"Failed to Synchronize providers. Status Code: {response.StatusCode}");
+                var content = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Failed to get pairs indicators. Status code: {response.StatusCode}, Content: {content}");
             }
-
-            using var jsonStream = await response.Content.ReadAsStreamAsync();
-            var pairs = await JsonSerializer.DeserializeAsync<IEnumerable<PartialPair>>(jsonStream, _jsonSerializerOptions);
-            pairs ??= Enumerable.Empty<PartialPair>();
-            return pairs;
         }
 
-        public Task Synchronize()
+        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairName(string pairName)
         {
-            throw new NotImplementedException();
-        }
+            var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
+            var apiUrl = $"IndicatorsByPairName?pairName={pairName}";
+            var response = await httpClient.GetAsync(apiUrl);
 
-        public Task GetIndicatorsByPairName(string pairName)
-        {
-            throw new NotImplementedException();
+            if (response.IsSuccessStatusCode)
+            {
+                using var jsonStream = await response.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<IEnumerable<PairExtended>>(jsonStream, _jsonSerializerOptions)
+                    ?? Enumerable.Empty<PairExtended>();
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Failed to calculate pair's indicators. Status code: {response.StatusCode}, Content: {content}");
+            }
         }
-
 
     }
 }
