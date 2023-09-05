@@ -21,7 +21,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("SynchronizeProviders")]
-        public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider)
+        public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider = Provider.All)
         {
             _logger.LogInformation("Method: {SynchronizeProvidersAsync} , request {request}", nameof(SynchronizeProvidersAsync), provider);
             await _syncService.SynchronizeProvidersAsync(provider);
@@ -30,18 +30,18 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("PairsIndicators")]
-        public async Task<IActionResult> GetPairsIndicators([FromQuery] Provider provider = Provider.All)
+        public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] Provider provider = Provider.All)
         {
-            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetPairsIndicators), provider);
+            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
             var pairs = await _analysisService.GetPairsIndicatorsAsync(provider);
             return Ok(pairs);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("IndicatorsByPairName")]
-        public async Task<IActionResult> GetIndicatorsByPairName([FromQuery] string pairName)
+        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName)
         {
-            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetIndicatorsByPairName), pairName);
+            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName);
             return Ok(pair);
         }
