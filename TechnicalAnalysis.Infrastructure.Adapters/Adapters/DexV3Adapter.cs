@@ -35,7 +35,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (dexV3Provider == null)
             {
-                _logger.LogInformation("Provider could not be found", provider);
+                _logger.LogWarning("Method {Method}: {Provider} could not be found", nameof(Sync), provider);
                 return;
             }
 
@@ -43,7 +43,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 && dexV3Provider?.LastPairSync.Date == DateTime.UtcNow.Date
                 && dexV3Provider?.LastCandlestickSync.Date == DateTime.UtcNow.Date)
             {
-                _logger.LogInformation("Provider synchronized for today", provider);
+                _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
             }
 

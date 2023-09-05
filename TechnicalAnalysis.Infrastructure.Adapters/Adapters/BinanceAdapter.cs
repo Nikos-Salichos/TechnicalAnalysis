@@ -35,7 +35,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binanceProvider == null)
             {
-                _logger.LogInformation("Provider could not be found", provider);
+                _logger.LogWarning("Method {Method}: {Provider} could not be found", nameof(Sync), provider);
                 return;
             }
 
@@ -43,7 +43,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             && binanceProvider?.LastPairSync.Date == DateTime.UtcNow.Date
             && binanceProvider?.LastCandlestickSync.Date == DateTime.UtcNow.Date)
             {
-                _logger.LogInformation("Provider synchronized for today", provider);
+                _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
             }
 

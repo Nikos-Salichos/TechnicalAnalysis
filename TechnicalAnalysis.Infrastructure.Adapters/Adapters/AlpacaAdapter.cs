@@ -69,7 +69,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             && alpacaProvider?.LastCandlestickSync.Date == DateTime.UtcNow.Date
             && allStockSymbolsExist)
             {
-                _logger.LogInformation("Provider synchronized for today", provider);
+                _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
             }
 
