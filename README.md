@@ -36,7 +36,7 @@ Technologies & Tools used:
 - Redis
 - Dapper
 - Structured logging with Seq
-- Multiple nugets(HttpClient,  Serilog, Polly, Fluent Validation, MailKit, HtmlAgilityPack, Moq, Xunit, .NetArchTest.Rules, TestContainers)
+- Multiple nugets(HttpClient,  Serilog, Polly, Fluent Validation, MailKit, HtmlAgilityPack, Moq, Xunit, .NetArchTest.Rules, TestContainers, Stock.Indicators, OoplesFinance.StockIndicators)
 
 
 ### How to start it
