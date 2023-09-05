@@ -10,17 +10,20 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
     {
         private readonly ISyncService _syncService;
         private readonly IAnalysisService _analysisService;
+        private readonly ILogger<AnalysisController> _logger;
 
-        public AnalysisController(ISyncService syncService, IAnalysisService analysisService)
+        public AnalysisController(ISyncService syncService, IAnalysisService analysisService, ILogger<AnalysisController> logger)
         {
             _syncService = syncService;
             _analysisService = analysisService;
+            _logger = logger;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("SynchronizeProviders")]
         public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider)
         {
+            _logger.LogInformation("Method: {SynchronizeProvidersAsync} , request {request}", nameof(SynchronizeProvidersAsync), provider);
             await _syncService.SynchronizeProvidersAsync(provider);
             return Ok();
         }
@@ -29,6 +32,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [HttpGet("PairsIndicators")]
         public async Task<IActionResult> GetPairsIndicators([FromQuery] Provider provider = Provider.All)
         {
+            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetPairsIndicators), provider);
             var pairs = await _analysisService.GetPairsIndicatorsAsync(provider);
             return Ok(pairs);
         }
@@ -37,6 +41,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [HttpGet("IndicatorsByPairName")]
         public async Task<IActionResult> GetIndicatorsByPairName([FromQuery] string pairName)
         {
+            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetIndicatorsByPairName), pairName);
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName);
             return Ok(pair);
         }
