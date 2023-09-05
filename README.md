@@ -15,7 +15,6 @@ I have designed a versatile system that seamlessly connects with multiple financ
 My project is built around two core services:
 
 1. **Sync Service**: This service is responsible for initiating data updates by communicating with the respective exchange providers. It effectively manages the synchronization of financial data.
-
 2. **Analysis Service**: The analysis service is the heart of the system, orchestrating the composition of data retrieved from the database. It then applies various technical indicators using extension methods to derive valuable insights.
 
 ### Testing and User-Friendly Interface
