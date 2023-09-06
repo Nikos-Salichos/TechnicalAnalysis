@@ -376,3 +376,4 @@ FodyWeavers.xsd
 /TechnicalAnalysis.Infrastructure.Host/BacktestData
 /TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json
 /TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json
+/TechnicalAnalysis.Infrastructure.Host/appsettings.local.json

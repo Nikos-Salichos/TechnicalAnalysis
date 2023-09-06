@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Helpers;
@@ -18,11 +19,13 @@ namespace TechnicalAnalysis.Application.Services
         private readonly IMediator _mediator;
         private readonly ILogger<AnalysisService> _logger;
         public delegate IAdapter AdapterResolver(string key);
+        private readonly IConfiguration _configuration;
 
-        public AnalysisService(ILogger<AnalysisService> logger, IMediator mediator)
+        public AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration)
         {
-            _mediator = mediator;
             _logger = logger;
+            _mediator = mediator;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(Provider provider)
@@ -78,6 +81,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var pairs = await FormatAssetsPairsCandlesticks();
             var selectedPairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+
             CalculateIndicators(selectedPairs);
 
             var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOne();
@@ -103,7 +107,12 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var indicator in indicatorReports)
             {
-                const string baseDirectory = "/app/BacktestData";  //todo set it in appsettings the path, this path is accessible within the container
+                var baseDirectory = _configuration.GetSection("OutputFolder:Path").Value;
+
+                if (string.IsNullOrWhiteSpace(baseDirectory))
+                {
+                    return Enumerable.Empty<PairExtended>();
+                }
 
                 var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");

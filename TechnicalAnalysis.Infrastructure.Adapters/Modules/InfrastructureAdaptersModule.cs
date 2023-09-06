@@ -49,7 +49,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
             var mailSettings = configuration.GetSection(nameof(MailSettings)).Get<MailSettings>();
 
-            services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMqCompose"));
+            services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMq"));
 
             services.AddSingleton<IMailer, Mailer>();
             services.AddSingleton<ICommunication, Communication>();
