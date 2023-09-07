@@ -87,7 +87,7 @@ namespace TechnicalAnalysis.Application.Services
             var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOne();
             var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAll();
 
-            //Indicator enhancedScan = CalculateStrongSignal(positionsCloseOneByOne);
+            Indicator enhancedScan = CalculateStrongSignal(positionsCloseOneByOne);
             List<Indicator> indicatorReports = new();
 
             foreach (var pair in selectedPairs)
@@ -102,7 +102,7 @@ namespace TechnicalAnalysis.Application.Services
                 Indicator stPatterns = CalculateStPatternSignals(pair);
                 Indicator closeBelowPivotSignal = CalculateCandlestickCloseBelowPivotPrice(pair);
 
-                indicatorReports.Add(fractalTrend);
+                indicatorReports.Add(enhancedScan);
             }
 
             foreach (var indicator in indicatorReports)
