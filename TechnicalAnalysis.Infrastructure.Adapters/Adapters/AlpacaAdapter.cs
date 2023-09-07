@@ -44,7 +44,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 "MA","BAC","MS","WCF","SCHW","RY","MSFT","NVDA","CRM","ABDE","VZ","IBM","EWH","MCHI","EWS",
                 "FEZ","IWM","SPY","DIA","DAX","VGK","QQQ",
                 "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","xom","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
-                "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo"
+                "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA"
             };
 
             stockSymbols = stockSymbols.Distinct().ToList();
@@ -117,6 +117,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             foreach (var stockSymbol in stockSymbols)
             {
                 var baseAsset = assets.Find(a => string.Equals(a.Symbol, stockSymbol, StringComparison.OrdinalIgnoreCase));
+
+                if (baseAsset is null)
+                {
+                    return;
+                }
+
                 var pairExists = pairs.Find(fp => fp.BaseAssetId == baseAsset?.PrimaryId);
 
                 if (pairExists is null)
