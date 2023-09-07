@@ -246,6 +246,9 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             double? previousRsiValue = null;
+            long consecutiveLowerRsiCount = 0;
+            long consecutiveHigherRsiCount = 0;
+
             foreach (var rsi in candlestickLookup.Values.SelectMany(candlestick => candlestick.Rsis.Where(r => r.Period == 14)))
             {
                 if (previousRsiValue.HasValue)
@@ -258,6 +261,20 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         rsi.RsiChangedDirectionFromPreviousCandlestick = true;
                     }
+
+                    if (previousRsiValue.Value > rsi.Value)
+                    {
+                        consecutiveLowerRsiCount++;
+                        consecutiveHigherRsiCount = 0;
+                    }
+                    else if (previousRsiValue.Value < rsi.Value)
+                    {
+                        consecutiveHigherRsiCount++;
+                        consecutiveLowerRsiCount = 0;
+                    }
+
+                    rsi.NumberOfConsecutiveLowerRsi = consecutiveLowerRsiCount;
+                    rsi.NumberOfConsecutiveHigherRsi = consecutiveHigherRsiCount;
                 }
                 previousRsiValue = rsi.Value;
             }
