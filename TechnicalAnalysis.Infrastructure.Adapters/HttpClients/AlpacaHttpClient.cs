@@ -30,6 +30,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         {
             try
             {
+                _logger.LogInformation("Method {Method}, pairName {pairName}, toDateTime {toDateTime}, barTimeFrame {barTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
                 var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(_alpacaSettings.CurrentValue.ApiKey, _alpacaSettings.CurrentValue.ApiSecret));
                 HistoricalBarsRequest historicalBarsRequest = new HistoricalBarsRequest(pairName, fromDateTime, toDateTime, barTimeFrame);
                 var stockData = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy).ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
@@ -37,7 +38,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
             catch (Exception exception)
             {
-                _logger.LogWarning("Method: {Method} {exception}", nameof(GetAlpacaData), exception);
+                _logger.LogWarning("Method {Method}, exception {exception}", nameof(GetAlpacaData), exception);
                 return Result<IMultiPage<IBar>, string>.Fail(exception.ToString());
             }
         }
