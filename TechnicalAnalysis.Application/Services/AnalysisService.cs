@@ -512,7 +512,8 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, options, pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, options, pair => pair.CalculateSignalIndicators());
 
-            pairs.CalculatePairStatistics();
+            //TODO Needs to optimize it.
+            //pairs.CalculatePairStatistics();
 
             return pairs;
         }
