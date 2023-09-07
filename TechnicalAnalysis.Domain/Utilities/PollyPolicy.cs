@@ -29,9 +29,13 @@ namespace TechnicalAnalysis.Domain.Utilities
                          });
         }
 
-        public AsyncTimeoutPolicy CreateTimeoutPolicy(TimeSpan timeout)
+        public AsyncTimeoutPolicy CreateTimeoutPolicy(TimeSpan timespan)
         {
-            return Policy.TimeoutAsync(timeout);
+            return Policy.TimeoutAsync(timespan, TimeoutStrategy.Optimistic, onTimeoutAsync: (context, timespan, task) =>
+            {
+                _logger.LogWarning("Timeout occurred after {timespan}. Context: {context}", timespan, context);
+                return Task.CompletedTask;
+            });
         }
     }
 }
