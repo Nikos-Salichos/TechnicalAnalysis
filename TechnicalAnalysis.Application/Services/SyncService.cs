@@ -20,27 +20,25 @@ namespace TechnicalAnalysis.Application.Services
         {
             var adaptersToSync = new List<Task>();
 
+            _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
+
             if (provider == Provider.Binance || provider == Provider.All)
             {
-                _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
                 adaptersToSync.Add(GetAndSyncAdapter(Provider.Binance));
             }
 
             if (provider == Provider.Alpaca || provider == Provider.All)
             {
-                _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
                 adaptersToSync.Add(GetAndSyncAdapter(Provider.Alpaca));
             }
 
             if (provider == Provider.Uniswap || provider == Provider.All)
             {
-                _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
                 adaptersToSync.Add(GetAndSyncAdapter(Provider.Uniswap));
             }
 
             if (provider == Provider.Pancakeswap || provider == Provider.All)
             {
-                _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
                 adaptersToSync.Add(GetAndSyncAdapter(Provider.Pancakeswap));
             }
 
