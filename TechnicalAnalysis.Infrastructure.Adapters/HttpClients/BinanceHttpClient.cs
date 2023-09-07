@@ -44,6 +44,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
                                                               .ExecuteAsync(() => httpclient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
+            _logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
+               nameof(GetBinanceCandlesticks), _binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage.StatusCode, httpResponseMessage.Content);
+
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 _logger.LogError("Method: {Method} {httpResponseMessage.StatusCode}", nameof(GetBinanceAssetsAndPairs), httpResponseMessage.StatusCode);
@@ -88,9 +91,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
                                                               .ExecuteAsync(() => httpclient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
 
+            _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
+                nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode, httpResponseMessage.Content);
+
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                _logger.LogWarning("Method: {Method}: {httpResponseMessage.StatusCode}", nameof(GetBinanceCandlesticks), httpResponseMessage.StatusCode);
+                _logger.LogWarning("Method: {Method}: {httpResponseMessage.Content}", nameof(GetBinanceCandlesticks), httpResponseMessage.Content);
                 return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
             }
 
@@ -107,7 +113,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
             catch (Exception exception)
             {
-                _logger.LogWarning("Method: {Method} {exception}", nameof(GetBinanceCandlesticks), exception);
+                _logger.LogWarning("Method: {Method}, exception {exception}", nameof(GetBinanceCandlesticks), exception);
                 return Result<object[][], string>.Fail(exception.ToString());
             }
         }
