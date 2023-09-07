@@ -109,6 +109,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
                                                               .ExecuteAsync(() => httpclient.PostAsJsonAsync(dexEndpoint, requestBody));
 
+            _logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
+                    nameof(GetMostActivePoolsAsync), dexEndpoint, httpResponseMessage.StatusCode, httpResponseMessage.Content);
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -124,12 +126,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     return Result<DexV3ApiResponse, string>.Success(deserializedData);
                 }
-                _logger.LogWarning("Method: {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
+                _logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
                 return Result<DexV3ApiResponse, string>.Fail($"{nameof(GetMostActivePoolsAsync)} Deserialization Failed");
             }
             catch (Exception exception)
             {
-                _logger.LogWarning("Method: {Method}: {exception}", nameof(GetMostActivePoolsAsync), exception);
+                _logger.LogWarning("Method {Method}, exception {exception}", nameof(GetMostActivePoolsAsync), exception);
                 return Result<DexV3ApiResponse, string>.Fail(exception.ToString());
             }
         }
