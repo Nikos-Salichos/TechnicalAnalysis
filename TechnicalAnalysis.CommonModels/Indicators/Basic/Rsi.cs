@@ -10,6 +10,8 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Basic
         public double? Value { get; init; }
         public long NumberOfRsiLowerThanPreviousRsis { get; init; }
         public bool RsiChangedDirectionFromPreviousCandlestick { get; set; }
+        public long NumberOfConsecutiveLowerRsi { get; set; }
+        public long NumberOfConsecutiveHigherRsi { get; set; }
 
         public Rsi(long candlestickId) : base(candlestickId)
         {
