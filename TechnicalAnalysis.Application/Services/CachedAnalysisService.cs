@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
@@ -44,7 +43,7 @@ namespace TechnicalAnalysis.Application.Services
             var pairs = await _inner.GetPairsIndicatorsAsync(provider);
 
             await _distributedCache.SetRecordAsync(provider.ToString(), pairs);
-            await _communication.CreateAttachmentSendMessage(pairs.ToContract());
+            await _communication.CreateAttachmentSendMessage(pairs);
             _rabbitMqService.PublishMessage(pairs);
 
             return pairs;
