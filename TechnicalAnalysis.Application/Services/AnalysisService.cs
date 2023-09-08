@@ -9,6 +9,7 @@ using TechnicalAnalysis.CommonModels;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
+using TechnicalAnalysis.Domain.Utilities;
 using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
 using Trend = TechnicalAnalysis.CommonModels.Enums.Trend;
 
@@ -504,13 +505,8 @@ namespace TechnicalAnalysis.Application.Services
             AdvancedIndicatorExtension.Logger = _logger;
             PairStatisticsExtension.Logger = _logger;
 
-            ParallelOptions options = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount / 4
-            };
-
-            Parallel.ForEach(pairs, options, pair => pair.CalculateBasicIndicators());
-            Parallel.ForEach(pairs, options, pair => pair.CalculateSignalIndicators());
+            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateBasicIndicators());
+            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
 
             //TODO Needs to optimize it.
             //pairs.CalculatePairStatistics();
