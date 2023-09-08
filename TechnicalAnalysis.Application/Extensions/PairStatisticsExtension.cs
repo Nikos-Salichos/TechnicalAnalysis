@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Application.Extensions
 {
@@ -21,12 +22,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 pair => pair.Candlesticks.OrderBy(c => c.CloseDate).Select(c => c.ClosePrice).Where(d => d.HasValue).Select(d => (double)d.Value).ToList()
             );
 
-            ParallelOptions options = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount / 4
-            };
-
-            Parallel.ForEach(pairs, options, pair =>
+            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair =>
             {
                 Logger.LogInformation("Method name: {MethodName} - Pair details - {PairPropertyName}: {PairName}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
