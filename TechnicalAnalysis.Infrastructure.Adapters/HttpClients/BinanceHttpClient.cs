@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Polly.Retry;
 using Polly.Timeout;
+using System.Collections.Immutable;
 using System.Text.Json;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 using TechnicalAnalysis.Domain.Interfaces;
@@ -86,7 +87,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var headers = new Dictionary<string, string>
                     {
                         { "X-MBX-APIKEY" , _binanceSettings.CurrentValue.ApiKey },
-                    };
+                    }.ToImmutableDictionary();
 
             using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
                                                               .ExecuteAsync(() => httpclient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
