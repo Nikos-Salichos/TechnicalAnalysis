@@ -3,6 +3,7 @@ using OoplesFinance.StockIndicators;
 using OoplesFinance.StockIndicators.Enums;
 using OoplesFinance.StockIndicators.Models;
 using Skender.Stock.Indicators;
+using System.Collections.Immutable;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.Indicators.Basic;
@@ -32,12 +33,22 @@ namespace TechnicalAnalysis.Application.Extensions
 
             var quotes = pair
                 .Candlesticks
-                .Where(candlestick => candlestick.OpenPrice != null && candlestick.HighPrice != null && candlestick.ClosePrice != null && candlestick.LowPrice != null)
-                .Select(candlestick => new Quote { Open = candlestick.OpenPrice.Value, High = candlestick.HighPrice.Value, Low = candlestick.LowPrice.Value, Close = candlestick.ClosePrice.Value, Date = candlestick.CloseDate, })
-                .OrderBy(q => q.Date)
-                .ToList();
+                .Where(candlestick =>
+                candlestick.OpenPrice.HasValue
+                && candlestick.HighPrice.HasValue
+                && candlestick.ClosePrice.HasValue
+                && candlestick.LowPrice.HasValue)
+                .Select(candlestick => new Quote
+                {
+                    Open = candlestick.OpenPrice.Value,
+                    High = candlestick.HighPrice.Value,
+                    Low = candlestick.LowPrice.Value,
+                    Close = candlestick.ClosePrice.Value,
+                    Date = candlestick.CloseDate,
+                })
+                .OrderBy(q => q.Date);
 
-            var candlestickLookup = pair.Candlesticks.ToDictionary(c => c.CloseDate);
+            var candlestickLookup = pair.Candlesticks.ToImmutableDictionary(c => c.CloseDate);
 
             CalculateStochastic(quotes, candlestickLookup);
             CalculateRsi(quotes, candlestickLookup);
@@ -67,7 +78,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateAverageRange(pair);
         }
 
-        private static void CalculateBollingerBands(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateBollingerBands(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var bollingerBandResult in quotes.Use(CandlePart.Close).GetBollingerBands())
             {
@@ -147,7 +158,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateDonchianChannel(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateDonchianChannel(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var donchianChannelResult in quotes.GetDonchian())
             {
@@ -166,7 +177,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateKeltnerChannel(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateKeltnerChannel(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var keltnerChannelResult in quotes.GetKeltner())
             {
@@ -185,7 +196,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateStochastic(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateStochastic(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             if (quotes.Count() <= 13)
             {
@@ -207,7 +218,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateRsi(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateRsi(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             var rsiResults = quotes.GetRsi(14).ToList();
 
@@ -280,7 +291,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateSma(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateSma(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetSma(200))
             {
@@ -297,7 +308,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateAdx(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateAdx(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetAdx())
             {
@@ -315,7 +326,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateAroon(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateAroon(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetAroon())
             {
@@ -333,7 +344,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateCci(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateCci(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetCci())
             {
@@ -351,7 +362,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateFractals(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateFractals(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetFractal(2))
             {
@@ -382,7 +393,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateIchimoku(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateIchimoku(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetIchimoku())
             {
@@ -401,7 +412,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateStandardDeviation(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateStandardDeviation(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetStdDev(20))
             {
@@ -420,7 +431,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateRateOfChange(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateRateOfChange(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetRoc(Constants.RateOfChangePeriod))
             {
@@ -436,7 +447,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateStandardPivotPoints(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateStandardPivotPoints(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetPivotPoints(PeriodSize.Day, PivotPointType.Standard))
             {
@@ -457,7 +468,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateMacd(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateMacd(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetMacd(7, 14, 9))
             {
@@ -476,7 +487,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateAverageTrueRange(IEnumerable<Quote> quotes, Dictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateAverageTrueRange(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetAtr())
             {
@@ -505,7 +516,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     i >= 0 && i < count &&                   // Make sure i is valid
                     i - startIndex + 1 <= count - startIndex) // Make sure the range is valid
                 {
-                    List<CandlestickExtended> group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
+                    var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
 
                     var lowestLow = group.Min(c => c.LowPrice);
 
@@ -530,7 +541,7 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = 0; i < count; i++)
             {
                 int startIndex = Math.Max(i - (period - 1), 0); // Start from the current candlestick and go back 4 candlesticks or less if there are fewer than 5 candlesticks available
-                List<CandlestickExtended> group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
+                var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
                 var highestHigh = group.Max(c => c.HighPrice);
 
                 foreach (var candlestick in group)
@@ -553,7 +564,7 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = period - 1; i < count; i++) // Start from the 22nd candlestick, as we need to calculate over the last 22 candlesticks
             {
                 int startIndex = i - (period - 1);
-                List<CandlestickExtended> group = pair.Candlesticks.GetRange(startIndex, period);
+                var group = pair.Candlesticks.GetRange(startIndex, period);
                 var highestClose = group.Max(c => c.ClosePrice);
 
                 foreach (var candlestick in group)
@@ -649,7 +660,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             var results = stockData.CalculateHistoricalVolatilityPercentile(MovingAvgType.ExponentialMovingAverage, period, 252);
 
-            List<double> hvpValues = results.OutputValues["Hvp"];  // Retrieve the "Hvp" values list
+            var hvpValues = results.OutputValues["Hvp"];  // Retrieve the "Hvp" values list
 
             for (int counter = 0; counter < pair.Candlesticks.Count; counter++)
             {
