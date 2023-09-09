@@ -6,6 +6,7 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
     {
         public bool IsBuy { get; init; }
         public bool IsSell { get; init; }
+        public long NumberOfSignal { get; set; }
         public StPatternSignal(long candlestickId) : base(candlestickId)
         {
         }
