@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TechnicalAnalysis.Application.Modules;
@@ -48,7 +50,7 @@ builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
 
-/*builder.Services.AddResponseCompression(options =>
+builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
     options.Providers.Add<BrotliCompressionProvider>();
@@ -57,7 +59,7 @@ builder.Services.AddApplicationModule(builder.Configuration);
 builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 {
     options.Level = CompressionLevel.Optimal;
-});*/
+});
 
 #endregion Services Registration
 
@@ -73,7 +75,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseResponseCompression();
+app.UseResponseCompression();
 
 app.UseHttpsRedirection();
 
