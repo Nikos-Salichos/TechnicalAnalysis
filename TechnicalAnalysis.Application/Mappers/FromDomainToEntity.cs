@@ -24,7 +24,7 @@ namespace TechnicalAnalysis.Application.Mappers
 
         public static IEnumerable<Pair> ToEntity(this IEnumerable<PairExtended> pairs)
         {
-            return pairs.Select(c => c.ToEntity()).ToList();
+            return pairs.Select(c => c.ToEntity());
         }
 
         private static Candlestick ToEntity(this CandlestickExtended candlestick)
@@ -46,7 +46,7 @@ namespace TechnicalAnalysis.Application.Mappers
 
         public static IEnumerable<Candlestick> ToEntity(this IEnumerable<CandlestickExtended> candlesticks)
         {
-            return candlesticks.Select(c => c.ToEntity()).ToList();
+            return candlesticks.Select(c => c.ToEntity());
         }
 
         private static DexCandlestick DexToEntityCandlestick(this CandlestickExtended candlestick)
@@ -71,7 +71,7 @@ namespace TechnicalAnalysis.Application.Mappers
 
         public static IEnumerable<DexCandlestick> DexToEntityCandlestick(this IEnumerable<CandlestickExtended> candlesticks)
         {
-            return candlesticks.Select(c => c.DexToEntityCandlestick()).ToList();
+            return candlesticks.Select(c => c.DexToEntityCandlestick());
         }
 
         private static Pool DexToEntityToken(this PairExtended pair)
@@ -97,7 +97,7 @@ namespace TechnicalAnalysis.Application.Mappers
 
         public static IEnumerable<Pool> DexToEntityPool(this IEnumerable<PairExtended> pairs)
         {
-            return pairs.Select(c => c.DexToEntityToken()).ToList();
+            return pairs.Select(c => c.DexToEntityToken());
         }
     }
 }
