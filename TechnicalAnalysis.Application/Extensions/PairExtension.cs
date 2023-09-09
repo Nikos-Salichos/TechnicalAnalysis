@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class PairExtension
     {
-        public static IList<BinancePair> GetDollarPairs(IList<BinanceAsset> assets, IList<BinancePair> fetchedPairs)
+        public static IEnumerable<BinancePair> GetDollarPairs(IEnumerable<BinanceAsset> assets, IEnumerable<BinancePair> fetchedPairs)
         {
             var usdt = assets.FirstOrDefault(a => string.Equals(a.Asset, Constants.Usdt, StringComparison.InvariantCultureIgnoreCase));
             var usdc = assets.FirstOrDefault(a => string.Equals(a.Asset, Constants.Usdc, StringComparison.InvariantCultureIgnoreCase));
