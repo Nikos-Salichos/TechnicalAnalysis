@@ -1,6 +1,7 @@
 ﻿using Alpaca.Markets;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
 using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Mediatr.Commands;
 using TechnicalAnalysis.Application.Mediatr.Queries;
@@ -214,7 +215,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                 var mergedData = mergedItems
                     .GroupBy(kvp => kvp.Key)
-                    .ToDictionary(group => group.Key, group => group.SelectMany(kvp => kvp.Value).ToList());
+                    .ToImmutableDictionary(group => group.Key, group => group.SelectMany(kvp => kvp.Value).ToList());
 
                 foreach (var key in mergedData.Keys)
                 {
