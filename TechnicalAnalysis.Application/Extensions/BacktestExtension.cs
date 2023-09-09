@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class BacktestExtension
     {
-        public static List<Position> RunBackTest(this PairExtended pair)
+        public static IEnumerable<Position> RunBackTest(this PairExtended pair)
         {
             _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
 
