@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
@@ -10,7 +11,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
     {
         public IEnumerable<Stock> Sync()
         {
-            Dictionary<string, string> stockExchanges = new Dictionary<string, string>
+            var stockExchanges = new Dictionary<string, string>
             {
                 { "xom", "nyse" },
                 { "nke", "nyse" },
@@ -20,7 +21,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 { "googl", "nasdaq" },
                 { "abnb", "nasdaq" },
                 { "brk.b", "nyse" },
-            };
+            }.ToImmutableDictionary();
 
             List<Stock> stocks = new List<Stock>();
 
