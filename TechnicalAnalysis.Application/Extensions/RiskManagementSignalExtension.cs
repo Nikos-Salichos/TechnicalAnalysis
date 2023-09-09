@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class RiskManagementSignalExtension
     {
-        public static List<Position> AverageDownStrategyCloseOneByOne(this List<PairExtended> pairs)
+        public static IEnumerable<Position> AverageDownStrategyCloseOneByOne(this IEnumerable<PairExtended> pairs)
         {
             List<Position> positions = new List<Position>();
             foreach (PairExtended pair in pairs)
@@ -78,7 +78,7 @@ namespace TechnicalAnalysis.Application.Extensions
             return positions;
         }
 
-        public static List<Position> AverageDownStrategyCloseAll(this List<PairExtended> pairs)
+        public static IEnumerable<Position> AverageDownStrategyCloseAll(this IEnumerable<PairExtended> pairs)
         {
             List<Position> positions = new List<Position>();
             foreach (PairExtended pair in pairs)
