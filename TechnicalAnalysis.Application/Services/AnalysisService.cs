@@ -31,7 +31,7 @@ namespace TechnicalAnalysis.Application.Services
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(Provider provider)
         {
-            var pairs = (await FormatAssetsPairsCandlesticks()).ToList();
+            var pairs = await FormatAssetsPairsCandlesticks();
 
             pairs = provider switch
             {
@@ -42,14 +42,14 @@ namespace TechnicalAnalysis.Application.Services
                 _ => pairs
             };
 
-            if (pairs.Count == 0)
+            if (!pairs.Any())
             {
                 return Enumerable.Empty<PairExtended>();
             }
 
             CalculateIndicators(pairs);
 
-            pairs = pairs.OrderByDescending(pair => pair.CreatedAt)
+            var filteredPairs = pairs.OrderByDescending(pair => pair.CreatedAt)
                              .Select(pair =>
                              {
                                  pair.Candlesticks = pair.Candlesticks
@@ -59,29 +59,15 @@ namespace TechnicalAnalysis.Application.Services
                                                  .ToList();
                                  return pair;
                              })
-                             .Where(pair => pair.Candlesticks.Count > 0)
-                             .ToList();
+                             .Where(pair => pair.Candlesticks.Count > 0);
 
-            var pairsSignal = pairs.OrderByDescending(pair => pair.CreatedAt)
-                            .Select(pair =>
-                            {
-                                pair.Candlesticks = pair.Candlesticks
-                                                    .OrderByDescending(c => c.CloseDate)
-                                                    .GroupBy(c => c.PoolOrPairId)
-                                                    .SelectMany(c => c.OrderByDescending(x => x.CloseDate).Take(1))
-                                                    .ToList();
-                                return pair;
-                            })
-                            .Where(pair => pair.Candlesticks.Any(c => c.EnhancedScans.Any(scan => scan.EnhancedScanIsBuy)))
-                            .ToList();
-
-            return pairsSignal;
+            return filteredPairs;
         }
 
         public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
-            var selectedPairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            var selectedPairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
 
             CalculateIndicators(selectedPairs);
 
@@ -136,7 +122,7 @@ namespace TechnicalAnalysis.Application.Services
             return selectedPairs;
         }
 
-        private static Indicator CalculateStrongSignal(List<Position> positionsCloseOneByOne)
+        private static Indicator CalculateStrongSignal(IEnumerable<Position> positionsCloseOneByOne)
         {
             var enhancedScan = new Indicator
             {
@@ -499,7 +485,7 @@ namespace TechnicalAnalysis.Application.Services
             return pivot;
         }
 
-        private List<PairExtended> CalculateIndicators(List<PairExtended> pairs)
+        private IEnumerable<PairExtended> CalculateIndicators(IEnumerable<PairExtended> pairs)
         {
             BasicIndicatorExtension.Logger = _logger;
             AdvancedIndicatorExtension.Logger = _logger;
