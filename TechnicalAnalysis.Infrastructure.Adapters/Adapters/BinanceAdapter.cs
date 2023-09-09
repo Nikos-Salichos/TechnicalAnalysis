@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Text.Json;
 using TechnicalAnalysis.Application.Extensions;
@@ -67,7 +68,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask);
 
             var assets = await fetchedAssetsTask;
-            var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == provider);
+            var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == provider).ToList();
             var candlesticks = await fetchedCandlesticksTask;
 
             pairs.MapPairsToCandlesticks(candlesticks);
@@ -103,8 +104,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
         private async Task SyncPairs(IEnumerable<BinanceSymbol> tradeablePairs)
         {
-            var fetchedAssets = await _mediator.Send(new GetAssetsQuery());
-            var assetDictionary = fetchedAssets.ToContract().ToDictionary(asset => asset.Asset, asset => asset.Id);
+            var fetchedAssets = (await _mediator.Send(new GetAssetsQuery())).ToList();
+            var assetDictionary = fetchedAssets.ToContract().ToImmutableDictionary(asset => asset.Asset, asset => asset.Id);
 
             var binancePairs = tradeablePairs.Select(tradeablePair => new BinancePair
             {
@@ -131,7 +132,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        private async Task SyncCandlesticks(IList<BinancePair> binancePairs, Timeframe period = Timeframe.Daily)
+        private async Task SyncCandlesticks(IEnumerable<BinancePair> binancePairs, Timeframe period = Timeframe.Daily)
         {
             var pairsWithExistingCandles = JsonSerializer.Deserialize<IEnumerable<BinancePair>>(JsonSerializer.Serialize(binancePairs));
 
@@ -168,7 +169,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     endDate = DateTime.Now.Date.AddHours(DateTime.Now.Hour - 1).AddMinutes(59).AddSeconds(59);
                 }
 
-                if (binancePairs.Count > 0)
+                if (binancePairs.Any())
                 {
                     string timeframe = "1d";
                     var dateRanges = new List<(DateTime, DateTime)>();
@@ -205,7 +206,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                     { "startTime", new DateTimeOffset(dateRange.Item1).ToUnixTimeMilliseconds().ToString() },
                                     { "endTime", new DateTimeOffset(dateRange.Item2).ToUnixTimeMilliseconds().ToString() },
                                     { "limit", candlesPerCall },
-                            };
+                            }.ToImmutableDictionary();
 
                         var response = await _binanceHttpClient.GetBinanceCandlesticks(queryParams);
 
