@@ -10,12 +10,12 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static ILogger Logger { get; set; }
 
-        public static void CalculatePairStatistics(this List<PairExtended> pairs)
+        public static void CalculatePairStatistics(this IEnumerable<PairExtended> pairs)
         {
             CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(pairs);
         }
 
-        public static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(List<PairExtended> pairs)
+        public static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(IEnumerable<PairExtended> pairs)
         {
             var preCalcCandlesticks = pairs.ToImmutableDictionary(
                 pair => pair.PrimaryId,
@@ -35,7 +35,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 nameof(pair.QuoteAssetContract), pair.QuoteAssetContract,
                 nameof(pair.QuoteAssetName), pair.QuoteAssetName);
 
-                if (!pair.Candlesticks.Any())
+                if (pair.Candlesticks.Count == 0)
                 {
                     return;
                 }
@@ -53,13 +53,13 @@ namespace TechnicalAnalysis.Application.Extensions
 
                     int desiredLength = Math.Min(otherPairOrderedCandles.Count, currentPairOrderedCandles.Count);
 
-                    List<double> closeOfCandlesticksInDouble = currentPairOrderedCandles.Take(desiredLength).ToList();
-                    List<double> pairCorrelatedCloseCandlesticks = otherPairOrderedCandles.Take(desiredLength).ToList();
+                    var closeOfCandlesticksInDouble = currentPairOrderedCandles.Take(desiredLength);
+                    var pairCorrelatedCloseCandlesticks = otherPairOrderedCandles.Take(desiredLength);
 
-                    for (int i = 0; i < closeOfCandlesticksInDouble.Count; i++)
+                    for (int i = 0; i < closeOfCandlesticksInDouble.Count(); i++)
                     {
-                        var currentCandlestickSubset = closeOfCandlesticksInDouble.Take(i + 1).ToList();
-                        var currentOtherPairCandlestickSubset = pairCorrelatedCloseCandlesticks.Take(i + 1).ToList();
+                        var currentCandlestickSubset = closeOfCandlesticksInDouble.Take(i + 1);
+                        var currentOtherPairCandlestickSubset = pairCorrelatedCloseCandlesticks.Take(i + 1);
 
                         var correlation = Correlation.Pearson(currentOtherPairCandlestickSubset, currentCandlestickSubset);
 
@@ -67,7 +67,6 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
             });
-
         }
 
     }
