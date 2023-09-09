@@ -85,7 +85,7 @@
 
         public static List<(DateTime, DateTime)> GetHourlyDateRanges(DateTime startDate, DateTime endDate)
         {
-            List<(DateTime start, DateTime end)> dateRanges = new List<(DateTime start, DateTime end)>();
+            var dateRanges = new List<(DateTime start, DateTime end)>();
             DateTime currentStart = startDate;
             DateTime currentEnd = currentStart.AddHours(1000).AddSeconds(-1); // Set end time to last second of last hour
             while (currentEnd < endDate)
