@@ -75,7 +75,10 @@ namespace TechnicalAnalysis.Application.Services
             var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAll();
 
             Indicator enhancedScan = CalculateStrongSignal(positionsCloseOneByOne);
-            List<Indicator> indicatorReports = new();
+            List<Indicator> indicatorReports = new()
+            {
+                enhancedScan
+            };
 
             foreach (var pair in selectedPairs)
             {
@@ -89,7 +92,13 @@ namespace TechnicalAnalysis.Application.Services
                 Indicator stPatterns = CalculateStPatternSignals(pair);
                 Indicator closeBelowPivotSignal = CalculateCandlestickCloseBelowPivotPrice(pair);
 
-                indicatorReports.Add(enhancedScan);
+                indicatorReports.Add(fractalTrend);
+                indicatorReports.Add(lowestHighLowestLowFractalSignals);
+                indicatorReports.Add(flagNestedBodySignals);
+                indicatorReports.Add(pivotSignals);
+                indicatorReports.Add(resistanceSignals);
+                indicatorReports.Add(stPatterns);
+                indicatorReports.Add(closeBelowPivotSignal);
             }
 
             foreach (var indicator in indicatorReports)
@@ -104,20 +113,9 @@ namespace TechnicalAnalysis.Application.Services
                 var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
                 await JsonHelper.SerializeToJson(outputPair, candlestickFileName);
-                string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-signals.json");
+                string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-{indicator}.json");
                 await JsonHelper.SerializeToJsonArray(indicator, signalFileName);
             }
-
-            selectedPairs = selectedPairs.OrderByDescending(pair => pair.CreatedAt)
-                .Select(pair =>
-                {
-                    pair.Candlesticks = pair.Candlesticks
-                                        .OrderByDescending(c => c.CloseDate)
-                                        .GroupBy(c => c.PoolOrPairId)
-                                        .SelectMany(c => c.OrderByDescending(x => x.CloseDate).Take(1))
-                                        .ToList();
-                    return pair;
-                }).ToList();
 
             return selectedPairs;
         }
