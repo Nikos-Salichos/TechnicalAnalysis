@@ -31,26 +31,5 @@ public class BinanceCandlestickValidator : AbstractValidator<BinanceCandlestick>
             .WithMessage("Low price must be less than or equal to high price.");
         RuleFor(candlestick => candlestick.HighPrice - candlestick.LowPrice).GreaterThanOrEqualTo(0)
             .WithMessage("The difference between HighPrice and LowPrice must be greater than or equal to 0.");
-
-        /*        RuleFor(currentCandlestick => currentCandlestick).Custom((currentCandlestick, context) =>
-                {
-                    if (context.RootContextData.TryGetValue("PreviousCandlestick", out object? value)
-                       && value is BinanceCandlestick previousCandlestick && previousCandlestick != null
-                       && currentCandlestick.OpenTime <= previousCandlestick.OpenTime)
-                    {
-                        context.AddFailure("Open time must be after the open time of the previous candlestick.");
-                    }
-                });
-
-                RuleFor(currentCandlestick => currentCandlestick).Custom((currentCandlestick, context) =>
-                {
-                    if (context.RootContextData.TryGetValue("PreviousCandlestick", out object? value)
-                        && value is BinanceCandlestick previousCandlestick && previousCandlestick != null
-                        && currentCandlestick.CloseTime <= previousCandlestick.CloseTime)
-                    {
-                        context.AddFailure("CloseTime time must be after the close time of the previous candlestick.");
-                    }
-                });*/
-
     }
 }
