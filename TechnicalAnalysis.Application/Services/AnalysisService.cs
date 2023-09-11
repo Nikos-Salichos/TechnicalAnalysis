@@ -69,6 +69,11 @@ namespace TechnicalAnalysis.Application.Services
             var pairs = await FormatAssetsPairsCandlesticks();
             var selectedPairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
 
+            if (!selectedPairs.Any())
+            {
+                return Enumerable.Empty<PairExtended>();
+            }
+
             CalculateIndicators(selectedPairs);
 
             var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOne();
