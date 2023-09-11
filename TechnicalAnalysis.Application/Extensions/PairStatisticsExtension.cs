@@ -19,7 +19,13 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             var preCalcCandlesticks = pairs.ToImmutableDictionary(
                 pair => pair.PrimaryId,
-                pair => pair.Candlesticks.OrderBy(c => c.CloseDate).Select(c => c.ClosePrice).Where(d => d.HasValue).Select(d => (double)d.Value).ToList()
+                pair => pair
+                    .Candlesticks
+                    .OrderBy(c => c.CloseDate)
+                    .Select(c => c.ClosePrice)
+                    .Where(d => d.HasValue)
+                    .Select(d => (double)d.Value)
+                    .ToList()
             );
 
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair =>
