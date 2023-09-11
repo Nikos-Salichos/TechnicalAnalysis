@@ -611,7 +611,7 @@ namespace TechnicalAnalysis.Application.Extensions
                                 {
                                 }*/
 
-                if (percentageTrueConditions >= 90 // TODO test it with candlesticks paterns
+                if (percentageTrueConditions >= 90 // TODO test it with candlesticks patterns
                 /*                &&
                                 (
                                     candlestick?.DragonFlyDojis.FirstOrDefault()?.IsDragonFlyDoji == true

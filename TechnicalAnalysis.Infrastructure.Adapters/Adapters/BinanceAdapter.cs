@@ -73,7 +73,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             pairs.MapPairsToCandlesticks(candlesticks);
 
-            await SyncCandlesticks(pairs.ToContract(), Timeframe.Daily);
+            await SyncCandlesticks(pairs.ToContract().ToList(), Timeframe.Daily);
 
             binanceProvider.LastAssetSync = DateTime.UtcNow;
             binanceProvider.LastPairSync = DateTime.UtcNow;
@@ -132,13 +132,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        private async Task SyncCandlesticks(IEnumerable<BinancePair> binancePairs, Timeframe period = Timeframe.Daily)
+        private async Task SyncCandlesticks(IList<BinancePair> binancePairs, Timeframe period = Timeframe.Daily)
         {
             var pairsWithExistingCandles = JsonSerializer.Deserialize<IEnumerable<BinancePair>>(JsonSerializer.Serialize(binancePairs));
 
-            foreach (var tradeablePair in binancePairs)
+            foreach (var binancePair in binancePairs)
             {
-                var latestCandlestickOpenTime = tradeablePair.BinanceCandlesticks
+                var latestCandlestickOpenTime = binancePair.BinanceCandlesticks
                                                              .Select(candlestick => candlestick.OpenTime)
                                                              .DefaultIfEmpty(DateTime.MinValue)
                                                              .Max();
@@ -150,7 +150,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                 if (startDate > yesterday.Date)
                 {
-                    return;
+                    continue;
                 }
 
                 if (latestCandlestickOpenTime != default)
@@ -171,7 +171,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                 if (binancePairs.Any())
                 {
-                    string timeframe = "1d";
+                    string timeframe = "1w";
                     var dateRanges = new List<(DateTime, DateTime)>();
 
                     if (period == Timeframe.OneHour)
@@ -192,7 +192,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                     if (dateRanges.Count == 0)
                     {
-                        return;
+                        continue;
                     }
 
                     const string candlesPerCall = "1000";
@@ -201,7 +201,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     {
                         var queryParams = new Dictionary<string, string>
                             {
-                                    { "symbol" , tradeablePair.Pair.Replace("-", "") },
+                                    { "symbol" , binancePair.Pair.Replace("-", "") },
                                     { "interval" , timeframe },
                                     { "startTime", new DateTimeOffset(dateRange.Item1).ToUnixTimeMilliseconds().ToString() },
                                     { "endTime", new DateTimeOffset(dateRange.Item2).ToUnixTimeMilliseconds().ToString() },
@@ -213,7 +213,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         if (response.IsError)
                         {
                             _logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(SyncCandlesticks), response.IsError);
-                            return;
+                            continue;
                         }
 
                         foreach (object[] row in response.SuccessValue)
@@ -249,15 +249,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                             var validator = new BinanceCandlestickValidator();
                             var result = validator.Validate(newCandlestick);
 
-                            bool candlestickExists = tradeablePair.BinanceCandlesticks.Any(c =>
+                            bool candlestickExists = binancePair.BinanceCandlesticks.Any(c =>
                                 c.OpenTime.EqualsYearMonthDayHourMinute(newCandlestick.OpenTime) &&
                                 c.CloseTime.EqualsYearMonthDayHourMinute(newCandlestick.CloseTime));
 
                             if (result.IsValid && !candlestickExists)
                             {
-                                newCandlestick.PairId = tradeablePair.Id;
+                                newCandlestick.PairId = binancePair.Id;
                                 newCandlestick.Period = timeframe;
-                                tradeablePair.BinanceCandlesticks.Add(newCandlestick);
+                                binancePair.BinanceCandlesticks.Add(newCandlestick);
                             }
                         }
                     }

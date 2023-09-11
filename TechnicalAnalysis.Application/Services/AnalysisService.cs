@@ -471,7 +471,7 @@ namespace TechnicalAnalysis.Application.Services
             //TODO Needs to optimize it.
             pairs.CalculatePairStatistics();
 
-            CountPairsWithEnhancedScanIsBuy(pairs);
+            // CountPairsWithEnhancedScanIsBuy(pairs);
 
             return pairs;
         }
