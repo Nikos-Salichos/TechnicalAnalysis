@@ -36,6 +36,7 @@ Technologies & Tools used:
 - Dapper
 - Structured logging with Seq
 - Multiple nugets(HttpClient,  Serilog, Polly, Fluent Validation, MailKit, HtmlAgilityPack, Moq, Xunit, .NetArchTest.Rules, TestContainers, Stock.Indicators, OoplesFinance.StockIndicators)
+- Brotli Compression in endpoints
 
 
 ### How to start it
