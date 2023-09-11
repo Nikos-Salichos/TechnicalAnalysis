@@ -154,35 +154,6 @@ namespace TechnicalAnalysis.Application.Services
             return enhancedScan;
         }
 
-        //TODO on test
-        private void SelectedPairs(List<PairExtended> pairs)
-        {
-            /*            List<Candlestick> strongPairs = new List<Domain.BusinessModels.Candlestick>();
-                        var enhancedScan = new Indicator();
-                        foreach (var selectedPair in selectedPairs)
-                        {
-                            foreach (var candlestick in selectedPair.Candlesticks)
-                            {
-                                foreach (var otherPair in alpacaPairs)
-                                {
-                                    foreach (var otherCandlestick in otherPair.Candlesticks)
-                                    {
-                                        if (selectedPair.Name != otherPair.Name && candlestick.CloseDate == otherCandlestick.CloseDate
-                                                && candlestick.EnhancedScans?.FirstOrDefault()?.EnhancedScanIsBuy == otherCandlestick.EnhancedScans?.FirstOrDefault()?.EnhancedScanIsBuy)
-                                        {
-                                            var signalIndicator = new Signal
-                                            {
-                                                OPENED_AT = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                                                BUY = 1
-                                            };
-                                            enhancedScan.signals.Add(signalIndicator);
-                                        }
-                                    }
-                                }
-                            }
-                        }*/
-        }
-
         private static Indicator CalculateCandlestickCloseBelowPivotPrice(PairExtended? pair)
         {
             var fractalTrend = new Indicator();
@@ -203,7 +174,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var fractalTrend = new Indicator();
 
-            foreach (var candlestick in pair.Candlesticks.Where(c => c.StPatternSignals.Count > 0))
+            foreach (var candlestick in pair.Candlesticks.Where(c => c.StPatternSignals.FirstOrDefault()?.NumberOfSignal == 1))
             {
                 var signalIndicator = new Signal
                 {
@@ -269,7 +240,7 @@ namespace TechnicalAnalysis.Application.Services
             {
                 Name = "lowestHighLowestLowFractal"
             };
-            // Assuming pair and lowestHighLowestLowFractal.signals are not null
+
             var lastSignal = string.Empty;
             for (int i = 0; i < pair?.Candlesticks.Count; i++)
             {
@@ -498,7 +469,9 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
 
             //TODO Needs to optimize it.
-            //pairs.CalculatePairStatistics();
+            pairs.CalculatePairStatistics();
+
+            CountPairsWithEnhancedScanIsBuy(pairs);
 
             return pairs;
         }
@@ -527,5 +500,22 @@ namespace TechnicalAnalysis.Application.Services
 
             return pairs;
         }
+
+        private static void CountPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        {
+            var marketStatistic = new MarketStatistic { NumberOfPairs = pairs.ToList().Count };
+            int numberOfPairsWithEnhancedScanIsBuy = 0;
+            foreach (var candlestick in pairs.SelectMany(pair => pair.Candlesticks))
+            {
+                var enhancedScan = candlestick.EnhancedScans.FirstOrDefault();
+                if (enhancedScan?.EnhancedScanIsBuy == true)
+                {
+                    numberOfPairsWithEnhancedScanIsBuy++;
+                }
+            }
+
+            marketStatistic.NumberOfPairsWithEnhancedScanIsBuy = numberOfPairsWithEnhancedScanIsBuy;
+        }
+
     }
 }
