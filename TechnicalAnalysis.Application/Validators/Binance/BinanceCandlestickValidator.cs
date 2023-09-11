@@ -8,7 +8,7 @@ public class BinanceCandlestickValidator : AbstractValidator<BinanceCandlestick>
     public BinanceCandlestickValidator()
     {
         RuleFor(candlestick => candlestick).NotNull()
-            .WithMessage("Candle cannot be null");
+            .WithMessage("Candlestick cannot be null");
         RuleFor(candlestick => candlestick.OpenTime).GreaterThanOrEqualTo(DateTime.MinValue)
             .WithMessage("Open time must be greater than or equal to DateTime.MinValue.");
         RuleFor(candlestick => candlestick.CloseTime).GreaterThanOrEqualTo(DateTime.MinValue)
