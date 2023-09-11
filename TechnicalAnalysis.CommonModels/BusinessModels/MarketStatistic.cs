@@ -3,7 +3,7 @@
 public class MarketStatistic
 {
     public int NumberOfPairs { get; init; }
-    public int NumberOfPairsWithEnhancedScanIsBuy { get; init; }
+    public int NumberOfPairsWithEnhancedScanIsBuy { get; set; }
     public double PercentageOfPairsWithEnhancedScanIsBuy
     {
         get
