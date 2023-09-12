@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
 
@@ -21,10 +22,10 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("SynchronizeProviders")]
-        public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider = Provider.All)
+        public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider = Provider.All, Timeframe timeframe = Timeframe.Daily)
         {
             _logger.LogInformation("Method: {SynchronizeProvidersAsync} , request {request}", nameof(SynchronizeProvidersAsync), provider);
-            await _syncService.SynchronizeProvidersAsync(provider);
+            await _syncService.SynchronizeProvidersAsync(provider, timeframe);
             return Ok();
         }
 
