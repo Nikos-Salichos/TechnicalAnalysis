@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
@@ -16,7 +17,7 @@ namespace TechnicalAnalysis.Application.Services
             _adapterFactory = adapterFactory;
         }
 
-        public async Task SynchronizeProvidersAsync(Provider provider)
+        public async Task SynchronizeProvidersAsync(Provider provider, Timeframe timeframe)
         {
             var adaptersToSync = new List<Task>();
 
