@@ -25,8 +25,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider = Provider.All, Timeframe timeframe = Timeframe.Daily)
         {
             _logger.LogInformation("Method: {SynchronizeProvidersAsync} , request {request}", nameof(SynchronizeProvidersAsync), provider);
-            await _syncService.SynchronizeProvidersAsync(provider, timeframe);
-            return Ok();
+            var result = await _syncService.SynchronizeProvidersAsync(provider, timeframe);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
