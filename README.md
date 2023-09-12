@@ -37,6 +37,7 @@ Technologies & Tools used:
 - Structured logging with Seq
 - Multiple nugets(HttpClient,  Serilog, Polly, Fluent Validation, MailKit, HtmlAgilityPack, Moq, Xunit, .NetArchTest.Rules, TestContainers, Stock.Indicators, OoplesFinance.StockIndicators)
 - Brotli Compression in endpoints
+- Hangfire for jobs
 
 
 ### How to start it
