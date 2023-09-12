@@ -4,6 +4,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
+    //TODO Under Development
     public class WallStreetZenAdapter : IAdapter
     {
         private readonly ILogger<WallStreetZenAdapter> _logger;
@@ -15,7 +16,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _wallStreetZenClient = WallStreetZenClient;
         }
 
-        public Task Sync(Provider provider)
+        public Task Sync(Provider provider, Timeframe timeframe)
         {
             var stocks = _wallStreetZenClient.Sync();
             return Task.CompletedTask;
