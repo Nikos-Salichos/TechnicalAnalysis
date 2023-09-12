@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _logger = logger;
         }
 
-        public async Task Sync(Provider provider)
+        public async Task Sync(Provider provider, Timeframe timeframe)
         {
             var exchanges = await _mediator.Send(new GetExchangesQuery());
             Exchange binanceProvider = exchanges.FirstOrDefault(p => p.Code == (int)provider);
@@ -73,7 +73,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             pairs.MapPairsToCandlesticks(candlesticks);
 
-            await SyncCandlesticks(pairs.ToContract().ToList(), Timeframe.Daily);
+            await SyncCandlesticks(pairs.ToContract().ToList(), timeframe);
 
             binanceProvider.LastAssetSync = DateTime.UtcNow;
             binanceProvider.LastPairSync = DateTime.UtcNow;
@@ -169,9 +169,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     endDate = DateTime.Now.Date.AddHours(DateTime.Now.Hour - 1).AddMinutes(59).AddSeconds(59);
                 }
 
-                if (binancePairs.Any())
+                if (binancePairs.Count > 0)
                 {
-                    string timeframe = "1w";
+                    string timeframe = "";
                     var dateRanges = new List<(DateTime, DateTime)>();
 
                     if (period == Timeframe.OneHour)
@@ -271,8 +271,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binancePairs.Any(pair => pair.BinanceCandlesticks.Count > 0))
             {
-                var pairsWithCandlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0).ToList();
-                var candlesticks = pairsWithCandlesticks.SelectMany(c => c.BinanceCandlesticks).ToList();
+                var pairsWithCandlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0);
+                var candlesticks = pairsWithCandlesticks.SelectMany(c => c.BinanceCandlesticks);
                 await _mediator.Send(new InsertCandlesticksCommand(candlesticks.ToDomain()));
             }
         }
