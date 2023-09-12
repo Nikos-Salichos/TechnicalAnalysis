@@ -28,7 +28,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _alpacaHttpClient = alpacaHttpClient;
         }
 
-        public async Task Sync(Provider provider)
+        public async Task Sync(Provider provider, Timeframe timeframe)
         {
             var exchanges = await _mediator.Send(new GetExchangesQuery());
             var alpacaProvider = exchanges.FirstOrDefault(p => p.Code == (int)Provider.Alpaca);
