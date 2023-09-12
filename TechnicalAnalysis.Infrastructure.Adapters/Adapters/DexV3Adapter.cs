@@ -28,7 +28,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _mediator = mediator;
         }
 
-        public async Task Sync(Provider provider)
+        public async Task Sync(Provider provider, Timeframe timeframe)
         {
             var exchanges = await _mediator.Send(new GetExchangesQuery());
             var dexV3Provider = exchanges.FirstOrDefault(p => p.Code == (int)provider);
