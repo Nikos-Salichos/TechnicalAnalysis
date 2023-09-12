@@ -8,7 +8,6 @@ using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.Domain.Interfaces.Application;
-using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Utilities;
 using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
 using Trend = TechnicalAnalysis.CommonModels.Enums.Trend;
@@ -19,7 +18,6 @@ namespace TechnicalAnalysis.Application.Services
     {
         private readonly IMediator _mediator;
         private readonly ILogger<AnalysisService> _logger;
-        public delegate IAdapter AdapterResolver(string key);
         private readonly IConfiguration _configuration;
 
         public AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration)
