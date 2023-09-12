@@ -24,7 +24,7 @@ namespace TechnicalAnalysis.StartUpService
                     using (var scope = _serviceScopeFactory.CreateScope())
                     {
                         var syncService = scope.ServiceProvider.GetRequiredService<ISyncService>();
-                        await syncService.SynchronizeProvidersAsync(Provider.All);
+                        await syncService.SynchronizeProvidersAsync(Provider.All, Timeframe.Daily);
                         var analysisService = scope.ServiceProvider.GetRequiredService<IAnalysisService>();
                         await analysisService.GetPairsIndicatorsAsync(Provider.All);
                     }
