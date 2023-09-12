@@ -4,6 +4,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Application
 {
     public interface ISyncService
     {
-        Task SynchronizeProvidersAsync(Provider provider, Timeframe timeframe);
+        Task<string> SynchronizeProvidersAsync(Provider provider, Timeframe timeframe);
     }
 }
