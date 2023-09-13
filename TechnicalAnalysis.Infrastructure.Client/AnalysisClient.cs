@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using TechnicalAnalysis.CommonModels;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
+using TechnicalAnalysis.CommonModels.JsonOutput;
 
 namespace TechnicalAnalysis.Infrastructure.Client
 {
@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Infrastructure.Client
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task SynchronizeAsync(Provider provider = Provider.All)
+        public async Task SynchronizeAsync(DataProvider provider = DataProvider.All)
         {
             var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
             var apiUrl = $"SynchronizeProviders?provider={provider}";
@@ -32,7 +32,7 @@ namespace TechnicalAnalysis.Infrastructure.Client
             }
         }
 
-        public async Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(Provider provider = Provider.All)
+        public async Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All)
         {
             var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
             var apiUrl = $"PairsIndicators?provider={provider}";
