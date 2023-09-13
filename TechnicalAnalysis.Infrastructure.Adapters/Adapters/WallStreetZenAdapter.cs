@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _wallStreetZenClient = WallStreetZenClient;
         }
 
-        public Task Sync(Provider provider, Timeframe timeframe)
+        public Task Sync(DataProvider provider, Timeframe timeframe)
         {
             var stocks = _wallStreetZenClient.Sync();
             return Task.CompletedTask;
