@@ -10,7 +10,7 @@ using TechnicalAnalysis.Domain.Builders;
 using TechnicalAnalysis.Domain.Contracts.Input.DexV3;
 using TechnicalAnalysis.Domain.Extensions;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
-using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
+using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
@@ -28,10 +28,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _mediator = mediator;
         }
 
-        public async Task Sync(Provider provider, Timeframe timeframe)
+        public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetExchangesQuery());
-            var dexV3Provider = exchanges.FirstOrDefault(p => p.Code == (int)provider);
+            var exchanges = await _mediator.Send(new GetPartialProviderQuery());
+            var dexV3Provider = exchanges.FirstOrDefault(p => p.PrimaryId == (int)provider);
 
             if (dexV3Provider == null)
             {
@@ -39,9 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return;
             }
 
-            if (dexV3Provider?.LastAssetSync.Date == DateTime.UtcNow.Date
-                && dexV3Provider?.LastPairSync.Date == DateTime.UtcNow.Date
-                && dexV3Provider?.LastCandlestickSync.Date == DateTime.UtcNow.Date)
+            if (dexV3Provider.IsProviderSyncedToday(timeframe))
             {
                 _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
@@ -71,7 +69,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             dexV3Provider.LastPairSync = DateTime.UtcNow;
 
             await SaveCandlesticks(apiResponse.SuccessValue.PoolResponse, provider);
-            dexV3Provider.LastCandlestickSync = DateTime.UtcNow;
+            dexV3Provider.CandlestickSyncInfos.Add(new ProviderCandlestickSyncInfo
+            {
+                ProviderId = dexV3Provider.PrimaryId,
+                TimeframeId = (long)timeframe,
+                LastCandlestickSync = DateTime.UtcNow
+            });
 
             await _mediator.Send(new UpdateExchangeCommand(dexV3Provider));
 
@@ -87,7 +90,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             //var poolsOrderByMaxVolumeInPoolData = pools.Where(p => p.ConsecutiveHigherTvlPoolData > 0 && p.Liquidity > 0).GetTop100PoolsByOrdering(p => p.ConsecutiveHigherTvlPoolData, false);
         }
 
-        private async Task<IEnumerable<PairExtended>> FormatDexAssetsPoolsCandlesticks(Provider provider)
+        private async Task<IEnumerable<PairExtended>> FormatDexAssetsPoolsCandlesticks(DataProvider provider)
         {
             var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
             var fetchedPoolsTask = _mediator.Send(new GetPoolsQuery());
@@ -149,7 +152,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             );
         }
 
-        private async Task SavePools(IEnumerable<Pool> pools, Provider provider)
+        private async Task SavePools(IEnumerable<Pool> pools, DataProvider provider)
         {
             List<PairExtended> newPairs = new();
 
@@ -187,13 +190,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 }
             }
 
-            var pairsHashSet = new HashSet<(string poolContractAddress, Provider Provider)>(pairs.Select(p => (p.ContractAddress, p.Provider)));
+            var pairsHashSet = new HashSet<(string poolContractAddress, DataProvider Provider)>(pairs.Select(p => (p.ContractAddress, p.Provider)));
             List<PairExtended> uniquePairs = newPairs.Where(np => !pairsHashSet.Contains((np.ContractAddress, np.Provider))).ToList();
 
             await _mediator.Send(new InsertPoolsCommand(uniquePairs.DexToEntityPool()));
         }
 
-        private async Task SaveCandlesticks(PoolResponse poolResponse, Provider provider)
+        private async Task SaveCandlesticks(PoolResponse poolResponse, DataProvider provider)
         {
             var fetchedPoolsTask = await _mediator.Send(new GetPoolsQuery());
 
