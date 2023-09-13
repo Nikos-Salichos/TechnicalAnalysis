@@ -1,5 +1,5 @@
-﻿using TechnicalAnalysis.CommonModels;
-using TechnicalAnalysis.CommonModels.BusinessModels;
+﻿using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.JsonOutput;
 
 namespace TechnicalAnalysis.Application.Mappers
 {
