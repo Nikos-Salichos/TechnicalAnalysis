@@ -10,8 +10,8 @@ using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Builders;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using Asset = TechnicalAnalysis.CommonModels.BusinessModels.Asset;
+using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 using PairExtended = TechnicalAnalysis.CommonModels.BusinessModels.PairExtended;
-using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
@@ -28,10 +28,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _alpacaHttpClient = alpacaHttpClient;
         }
 
-        public async Task Sync(Provider provider, Timeframe timeframe)
+        public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetExchangesQuery());
-            var alpacaProvider = exchanges.FirstOrDefault(p => p.Code == (int)Provider.Alpaca);
+            var exchanges = await _mediator.Send(new GetPartialProviderQuery());
+            var alpacaProvider = exchanges.FirstOrDefault(p => p.PrimaryId == (int)DataProvider.Alpaca);
 
             if (alpacaProvider == null)
             {
@@ -39,7 +39,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return;
             }
 
-            var stockSymbols = new List<string> { "vt", "vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
+            var stockSymbols = new List<string> { "vt",
+                "vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
                 "tsla", "aapl", "googl", "abnb", "JNJ", "XOM", "WMT", "META", "JPM","V", "KO", "PEP",
                 "MCD", "AVGO", "ACN", "NFLX",
                 "MA","BAC","MS","WCF","SCHW","RY","MSFT","NVDA","CRM","ABDE","VZ","IBM","EWH","MCHI","EWS",
@@ -57,7 +58,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             bool allStockSymbolsExist = true;
             foreach (var symbol in stockSymbols)
             {
-                var assetFound = fetchedAssetNames.FirstOrDefault(name => string.Equals(name, symbol, StringComparison.InvariantCultureIgnoreCase));
+                var assetFound = fetchedAssetNames.Find(name => string.Equals(name, symbol, StringComparison.InvariantCultureIgnoreCase));
                 if (assetFound is null)
                 {
                     allStockSymbolsExist = false;
@@ -65,10 +66,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 }
             }
 
-            if (alpacaProvider?.LastAssetSync.Date == DateTime.UtcNow.Date
-            && alpacaProvider?.LastPairSync.Date == DateTime.UtcNow.Date
-            && alpacaProvider?.LastCandlestickSync.Date == DateTime.UtcNow.Date
-            && allStockSymbolsExist)
+            if (alpacaProvider.IsProviderSyncedToday(timeframe) && allStockSymbolsExist)
             {
                 _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
@@ -80,7 +78,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             alpacaProvider.LastAssetSync = DateTime.UtcNow;
             alpacaProvider.LastPairSync = DateTime.UtcNow;
-            alpacaProvider.LastCandlestickSync = DateTime.UtcNow;
+            alpacaProvider.CandlestickSyncInfos.Add(new ProviderCandlestickSyncInfo
+            {
+                ProviderId = alpacaProvider.PrimaryId,
+                TimeframeId = (long)timeframe,
+                LastCandlestickSync = DateTime.UtcNow
+            });
 
             await _mediator.Send(new UpdateExchangeCommand(alpacaProvider));
         }
@@ -112,7 +115,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask);
 
             var assets = (await fetchedAssetsTask).ToList();
-            var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == Provider.Alpaca).ToList();
+            var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == DataProvider.Alpaca).ToList();
 
             var newPairs = new List<PairExtended>();
             foreach (var stockSymbol in stockSymbols)
@@ -132,7 +135,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     {
                         BaseAssetId = baseAsset.PrimaryId,
                         BaseAssetName = baseAsset.Symbol,
-                        Provider = Provider.Alpaca,
+                        Provider = DataProvider.Alpaca,
                         Symbol = baseAsset.Symbol,
                         IsActive = true,
                         CreatedAt = DateTime.UtcNow
@@ -159,7 +162,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var fetchedPairs = await fetchedPairsTask;
             var fetchedCandlesticks = await fetchedCandlesticksTask;
 
-            var pairs = fetchedPairs.Where(p => p.Provider == Provider.Alpaca).ToList();
+            var pairs = fetchedPairs.Where(p => p.Provider == DataProvider.Alpaca).ToList();
 
             pairs.MapPairsToAssets(fetchedAssets);
             pairs.MapPairsToCandlesticks(fetchedCandlesticks);
