@@ -12,7 +12,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
-using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
+using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
@@ -29,10 +29,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             _logger = logger;
         }
 
-        public async Task Sync(Provider provider, Timeframe timeframe)
+        public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetExchangesQuery());
-            Exchange binanceProvider = exchanges.FirstOrDefault(p => p.Code == (int)provider);
+            var exchanges = await _mediator.Send(new GetPartialProviderQuery());
+            var binanceProvider = exchanges.FirstOrDefault(p => p.PrimaryId == (int)provider);
 
             if (binanceProvider == null)
             {
@@ -40,9 +40,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return;
             }
 
-            if (binanceProvider?.LastAssetSync.Date == DateTime.UtcNow.Date
-            && binanceProvider?.LastPairSync.Date == DateTime.UtcNow.Date
-            && binanceProvider?.LastCandlestickSync.Date == DateTime.UtcNow.Date)
+            if (binanceProvider.IsProviderSyncedToday(timeframe))
             {
                 _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
@@ -77,7 +75,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             binanceProvider.LastAssetSync = DateTime.UtcNow;
             binanceProvider.LastPairSync = DateTime.UtcNow;
-            binanceProvider.LastCandlestickSync = DateTime.UtcNow;
+            binanceProvider.CandlestickSyncInfos.Add(new ProviderCandlestickSyncInfo
+            {
+                ProviderId = binanceProvider.PrimaryId,
+                TimeframeId = (long)timeframe,
+                LastCandlestickSync = DateTime.UtcNow
+            });
 
             await _mediator.Send(new UpdateExchangeCommand(binanceProvider));
         }
@@ -112,7 +115,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 Pair = $"{tradeablePair.BaseAsset}-{tradeablePair.QuoteAsset}",
                 BaseAssetId = assetDictionary.TryGetValue(tradeablePair.BaseAsset, out long baseAssetId) ? baseAssetId : 0,
                 QuoteAssetId = assetDictionary.TryGetValue(tradeablePair.QuoteAsset, out long quoteAssetId) ? quoteAssetId : 0,
-                Provider = Provider.Binance,
+                Provider = DataProvider.Binance,
                 AllCandles = false,
                 IsActive = true,
             });
