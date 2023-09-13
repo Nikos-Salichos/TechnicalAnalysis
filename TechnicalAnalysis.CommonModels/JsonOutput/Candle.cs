@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 
-namespace TechnicalAnalysis.CommonModels
+namespace TechnicalAnalysis.CommonModels.JsonOutput
 {
     public class Candle
     {

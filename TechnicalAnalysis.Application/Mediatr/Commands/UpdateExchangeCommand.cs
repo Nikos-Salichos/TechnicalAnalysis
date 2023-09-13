@@ -5,9 +5,9 @@ namespace TechnicalAnalysis.Application.Mediatr.Commands
 {
     public class UpdateExchangeCommand : IRequest
     {
-        public Exchange Exchange { get; }
+        public Provider Exchange { get; }
 
-        public UpdateExchangeCommand(Exchange exchange)
+        public UpdateExchangeCommand(Provider exchange)
         {
             Exchange = exchange;
         }

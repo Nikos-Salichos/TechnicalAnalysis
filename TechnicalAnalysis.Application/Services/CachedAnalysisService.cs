@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Infrastructure.Persistence.DistributedCache;
-using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
+using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Application.Services
 {
@@ -28,7 +28,7 @@ namespace TechnicalAnalysis.Application.Services
             return _inner.GetIndicatorsByPairNamesAsync(pairName);
         }
 
-        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(Provider provider = Provider.All)
+        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All)
         {
             var cachedPairs = await _distributedCache.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
             if (cachedPairs is not null)

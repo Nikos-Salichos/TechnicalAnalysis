@@ -2,55 +2,54 @@
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
-using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
 
 namespace TechnicalAnalysis.Application.Services
 {
     public class SyncService : ISyncService
     {
         private readonly ILogger<SyncService> _logger;
-        private readonly Func<Provider, IAdapter> _adapterFactory;
+        private readonly Func<DataProvider, IAdapter> _adapterFactory;
 
-        public SyncService(ILogger<SyncService> logger, Func<Provider, IAdapter> adapterFactory)
+        public SyncService(ILogger<SyncService> logger, Func<DataProvider, IAdapter> adapterFactory)
         {
             _logger = logger;
             _adapterFactory = adapterFactory;
         }
 
-        public Task<string> SynchronizeProvidersAsync(Provider provider, Timeframe timeframe)
+        public Task<string> SynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
         {
             if (timeframe != Timeframe.Daily &&
-                (timeframe != Timeframe.Weekly || provider != Provider.Binance))
+                (timeframe != Timeframe.Weekly || provider != DataProvider.Binance))
             {
                 return Task.FromResult($"Combination {provider} and {timeframe} timeframe is not supported yet");
             }
 
             return InternalSynchronizeProvidersAsync(provider, timeframe);
 
-            async Task<string> InternalSynchronizeProvidersAsync(Provider provider, Timeframe timeframe)
+            async Task<string> InternalSynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
             {
                 var adaptersToSync = new List<Task>();
 
                 _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
 
-                if (provider == Provider.Binance || provider == Provider.All)
+                if (provider == DataProvider.Binance || provider == DataProvider.All)
                 {
-                    adaptersToSync.Add(GetAndSyncAdapter(Provider.Binance, timeframe));
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Binance, timeframe));
                 }
 
-                if (provider == Provider.Alpaca || provider == Provider.All)
+                if (provider == DataProvider.Alpaca || provider == DataProvider.All)
                 {
-                    adaptersToSync.Add(GetAndSyncAdapter(Provider.Alpaca, timeframe));
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Alpaca, timeframe));
                 }
 
-                if (provider == Provider.Uniswap || provider == Provider.All)
+                if (provider == DataProvider.Uniswap || provider == DataProvider.All)
                 {
-                    adaptersToSync.Add(GetAndSyncAdapter(Provider.Uniswap, timeframe));
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Uniswap, timeframe));
                 }
 
-                if (provider == Provider.Pancakeswap || provider == Provider.All)
+                if (provider == DataProvider.Pancakeswap || provider == DataProvider.All)
                 {
-                    adaptersToSync.Add(GetAndSyncAdapter(Provider.Pancakeswap, timeframe));
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Pancakeswap, timeframe));
                 }
 
                 if (adaptersToSync.Count > 0)
@@ -62,10 +61,10 @@ namespace TechnicalAnalysis.Application.Services
             }
         }
 
-        private Task GetAndSyncAdapter(Provider provider, Timeframe timeframe)
+        private async Task GetAndSyncAdapter(DataProvider provider, Timeframe timeframe)
         {
             var adapter = _adapterFactory(provider);
-            return adapter.Sync(provider, timeframe);
+            await adapter.Sync(provider, timeframe);
         }
     }
 }

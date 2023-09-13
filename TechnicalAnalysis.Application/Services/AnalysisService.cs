@@ -7,10 +7,10 @@ using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
+using TechnicalAnalysis.CommonModels.JsonOutput;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Utilities;
-using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
-using Trend = TechnicalAnalysis.CommonModels.Enums.Trend;
 
 namespace TechnicalAnalysis.Application.Services
 {
@@ -27,16 +27,16 @@ namespace TechnicalAnalysis.Application.Services
             _configuration = configuration;
         }
 
-        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(Provider provider)
+        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
 
             pairs = provider switch
             {
-                Provider.Binance => pairs.Where(p => p.Provider == Provider.Binance).ToList(),
-                Provider.Uniswap => pairs.Where(p => p.Provider == Provider.Uniswap).ToList(),
-                Provider.Pancakeswap => pairs.Where(p => p.Provider == Provider.Pancakeswap).ToList(),
-                Provider.Alpaca => pairs.Where(p => p.Provider == Provider.Alpaca).ToList(),
+                DataProvider.Binance => pairs.Where(p => p.Provider == DataProvider.Binance).ToList(),
+                DataProvider.Uniswap => pairs.Where(p => p.Provider == DataProvider.Uniswap).ToList(),
+                DataProvider.Pancakeswap => pairs.Where(p => p.Provider == DataProvider.Pancakeswap).ToList(),
+                DataProvider.Alpaca => pairs.Where(p => p.Provider == DataProvider.Alpaca).ToList(),
                 _ => pairs
             };
 

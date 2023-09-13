@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
-using Provider = TechnicalAnalysis.CommonModels.Enums.Provider;
+using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 {
@@ -22,7 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("SynchronizeProviders")]
-        public async Task<IActionResult> SynchronizeProvidersAsync(Provider provider = Provider.All, Timeframe timeframe = Timeframe.Daily)
+        public async Task<IActionResult> SynchronizeProvidersAsync(DataProvider provider = DataProvider.All, Timeframe timeframe = Timeframe.Daily)
         {
             _logger.LogInformation("Method: {SynchronizeProvidersAsync} , request {request}", nameof(SynchronizeProvidersAsync), provider);
             var result = await _syncService.SynchronizeProvidersAsync(provider, timeframe);
@@ -31,7 +31,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("PairsIndicators")]
-        public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] Provider provider = Provider.All)
+        public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] DataProvider provider = DataProvider.All)
         {
             _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
             var pairs = await _analysisService.GetPairsIndicatorsAsync(provider);

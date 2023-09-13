@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Queries
 {
-    public class GetExchangesQuery : IRequest<IEnumerable<Exchange>>
+    public class GetPartialProviderQuery : IRequest<IEnumerable<Provider>>
     {
     }
 }

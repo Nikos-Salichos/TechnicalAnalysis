@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TechnicalAnalysis.CommonModels
+namespace TechnicalAnalysis.CommonModels.JsonOutput
 {
     public class PartialPair
     {

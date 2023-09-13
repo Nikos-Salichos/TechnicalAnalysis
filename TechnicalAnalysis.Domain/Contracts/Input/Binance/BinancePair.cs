@@ -8,7 +8,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
         public string Pair { get; init; } = string.Empty;
         public long BaseAssetId { get; init; }
         public long QuoteAssetId { get; init; }
-        public Provider Provider { get; init; }
+        public DataProvider Provider { get; init; }
         public bool IsActive { get; init; }
         public bool AllCandles { get; init; }
         public DateTime CreatedAt { get; init; } = DateTime.Now;

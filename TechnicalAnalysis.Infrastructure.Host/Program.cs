@@ -95,7 +95,7 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions()
     Authorization = new[] { new DashboardNoAuthorizationFilter() }
 });
 
-HangfireStartupJob.SynchronizeProvidersAsyncJob(app);
+HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
 
 // Authorization should come after Hangfire Dashboard.
 app.UseAuthorization();

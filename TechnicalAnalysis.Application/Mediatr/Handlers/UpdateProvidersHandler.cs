@@ -16,6 +16,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
         public async Task Handle(UpdateExchangeCommand request, CancellationToken cancellationToken)
         {
             await _repository.UpdateProvider(request.Exchange);
+            await _repository.UpdateProvider(request.Exchange.CandlestickSyncInfos);
         }
     }
 }

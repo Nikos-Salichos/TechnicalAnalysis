@@ -37,7 +37,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             _asyncTimeoutPolicy = pollyPolicy.CreateTimeoutPolicy(TimeSpan.FromMinutes(5));
         }
 
-        public async Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, Provider provider)
+        public async Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
         {
             const string query = @"
                           query($numberOfPools: Int!, $numberOfData: Int! ) {
@@ -98,8 +98,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             var dexEndpoint = provider switch
             {
-                Provider.Uniswap => _dexSettings.CurrentValue.UniswapEndpoint,
-                Provider.Pancakeswap => _dexSettings.CurrentValue.PancakeswapEndpoint,
+                DataProvider.Uniswap => _dexSettings.CurrentValue.UniswapEndpoint,
+                DataProvider.Pancakeswap => _dexSettings.CurrentValue.PancakeswapEndpoint,
                 _ => throw new InvalidOperationException("Unknown provider")
             };
 

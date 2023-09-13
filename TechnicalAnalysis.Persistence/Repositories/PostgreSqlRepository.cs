@@ -73,20 +73,62 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task<IResult<IEnumerable<Exchange>, string>> GetExchanges()
+        public async Task<IResult<IEnumerable<Provider>, string>> GetProviders()
         {
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 dbConnection.Open();
-                const string query = "SELECT \"Id\" AS PrimaryId, \"Name\", \"Code\", \"LastAssetSync\", \"LastPairSync\", \"LastCandlestickSync\" FROM \"Providers\"";
-                var exchanges = await dbConnection.QueryAsync<Exchange>(query);
+
+                const string query = @"
+                                        SELECT
+                                            p.""Id"" AS PrimaryId,
+                                            p.""Name"" AS ProviderName,
+                                            pas.""LastAssetSync"",
+                                            pas.""LastPairSync"",
+                                            pc.""Id"" AS CandlestickSyncInfoId,
+                                            pc.""LastCandlestickSync"" AS LastCandlestickSync,
+                                            t.""Id"" AS TimeframeId,
+                                            t.""Name"" AS Timeframe
+                                        FROM
+                                            public.""Providers"" p
+                                        LEFT JOIN
+                                            public.""ProviderCandlestickSyncInfos"" pc ON p.""Id"" = p.""Id""
+                                        LEFT JOIN
+                                            public.""ProvidersPairAssetSync"" pas ON p.""Id"" = p.""Id""
+                                        LEFT JOIN
+                                            public.""Timeframes"" t ON pc.""TimeframeId"" = t.""Id""";
+
+                var providerDictionary = new Dictionary<long, Provider>();
+
+                var providers = await dbConnection.QueryAsync<Provider, ProviderCandlestickSyncInfo, Provider>(
+                    query,
+                    (provider, candlestickSyncInfo) =>
+                    {
+                        if (!providerDictionary.TryGetValue(provider.PrimaryId, out var currentProvider))
+                        {
+                            currentProvider = provider;
+                            currentProvider.CandlestickSyncInfos = new List<ProviderCandlestickSyncInfo>();
+                            providerDictionary.Add(provider.PrimaryId, currentProvider);
+                        }
+
+                        if (candlestickSyncInfo != null)
+                        {
+                            currentProvider.CandlestickSyncInfos.Add(candlestickSyncInfo);
+                        }
+
+                        return currentProvider;
+                    },
+                   splitOn: "CandlestickSyncInfoId"
+                );
+
+                providers = providers.Distinct().ToList();
                 dbConnection.Close();
-                return Result<IEnumerable<Exchange>, string>.Success(exchanges);
+                return Result<IEnumerable<Provider>, string>.Success(providers);
             }
             catch (Exception exception)
             {
-                return Result<IEnumerable<Exchange>, string>.Fail(exception.ToString());
+                return Result<IEnumerable<Provider>, string>.Fail(exception.ToString());
             }
         }
 
@@ -263,16 +305,15 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProvider(Exchange provider)
+        public async Task UpdateProvider(Provider provider)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "UPDATE \"Providers\" " +
-                       "SET \"Name\" = @Name, " +
-                       "\"Code\" = @Code, " +
-                       "\"LastAssetSync\" = @LastAssetSync, " +
-                       "\"LastPairSync\" = @LastPairSync, " +
-                       "\"LastCandlestickSync\" = @LastCandlestickSync " +
-                       "WHERE \"Id\" = @PrimaryId";
+
+            const string query = "INSERT INTO \"ProvidersPairAssetSync\" (\"ProviderId\", \"LastAssetSync\", \"LastPairSync\") " +
+                                 "VALUES (@ProviderId, @LastAssetSync, @LastPairSync) " +
+                                 "ON CONFLICT (\"ProviderId\") DO UPDATE SET " +
+                                 "\"LastAssetSync\" = EXCLUDED.\"LastAssetSync\", " +
+                                 "\"LastPairSync\" = EXCLUDED.\"LastPairSync\"";
 
             NpgsqlTransaction? transaction = null;
             try
@@ -281,6 +322,35 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 transaction = dbConnection.BeginTransaction();
 
                 await dbConnection.ExecuteAsync(query, provider, transaction: transaction);
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction?.Rollback();
+                throw;
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
+        }
+
+        public async Task UpdateProvider(IEnumerable<ProviderCandlestickSyncInfo> candlestickSyncInfos)
+        {
+            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            const string query = "INSERT INTO public.\"ProviderCandlestickSyncInfos\" (\"ProviderId\", \"TimeframeId\", \"LastCandlestickSync\") " +
+                                 "VALUES (@ProviderId, @TimeframeId, @LastCandlestickSync) " +
+                                 "ON CONFLICT (\"ProviderId\", \"TimeframeId\") DO UPDATE SET " +
+                                 "\"LastCandlestickSync\" = EXCLUDED.\"LastCandlestickSync\"";
+
+            NpgsqlTransaction? transaction = null;
+            try
+            {
+                dbConnection.Open();
+                transaction = dbConnection.BeginTransaction();
+
+                await dbConnection.ExecuteAsync(query, candlestickSyncInfos, transaction: transaction);
 
                 transaction.Commit();
             }

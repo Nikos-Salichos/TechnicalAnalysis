@@ -14,7 +14,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public string QuoteAssetContract { get; init; }
         public string BaseAssetName { get; set; }
         public string QuoteAssetName { get; set; }
-        public Provider Provider { get; set; }
+        public DataProvider Provider { get; set; }
         public bool IsActive { get; set; }
         public bool AllCandles { get; init; }
         public DateTime CreatedAt { get; init; }

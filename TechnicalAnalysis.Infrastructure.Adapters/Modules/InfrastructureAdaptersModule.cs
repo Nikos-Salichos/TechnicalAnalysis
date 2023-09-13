@@ -24,15 +24,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<DexV3Adapter>();
             services.AddSingleton<WallStreetZenAdapter>();
 
-            services.AddSingleton<Func<Provider, IAdapter>>(serviceProvider => provider =>
+            services.AddSingleton<Func<DataProvider, IAdapter>>(serviceProvider => provider =>
             {
                 IAdapter adapter = provider switch
                 {
-                    Provider.Binance => serviceProvider.GetService<BinanceAdapter>(),
-                    Provider.Alpaca => serviceProvider.GetService<AlpacaAdapter>(),
-                    Provider.Uniswap or Provider.Pancakeswap => serviceProvider.GetService<DexV3Adapter>(),
-                    Provider.WallStreetZen => serviceProvider.GetService<WallStreetZenAdapter>(),
-                    Provider.All => throw new NotImplementedException($"Exchange {provider} has not been implemented found"),
+                    DataProvider.Binance => serviceProvider.GetService<BinanceAdapter>(),
+                    DataProvider.Alpaca => serviceProvider.GetService<AlpacaAdapter>(),
+                    DataProvider.Uniswap or DataProvider.Pancakeswap => serviceProvider.GetService<DexV3Adapter>(),
+                    DataProvider.WallStreetZen => serviceProvider.GetService<WallStreetZenAdapter>(),
+                    DataProvider.All => throw new NotImplementedException($"Exchange {provider} has not been implemented found"),
                     _ => throw new ArgumentOutOfRangeException($"Exchange {provider} not found")
                 };
 

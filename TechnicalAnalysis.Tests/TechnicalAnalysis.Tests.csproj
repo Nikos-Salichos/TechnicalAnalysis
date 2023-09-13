@@ -31,8 +31,4 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\TechnicalAnalysis.StartUpService\TechnicalAnalysis.StartUpService.csproj" />
-	</ItemGroup>
-
 </Project>

@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Domain.Entities
 {
     public class Pool : BaseEntity
     {
-        public Provider Provider { get; init; }
+        public DataProvider Provider { get; init; }
         public string PoolContract { get; init; }
         public long Token0Id { get; init; }
         public string Token0Contract { get; init; }
