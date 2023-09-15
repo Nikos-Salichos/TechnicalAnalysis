@@ -30,13 +30,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetPartialProviderQuery());
-            var alpacaProvider = exchanges.FirstOrDefault(p => p.PrimaryId == (int)DataProvider.Alpaca);
+            var exchanges = await _mediator.Send(new GetProviderSynchronizationQuery());
+            var alpacaProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
             if (alpacaProvider == null)
             {
-                _logger.LogWarning("Method {Method}: {Provider} could not be found", nameof(Sync), provider);
-                return;
+                alpacaProvider = new ProviderSynchronization(provider);
+                alpacaProvider.DataProvider = provider;
             }
 
             var stockSymbols = new List<string> { "vt",
@@ -76,16 +76,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await SyncPairs(stockSymbols);
             await SyncCandlesticks(Timeframe.Daily);
 
-            alpacaProvider.LastAssetSync = DateTime.UtcNow;
-            alpacaProvider.LastPairSync = DateTime.UtcNow;
-            alpacaProvider.CandlestickSyncInfos.Add(new ProviderCandlestickSyncInfo
-            {
-                ProviderId = alpacaProvider.PrimaryId,
-                TimeframeId = (long)timeframe,
-                LastCandlestickSync = DateTime.UtcNow
-            });
-
-            await _mediator.Send(new UpdateExchangeCommand(alpacaProvider));
+            alpacaProvider.UpdateProviderInfo();
+            var providerCandlestickSyncInfo = alpacaProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
+            await _mediator.Send(new UpdateExchangeCommand(alpacaProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
 
         private async Task SyncAssets(IEnumerable<Asset> fetchedAssets, IEnumerable<string> stockSymbols)

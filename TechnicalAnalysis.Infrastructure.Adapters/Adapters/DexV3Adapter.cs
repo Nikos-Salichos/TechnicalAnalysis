@@ -30,13 +30,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetPartialProviderQuery());
-            var dexV3Provider = exchanges.FirstOrDefault(p => p.PrimaryId == (int)provider);
+            var exchanges = await _mediator.Send(new GetProviderSynchronizationQuery());
+            var dexV3Provider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
             if (dexV3Provider == null)
             {
-                _logger.LogWarning("Method {Method}: {Provider} could not be found", nameof(Sync), provider);
-                return;
+                dexV3Provider = new ProviderSynchronization(provider);
+                dexV3Provider.DataProvider = provider;
             }
 
             if (dexV3Provider.IsProviderSyncedToday(timeframe))
@@ -63,20 +63,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var poolsWithStables = FilterPoolsBasedOnStable(apiResponse.SuccessValue.PoolResponse);
 
             await SaveTokens(poolsWithStables);
-            dexV3Provider.LastAssetSync = DateTime.UtcNow;
-
             await SavePools(poolsWithStables, provider);
-            dexV3Provider.LastPairSync = DateTime.UtcNow;
-
             await SaveCandlesticks(apiResponse.SuccessValue.PoolResponse, provider);
-            dexV3Provider.CandlestickSyncInfos.Add(new ProviderCandlestickSyncInfo
-            {
-                ProviderId = dexV3Provider.PrimaryId,
-                TimeframeId = (long)timeframe,
-                LastCandlestickSync = DateTime.UtcNow
-            });
 
-            await _mediator.Send(new UpdateExchangeCommand(dexV3Provider));
+            dexV3Provider.UpdateProviderInfo();
+            var providerCandlestickSyncInfo = dexV3Provider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
+            await _mediator.Send(new UpdateExchangeCommand(dexV3Provider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
 
             //var poolsOrderByTotalValueLocked = pools.Where(p => p.TotalValueLocked > 0).GetTop100PoolsByOrdering(p => p.TotalValueLocked);
             //var poolsOrderByLiquidity = pools.Where(p => p.Liquidity > 0).GetTop100PoolsByOrdering(p => p.Liquidity);

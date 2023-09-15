@@ -31,13 +31,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetPartialProviderQuery());
-            var binanceProvider = exchanges.FirstOrDefault(p => p.PrimaryId == (int)provider);
+            var exchanges = await _mediator.Send(new GetProviderSynchronizationQuery());
+            var binanceProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
             if (binanceProvider == null)
             {
-                _logger.LogWarning("Method {Method}: {Provider} could not be found", nameof(Sync), provider);
-                return;
+                binanceProvider = new ProviderSynchronization(provider);
+                binanceProvider.DataProvider = provider;
             }
 
             if (binanceProvider.IsProviderSyncedToday(timeframe))
@@ -73,16 +73,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await SyncCandlesticks(pairs.ToContract().ToList(), timeframe);
 
-            binanceProvider.LastAssetSync = DateTime.UtcNow;
-            binanceProvider.LastPairSync = DateTime.UtcNow;
-            binanceProvider.CandlestickSyncInfos.Add(new ProviderCandlestickSyncInfo
-            {
-                ProviderId = binanceProvider.PrimaryId,
-                TimeframeId = (long)timeframe,
-                LastCandlestickSync = DateTime.UtcNow
-            });
-
-            await _mediator.Send(new UpdateExchangeCommand(binanceProvider));
+            binanceProvider.UpdateProviderInfo();
+            var providerCandlestickSyncInfo = binanceProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
+            await _mediator.Send(new UpdateExchangeCommand(binanceProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
 
         private async Task SyncAssets(IEnumerable<BinanceSymbol> tradeablePairs)
