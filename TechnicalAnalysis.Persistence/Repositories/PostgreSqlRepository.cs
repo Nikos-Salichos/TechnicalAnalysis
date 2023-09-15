@@ -1,7 +1,9 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Entities;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
@@ -13,13 +15,16 @@ using Pool = TechnicalAnalysis.Domain.Entities.Pool;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
+    //TODO ADD LOGGER IN ALL EXCEPTION
     public class PostgreSqlRepository : IPostgreSqlRepository
     {
         private readonly string _connectionStringKey;
+        private readonly ILogger<PostgreSqlRepository> _logger;
 
-        public PostgreSqlRepository(IOptionsMonitor<DatabaseSetting> databaseSettings)
+        public PostgreSqlRepository(IOptionsMonitor<DatabaseSetting> databaseSettings, ILogger<PostgreSqlRepository> logger)
         {
             _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
+            _logger = logger;
         }
 
         public async Task<IResult<IEnumerable<Asset>, string>> GetAssets()
@@ -35,6 +40,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{exception}", nameof(GetAssets), exception);
                 return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
         }
@@ -45,13 +51,24 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 dbConnection.Open();
-                const string query = "SELECT \"id\" AS PrimaryId, \"open_date\" AS OpenDate, \"open_price\" AS OpenPrice, \"high_price\" AS HighPrice, \"low_price\" AS LowPrice, \"close_price\" AS ClosePrice, \"volume\" AS Volume, \"close_date\" AS CloseDate, \"number_of_trades\" AS NumberOfTrades, \"timeframe\" AS Timeframe, \"pair_id\" AS PairId FROM \"Candlesticks\"";
+                const string query = "SELECT \"Id\" AS PrimaryId, " +
+                    "\"open_date\" AS OpenDate, " +
+                    "\"open_price\" AS OpenPrice, " +
+                    "\"high_price\" AS HighPrice, " +
+                    "\"low_price\" AS LowPrice, " +
+                    "\"close_price\" AS ClosePrice," +
+                    " \"volume\" AS Volume, " +
+                    "\"close_date\" AS CloseDate, " +
+                    "\"number_of_trades\" AS NumberOfTrades," +
+                    " \"timeframe\" AS Timeframe, " +
+                    "\"pair_id\" AS PairId FROM \"Candlesticks\"";
                 var candlesticks = await dbConnection.QueryAsync<Candlestick>(query);
                 dbConnection.Close();
                 return Result<IEnumerable<Candlestick>, string>.Success(candlesticks);
             }
             catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{exception}", nameof(GetCandlesticks), exception);
                 return Result<IEnumerable<Candlestick>, string>.Fail(exception.ToString());
             }
         }
@@ -73,62 +90,61 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task<IResult<IEnumerable<Provider>, string>> GetProviders()
+        public async Task<IResult<IEnumerable<ProviderSynchronization>, string>> GetProviders()
         {
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 dbConnection.Open();
 
-                const string query = @"
+                const string providerPairAssetSyncInfoQuery = @"
                                         SELECT
                                             p.""Id"" AS PrimaryId,
-                                            p.""Name"" AS ProviderName,
-                                            pas.""LastAssetSync"",
-                                            pas.""LastPairSync"",
-                                            pc.""Id"" AS CandlestickSyncInfoId,
-                                            pc.""LastCandlestickSync"" AS LastCandlestickSync,
-                                            t.""Id"" AS TimeframeId,
-                                            t.""Name"" AS Timeframe
+                                            p.""ProviderId"" AS DataProvider,
+                                            p.""LastAssetSync"",
+                                            p.""LastPairSync""
                                         FROM
-                                            public.""Providers"" p
-                                        LEFT JOIN
-                                            public.""ProviderCandlestickSyncInfos"" pc ON p.""Id"" = p.""Id""
-                                        LEFT JOIN
-                                            public.""ProvidersPairAssetSync"" pas ON p.""Id"" = p.""Id""
-                                        LEFT JOIN
-                                            public.""Timeframes"" t ON pc.""TimeframeId"" = t.""Id""";
+                                            public.""ProviderPairAssetSyncInfos"" p";
 
-                var providerDictionary = new Dictionary<long, Provider>();
+                const string providerCandlestickSyncInfoQuery = @"
+                                            SELECT
+                                                p.""Id"" AS PrimaryId,
+                                                p.""ProviderId"" AS DataProvider,
+                                                p.""LastCandlestickSync"" AS LastCandlestickSync,
+                                                p.""TimeframeId"" AS Timeframe
+                                            FROM
+                                                public.""ProviderCandlestickSyncInfos"" p";
 
-                var providers = await dbConnection.QueryAsync<Provider, ProviderCandlestickSyncInfo, Provider>(
-                    query,
-                    (provider, candlestickSyncInfo) =>
-                    {
-                        if (!providerDictionary.TryGetValue(provider.PrimaryId, out var currentProvider))
-                        {
-                            currentProvider = provider;
-                            currentProvider.CandlestickSyncInfos = new List<ProviderCandlestickSyncInfo>();
-                            providerDictionary.Add(provider.PrimaryId, currentProvider);
-                        }
+                var providerPairAssetSyncInfos = await dbConnection.QueryAsync<ProviderPairAssetSyncInfo>(providerPairAssetSyncInfoQuery);
+                var providerCandlestickSyncInfos = await dbConnection.QueryAsync<ProviderCandlestickSyncInfo>(providerCandlestickSyncInfoQuery);
 
-                        if (candlestickSyncInfo != null)
-                        {
-                            currentProvider.CandlestickSyncInfos.Add(candlestickSyncInfo);
-                        }
+                var providers = dbConnection.Query<string>("select 'Binance' union select 'Uniswap' union select 'Pancakeswap' " +
+                    "union select 'Alpaca' union select 'WallStreetZen' union select 'All'")
+                    .Select(x => Enum.Parse(typeof(DataProvider), x)).ToList();
 
-                        return currentProvider;
-                    },
-                   splitOn: "CandlestickSyncInfoId"
-                );
+                var timeframes = dbConnection.Query<string>("select 'Daily' union select 'Weekly' union select 'OneHour'")
+                    .Select(x => Enum.Parse(typeof(Timeframe), x)).ToList();
 
-                providers = providers.Distinct().ToList();
+                var providerSynchronizations = new List<ProviderSynchronization>();
+                foreach (var providerPairAssetSyncInfo in providerPairAssetSyncInfos)
+                {
+                    var providerSynchronization = new ProviderSynchronization(providerPairAssetSyncInfo.DataProvider);
+                    providerSynchronization.ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
+                    providerSynchronizations.Add(providerSynchronization);
+                }
+
+                foreach (var providerCandlestickSyncInfo in providerCandlestickSyncInfos)
+                {
+                    var providerSynchronizationFound = providerSynchronizations.Find(p => p.DataProvider == providerCandlestickSyncInfo.DataProvider);
+                    providerSynchronizationFound?.CandlestickSyncInfos.Add(providerCandlestickSyncInfo);
+                }
+
                 dbConnection.Close();
-                return Result<IEnumerable<Provider>, string>.Success(providers);
+                return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
             }
             catch (Exception exception)
             {
-                return Result<IEnumerable<Provider>, string>.Fail(exception.ToString());
+                return Result<IEnumerable<ProviderSynchronization>, string>.Fail(exception.ToString());
             }
         }
 
@@ -305,12 +321,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProvider(Provider provider)
+        public async Task UpdateProvider(ProviderPairAssetSyncInfo providerPairAssetSyncInfos)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
 
-            const string query = "INSERT INTO \"ProvidersPairAssetSync\" (\"ProviderId\", \"LastAssetSync\", \"LastPairSync\") " +
-                                 "VALUES (@ProviderId, @LastAssetSync, @LastPairSync) " +
+            const string query = "INSERT INTO \"ProviderPairAssetSyncInfos\" (\"ProviderId\", \"LastAssetSync\", \"LastPairSync\") " +
+                                 "VALUES (@DataProvider, @LastAssetSync, @LastPairSync) " +
                                  "ON CONFLICT (\"ProviderId\") DO UPDATE SET " +
                                  "\"LastAssetSync\" = EXCLUDED.\"LastAssetSync\", " +
                                  "\"LastPairSync\" = EXCLUDED.\"LastPairSync\"";
@@ -321,7 +337,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 dbConnection.Open();
                 transaction = dbConnection.BeginTransaction();
 
-                await dbConnection.ExecuteAsync(query, provider, transaction: transaction);
+                await dbConnection.ExecuteAsync(query, providerPairAssetSyncInfos, transaction: transaction);
 
                 transaction.Commit();
             }
@@ -336,11 +352,11 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProvider(IEnumerable<ProviderCandlestickSyncInfo> candlestickSyncInfos)
+        public async Task UpdateProvider(ProviderCandlestickSyncInfo candlestickSyncInfos)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO public.\"ProviderCandlestickSyncInfos\" (\"ProviderId\", \"TimeframeId\", \"LastCandlestickSync\") " +
-                                 "VALUES (@ProviderId, @TimeframeId, @LastCandlestickSync) " +
+                                 "VALUES (@DataProvider, @Timeframe, @LastCandlestickSync) " +
                                  "ON CONFLICT (\"ProviderId\", \"TimeframeId\") DO UPDATE SET " +
                                  "\"LastCandlestickSync\" = EXCLUDED.\"LastCandlestickSync\"";
 
