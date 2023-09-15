@@ -64,9 +64,6 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
     options.Level = CompressionLevel.Optimal;
 });
 
-builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
-builder.Services.AddHangfireServer();
-
 #endregion Services Registration
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -90,12 +87,17 @@ app.UseSerilogRequestLogging();
 
 app.UseCors();
 
-app.UseHangfireDashboard("/hangfire", new DashboardOptions()
-{
-    Authorization = new[] { new DashboardNoAuthorizationFilter() }
-});
 
-HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
+if (app.Environment.IsProduction())
+{
+    builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
+    builder.Services.AddHangfireServer();
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+    {
+        Authorization = new[] { new DashboardNoAuthorizationFilter() }
+    });
+    HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
+}
 
 // Authorization should come after Hangfire Dashboard.
 app.UseAuthorization();
