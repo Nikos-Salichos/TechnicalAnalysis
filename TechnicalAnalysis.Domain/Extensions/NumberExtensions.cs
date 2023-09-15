@@ -53,31 +53,5 @@ namespace TechnicalAnalysis.Domain.Extensions
                 throw new ArgumentException("The provided string cannot be converted to a decimal.");
             }
         }
-
-
-        public static double? ReduceDigitsToFitDoubleLength(this string stringWithComma)
-        {
-            if (string.IsNullOrWhiteSpace(stringWithComma))
-            {
-                return null;
-            }
-
-            string stringWithoutComma = stringWithComma.Replace(',', '.');
-            if (stringWithoutComma.Length > 10)
-            {
-                stringWithoutComma = stringWithoutComma[..10];
-            }
-
-            if (double.TryParse(stringWithoutComma, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleNumber))
-            {
-                doubleNumber = Math.Round(doubleNumber, 4, MidpointRounding.AwayFromZero);
-                return doubleNumber;
-            }
-            else
-            {
-                throw new ArgumentException("The provided string cannot be converted to a double.");
-            }
-        }
-
     }
 }
