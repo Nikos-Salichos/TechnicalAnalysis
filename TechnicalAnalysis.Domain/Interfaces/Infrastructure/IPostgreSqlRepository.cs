@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface IPostgreSqlRepository
     {
-        Task<IResult<IEnumerable<Provider>, string>> GetProviders();
+        Task<IResult<IEnumerable<ProviderSynchronization>, string>> GetProviders();
         Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticks();
         Task<IResult<IEnumerable<Pair>, string>> GetPairs();
         Task<IResult<IEnumerable<Asset>, string>> GetAssets();
@@ -15,8 +15,8 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
         Task InsertPairs(IEnumerable<Pair> pairs);
         Task InsertCandlesticks(IEnumerable<Candlestick> candlesticks);
         Task InsertAssets(IEnumerable<Asset> assets);
-        Task UpdateProvider(Provider provider);
-        Task UpdateProvider(IEnumerable<ProviderCandlestickSyncInfo> providerCandlestickSyncInfos);
+        Task UpdateProvider(ProviderPairAssetSyncInfo providerPairAssetSyncInfos);
+        Task UpdateProvider(ProviderCandlestickSyncInfo providerCandlestickSyncInfos);
         Task InsertPools(IEnumerable<Pool> pools);
         Task InsertCandlesticks(IEnumerable<DexCandlestick> candlesticks);
         Task DeletePoolsByIds(IEnumerable<long> ids);
