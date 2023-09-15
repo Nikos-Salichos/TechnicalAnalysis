@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests
             using var command = new NpgsqlCommand();
             connection.Open();
             const string query = "SELECT \"Id\" AS PrimaryId, \"Name\", \"Code\", \"LastAssetSync\", \"LastPairSync\", \"LastCandlestickSync\" FROM \"Providers\"";
-            var providers = await connection.QueryAsync<Provider>(query);
+            var providers = await connection.QueryAsync<ProviderPairAssetSyncInfo>(query);
             providers.Should().NotBeNullOrEmpty();
         }
 
