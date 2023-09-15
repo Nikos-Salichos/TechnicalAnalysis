@@ -61,8 +61,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, _jsonSerializerOptions);
                 if (deserializedData is not null)
                 {
-                    _logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ",
-                    nameof(GetBinanceAssetsAndPairs), deserializedData);
+                    _logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetBinanceAssetsAndPairs), deserializedData);
                     return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
                 }
 
