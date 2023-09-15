@@ -14,6 +14,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests
             _factory = factory;
         }
 
+        //TODO Finish the test
         [Fact]
         public async Task Should_return_ok_on_http_get_synchronizeProviders()
         {
