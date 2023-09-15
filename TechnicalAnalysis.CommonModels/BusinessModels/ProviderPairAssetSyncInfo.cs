@@ -3,18 +3,18 @@ using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
-    public class ProviderCandlestickSyncInfo : BaseEntity
+    public class ProviderPairAssetSyncInfo : BaseEntity
     {
         public DataProvider DataProvider { get; set; }
-        public Timeframe Timeframe { get; set; }
-        public DateTime LastCandlestickSync { get; set; }
+        public DateTime LastAssetSync { get; set; }
+        public DateTime LastPairSync { get; set; }
 
-        public ProviderCandlestickSyncInfo(DataProvider dataProvider)
+        public ProviderPairAssetSyncInfo(DataProvider dataProvider)
         {
             DataProvider = dataProvider;
         }
 
-        public ProviderCandlestickSyncInfo()
+        public ProviderPairAssetSyncInfo()
         {
 
         }
