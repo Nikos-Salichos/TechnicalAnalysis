@@ -5,7 +5,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers
 {
-    public class GetExchangesHandler : IRequestHandler<GetPartialProviderQuery, IEnumerable<Provider>>
+    public class GetExchangesHandler : IRequestHandler<GetProviderSynchronizationQuery, IEnumerable<ProviderSynchronization>>
     {
         private readonly IPostgreSqlRepository _repository;
 
@@ -14,12 +14,12 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Provider>> Handle(GetPartialProviderQuery getProvidersQuery, CancellationToken cancellationToken)
+        public async Task<IEnumerable<ProviderSynchronization>> Handle(GetProviderSynchronizationQuery getProvidersQuery, CancellationToken cancellationToken)
         {
             var providers = await _repository.GetProviders();
             if (providers.IsError)
             {
-                return Enumerable.Empty<Provider>();
+                return Enumerable.Empty<ProviderSynchronization>();
             }
             return providers.SuccessValue;
         }
