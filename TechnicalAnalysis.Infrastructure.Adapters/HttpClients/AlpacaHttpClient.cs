@@ -34,6 +34,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(_alpacaSettings.CurrentValue.ApiKey, _alpacaSettings.CurrentValue.ApiSecret));
                 HistoricalBarsRequest historicalBarsRequest = new HistoricalBarsRequest(pairName, fromDateTime, toDateTime, barTimeFrame);
                 var stockData = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy).ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
+                _logger.LogInformation("Method: {Method}, deserializedData '{@stockData}' ", nameof(GetAlpacaData), stockData);
                 return Result<IMultiPage<IBar>, string>.Success(stockData);
             }
             catch (Exception exception)
