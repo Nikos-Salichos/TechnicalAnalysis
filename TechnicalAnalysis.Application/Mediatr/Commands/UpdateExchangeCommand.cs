@@ -5,11 +5,14 @@ namespace TechnicalAnalysis.Application.Mediatr.Commands
 {
     public class UpdateExchangeCommand : IRequest
     {
-        public Provider Exchange { get; }
+        public ProviderPairAssetSyncInfo ProviderPairAssetSyncInfo { get; }
+        public ProviderCandlestickSyncInfo ProviderCandlestickSyncInfo { get; }
 
-        public UpdateExchangeCommand(Provider exchange)
+        public UpdateExchangeCommand(ProviderPairAssetSyncInfo providerPairAssetSyncInfo,
+            ProviderCandlestickSyncInfo providerCandlestickSyncInfo)
         {
-            Exchange = exchange;
+            ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
+            ProviderCandlestickSyncInfo = providerCandlestickSyncInfo;
         }
     }
 }
