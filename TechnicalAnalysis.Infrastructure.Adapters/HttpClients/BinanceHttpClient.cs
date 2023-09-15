@@ -45,8 +45,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
                                                               .ExecuteAsync(() => httpclient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
-            _logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
-               nameof(GetBinanceCandlesticks), _binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage.StatusCode, httpResponseMessage.Content);
+            _logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
+               nameof(GetBinanceAssetsAndPairs), _binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -57,9 +57,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             try
             {
                 using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+
                 var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, _jsonSerializerOptions);
                 if (deserializedData is not null)
                 {
+                    _logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ",
+                    nameof(GetBinanceAssetsAndPairs), deserializedData);
                     return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
                 }
 
@@ -92,8 +95,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
                                                               .ExecuteAsync(() => httpclient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
 
-            _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
-                nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode, httpResponseMessage.Content);
+            _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode} ",
+                nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode);
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
