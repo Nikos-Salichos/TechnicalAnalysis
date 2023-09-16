@@ -12,10 +12,10 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static void CalculatePairStatistics(this IEnumerable<PairExtended> pairs)
         {
-            CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(pairs);
+            // CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(pairs);
         }
 
-        public static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(IEnumerable<PairExtended> pairs)
+        private static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(IEnumerable<PairExtended> pairs)
         {
             var preCalcCandlesticks = pairs.ToImmutableDictionary(
                 pair => pair.PrimaryId,
