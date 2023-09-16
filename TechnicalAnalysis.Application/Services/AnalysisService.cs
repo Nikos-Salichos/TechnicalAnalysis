@@ -5,7 +5,6 @@ using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Helpers;
 using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Queries;
-using TechnicalAnalysis.CommonModels;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.JsonOutput;
@@ -62,7 +61,7 @@ namespace TechnicalAnalysis.Application.Services
             return filteredPairs;
         }
 
-        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName)
+        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
             var selectedPairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
@@ -116,7 +115,7 @@ namespace TechnicalAnalysis.Application.Services
                 var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
                 await JsonHelper.SerializeToJson(outputPair, candlestickFileName);
-                string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-{indicator}.json");
+                string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-{indicator.Name}.json");
                 await JsonHelper.SerializeToJsonArray(indicator, signalFileName);
             }
 
@@ -125,10 +124,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator CalculateStrongSignal(IEnumerable<Position> positionsCloseOneByOne)
         {
-            var enhancedScan = new Indicator
-            {
-                Name = "EnhancedScan"
-            };
+            var enhancedScan = new Indicator { Name = "EnhancedScan" };
             foreach (var position in positionsCloseOneByOne)
             {
                 var openPosition = new Signal
@@ -154,7 +150,8 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator CalculateCandlestickCloseBelowPivotPrice(PairExtended? pair)
         {
-            var fractalTrend = new Indicator();
+            var closeBelowPivotPrice = new Indicator { Name = "closeBelowPivotPrice" };
+
             foreach (var candlestick in pair.Candlesticks.Where(c => c.CloseRelativeToPivots.FirstOrDefault()?.NumberOfConsecutiveCandlestickBelowPivot >= 5))
             {
                 var signalIndicator = new Signal
@@ -162,15 +159,15 @@ namespace TechnicalAnalysis.Application.Services
                     OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
                     Buy = 1,
                 };
-                fractalTrend.Signals.Add(signalIndicator);
+                closeBelowPivotPrice.Signals.Add(signalIndicator);
             }
 
-            return fractalTrend;
+            return closeBelowPivotPrice;
         }
 
         private static Indicator CalculateStPatternSignals(PairExtended? pair)
         {
-            var fractalTrend = new Indicator();
+            var stPatternSignals = new Indicator { Name = "StPatternSignals" };
 
             foreach (var candlestick in pair.Candlesticks.Where(c => c.StPatternSignals.FirstOrDefault()?.NumberOfSignal == 1))
             {
@@ -179,15 +176,15 @@ namespace TechnicalAnalysis.Application.Services
                     OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
                     Buy = 1,
                 };
-                fractalTrend.Signals.Add(signalIndicator);
+                stPatternSignals.Signals.Add(signalIndicator);
             }
 
-            return fractalTrend;
+            return stPatternSignals;
         }
 
         private static Indicator PrintFractalTrend(PairExtended? pair)
         {
-            var fractalTrend = new Indicator();
+            var fractalTrend = new Indicator { Name = "FractalTrend" };
             for (int i = 0; i < pair?.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
@@ -234,10 +231,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintLowestHighSignals(PairExtended? pair)
         {
-            var lowestHighLowestLowFractal = new Indicator
-            {
-                Name = "lowestHighLowestLowFractal"
-            };
+            var lowestHighLowestLowFractal = new Indicator { Name = "lowestHighLowestLowFractal" };
 
             var lastSignal = string.Empty;
             for (int i = 0; i < pair?.Candlesticks.Count; i++)
@@ -280,10 +274,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintFlagNestedBodySignals(PairExtended? pair)
         {
-            var indicator = new Indicator
-            {
-                Name = "B"
-            };
+            var indicator = new Indicator { Name = "FlagNestedBodySignals" };
             foreach (var candlestick in pair?.Candlesticks)
             {
                 foreach (var signal in candlestick.FlagsNestedCandlesticksBody)
@@ -394,10 +385,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintResistanceBreakoutSignals(PairExtended? pair)
         {
-            var flagNestedCandlesticksBody = new Indicator
-            {
-                Name = "ResistanceBreakout"
-            };
+            var flagNestedCandlesticksBody = new Indicator { Name = "ResistanceBreakout" };
             decimal? profit = 0;
             decimal? loss = 0;
             foreach (var candlestick in pair?.Candlesticks)
@@ -432,18 +420,13 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintPivotSignals(PairExtended? pair)
         {
-            var pivot = new Indicator
-            {
-                Name = "Pivot"
-            };
+            var pivot = new Indicator { Name = "PivotPointSignals" };
             var candlesticks = pair?.Candlesticks;
 
             // Start the loop from the second candlestick to avoid index -1
             for (int i = 1; i < candlesticks?.Count; i++)
             {
                 var candlestick = candlesticks[i];
-                //var candlestick1 = candlesticks[i - 1];
-
                 foreach (var standardPivotPoint in candlestick.CloseRelativeToPivots.Where(c => c.NumberOfConsecutiveCandlestickBelowPivot > 3))
                 {
                     var signalIndicator = new Signal
@@ -469,8 +452,7 @@ namespace TechnicalAnalysis.Application.Services
             //TODO Needs to optimize it.
             pairs.CalculatePairStatistics();
 
-            // CountPairsWithEnhancedScanIsBuy(pairs);
-
+            CountPairsWithEnhancedScanIsBuy(pairs);
             return pairs;
         }
 
@@ -499,6 +481,7 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
+        //TODO Finish this method
         private static void CountPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
         {
             var marketStatistic = new MarketStatistic { NumberOfPairs = pairs.ToList().Count };
