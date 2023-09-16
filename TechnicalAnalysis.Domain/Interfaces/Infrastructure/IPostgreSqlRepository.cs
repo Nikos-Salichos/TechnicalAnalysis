@@ -15,10 +15,10 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
         Task InsertPairs(IEnumerable<Pair> pairs);
         Task InsertCandlesticks(IEnumerable<Candlestick> candlesticks);
         Task InsertAssets(IEnumerable<Asset> assets);
-        Task UpdateProvider(ProviderPairAssetSyncInfo providerPairAssetSyncInfos);
-        Task UpdateProvider(ProviderCandlestickSyncInfo providerCandlestickSyncInfos);
+        Task UpdateProviderPairAssetSyncInfo(ProviderPairAssetSyncInfo providerPairAssetSyncInfos);
+        Task UpdateProviderCandlestickSyncInfo(ProviderCandlestickSyncInfo providerCandlestickSyncInfos);
         Task InsertPools(IEnumerable<Pool> pools);
-        Task InsertCandlesticks(IEnumerable<DexCandlestick> candlesticks);
+        Task InsertDexCandlesticks(IEnumerable<DexCandlestick> candlesticks);
         Task DeletePoolsByIds(IEnumerable<long> ids);
         Task DeleteDexCandlesticksByIds(IEnumerable<long> ids);
         Task DeleteTokensByIds(IEnumerable<long> ids);
