@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Infrastructure.Persistence.DistributedCache;
@@ -23,9 +24,9 @@ namespace TechnicalAnalysis.Application.Services
             _rabbitMqService = rabbitMqService;
         }
 
-        public Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName)
+        public Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
         {
-            return _inner.GetIndicatorsByPairNamesAsync(pairName);
+            return _inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
         }
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All)
