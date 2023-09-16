@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.Domain.Utilities;
@@ -12,7 +13,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static void CalculatePairStatistics(this IEnumerable<PairExtended> pairs)
         {
-            // CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(pairs);
+            CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(pairs);
         }
 
         private static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(IEnumerable<PairExtended> pairs)
@@ -28,8 +29,23 @@ namespace TechnicalAnalysis.Application.Extensions
                     .ToList()
             );
 
+            // Outside of the loop
+            ConcurrentDictionary<long, double[]> preCalcCandlestickArrays = new ConcurrentDictionary<long, double[]>();
+
+            // Convert to arrays once, for faster access
+            foreach (var preCalcCandlestick in preCalcCandlesticks)
+            {
+                preCalcCandlestickArrays[preCalcCandlestick.Key] = preCalcCandlestick.Value.ToArray();
+            }
+
+            // Main loop
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair =>
             {
+                if (pair.Candlesticks.Count == 0)
+                {
+                    return;
+                }
+
                 Logger.LogInformation("Method name: {MethodName} - Pair details - {PairPropertyName}: {PairName}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
                 "{BaseAssetNamePropertyName}: {BaseAssetName}, " +
@@ -41,39 +57,37 @@ namespace TechnicalAnalysis.Application.Extensions
                 nameof(pair.QuoteAssetContract), pair.QuoteAssetContract,
                 nameof(pair.QuoteAssetName), pair.QuoteAssetName);
 
-                if (pair.Candlesticks.Count == 0)
-                {
-                    return;
-                }
-
-                var currentPairOrderedCandles = preCalcCandlesticks[pair.PrimaryId];
+                var currentPairOrderedCandles = preCalcCandlestickArrays[pair.PrimaryId];
+                int currentPairOrderedCandlesLength = currentPairOrderedCandles.Length;
 
                 foreach (var correlatedPair in pairs)
                 {
-                    if (correlatedPair.PrimaryId == pair?.PrimaryId)
+                    if (correlatedPair.PrimaryId == pair.PrimaryId)
                     {
                         continue;
                     }
 
-                    var otherPairOrderedCandles = preCalcCandlesticks[correlatedPair.PrimaryId];
+                    var otherPairOrderedCandles = preCalcCandlestickArrays[correlatedPair.PrimaryId];
+                    int desiredLength = Math.Min(otherPairOrderedCandles.Length, currentPairOrderedCandlesLength);
 
-                    int desiredLength = Math.Min(otherPairOrderedCandles.Count, currentPairOrderedCandles.Count);
-
-                    var closeOfCandlesticksInDouble = currentPairOrderedCandles.Take(desiredLength);
-                    var pairCorrelatedCloseCandlesticks = otherPairOrderedCandles.Take(desiredLength);
-
-                    for (int i = 0; i < closeOfCandlesticksInDouble.Count(); i++)
+                    for (int i = 0; i < desiredLength; i++)
                     {
-                        var currentCandlestickSubset = closeOfCandlesticksInDouble.Take(i + 1);
-                        var currentOtherPairCandlestickSubset = pairCorrelatedCloseCandlesticks.Take(i + 1);
+                        var currentCandlestickSubset = currentPairOrderedCandles.Take(i + 1).ToArray();
+                        var currentOtherPairCandlestickSubset = otherPairOrderedCandles.Take(i + 1).ToArray();
 
                         var correlation = Correlation.Pearson(currentOtherPairCandlestickSubset, currentCandlestickSubset);
-
-                        pair?.Candlesticks.ElementAtOrDefault(i)?.CorrelationPerPair.TryAdd(correlatedPair.BaseAssetName, correlation);
+                        pair.Candlesticks[i].CorrelationPerPair.TryAdd(correlatedPair.BaseAssetName, correlation);
                     }
                 }
             });
+
+
+
+
+
         }
+
+
 
     }
 }
