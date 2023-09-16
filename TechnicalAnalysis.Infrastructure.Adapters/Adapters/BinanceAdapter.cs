@@ -7,7 +7,7 @@ using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Commands;
 using TechnicalAnalysis.Application.Mediatr.Queries;
-using TechnicalAnalysis.Application.Validators.Binance;
+using TechnicalAnalysis.Application.Validations.Binance;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
