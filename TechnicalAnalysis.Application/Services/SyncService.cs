@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using TechnicalAnalysis.CommonModels.ApiRequests;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
@@ -16,15 +17,9 @@ namespace TechnicalAnalysis.Application.Services
             _adapterFactory = adapterFactory;
         }
 
-        public Task<string> SynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
+        public Task<string> SynchronizeProvidersAsync(DataProviderTimeframeRequest dataProviderTimeframeRequest)
         {
-            if (timeframe != Timeframe.Daily &&
-                (timeframe != Timeframe.Weekly || provider != DataProvider.Binance))
-            {
-                return Task.FromResult($"Combination {provider} and {timeframe} timeframe is not supported yet");
-            }
-
-            return InternalSynchronizeProvidersAsync(provider, timeframe);
+            return InternalSynchronizeProvidersAsync(dataProviderTimeframeRequest.DataProvider, dataProviderTimeframeRequest.Timeframe);
 
             async Task<string> InternalSynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
             {
