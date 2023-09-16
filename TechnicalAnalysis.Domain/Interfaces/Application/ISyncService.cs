@@ -1,9 +1,9 @@
-﻿using TechnicalAnalysis.CommonModels.Enums;
+﻿using TechnicalAnalysis.CommonModels.ApiRequests;
 
 namespace TechnicalAnalysis.Domain.Interfaces.Application
 {
     public interface ISyncService
     {
-        Task<string> SynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe);
+        Task<string> SynchronizeProvidersAsync(DataProviderTimeframeRequest dataProviderTimeframeRequest);
     }
 }
