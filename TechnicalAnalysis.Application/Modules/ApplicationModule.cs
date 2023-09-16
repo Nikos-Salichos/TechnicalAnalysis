@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using FluentValidation;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using TechnicalAnalysis.Application.Services;
+using TechnicalAnalysis.Application.Validations;
+using TechnicalAnalysis.CommonModels.ApiRequests;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Settings;
@@ -32,6 +35,8 @@ namespace TechnicalAnalysis.Application.Modules
             services.AddOptions<AlpacaSetting>().Bind(configuration.GetSection("AlpacaSettings"));
             services.AddOptions<BinanceSetting>().Bind(configuration.GetSection("BinanceSettings"));
             services.AddOptions<DexSetting>().Bind(configuration.GetSection("DexSettings"));
+
+            services.AddSingleton<IValidator<DataProviderTimeframeRequest>, DataProviderTimeframeValidator>();
         }
     }
 }
