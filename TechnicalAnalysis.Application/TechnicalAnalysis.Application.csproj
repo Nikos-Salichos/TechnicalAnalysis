@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Validators\**" />
+	  <EmbeddedResource Remove="Validators\**" />
+	  <None Remove="Validators\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="11.7.1" />
 		<PackageReference Include="MediatR" Version="12.1.1" />
 		<PackageReference Include="OoplesFinance.StockIndicators" Version="1.0.53" />
