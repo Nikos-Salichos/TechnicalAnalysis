@@ -2,15 +2,17 @@
 
 public class MarketStatistic
 {
-    public int NumberOfPairs { get; init; }
-    public int NumberOfPairsWithEnhancedScanIsBuy { get; set; }
-    public double PercentageOfPairsWithEnhancedScanIsBuy
+    public double NumberOfPairs { get; init; }
+    public IDictionary<DateTime, List<PairExtended>> NumberOfPairsEnhancedScanPerDate { get; set; } = new Dictionary<DateTime, List<PairExtended>>();
+    public IDictionary<DateTime, double> CalculateAllPercentages()
     {
-        get
+        var percentages = new Dictionary<DateTime, double>();
+        foreach (var (date, pairs) in NumberOfPairsEnhancedScanPerDate)
         {
-            return NumberOfPairs == 0
-                ? 0
-                : (double)NumberOfPairsWithEnhancedScanIsBuy / NumberOfPairs * 100;
+            var percentage = pairs.Count / NumberOfPairs * 100;
+            percentages.Add(date, percentage);
         }
+
+        return percentages;
     }
 }
