@@ -449,7 +449,6 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
 
-            //TODO Needs to optimize it.
             pairs.CalculatePairStatistics();
 
             CountPairsWithEnhancedScanIsBuy(pairs);
@@ -481,22 +480,31 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
-        //TODO Finish this method
         private static void CountPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
         {
             var marketStatistic = new MarketStatistic { NumberOfPairs = pairs.ToList().Count };
-            int numberOfPairsWithEnhancedScanIsBuy = 0;
-            foreach (var candlestick in pairs.SelectMany(pair => pair.Candlesticks))
+
+            foreach (var pair in pairs)
             {
-                var enhancedScan = candlestick.EnhancedScans.FirstOrDefault();
-                if (enhancedScan?.EnhancedScanIsBuy == true)
+                foreach (var candlestick in pair.Candlesticks)
                 {
-                    numberOfPairsWithEnhancedScanIsBuy++;
+                    var enhancedScan = candlestick.EnhancedScans.FirstOrDefault();
+                    if (enhancedScan?.EnhancedScanIsBuy == true)
+                    {
+                        if (marketStatistic.NumberOfPairsEnhancedScanPerDate.TryGetValue(candlestick.CloseDate, out var pairsWithEnhanced))
+                        {
+                            pairsWithEnhanced.Add(pair);
+                        }
+                        else
+                        {
+                            pairsWithEnhanced = new List<PairExtended> { pair };
+                            marketStatistic.NumberOfPairsEnhancedScanPerDate[candlestick.CloseDate] = pairsWithEnhanced;
+                        }
+                    }
                 }
             }
 
-            marketStatistic.NumberOfPairsWithEnhancedScanIsBuy = numberOfPairsWithEnhancedScanIsBuy;
+            var percentagesPerDate = marketStatistic.CalculateAllPercentages();
         }
-
     }
 }
