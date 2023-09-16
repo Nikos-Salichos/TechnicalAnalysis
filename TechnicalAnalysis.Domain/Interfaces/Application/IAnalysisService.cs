@@ -6,6 +6,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Application
     public interface IAnalysisService
     {
         Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All);
-        Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName);
+        Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe);
     }
 }
