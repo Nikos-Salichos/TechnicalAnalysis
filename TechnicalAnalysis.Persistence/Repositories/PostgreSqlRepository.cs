@@ -15,7 +15,6 @@ using Pool = TechnicalAnalysis.Domain.Entities.Pool;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
-    //TODO ADD LOGGER IN ALL EXCEPTION
     public class PostgreSqlRepository : IPostgreSqlRepository
     {
         private readonly string _connectionStringKey;
@@ -40,7 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{exception}", nameof(GetAssets), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetAssets), exception);
                 return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
         }
@@ -68,7 +67,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{exception}", nameof(GetCandlesticks), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetCandlesticks), exception);
                 return Result<IEnumerable<Candlestick>, string>.Fail(exception.ToString());
             }
         }
@@ -86,6 +85,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetPairs), exception);
                 return Result<IEnumerable<Pair>, string>.Fail(exception.ToString());
             }
         }
@@ -144,6 +144,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetProviders), exception);
                 return Result<IEnumerable<ProviderSynchronization>, string>.Fail(exception.ToString());
             }
         }
@@ -163,6 +164,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetPools), exception);
                 return Result<IEnumerable<Pool>, string>.Fail(exception.ToString());
             }
         }
@@ -182,6 +184,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetDexCandlesticks), exception);
                 return Result<IEnumerable<DexCandlestick>, string>.Fail(exception.ToString());
             }
         }
@@ -203,8 +206,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPairs), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -229,8 +233,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertAssets), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -256,8 +261,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticks), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -267,7 +273,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertCandlesticks(IEnumerable<DexCandlestick> candlesticks)
+        public async Task InsertDexCandlesticks(IEnumerable<DexCandlestick> candlesticks)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\")" +
@@ -283,8 +289,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticks), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -310,8 +317,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPools), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -321,7 +329,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProvider(ProviderPairAssetSyncInfo providerPairAssetSyncInfos)
+        public async Task UpdateProviderPairAssetSyncInfo(ProviderPairAssetSyncInfo providerPairAssetSyncInfos)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
 
@@ -341,8 +349,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfo), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -352,7 +361,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProvider(ProviderCandlestickSyncInfo candlestickSyncInfos)
+        public async Task UpdateProviderCandlestickSyncInfo(ProviderCandlestickSyncInfo candlestickSyncInfos)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO public.\"ProviderCandlestickSyncInfos\" (\"ProviderId\", \"TimeframeId\", \"LastCandlestickSync\") " +
@@ -370,8 +379,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfo), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -396,8 +406,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteDexCandlesticksByIds), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -422,8 +433,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeletePoolsByIds), exception);
                 transaction?.Rollback();
                 throw;
             }
@@ -448,8 +460,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteTokensByIds), exception);
                 transaction?.Rollback();
                 throw;
             }
