@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using TechnicalAnalysis.CommonModels.Enums;
+using TechnicalAnalysis.CommonModels.ApiRequests;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 
 namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
@@ -13,7 +13,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
 
             if (syncService != null)
             {
-                BackgroundJob.Enqueue(() => syncService.SynchronizeProvidersAsync(DataProvider.Alpaca, Timeframe.Daily));
+                var dataProviderTimeframeRequest = new DataProviderTimeframeRequest();
+                BackgroundJob.Enqueue(() => syncService.SynchronizeProvidersAsync(dataProviderTimeframeRequest));
             }
         }
     }
