@@ -8,8 +8,6 @@ namespace TechnicalAnalysis.Domain.Utilities
     public class PollyPolicy : IPollyPolicy
     {
         private readonly ILogger<PollyPolicy> _logger;
-        public const string GooglePolicyName = "retryPolicy";
-        public const string RedisPolicyName = "timeoutPolicy";
 
         public PollyPolicy(ILogger<PollyPolicy> logger)
         {
