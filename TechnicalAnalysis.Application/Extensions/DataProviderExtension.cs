@@ -61,6 +61,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
             else
             {
+                providerCandlestickSyncInfoProviderFound.LastCandlestickSync = DateTime.UtcNow;
                 return providerCandlestickSyncInfoProviderFound;
             }
         }
