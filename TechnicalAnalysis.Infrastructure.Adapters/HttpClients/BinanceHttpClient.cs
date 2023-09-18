@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly.Retry;
-using Polly.Timeout;
+using Polly;
 using System.Collections.Immutable;
 using System.Text.Json;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
@@ -24,8 +23,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly AsyncRetryPolicy _retryPolicy;
-        private readonly AsyncTimeoutPolicy _asyncTimeoutPolicy;
+        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy;
 
         public BinanceHttpClient(IOptionsMonitor<BinanceSetting> binanceSettings, IHttpClientFactory httpClientFactory,
             ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy)
@@ -33,8 +31,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             _logger = logger;
             _binanceSettings = binanceSettings;
             _httpClientFactory = httpClientFactory;
-            _retryPolicy = pollyPolicy.CreateRetryPolicy(3, TimeSpan.FromSeconds(5));
-            _asyncTimeoutPolicy = pollyPolicy.CreateTimeoutPolicy(TimeSpan.FromMinutes(5));
+            _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
         }
 
         public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
@@ -42,8 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var httpclient = _httpClientFactory.CreateClient();
             httpclient.DefaultRequestHeaders.Add("User-Agent", "Chrome application");
 
-            using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
-                                                              .ExecuteAsync(() => httpclient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
+            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => httpclient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
             _logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
                nameof(GetBinanceAssetsAndPairs), _binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
@@ -91,8 +87,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                         { "X-MBX-APIKEY" , _binanceSettings.CurrentValue.ApiKey },
                     }.ToImmutableDictionary();
 
-            using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
-                                                              .ExecuteAsync(() => httpclient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
+            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => httpclient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
 
             _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode} ",
                 nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode);
