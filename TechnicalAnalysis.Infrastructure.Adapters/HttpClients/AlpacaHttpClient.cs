@@ -1,8 +1,7 @@
 ﻿using Alpaca.Markets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly.Retry;
-using Polly.Timeout;
+using Polly;
 using TechnicalAnalysis.Domain.Interfaces;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
@@ -15,15 +14,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
     {
         private readonly IOptionsMonitor<AlpacaSetting> _alpacaSettings;
         private readonly ILogger<AlpacaHttpClient> _logger;
-        private readonly AsyncRetryPolicy _retryPolicy;
-        private readonly AsyncTimeoutPolicy _asyncTimeoutPolicy;
+        private readonly IAsyncPolicy<IMultiPage<IBar>> _retryPolicy;
 
         public AlpacaHttpClient(IOptionsMonitor<AlpacaSetting> alpacaSettings, ILogger<AlpacaHttpClient> logger, IPollyPolicy pollyPolicy)
         {
             _alpacaSettings = alpacaSettings;
             _logger = logger;
-            _retryPolicy = pollyPolicy.CreateRetryPolicy(3, TimeSpan.FromSeconds(5));
-            _asyncTimeoutPolicy = pollyPolicy.CreateTimeoutPolicy(TimeSpan.FromMinutes(5));
+            _retryPolicy = pollyPolicy.CreatePolicies<IMultiPage<IBar>>(3, TimeSpan.FromMinutes(5));
         }
 
         public async Task<IResult<IMultiPage<IBar>, string>> GetAlpacaData(string pairName, DateTime fromDateTime, DateTime toDateTime, BarTimeFrame barTimeFrame)
@@ -33,7 +30,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 _logger.LogInformation("Method {Method}, pairName {pairName}, toDateTime {toDateTime}, barTimeFrame {barTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
                 var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(_alpacaSettings.CurrentValue.ApiKey, _alpacaSettings.CurrentValue.ApiSecret));
                 HistoricalBarsRequest historicalBarsRequest = new HistoricalBarsRequest(pairName, fromDateTime, toDateTime, barTimeFrame);
-                var stockData = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy).ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
+                var stockData = await _retryPolicy.ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
                 _logger.LogInformation("Method: {Method}, deserializedData '{@stockData}' ", nameof(GetAlpacaData), stockData);
                 return Result<IMultiPage<IBar>, string>.Success(stockData);
             }
