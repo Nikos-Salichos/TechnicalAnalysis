@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
-using Polly.Timeout;
 using System.Net.Http.Json;
 using System.Text.Json;
 using TechnicalAnalysis.CommonModels.Enums;
@@ -26,7 +25,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         };
 
         private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy;
-        private readonly AsyncTimeoutPolicy _asyncTimeoutPolicy;
 
         public DexV3HttpClient(IOptionsMonitor<DexSetting> dexSettings, IHttpClientFactory httpClientFactory,
             ILogger<DexV3HttpClient> logger, IPollyPolicy pollyPolicy)
@@ -104,10 +102,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             };
 
             var httpclient = _httpClientFactory.CreateClient();
-            httpclient.DefaultRequestHeaders.Add("User-Agent", "Chrome application");
 
-            using var httpResponseMessage = await _retryPolicy.WrapAsync(_asyncTimeoutPolicy)
-                                                              .ExecuteAsync(() => httpclient.PostAsJsonAsync(dexEndpoint, requestBody));
+            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => httpclient.PostAsJsonAsync(dexEndpoint, requestBody));
 
             _logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
                     nameof(GetMostActivePoolsAsync), dexEndpoint, httpResponseMessage.StatusCode, httpResponseMessage.Content);
