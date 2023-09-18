@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly.Retry;
+using Polly;
 using Polly.Timeout;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -24,7 +24,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         {
             PropertyNameCaseInsensitive = true
         };
-        private readonly AsyncRetryPolicy _retryPolicy;
+
+        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy;
         private readonly AsyncTimeoutPolicy _asyncTimeoutPolicy;
 
         public DexV3HttpClient(IOptionsMonitor<DexSetting> dexSettings, IHttpClientFactory httpClientFactory,
@@ -33,8 +34,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             _dexSettings = dexSettings;
             _logger = logger;
             _httpClientFactory = httpClientFactory;
-            _retryPolicy = pollyPolicy.CreateRetryPolicy(3, TimeSpan.FromSeconds(5));
-            _asyncTimeoutPolicy = pollyPolicy.CreateTimeoutPolicy(TimeSpan.FromMinutes(5));
+            _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
         }
 
         public async Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
