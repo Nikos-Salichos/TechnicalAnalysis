@@ -1,12 +1,9 @@
-﻿using Polly.Retry;
-using Polly.Timeout;
+﻿using Polly;
 
 namespace TechnicalAnalysis.Domain.Interfaces
 {
     public interface IPollyPolicy
     {
-        public AsyncRetryPolicy CreateRetryPolicy(int retries, TimeSpan retryInterval);
-
-        public AsyncTimeoutPolicy CreateTimeoutPolicy(TimeSpan timeout);
+        IAsyncPolicy<T> CreatePolicies<T>(int retries, TimeSpan timeout);
     }
 }
