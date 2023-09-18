@@ -46,7 +46,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 "MA","BAC","MS","WCF","SCHW","RY","MSFT","NVDA","CRM","ABDE","VZ","IBM","EWH","MCHI","EWS",
                 "FEZ","IWM","SPY","DIA","DAX","VGK","QQQ",
                 "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","xom","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
-                "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA"
+                "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA",
+                "BRK.A"
             };
 
             stockSymbols = stockSymbols.Distinct().ToList();
