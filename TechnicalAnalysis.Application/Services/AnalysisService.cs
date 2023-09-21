@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TechnicalAnalysis.Application.Extensions;
@@ -26,7 +27,7 @@ namespace TechnicalAnalysis.Application.Services
             _configuration = configuration;
         }
 
-        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider)
+        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
 
