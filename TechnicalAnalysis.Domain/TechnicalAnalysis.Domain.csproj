@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Alpaca.Markets" Version="6.2.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="7.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
 		<PackageReference Include="MimeKit" Version="4.2.0" />

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Distributed;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
@@ -29,7 +30,7 @@ namespace TechnicalAnalysis.Application.Services
             return _inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
         }
 
-        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All)
+        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All, HttpContext? httpContext = null)
         {
             var cachedPairs = await _distributedCache.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
             if (cachedPairs is not null)
@@ -41,9 +42,9 @@ namespace TechnicalAnalysis.Application.Services
                 return cachedPairs;
             }
 
-            var pairs = await _inner.GetPairsIndicatorsAsync(provider);
+            var pairs = await _inner.GetPairsIndicatorsAsync(provider, httpContext);
 
-            await _distributedCache.SetRecordAsync(provider.ToString(), pairs);
+            await _distributedCache.SetRecordAsync(provider.ToString(), pairs, null, null, httpContext);
             await _communication.CreateAttachmentSendMessage(pairs);
             _rabbitMqService.PublishMessage(pairs);
 

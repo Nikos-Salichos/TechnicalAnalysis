@@ -50,7 +50,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] DataProvider provider = DataProvider.All)
         {
             _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
-            var pairs = await _analysisService.GetPairsIndicatorsAsync(provider);
+            var pairs = await _analysisService.GetPairsIndicatorsAsync(provider, HttpContext);
             return Ok(pairs);
         }
 

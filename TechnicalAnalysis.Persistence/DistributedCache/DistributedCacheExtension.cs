@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -14,10 +15,11 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.DistributedCache
         };
 
         public static async Task SetRecordAsync<T>(this IDistributedCache cache,
-                                          string recordId,
-                                          T data,
-                                          TimeSpan? absoluteExpireTime = null,
-                                          TimeSpan? slidingExpireTime = null)
+                                              string recordId,
+                                              T data,
+                                              TimeSpan? absoluteExpireTime = null,
+                                              TimeSpan? slidingExpireTime = null,
+                                              HttpContext? httpContext = null)
         {
             DateTime now = DateTime.UtcNow;
             DateTime endOfDay = now.Date.AddDays(1).AddTicks(-1); // Set time to 23:59:59.9999999
@@ -29,8 +31,20 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.DistributedCache
             };
 
             var jsonData = JsonSerializer.Serialize(data, jsonSerializerOptions);
-            await cache.SetStringAsync(recordId, jsonData, distributedCacheEntryOptions, default);
+
+            // Check if a specific header is present in the request
+            if (httpContext != null && httpContext.Request.Headers.ContainsKey("C-Invalid"))
+            {
+                // If the specific header is present, invalidate the cache
+                await cache.RemoveAsync(recordId);
+            }
+            else
+            {
+                // Otherwise, set the cache as usual
+                await cache.SetStringAsync(recordId, jsonData, distributedCacheEntryOptions, default);
+            }
         }
+
 
         public static async Task<T?> GetRecordAsync<T>(this IDistributedCache cache, string recordId)
         {
