@@ -220,7 +220,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateRsi(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            var rsiResults = quotes.GetRsi(14).ToList();
+            var rsiResults = quotes.GetRsi(Constants.RsiPeriod).ToList();
 
             for (int i = 0; i < rsiResults.Count; i++)
             {
@@ -245,9 +245,9 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         candlestick.Rsis.Add(new Rsi(candlestick.PrimaryId)
                         {
-                            Period = 14,
-                            Overbought = 70,
-                            Oversold = 30,
+                            Period = Constants.RsiPeriod,
+                            Overbought = Constants.RsiOverbought,
+                            Oversold = Constants.RsiOversold,
                             Value = rsiResult.Rsi,
                             NumberOfRsiLowerThanPreviousRsis = numberOfRsiLower
                         });
@@ -260,7 +260,7 @@ namespace TechnicalAnalysis.Application.Extensions
             long consecutiveLowerRsiCount = 0;
             long consecutiveHigherRsiCount = 0;
 
-            foreach (var rsi in candlestickLookup.Values.SelectMany(candlestick => candlestick.Rsis.Where(r => r.Period == 14)))
+            foreach (var rsi in candlestickLookup.Values.SelectMany(candlestick => candlestick.Rsis.Where(r => r.Period == Constants.RsiPeriod)))
             {
                 if (previousRsiValue.HasValue)
                 {
