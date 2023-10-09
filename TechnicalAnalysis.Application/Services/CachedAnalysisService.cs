@@ -32,19 +32,22 @@ namespace TechnicalAnalysis.Application.Services
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All, HttpContext? httpContext = null)
         {
-            var cachedPairs = await _distributedCache.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
-            if (cachedPairs is not null)
+            if (httpContext?.Request.Headers.ContainsKey("C-Invalid") == false)
             {
-                await _communication.CreateAttachmentSendMessage(cachedPairs);
-                _rabbitMqService.PublishMessage(cachedPairs);
-                _rabbitMqService.PublishMessage(cachedPairs);
-                var message = await _rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
-                return cachedPairs;
+                var cachedPairs = await _distributedCache.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
+                if (cachedPairs is not null)
+                {
+                    await _communication.CreateAttachmentSendMessage(cachedPairs);
+                    _rabbitMqService.PublishMessage(cachedPairs);
+                    _rabbitMqService.PublishMessage(cachedPairs);
+                    var message = await _rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
+                    return cachedPairs;
+                }
             }
 
             var pairs = await _inner.GetPairsIndicatorsAsync(provider, httpContext);
 
-            await _distributedCache.SetRecordAsync(provider.ToString(), pairs, null, null, httpContext);
+            await _distributedCache.SetRecordAsync(provider.ToString(), pairs, null, null);
             await _communication.CreateAttachmentSendMessage(pairs);
             _rabbitMqService.PublishMessage(pairs);
 
