@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using TechnicalAnalysis.CommonModels.ApiRequests;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
@@ -27,6 +28,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+        [EnableRateLimiting("fixed-by-ip")]
         [HttpPost("SynchronizeProviders")]
         public async Task<IActionResult> SynchronizeProvidersAsync([FromBody] DataProviderTimeframeRequest dataProviderTimeframeRequest)
         {
@@ -41,24 +45,30 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
                 return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
             }
 
-            var result = await _syncService.SynchronizeProvidersAsync(dataProviderTimeframeRequest);
-            return Ok(result);
+            await _syncService.SynchronizeProvidersAsync(dataProviderTimeframeRequest);
+            return Ok();
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("PairsIndicators")]
+        [EnableRateLimiting("fixed-by-ip")]
         public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] DataProvider provider = DataProvider.All)
         {
-            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
+            _logger.LogInformation("Method: {GetPairsIndicatorsAsync} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
             var pairs = await _analysisService.GetPairsIndicatorsAsync(provider, HttpContext);
             return Ok(pairs);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("IndicatorsByPairName")]
+        [EnableRateLimiting("fixed-by-ip")]
         public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName, Timeframe timeframe)
         {
-            _logger.LogInformation("Method: {MethodName} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
+            _logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
             return Ok();
         }
