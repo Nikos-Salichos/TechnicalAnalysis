@@ -17,11 +17,11 @@ namespace TechnicalAnalysis.Application.Services
             _adapterFactory = adapterFactory;
         }
 
-        public Task<string> SynchronizeProvidersAsync(DataProviderTimeframeRequest dataProviderTimeframeRequest)
+        public Task SynchronizeProvidersAsync(DataProviderTimeframeRequest dataProviderTimeframeRequest)
         {
             return InternalSynchronizeProvidersAsync(dataProviderTimeframeRequest.DataProvider, dataProviderTimeframeRequest.Timeframe);
 
-            async Task<string> InternalSynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
+            async Task InternalSynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
             {
                 var adaptersToSync = new List<Task>();
 
@@ -51,8 +51,6 @@ namespace TechnicalAnalysis.Application.Services
                 {
                     await Task.WhenAll(adaptersToSync);
                 }
-
-                return "Synchronization Completed";
             }
         }
 
