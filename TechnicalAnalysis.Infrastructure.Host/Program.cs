@@ -6,6 +6,7 @@ using Serilog;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using TechnicalAnalysis.Application.Modules;
 using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host;
@@ -69,6 +70,23 @@ builder.Services.AddAntiforgery(options =>
     options.SuppressXFrameOptionsHeader = true;
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("fixed-by-ip", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            // Required if I run behind a reverse proxy, so I do not limit the proxy Ip Address
+            // httpContext.Request.Headers["X-Forwarded-For"].ToString(), 
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
+
+
 #endregion Services Registration
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -86,6 +104,8 @@ if (app.Environment.IsDevelopment())
 app.UseResponseCompression();
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter(); // Always first in middleware order
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<SecureHeadersMiddleware>();
