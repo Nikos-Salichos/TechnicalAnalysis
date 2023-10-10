@@ -7,6 +7,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
     {
         public RequestDelegate requestDelegate;
         private readonly ILogger<ExceptionHandlingMiddleware> logger;
+
         public ExceptionHandlingMiddleware(RequestDelegate requestDelegate, ILogger<ExceptionHandlingMiddleware> logger)
         {
             this.requestDelegate = requestDelegate;
