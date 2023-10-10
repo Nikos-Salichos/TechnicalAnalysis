@@ -1,23 +1,30 @@
 ﻿namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
-    public class SecureHeadersMiddleware : IMiddleware
+    public class SecureHeadersMiddleware
     {
-        public async Task InvokeAsync(HttpContext httpContext, RequestDelegate requestDelegate)
+        private readonly RequestDelegate _requestDelegate;
+
+        public SecureHeadersMiddleware(RequestDelegate requestDelegate)
         {
-            // Click jacking attack
-            httpContext.Response.Headers.Add("X-Frame-Options", "DENY");
-
-            // MIME-type sniffing attack
-            httpContext.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-
-            //  site scripting attack
-            httpContext.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-
-            // Referring to un wanted site and reading the data
-            httpContext.Response.Headers.Add("Referrer-Policy", "no-referrer");
-
-            // Code Injection Attacks either click jacking or cross site scripting
-            httpContext.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
+            _requestDelegate = requestDelegate;
         }
+
+        public async Task InvokeAsync(HttpContext httpContext)
+        {
+            AddHeaderIfNotExists(httpContext, "X-Frame-Options", "DENY");
+            AddHeaderIfNotExists(httpContext, "X-Content-Type-Options", "nosniff");
+            AddHeaderIfNotExists(httpContext, "X-Xss-Protection", "1; mode=block");
+            AddHeaderIfNotExists(httpContext, "Referrer-Policy", "no-referrer");
+            AddHeaderIfNotExists(httpContext, "Content-Security-Policy", "default-src 'self';");
+
+            // Invoke the next middleware in the pipeline
+            await _requestDelegate(httpContext);
+        }
+
+        private static void AddHeaderIfNotExists(HttpContext context, string key, string value)
+        {
+            context.Response.Headers.TryAdd(key, value);
+        }
+
     }
 }
