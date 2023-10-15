@@ -210,7 +210,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPairs), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -237,7 +236,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertAssets), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -265,7 +263,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticks), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -293,7 +290,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticks), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -321,7 +317,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPools), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -353,7 +348,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfo), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -383,7 +377,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfo), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -410,7 +403,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteDexCandlesticksByIds), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -437,7 +429,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeletePoolsByIds), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
@@ -464,7 +455,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteTokensByIds), exception);
                 transaction?.Rollback();
-                throw;
             }
             finally
             {
