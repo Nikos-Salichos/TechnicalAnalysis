@@ -12,3 +12,12 @@ pg_dump -U postgres -h localhost -p 5432 --schema-only TechnicalAnalysis > C:\Us
 
 Note:
 I suggest you to use the existing one, because you need to insert providers the first time that you will use it.
+
+
+Note if we get error like
+exception = {"28000: no pg_hba.conf entry for host \"192.168.1.11\", user \"postgres\", database \"TechnicalAnalysis\", no encryption"}
+
+then we go to C:\Program Files\PostgreSQL\15\data
+open pg_hba.conf with text editor
+and copy paste this line in the end:
+host    TechnicalAnalysis    postgres    192.168.1.11/32    md5
