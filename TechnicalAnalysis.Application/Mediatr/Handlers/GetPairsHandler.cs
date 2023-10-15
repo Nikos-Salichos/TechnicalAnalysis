@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task<IEnumerable<PairExtended>> Handle(GetPairsQuery getCoinsQuery, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetPairs();
+            var result = await _repository.GetPairsAsync();
             if (result.IsError)
             {
                 return Enumerable.Empty<PairExtended>();
