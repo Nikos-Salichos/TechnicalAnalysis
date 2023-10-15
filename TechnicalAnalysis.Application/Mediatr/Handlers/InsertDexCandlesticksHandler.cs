@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(InsertDexCandlesticksCommand request, CancellationToken cancellationToken)
         {
-            await _repository.InsertDexCandlesticks(request.DexCandlesticks);
+            await _repository.InsertDexCandlesticksAsync(request.DexCandlesticks);
         }
     }
 }
