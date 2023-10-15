@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task<IEnumerable<CandlestickExtended>> Handle(GetCandlesticksQuery getCoinsQuery, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetCandlesticks();
+            var result = await _repository.GetCandlesticksAsync();
             if (result.IsError)
             {
                 return Enumerable.Empty<CandlestickExtended>();
