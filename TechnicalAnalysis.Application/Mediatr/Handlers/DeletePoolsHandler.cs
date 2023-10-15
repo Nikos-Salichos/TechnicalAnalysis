@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(DeletePoolsCommand request, CancellationToken cancellationToken)
         {
-            await _repository.DeletePoolsByIds(request.Ids);
+            await _repository.DeletePoolsByIdsAsync(request.Ids);
         }
     }
 }
