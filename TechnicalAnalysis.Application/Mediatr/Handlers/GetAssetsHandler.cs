@@ -16,7 +16,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsQuery, IEnumerable<Asse
 
     public async Task<IEnumerable<Asset>> Handle(GetAssetsQuery getAssetsQuery, CancellationToken cancellationToken)
     {
-        var result = await _repository.GetAssets();
+        var result = await _repository.GetAssetsAsync();
         if (result.IsError)
         {
             return Enumerable.Empty<Asset>();
