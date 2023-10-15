@@ -15,8 +15,8 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(UpdateExchangeCommand request, CancellationToken cancellationToken)
         {
-            await _repository.UpdateProviderPairAssetSyncInfo(request.ProviderPairAssetSyncInfo);
-            await _repository.UpdateProviderCandlestickSyncInfo(request.ProviderCandlestickSyncInfo);
+            await _repository.UpdateProviderPairAssetSyncInfoAsync(request.ProviderPairAssetSyncInfo);
+            await _repository.UpdateProviderCandlestickSyncInfoAsync(request.ProviderCandlestickSyncInfo);
         }
     }
 }
