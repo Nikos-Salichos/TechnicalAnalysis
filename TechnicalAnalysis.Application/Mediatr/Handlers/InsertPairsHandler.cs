@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(InsertPairsCommand request, CancellationToken cancellationToken)
         {
-            await _repository.InsertPairs(request.Pairs.ToEntity());
+            await _repository.InsertPairsAsync(request.Pairs.ToEntity());
         }
     }
 }
