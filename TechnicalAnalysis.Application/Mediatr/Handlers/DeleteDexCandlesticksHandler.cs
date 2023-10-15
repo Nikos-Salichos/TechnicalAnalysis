@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(DeleteDexCandlesticksCommand request, CancellationToken cancellationToken)
         {
-            await _repository.DeleteDexCandlesticksByIds(request.Ids);
+            await _repository.DeleteDexCandlesticksByIdsAsync(request.Ids);
         }
     }
 }
