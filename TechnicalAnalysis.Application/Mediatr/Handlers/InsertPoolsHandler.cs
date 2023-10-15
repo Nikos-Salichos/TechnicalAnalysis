@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(InsertPoolsCommand request, CancellationToken cancellationToken)
         {
-            await _repository.InsertPools(request.Pools);
+            await _repository.InsertPoolsAsync(request.Pools);
         }
     }
 }
