@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(InsertAssetsCommand request, CancellationToken cancellationToken)
         {
-            await _repository.InsertAssets(request.Assets);
+            await _repository.InsertAssetsAsync(request.Assets);
         }
     }
 }

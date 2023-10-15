@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task<IEnumerable<ProviderSynchronization>> Handle(GetProviderSynchronizationQuery getProvidersQuery, CancellationToken cancellationToken)
         {
-            var providers = await _repository.GetProviders();
+            var providers = await _repository.GetProvidersAsync();
             if (providers.IsError)
             {
                 return Enumerable.Empty<ProviderSynchronization>();
