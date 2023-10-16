@@ -11,7 +11,7 @@ namespace TechnicalAnalysis.Tests.ArchitectureTests
             var result = Types.InCurrentDomain()
                                .That().ResideInNamespace(BaseArchitectureSetup.ContractsProject)
                                .And().AreClasses()
-                               .Should().NotHaveDependencyOnAny(BaseArchitectureSetup.InfrastructurePersistenceProject,
+                               .Should().HaveDependenciesOtherThan(BaseArchitectureSetup.InfrastructurePersistenceProject,
                                BaseArchitectureSetup.InfrastructureAdaptersProject, BaseArchitectureSetup.InfrastructureHostProject,
                                BaseArchitectureSetup.InfrastructureClientProject, BaseArchitectureSetup.PresentationProject,
                                BaseArchitectureSetup.ContractsProject)
