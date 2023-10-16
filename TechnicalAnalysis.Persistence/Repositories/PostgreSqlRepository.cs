@@ -26,7 +26,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             _logger = logger;
         }
 
-        public async Task<IResult<IEnumerable<Asset>, string>> GetAssets()
+        public async Task<IResult<IEnumerable<Asset>, string>> GetAssetsAsync()
         {
             try
             {
@@ -39,12 +39,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetAssets), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetAssetsAsync), exception);
                 return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
         }
 
-        public async Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticks()
+        public async Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticksAsync()
         {
             try
             {
@@ -67,12 +67,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetCandlesticks), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetCandlesticksAsync), exception);
                 return Result<IEnumerable<Candlestick>, string>.Fail(exception.ToString());
             }
         }
 
-        public async Task<IResult<IEnumerable<Pair>, string>> GetPairs()
+        public async Task<IResult<IEnumerable<Pair>, string>> GetPairsAsync()
         {
             try
             {
@@ -85,12 +85,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetPairs), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetPairsAsync), exception);
                 return Result<IEnumerable<Pair>, string>.Fail(exception.ToString());
             }
         }
 
-        public async Task<IResult<IEnumerable<ProviderSynchronization>, string>> GetProviders()
+        public async Task<IResult<IEnumerable<ProviderSynchronization>, string>> GetProvidersAsync()
         {
             try
             {
@@ -144,12 +144,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetProviders), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetProvidersAsync), exception);
                 return Result<IEnumerable<ProviderSynchronization>, string>.Fail(exception.ToString());
             }
         }
 
-        public async Task<IResult<IEnumerable<Pool>, string>> GetPools()
+        public async Task<IResult<IEnumerable<Pool>, string>> GetPoolsAsync()
         {
             try
             {
@@ -164,12 +164,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetPools), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetPoolsAsync), exception);
                 return Result<IEnumerable<Pool>, string>.Fail(exception.ToString());
             }
         }
 
-        public async Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlesticks()
+        public async Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlestickssAsync()
         {
             try
             {
@@ -184,12 +184,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetDexCandlesticks), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetDexCandlestickssAsync), exception);
                 return Result<IEnumerable<DexCandlestick>, string>.Fail(exception.ToString());
             }
         }
 
-        public async Task InsertPairs(IEnumerable<Pair> pairs)
+        public async Task InsertPairsAsync(IEnumerable<Pair> pairs)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
 
@@ -208,7 +208,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPairs), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPairsAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -217,10 +217,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertAssets(IEnumerable<Asset> assets)
+        public async Task InsertAssetsAsync(IEnumerable<Asset> assets)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "INSERT INTO \"Assets\" (\"Symbol\") VALUES (@Symbol)";
+            const string query = "INSERT INTO \"Assets\" (\"Symbol\", \"CreatedDate\") VALUES (@Symbol, @CreatedDate)";
 
             NpgsqlTransaction? transaction = null;
             try
@@ -234,7 +234,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertAssets), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -243,7 +243,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertCandlesticks(IEnumerable<Candlestick> candlesticks)
+        public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") " +
@@ -261,7 +261,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticks), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -270,7 +270,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertDexCandlesticks(IEnumerable<DexCandlestick> candlesticks)
+        public async Task InsertDexCandlesticksAsync(IEnumerable<DexCandlestick> candlesticks)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\")" +
@@ -288,7 +288,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticks), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -297,7 +297,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertPools(IEnumerable<Pool> pools)
+        public async Task InsertPoolsAsync(IEnumerable<Pool> pools)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"Pools\" (\"DexId\", \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", \"FeeTier\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\")" +
@@ -315,7 +315,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPools), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPoolsAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -324,7 +324,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProviderPairAssetSyncInfo(ProviderPairAssetSyncInfo providerPairAssetSyncInfos)
+        public async Task UpdateProviderPairAssetSyncInfoAsync(ProviderPairAssetSyncInfo providerPairAssetSyncInfos)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
 
@@ -346,7 +346,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfo), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfoAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -355,7 +355,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProviderCandlestickSyncInfo(ProviderCandlestickSyncInfo candlestickSyncInfos)
+        public async Task UpdateProviderCandlestickSyncInfoAsync(ProviderCandlestickSyncInfo candlestickSyncInfos)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO public.\"ProviderCandlestickSyncInfos\" (\"ProviderId\", \"TimeframeId\", \"LastCandlestickSync\") " +
@@ -375,7 +375,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfo), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfoAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -384,7 +384,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task DeleteDexCandlesticksByIds(IEnumerable<long> ids)
+        public async Task DeleteDexCandlesticksByIdsAsync(IEnumerable<long> ids)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "DELETE FROM \"DexCandlesticks\" WHERE \"Id\" = ANY(@Ids)";
@@ -401,7 +401,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteDexCandlesticksByIds), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteDexCandlesticksByIdsAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -410,7 +410,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task DeletePoolsByIds(IEnumerable<long> ids)
+        public async Task DeletePoolsByIdsAsync(IEnumerable<long> ids)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "DELETE FROM \"Pools\" WHERE \"Id\" = ANY(@Ids)";
@@ -427,7 +427,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeletePoolsByIds), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeletePoolsByIdsAsync), exception);
                 transaction?.Rollback();
             }
             finally
@@ -436,7 +436,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task DeleteTokensByIds(IEnumerable<long> ids)
+        public async Task DeleteTokensByIdsAsync(IEnumerable<long> ids)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "DELETE FROM \"Tokens\" WHERE \"Id\" = ANY(@Ids)";
@@ -453,7 +453,33 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteTokensByIds), exception);
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteTokensByIdsAsync), exception);
+                transaction?.Rollback();
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
+        }
+
+        public async Task DeleteAssetsAsync()
+        {
+            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            const string query = "DELETE FROM \"Assets\" ";
+
+            NpgsqlTransaction? transaction = null;
+            try
+            {
+                dbConnection.Open();
+                transaction = dbConnection.BeginTransaction();
+
+                await dbConnection.ExecuteAsync(query, transaction: transaction);
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(DeleteTokensByIdsAsync), exception);
                 transaction?.Rollback();
             }
             finally
