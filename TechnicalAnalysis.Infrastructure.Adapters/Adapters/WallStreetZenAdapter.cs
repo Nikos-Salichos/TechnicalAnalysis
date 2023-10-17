@@ -4,7 +4,6 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    //TODO Under Development
     public class WallStreetZenAdapter : IAdapter
     {
         private readonly ILogger<WallStreetZenAdapter> _logger;
