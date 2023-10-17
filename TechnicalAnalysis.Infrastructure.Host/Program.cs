@@ -86,6 +86,9 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 
+builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
+builder.Services.AddHangfireServer();
+
 
 #endregion Services Registration
 
@@ -113,15 +116,13 @@ app.UseSerilogRequestLogging();
 
 app.UseCors();
 
+app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+{
+    Authorization = new[] { new DashboardNoAuthorizationFilter() }
+});
 
 if (app.Environment.IsProduction())
 {
-    builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
-    builder.Services.AddHangfireServer();
-    app.UseHangfireDashboard("/hangfire", new DashboardOptions()
-    {
-        Authorization = new[] { new DashboardNoAuthorizationFilter() }
-    });
     HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
 }
 
