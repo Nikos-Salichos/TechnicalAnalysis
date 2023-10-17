@@ -7,7 +7,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
-    public class WallStreetZenClient : IWallStreetZenClient
+    public partial class WallStreetZenClient : IWallStreetZenClient
     {
         public IEnumerable<Stock> Sync()
         {
@@ -30,10 +30,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 Stock stock = new Stock();
                 stock.Symbol = stockExchange.Key;
                 stock.Exchange = stockExchange.Value;
-                //GetStockForecast(stock);
-                //GetStockData(stock);
+                // GetStockForecast(stock); //TODO In progress
+                // GetStockData(stock); //TODO In progress
                 stocks.Add(stock);
-            };
+            }
 
             return stocks;
         }
@@ -45,13 +45,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var document = web.Load(urlStockForecast);
             var innerText = document.DocumentNode.InnerText;
 
-            const string minForecastPattern = @"Min Forecast\$([0-9.]+)([+-][0-9.]+)%";
-            const string avgForecastPattern = @"Avg Forecast\$([0-9.]+)([+-][0-9.]+)%";
-            const string maxForecastPattern = @"Max Forecast\$([0-9.]+)([+-][0-9.]+)%";
-
-            Match minForecastMatch = Regex.Match(innerText, minForecastPattern);
-            Match avgForecastMatch = Regex.Match(innerText, avgForecastPattern);
-            Match maxForecastMatch = Regex.Match(innerText, maxForecastPattern);
+            Match minForecastMatch = MinimumPriceForecastPattern().Match(innerText);
+            Match avgForecastMatch = AveragePriceForecastPattern().Match(innerText);
+            Match maxForecastMatch = MaximumPriceForecastPattern().Match(innerText);
 
             stock.MinForecast = decimal.Parse(minForecastMatch.Groups[1].Value, CultureInfo.InvariantCulture);
             stock.MinForecastPercentage = decimal.Parse(minForecastMatch.Groups[2].Value, CultureInfo.InvariantCulture);
@@ -67,13 +63,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var web = new HtmlWeb();
             HtmlDocument document = web.Load(urlStockSymbol);
 
-            const string fairValuePattern = @"Fair Value Price\$([0-9.]+)";
-            const string undervaluedPattern = @"Undervalued by([0-9.]+)%";
-
             var innerText = document.DocumentNode.InnerText;
 
-            Match fairValueMatch = Regex.Match(innerText, fairValuePattern);
-            Match undervaluedMatch = Regex.Match(innerText, undervaluedPattern);
+            Match fairValueMatch = FairPricePattern().Match(innerText);
+            Match undervaluedMatch = UndervaluePricePattern().Match(innerText);
 
             if (fairValueMatch.Success)
             {
@@ -84,5 +77,18 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 stock.UnderValuePercentage = decimal.Parse(undervaluedMatch.Groups[1].Value, CultureInfo.InvariantCulture);
             }
         }
+
+        [GeneratedRegex("Min Forecast\\$([0-9.]+)([+-][0-9.]+)%")]
+        private static partial Regex MinimumPriceForecastPattern();
+
+        [GeneratedRegex("Avg Forecast\\$([0-9.]+)([+-][0-9.]+)%")]
+        private static partial Regex AveragePriceForecastPattern();
+
+        [GeneratedRegex("Max Forecast\\$([0-9.]+)([+-][0-9.]+)%")]
+        private static partial Regex MaximumPriceForecastPattern();
+        [GeneratedRegex("Fair Value Price\\$([0-9.]+)")]
+        private static partial Regex FairPricePattern();
+        [GeneratedRegex("Undervalued by([0-9.]+)%")]
+        private static partial Regex UndervaluePricePattern();
     }
 }
