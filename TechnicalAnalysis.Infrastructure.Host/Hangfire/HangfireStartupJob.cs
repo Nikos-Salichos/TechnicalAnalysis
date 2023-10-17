@@ -4,7 +4,7 @@ using TechnicalAnalysis.Domain.Interfaces.Application;
 
 namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
 {
-    public class HangfireStartupJob
+    public static class HangfireStartupJob
     {
         public static void EnqueueSynchronizeProvidersJob(WebApplication app)
         {
@@ -13,8 +13,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
 
             if (syncService != null)
             {
-                var dataProviderTimeframeRequest = new DataProviderTimeframeRequest();
-                BackgroundJob.Enqueue(() => syncService.SynchronizeProvidersAsync(dataProviderTimeframeRequest));
+                BackgroundJob.Enqueue(() => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest()));
             }
         }
     }
