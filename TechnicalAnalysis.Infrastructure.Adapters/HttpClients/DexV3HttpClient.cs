@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
     {
         private readonly IOptionsMonitor<DexSetting> _dexSettings;
         private readonly ILogger<DexV3HttpClient> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -31,11 +31,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         {
             _dexSettings = dexSettings;
             _logger = logger;
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClientFactory.CreateClient("default");
             _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
         }
 
-        public async Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
+        public Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
         {
             const string query = @"
                           query($numberOfPools: Int!, $numberOfData: Int! ) {
@@ -101,35 +101,38 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 _ => throw new InvalidOperationException("Unknown provider")
             };
 
-            var httpclient = _httpClientFactory.CreateClient();
+            return FetchDataAsync(dexEndpoint, requestBody);
 
-            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => httpclient.PostAsJsonAsync(dexEndpoint, requestBody));
-
-            _logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
-                    nameof(GetMostActivePoolsAsync), dexEndpoint, httpResponseMessage.StatusCode, httpResponseMessage.Content);
-
-            if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+            async Task<IResult<DexV3ApiResponse, string>> FetchDataAsync(string endpoint, object body)
             {
-                _logger.LogWarning("Method: {Method}: {httpResponseMessage.StatusCode}", nameof(GetMostActivePoolsAsync), httpResponseMessage.StatusCode);
-                return Result<DexV3ApiResponse, string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
-            }
-
-            try
-            {
-                using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, _jsonSerializerOptions);
-                if (deserializedData is not null)
+                try
                 {
-                    _logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetMostActivePoolsAsync), deserializedData);
-                    return Result<DexV3ApiResponse, string>.Success(deserializedData);
+                    using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => _httpClient.PostAsJsonAsync(endpoint, body));
+
+                    _logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
+                            nameof(GetMostActivePoolsAsync), endpoint, httpResponseMessage.StatusCode, httpResponseMessage.Content);
+
+                    if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        _logger.LogWarning("Method: {Method}: {httpResponseMessage.StatusCode}", nameof(GetMostActivePoolsAsync), httpResponseMessage.StatusCode);
+                        return Result<DexV3ApiResponse, string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
+                    }
+
+                    using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                    var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, _jsonSerializerOptions);
+                    if (deserializedData is not null)
+                    {
+                        _logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetMostActivePoolsAsync), deserializedData);
+                        return Result<DexV3ApiResponse, string>.Success(deserializedData);
+                    }
+                    _logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
+                    return Result<DexV3ApiResponse, string>.Fail($"{nameof(GetMostActivePoolsAsync)} Deserialization Failed");
                 }
-                _logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
-                return Result<DexV3ApiResponse, string>.Fail($"{nameof(GetMostActivePoolsAsync)} Deserialization Failed");
-            }
-            catch (Exception exception)
-            {
-                _logger.LogWarning("Method {Method}, exception {exception}", nameof(GetMostActivePoolsAsync), exception);
-                return Result<DexV3ApiResponse, string>.Fail(exception.ToString());
+                catch (Exception exception)
+                {
+                    _logger.LogWarning("Method {Method}, exception {exception}", nameof(GetMostActivePoolsAsync), exception);
+                    return Result<DexV3ApiResponse, string>.Fail(exception.ToString());
+                }
             }
         }
     }
