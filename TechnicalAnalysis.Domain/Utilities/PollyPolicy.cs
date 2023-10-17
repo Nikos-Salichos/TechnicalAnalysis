@@ -24,18 +24,18 @@ namespace TechnicalAnalysis.Domain.Utilities
                         _logger.LogWarning("Timeout occurred after {timespan}. Context: {context}", timespan, context);
                         return Task.CompletedTask;
                     }),
-                Policy<T>
-                    .Handle<Exception>()
-                    .WaitAndRetryAsync(retries, retryAttempt =>
-                    {
-                        var delay = TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
-                                    + TimeSpan.FromMilliseconds(random.Next(0, 1000));
-                        _logger.LogWarning("Retry attempt {Retry} of {Retries}. Delaying for {Delay} seconds.",
-                            retryAttempt,
-                            retries,
-                            delay.TotalSeconds);
-                        return delay;
-                    })
+               Policy<T>.Handle<Exception>()
+                        .WaitAndRetryAsync(retries, retryAttempt =>
+                        {
+                            return TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                                        + TimeSpan.FromMilliseconds(random.Next(0, 1000));
+                        },
+                        onRetry: (exception, delay, retryAttempt, context) =>
+                        {
+                            _logger.LogWarning("Retry attempt {retryAttempt} of {retries}. Delaying for {delay.TotalSeconds} seconds. Exception: {exception}",
+                                retryAttempt, retries, delay.TotalSeconds, exception.Exception);
+                        })
+
             );
         }
 
