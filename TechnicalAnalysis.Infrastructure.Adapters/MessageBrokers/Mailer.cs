@@ -20,7 +20,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
         {
             try
             {
-                // Initialize a new instance of the MimeKit.MimeMessage class
                 var mail = new MimeMessage();
 
                 #region Sender / Receiver
