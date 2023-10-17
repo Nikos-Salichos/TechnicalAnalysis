@@ -47,6 +47,11 @@ namespace TechnicalAnalysis.Application.Services
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Pancakeswap, timeframe));
                 }
 
+                if (provider == DataProvider.WallStreetZen || provider == DataProvider.All)
+                {
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.WallStreetZen, timeframe));
+                }
+
                 if (adaptersToSync.Count > 0)
                 {
                     await Task.WhenAll(adaptersToSync);
