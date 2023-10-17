@@ -22,8 +22,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             HealthCheckContext healthCheckContext = new();
             var report = await healthCheckRepository.CheckHealthAsync(healthCheckContext);
 
-            return report.Status == HealthStatus.Healthy ? Ok(report) :
-                StatusCode((int)HttpStatusCode.ServiceUnavailable, report);
+            return report.Status == HealthStatus.Healthy
+                ? Ok(report)
+                : StatusCode((int)HttpStatusCode.ServiceUnavailable, report);
         }
     }
 }
