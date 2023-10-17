@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
     {
         private readonly IOptionsMonitor<BinanceSetting> _binanceSettings;
         private readonly ILogger<BinanceHttpClient> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
@@ -30,16 +30,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         {
             _logger = logger;
             _binanceSettings = binanceSettings;
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClientFactory.CreateClient("default");
             _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
         }
 
         public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
         {
-            var httpclient = _httpClientFactory.CreateClient();
-            httpclient.DefaultRequestHeaders.Add("User-Agent", "Chrome application");
-
-            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => httpclient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
+            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => _httpClient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
             _logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
                nameof(GetBinanceAssetsAndPairs), _binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
@@ -52,7 +49,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             try
             {
-                using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                using var content = httpResponseMessage.Content;
+                using var jsonStream = await content.ReadAsStreamAsync();
 
                 var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, _jsonSerializerOptions);
                 if (deserializedData is not null)
@@ -73,9 +71,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         public async Task<IResult<object[][], string>> GetBinanceCandlesticks(IDictionary<string, string>? queryParams = null)
         {
-            var httpclient = _httpClientFactory.CreateClient();
-            httpclient.DefaultRequestHeaders.Add("User-Agent", "Chrome application");
-
             var binanceCandlestickPath = _binanceSettings.CurrentValue.CandlestickPath;
             if (queryParams != null)
             {
@@ -86,22 +81,21 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     {
                         { "X-MBX-APIKEY" , _binanceSettings.CurrentValue.ApiKey },
                     }.ToImmutableDictionary();
-
-            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => httpclient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
-
-            _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode} ",
-                nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode);
-
-            if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
-            {
-                _logger.LogWarning("Method: {Method}: {httpResponseMessage.Content}", nameof(GetBinanceCandlesticks), httpResponseMessage.Content);
-                return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
-            }
-
             try
             {
+                using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
+
+                _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode} ",
+                    nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode);
+
+                if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    _logger.LogWarning("Method: {Method}: {httpResponseMessage.Content}", nameof(GetBinanceCandlesticks), httpResponseMessage.Content);
+                    return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
+                }
+
                 using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                object[][]? deserializedData = await JsonSerializer.DeserializeAsync<object[][]>(jsonStream, _jsonSerializerOptions);
+                var deserializedData = await JsonSerializer.DeserializeAsync<object[][]>(jsonStream, _jsonSerializerOptions);
                 if (deserializedData is not null)
                 {
                     return Result<object[][], string>.Success(deserializedData);
