@@ -32,7 +32,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [EnableRateLimiting("fixed-by-ip")]
         [HttpPost("SynchronizeProviders")]
-        public async Task<IActionResult> SynchronizeProvidersAsync([FromBody] DataProviderTimeframeRequest dataProviderTimeframeRequest)
+        public Task<IActionResult> SynchronizeProvidersAsync([FromBody] DataProviderTimeframeRequest dataProviderTimeframeRequest)
         {
             _logger.LogInformation("Method: {SynchronizeProvidersAsync} , dataProviderTimeframeRequest {@dataProviderTimeframeRequest}",
                 nameof(SynchronizeProvidersAsync), dataProviderTimeframeRequest);
@@ -42,11 +42,16 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             {
                 _logger.LogWarning("Method: {SynchronizeProvidersAsync} , validationResult {@validationResult}",
                     nameof(SynchronizeProvidersAsync), validationResult);
-                return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+                return Task.FromResult<IActionResult>(BadRequest(validationResult.Errors.Select(e => e.ErrorMessage)));
             }
 
-            await _syncService.SynchronizeProvidersAsync(dataProviderTimeframeRequest);
-            return Ok();
+            return SynchronizeInternalAsync(dataProviderTimeframeRequest);
+
+            async Task<IActionResult> SynchronizeInternalAsync(DataProviderTimeframeRequest request)
+            {
+                await _syncService.SynchronizeProvidersAsync(request);
+                return Ok();
+            }
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
