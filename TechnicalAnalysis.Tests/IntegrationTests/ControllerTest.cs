@@ -1,6 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Newtonsoft.Json;
 using Npgsql;
+using System.Text;
+using TechnicalAnalysis.CommonModels.ApiRequests;
+using TechnicalAnalysis.CommonModels.Enums;
 using Testcontainers.PostgreSql;
 
 namespace TechnicalAnalysis.Tests.IntegrationTests
@@ -23,7 +27,15 @@ namespace TechnicalAnalysis.Tests.IntegrationTests
 
             var client = _factory.CreateClient();
 
-            var response = await client.GetAsync("api/v1/analysis/SynchronizeProviders");
+            var dataProviderTimeframeRequest = new DataProviderTimeframeRequest
+            {
+                DataProvider = DataProvider.Binance,
+                Timeframe = Timeframe.Weekly
+            };
+
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(dataProviderTimeframeRequest), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("api/v1/analysis/SynchronizeProviders", jsonContent);
+
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         }
     }
