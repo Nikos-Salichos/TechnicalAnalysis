@@ -9,11 +9,13 @@ namespace TechnicalAnalysis.Tests.IntegrationTests
         public BaseIntegrationTest()
         {
             PostgreSqlContainer = new PostgreSqlBuilder()
+                                   //.WithPortBinding(5432)
+                                   //.WithHostname("Host.docker.internal")
                                    .WithImage("postgres")
-                                   .WithDatabase("technicalAnalysis")
+                                   .WithDatabase("TechnicalAnalysis")
                                    .WithUsername("postgres")
                                    .WithPassword("admin")
-                                   .WithBindMount("C:\\Users\\Nikos\\source\\repos\\TechnicalAnalysis\\createTables.sql", "/docker-entrypoint-initdb.d/createTables.sql")  // Mount the SQL script
+                                   //.WithBindMount("C:\\Users\\Nikos\\source\\repos\\TechnicalAnalysis\\createTables.sql", "/docker-entrypoint-initdb.d/createTables.sql")  // Mount the SQL script
                                    .WithCleanUp(true)
                                    .Build();
         }
