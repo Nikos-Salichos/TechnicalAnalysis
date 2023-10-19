@@ -1,67 +1,55 @@
-﻿using Dapper;
-using FluentAssertions;
-using Npgsql;
-using System.Data;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Tests.IntegrationTests
 {
-    public sealed class PostgreSqlRepositoryTest : BaseIntegrationTest
+    public sealed class PostgreSqlRepositoryTest : BaseIntegrationTest, IClassFixture<WebApplicationFactory<Program>>
     {
-        [Fact]
-        public async Task ExecuteAssetsCommand()
+        private readonly WebApplicationFactory<Program> _factory;
+        private readonly IPostgreSqlRepository _postgreSqlRepository;
+
+        public PostgreSqlRepositoryTest(WebApplicationFactory<Program> factory)
         {
-            List<Asset> _assets = new List<Asset>
-            {
-                new Asset { Symbol = "BTC" },
-            };
-            using var connection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
-            using var command = new NpgsqlCommand();
-            connection.Open();
-            const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol FROM \"Assets\"";
-            var assets = await connection.QueryAsync<Asset>(query);
+            _factory = factory;
+            _postgreSqlRepository = (IPostgreSqlRepository)_factory.Services.GetService(typeof(IPostgreSqlRepository));
         }
 
         [Fact]
-        public async Task ExecuteProvidersCommand()
+        public async Task ExecuteAssetsCommand_Successful()
         {
-            using var connection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
-            using var command = new NpgsqlCommand();
-            connection.Open();
-            const string query = "SELECT \"Id\" AS PrimaryId, \"Name\", \"Code\", \"LastAssetSync\", \"LastPairSync\", \"LastCandlestickSync\" FROM \"Providers\"";
-            var providers = await connection.QueryAsync<ProviderPairAssetSyncInfo>(query);
-            providers.Should().NotBeNullOrEmpty();
+            await _postgreSqlRepository.DeleteAssetsAsync();
+
+            List<Asset> assets = new List<Asset>
+            {
+                new Asset { Symbol = "TestContainersAsset"},
+            };
+
+            await _postgreSqlRepository.InsertAssetsAsync(assets);
+
+            var retrievedAssets = await _postgreSqlRepository.GetAssetsAsync();
+            retrievedAssets.Should().NotBeNull();
+            retrievedAssets.FailValue.Should().BeNull();
+            retrievedAssets.SuccessValue.First().Symbol.Should().Be(assets[0].Symbol);
         }
 
         [Fact]
-        public async Task InsertDuplicateAssets_ThrowsExceptionAndRollback()
+        public async Task InsertDuplicateAssets_Fail()
         {
-            List<Asset> _assets = new List<Asset>
+            await _postgreSqlRepository.DeleteAssetsAsync();
+
+            List<Asset> assets = new List<Asset>
             {
-                new Asset { Symbol = "BTC" },
-                new Asset { Symbol = "BTC" }
+                new Asset { Symbol = "TestContainersAsset"},
+                new Asset { Symbol = "TestContainersAsset"},
             };
 
-            using var connection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
-            const string query = "INSERT INTO \"Assets\" (\"Symbol\") VALUES (@Symbol)";
+            await _postgreSqlRepository.InsertAssetsAsync(assets);
 
-            IDbTransaction transaction = null;
-            try
-            {
-                connection.Open();
-                transaction = connection.BeginTransaction();
-                await connection.ExecuteAsync(query, _assets, transaction: transaction);
-                transaction.Commit();
-            }
-            catch (Exception exception)
-            {
-                exception.Should().NotBeNull();
-                transaction?.Rollback();
-            }
-            finally
-            {
-                transaction?.Dispose();
-            }
+            var retrievedAssets = await _postgreSqlRepository.GetAssetsAsync();
+            retrievedAssets.FailValue.Should().BeNull();
+            retrievedAssets.SuccessValue.Should().BeEmpty();
         }
 
     }
