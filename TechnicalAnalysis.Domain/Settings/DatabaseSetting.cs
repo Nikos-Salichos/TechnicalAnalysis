@@ -2,6 +2,6 @@
 {
     public class DatabaseSetting
     {
-        public string PostgreSqlTechnicalAnalysisDockerCompose { get; init; }
+        public string PostgreSqlTechnicalAnalysisDockerCompose { get; init; } = string.Empty;
     }
 }
