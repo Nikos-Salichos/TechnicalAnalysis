@@ -89,7 +89,6 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
 builder.Services.AddHangfireServer();
 
-
 #endregion Services Registration
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

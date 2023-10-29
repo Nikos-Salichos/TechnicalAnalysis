@@ -34,8 +34,8 @@ services:
     ports:
      - "5432:5432"
     environment:
+      POSTGRES_DB: "TechnicalAnalysis"
       POSTGRES_PASSWORD: "admin"
-      ACCEPT_EULA: "Y"
     volumes: 
        - ./postgres-data:/var/lib/postgresql/data
        # copy the sql script to create tables

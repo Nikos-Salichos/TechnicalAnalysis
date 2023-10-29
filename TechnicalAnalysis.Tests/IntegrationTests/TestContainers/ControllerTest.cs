@@ -1,19 +1,16 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
-using Npgsql;
 using System.Text;
 using TechnicalAnalysis.CommonModels.ApiRequests;
 using TechnicalAnalysis.CommonModels.Enums;
-using Testcontainers.PostgreSql;
+using TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses;
 
-namespace TechnicalAnalysis.Tests.IntegrationTests
+namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
 {
-    public class ControllerTest : BaseIntegrationTest, IClassFixture<WebApplicationFactory<Program>>
+    public class ControllerTest : BaseIntegrationTest
     {
-        private readonly WebApplicationFactory<Program> _factory;
-
-        public ControllerTest(WebApplicationFactory<Program> factory)
+        private readonly IntegrationTestWebAppFactory _factory;
+        public ControllerTest(IntegrationTestWebAppFactory factory) : base(factory)
         {
             _factory = factory;
         }
@@ -22,9 +19,6 @@ namespace TechnicalAnalysis.Tests.IntegrationTests
         [Fact]
         public async Task Should_return_ok_on_http_get_synchronizeProviders()
         {
-            using var connection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
-            connection.Open();
-
             var client = _factory.CreateClient();
 
             var dataProviderTimeframeRequest = new DataProviderTimeframeRequest

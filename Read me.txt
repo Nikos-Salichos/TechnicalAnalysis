@@ -5,10 +5,10 @@ You can generate this file by completing the following steps:
 2) cd C:\Program Files\PostgreSQL\15\bin
 
 This command back up object definitions + data
-3) pg_dump -U postgres -h localhost -p 5432 TechnicalAnalysis > C:\Users\Nikos\source\repos\TechnicalAnalysis\createTables.sql
+3) pg_dump -U postgres -h localhost -p 5432 -d TechnicalAnalysis -n public > C:\Users\Nikos\source\repos\TechnicalAnalysis\createTables.sql
 
 This command can be used to back up schema only:
-pg_dump -U postgres -h localhost -p 5432 --schema-only TechnicalAnalysis > C:\Users\Nikos\source\repos\TechnicalAnalysis\createTables_schemaonly.sql
+pg_dump -U postgres -h localhost -p 5432 -d TechnicalAnalysis -n public -f "C:\Users\Nikos\source\repos\TechnicalAnalysis\createTables.sql"
 
 Note:
 I suggest you to use the existing one, because you need to insert providers the first time that you will use it.

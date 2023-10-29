@@ -1,0 +1,49 @@
+version: '3.4'
+
+services:
+  infrastructurehost-test:
+    image: ${DOCKER_REGISTRY-}infrastructurehost:test
+    build:
+      context: .
+      dockerfile: TechnicalAnalysis.Infrastructure.Host/Dockerfile.test
+    user: root
+
+  redis-test:
+    image: redis
+    container_name: technical-analysis-redis-test
+    restart: always
+    ports:
+      - "6380:6379"  # Use a different host port to avoid conflicts
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  rabbitmq-test:
+    image: rabbitmq:management
+    container_name: technical-analysis-rabbitmq-test
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5673:5672"  # Use different ports for RabbitMQ
+      - "15673:15672"
+
+  postgresql-test:
+    image: postgres:latest
+    container_name: technical-analysis-postgresql-test
+    restart: always
+    ports:
+      - "5433:5432"  # Use a different host port for PostgreSQL
+    environment:
+      POSTGRES_PASSWORD: "admin"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ./postgres-test-data:/var/lib/postgresql/data  # Separate data volume for testing
+      - ./createTables-test.sql:/docker-entrypoint-initdb.d/createTables.sql  # Testing SQL script
+
+  seq-test:
+    container_name: technical-analysis-seq-test
+    image: datalust/seq:latest
+    ports:
+      - 5342:80  # Use a different host port for Seq
+    environment:
+      - ACCEPT_EULA=Y
