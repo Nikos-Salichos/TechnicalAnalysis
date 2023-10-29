@@ -2,19 +2,13 @@
 {
     public static class ParallelOption
     {
-        private static readonly ParallelOptions _options;
-
-        static ParallelOption()
+        public static ParallelOptions GetOptions()
         {
-            _options = new ParallelOptions
+            return new ParallelOptions
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount / 4
             };
         }
-
-        public static ParallelOptions GetOptions()
-        {
-            return _options;
-        }
     }
+
 }
