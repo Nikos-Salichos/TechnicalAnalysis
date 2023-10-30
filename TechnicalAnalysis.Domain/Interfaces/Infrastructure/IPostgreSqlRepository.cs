@@ -14,7 +14,7 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
         Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlestickssAsync();
         Task InsertPairsAsync(IEnumerable<Pair> pairs);
         Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks);
-        Task InsertAssetsAsync(IEnumerable<Asset> assets);
+        Task<IResult<IEnumerable<Asset>, string>> InsertAssetsAsync(IEnumerable<Asset> assets);
         Task UpdateProviderPairAssetSyncInfoAsync(ProviderPairAssetSyncInfo providerPairAssetSyncInfos);
         Task UpdateProviderCandlestickSyncInfoAsync(ProviderCandlestickSyncInfo providerCandlestickSyncInfos);
         Task InsertPoolsAsync(IEnumerable<Pool> pools);
