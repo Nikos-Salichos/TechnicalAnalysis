@@ -217,12 +217,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertAssetsAsync(IEnumerable<Asset> assets)
+        public async Task<IResult<IEnumerable<Asset>, string>> InsertAssetsAsync(IEnumerable<Asset> assets)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"Assets\" (\"Symbol\", \"CreatedDate\") VALUES (@Symbol, @CreatedDate)";
 
             NpgsqlTransaction? transaction = null;
+            IResult<IEnumerable<Asset>, string> result = null;
             try
             {
                 dbConnection.Open();
@@ -231,17 +232,21 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 await dbConnection.ExecuteAsync(query, assets, transaction: transaction);
 
                 transaction.Commit();
+                result = Result<IEnumerable<Asset>, string>.Success(assets);
             }
             catch (Exception exception)
             {
                 _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
                 transaction?.Rollback();
+                result = Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
             finally
             {
                 transaction?.Dispose();
             }
+            return result;
         }
+
 
         public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
