@@ -11,8 +11,6 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
         [Fact]
         public async Task ExecuteAssetsCommand_Successful()
         {
-            await PostgreSqlRepository.DeleteAssetsAsync();
-
             List<Asset> assets = new List<Asset>
             {
                 new Asset { Symbol = "TestContainersAsset"},
@@ -35,11 +33,10 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
                 new Asset { Symbol = "TestContainersAsset"},
             };
 
-            await PostgreSqlRepository.InsertAssetsAsync(assets);
+            var insertedAssets = await PostgreSqlRepository.InsertAssetsAsync(assets);
 
-            var retrievedAssets = await PostgreSqlRepository.GetAssetsAsync();
-            retrievedAssets.FailValue.Should().BeNull();
-            retrievedAssets.SuccessValue.Should().BeEmpty();
+            insertedAssets.FailValue.Should().NotBeEmpty();
+            insertedAssets.SuccessValue.Should().BeNull();
         }
 
     }
