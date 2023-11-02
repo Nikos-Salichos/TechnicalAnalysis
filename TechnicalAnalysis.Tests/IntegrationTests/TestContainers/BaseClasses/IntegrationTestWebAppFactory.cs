@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Dapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Settings;
 using TechnicalAnalysis.Infrastructure.Persistence.Repositories;
@@ -66,10 +68,39 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
 
         }
 
-        public Task InitializeAsync()
+        public async Task InitializeAsync()
         {
-            return PostgreSqlContainer.StartAsync();
+            await PostgreSqlContainer.StartAsync();
+
+            using var dbConnection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
+            await dbConnection.OpenAsync();
+
+            const string query = @"
+                                CREATE TABLE public.""Assets"" (
+                                    ""Id"" bigint NOT NULL,
+                                    ""Symbol"" text UNIQUE,
+                                    ""CreatedDate"" date
+                                );
+                                
+                                ALTER TABLE public.""Assets"" OWNER TO postgres;
+                                
+                                ALTER TABLE public.""Assets"" ALTER COLUMN ""Id"" ADD GENERATED ALWAYS AS IDENTITY (
+                                    SEQUENCE NAME public.""Assets_Id_seq""
+                                    START WITH 1
+                                    INCREMENT BY 1
+                                    NO MINVALUE
+                                    NO MAXVALUE
+                                    CACHE 1
+                                );";
+
+            // Combine all the SQL queries into one transaction
+            using var transaction = dbConnection.BeginTransaction();
+            await dbConnection.ExecuteAsync(query, transaction: transaction);
+
+            // Commit the transaction to execute all queries
+            transaction.Commit();
         }
+
 
         public new Task DisposeAsync()
         {
