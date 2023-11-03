@@ -21,3 +21,5 @@ then we go to C:\Program Files\PostgreSQL\15\data
 open pg_hba.conf with text editor
 and copy paste this line in the end:
 host    TechnicalAnalysis    postgres    192.168.1.11/32    md5
+
+or we try to remove SSL
