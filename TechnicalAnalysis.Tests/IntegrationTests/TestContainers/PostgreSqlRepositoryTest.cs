@@ -39,5 +39,17 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
             insertedAssets.SuccessValue.Should().BeNull();
         }
 
+        [Fact]
+        public async Task DeleteAssets_Success()
+        {
+            await ExecuteAssetsCommand_Successful();
+
+            await PostgreSqlRepository.DeleteAssetsAsync();
+
+            var retrievedAssets = await PostgreSqlRepository.GetAssetsAsync();
+            retrievedAssets.Should().NotBeNull();
+            retrievedAssets.SuccessValue.Should().BeEmpty();
+        }
+
     }
 }
