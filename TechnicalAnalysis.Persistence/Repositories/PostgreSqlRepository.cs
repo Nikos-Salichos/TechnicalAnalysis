@@ -247,7 +247,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             return result;
         }
 
-
         public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
