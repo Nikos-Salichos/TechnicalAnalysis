@@ -40,11 +40,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             });
 
             services.AddHttpClient("default")
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5))  // Set handler lifetime, if needed
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler())
                 .ConfigureHttpClient(client =>
                 {
-                    client.Timeout = TimeSpan.FromSeconds(30);  // Set timeout to 30 seconds
                     client.DefaultRequestHeaders.Add("User-Agent", "Tracking prices application");
                 });
 
