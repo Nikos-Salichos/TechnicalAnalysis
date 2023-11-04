@@ -247,30 +247,69 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             return result;
         }
 
+        //TODO Change all bulk to use BeginBinaryImport
         public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "INSERT INTO \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") " +
-                        "VALUES (@PairId, @Timeframe, @OpenDate, @CloseDate, @OpenPrice, @HighPrice, @LowPrice, @ClosePrice, @Volume, @NumberOfTrades)";
-
-            NpgsqlTransaction? transaction = null;
             try
             {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
 
-                await dbConnection.ExecuteAsync(query, candlesticks, transaction: transaction);
+                using var writer = dbConnection.BeginBinaryImport("COPY \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") FROM STDIN BINARY");
 
-                transaction.Commit();
+                foreach (var candlestick in candlesticks)
+                {
+                    await writer.StartRowAsync();
+                    await writer.WriteAsync(candlestick.PairId);
+                    await writer.WriteAsync((int)candlestick.Timeframe);
+                    await writer.WriteAsync(candlestick.OpenDate);
+                    await writer.WriteAsync(candlestick.CloseDate);
+
+                    if (candlestick.OpenPrice.HasValue)
+                    {
+                        await writer.WriteAsync(candlestick.OpenPrice.Value);
+                    }
+                    else
+                    {
+                        await writer.WriteNullAsync();
+                    }
+
+                    if (candlestick.HighPrice.HasValue)
+                    {
+                        await writer.WriteAsync(candlestick.HighPrice.Value);
+                    }
+                    else
+                    {
+                        await writer.WriteNullAsync();
+                    }
+
+                    if (candlestick.LowPrice.HasValue)
+                    {
+                        await writer.WriteAsync(candlestick.LowPrice.Value);
+                    }
+                    else
+                    {
+                        await writer.WriteNullAsync();
+                    }
+
+                    if (candlestick.ClosePrice.HasValue)
+                    {
+                        await writer.WriteAsync(candlestick.ClosePrice.Value);
+                    }
+                    else
+                    {
+                        await writer.WriteNullAsync();
+                    }
+
+                    await writer.WriteAsync(candlestick.Volume);
+                    await writer.WriteAsync(candlestick.NumberOfTrades);
+                }
+
+                await writer.CompleteAsync();
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
-                transaction?.Rollback();
-            }
-            finally
-            {
-                transaction?.Dispose();
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
             }
         }
 
@@ -292,7 +331,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
                 transaction?.Rollback();
             }
             finally
