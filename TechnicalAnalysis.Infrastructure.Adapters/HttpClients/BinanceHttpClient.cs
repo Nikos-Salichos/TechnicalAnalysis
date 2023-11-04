@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
-using System.Collections.Immutable;
 using System.Text.Json;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 using TechnicalAnalysis.Domain.Interfaces;
@@ -23,7 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy;
+        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy;
 
         public BinanceHttpClient(IOptionsMonitor<BinanceSetting> binanceSettings, IHttpClientFactory httpClientFactory,
             ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy)
@@ -31,12 +30,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             _logger = logger;
             _binanceSettings = binanceSettings;
             _httpClient = httpClientFactory.CreateClient("default");
-            _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
+            _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
         }
 
         public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
         {
-            using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => _httpClient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
+            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
             _logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
                nameof(GetBinanceAssetsAndPairs), _binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
@@ -80,13 +79,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var headers = new Dictionary<string, string>
                     {
                         { "X-MBX-APIKEY" , _binanceSettings.CurrentValue.ApiKey },
-                    }.ToImmutableDictionary();
+                    };
             try
             {
-                using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
+                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
 
                 _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode} ",
-                    nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode);
+                    nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode.ToString());
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
@@ -108,6 +107,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 _logger.LogWarning("Method: {Method}, exception {exception}", nameof(GetBinanceCandlesticks), exception);
                 return Result<object[][], string>.Fail(exception.ToString());
             }
+        }
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
         }
     }
 }
