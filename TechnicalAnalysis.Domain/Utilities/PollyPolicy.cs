@@ -21,7 +21,7 @@ namespace TechnicalAnalysis.Domain.Utilities
             return Policy.WrapAsync(
                     Policy.TimeoutAsync<T>(timeout, TimeoutStrategy.Optimistic, onTimeoutAsync: (context, timespan, task) =>
                     {
-                        _logger.LogWarning("Timeout occurred after {timespan}. Context: {context}", timespan, context);
+                        _logger.LogError("Timeout occurred after {timespan}. Context: {context}", timespan, context);
                         return Task.CompletedTask;
                     }),
                Policy<T>.Handle<Exception>()
@@ -32,7 +32,7 @@ namespace TechnicalAnalysis.Domain.Utilities
                         },
                         onRetry: (exception, delay, retryAttempt, context) =>
                         {
-                            _logger.LogWarning("Retry attempt {retryAttempt} of {retries}. Delaying for {delay.TotalSeconds} seconds. Exception: {exception}",
+                            _logger.LogError("Retry attempt {retryAttempt} of {retries}. Delaying for {delay.TotalSeconds} seconds. Exception: {exception}",
                                 retryAttempt, retries, delay.TotalSeconds, exception.Exception);
                         })
 
