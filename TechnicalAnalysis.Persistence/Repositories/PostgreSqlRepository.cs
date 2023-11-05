@@ -144,7 +144,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetProvidersAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetProvidersAsync), exception);
                 return Result<IEnumerable<ProviderSynchronization>, string>.Fail(exception.ToString());
             }
         }
