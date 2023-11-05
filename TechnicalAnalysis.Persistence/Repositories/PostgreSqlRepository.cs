@@ -39,7 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetAssetsAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetAssetsAsync), exception);
                 return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
         }
