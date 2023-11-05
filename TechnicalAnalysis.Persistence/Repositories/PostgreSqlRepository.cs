@@ -236,7 +236,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
                 transaction?.Rollback();
                 result = Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
