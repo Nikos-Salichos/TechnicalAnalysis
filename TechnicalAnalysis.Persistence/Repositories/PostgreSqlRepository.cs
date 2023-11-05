@@ -67,7 +67,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetCandlesticksAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetCandlesticksAsync), exception);
                 return Result<IEnumerable<Candlestick>, string>.Fail(exception.ToString());
             }
         }
