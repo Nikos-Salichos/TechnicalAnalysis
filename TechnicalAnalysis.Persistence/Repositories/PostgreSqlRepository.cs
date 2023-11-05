@@ -184,7 +184,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(GetDexCandlestickssAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetDexCandlestickssAsync), exception);
                 return Result<IEnumerable<DexCandlestick>, string>.Fail(exception.ToString());
             }
         }
