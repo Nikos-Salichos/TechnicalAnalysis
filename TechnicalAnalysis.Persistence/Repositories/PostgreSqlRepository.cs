@@ -15,6 +15,7 @@ using Pool = TechnicalAnalysis.Domain.Entities.Pool;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
+    //TODO Change methods to async
     public class PostgreSqlRepository : IPostgreSqlRepository
     {
         private readonly string _connectionStringKey;
@@ -358,7 +359,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogInformation("Method:{Method}, Exception{@exception}", nameof(InsertPoolsAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPoolsAsync), exception);
                 transaction?.Rollback();
             }
             finally
