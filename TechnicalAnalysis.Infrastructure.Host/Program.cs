@@ -1,12 +1,9 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.RateLimiting;
 using TechnicalAnalysis.Application.Modules;
 using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host;
@@ -21,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 #region Read Configuration
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
-    .AddJsonFile("appsettings.prod.json", optional: true, reloadOnChange: true);
+    .AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true);
 #endregion Read Configuration
 
 #region Serilog
@@ -49,47 +46,29 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 #endregion Accept Json in Controller
 
-#region Services Registration
+#region Layer Modules
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
+#endregion Layer Modules
 
-builder.Services.AddResponseCompression(options =>
-{
-    options.EnableForHttps = true;
-    options.Providers.Add<BrotliCompressionProvider>();
-});
-
-builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
-{
-    options.Level = CompressionLevel.Optimal;
-});
+#region Brotli Compression
+builder.Services.ConfigureCompression();
+#endregion Brotli Compression
 
 builder.Services.AddAntiforgery(options =>
 {
     options.SuppressXFrameOptionsHeader = true;
 });
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+#region Api Rate Limit
+builder.Services.ConfigureRateLimit();
+#endregion Api Rate Limit
 
-    options.AddPolicy("fixed-by-ip", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            // Required if I run behind a reverse proxy, so I do not limit the proxy Ip Address
-            // httpContext.Request.Headers["X-Forwarded-For"].ToString(), 
-            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 3,
-                Window = TimeSpan.FromMinutes(1)
-            }));
-});
 
 builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
 builder.Services.AddHangfireServer();
 
-#endregion Services Registration
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
