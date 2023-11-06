@@ -48,7 +48,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             {
                 _logger.LogWarning("Method: {SynchronizeProvidersAsync} , validationResult {@validationResult}",
                     nameof(SynchronizeProvidersAsync), validationResult);
-                return Task.FromResult<IActionResult>(BadRequest(validationResult.Errors.Select(e => e.ErrorMessage)));
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage);
+                return Task.FromResult<IActionResult>(BadRequest(errors));
             }
 
             return SynchronizeInternalAsync(dataProviderTimeframeRequest);
@@ -81,7 +82,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         {
             _logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
-            return Ok();
+            return Ok(pair);
         }
     }
 }
