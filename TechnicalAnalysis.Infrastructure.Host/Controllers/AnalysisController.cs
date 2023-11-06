@@ -31,11 +31,17 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [EnableRateLimiting("fixed-by-ip")]
-        [HttpPost("SynchronizeProviders")]
-        public Task<IActionResult> SynchronizeProvidersAsync([FromBody] DataProviderTimeframeRequest dataProviderTimeframeRequest)
+        [HttpGet("SynchronizeProviders")]
+        public Task<IActionResult> SynchronizeProvidersAsync([FromQuery] DataProvider dataProvider, Timeframe timeframe)
         {
+            var dataProviderTimeframeRequest = new DataProviderTimeframeRequest
+            {
+                DataProvider = dataProvider,
+                Timeframe = timeframe
+            };
+
             _logger.LogInformation("Method: {SynchronizeProvidersAsync} , dataProviderTimeframeRequest {@dataProviderTimeframeRequest}",
-                nameof(SynchronizeProvidersAsync), dataProviderTimeframeRequest);
+                 nameof(SynchronizeProvidersAsync), dataProviderTimeframeRequest);
 
             var validationResult = _dataProviderTimeframeRequest.Validate(dataProviderTimeframeRequest);
             if (!validationResult.IsValid)
