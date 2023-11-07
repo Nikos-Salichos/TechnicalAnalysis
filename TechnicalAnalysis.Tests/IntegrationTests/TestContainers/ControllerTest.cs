@@ -21,11 +21,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
         {
             var client = _factory.CreateClient();
 
-            var dataProviderTimeframeRequest = new DataProviderTimeframeRequest
-            {
-                DataProvider = DataProvider.Binance,
-                Timeframe = Timeframe.Weekly
-            };
+            var dataProviderTimeframeRequest = new DataProviderTimeframeRequest(DataProvider.Binance, Timeframe.Weekly);
 
             var jsonContent = new StringContent(JsonConvert.SerializeObject(dataProviderTimeframeRequest), Encoding.UTF8, "application/json");
             var response = await client.PostAsync("api/v1/analysis/SynchronizeProviders", jsonContent);
