@@ -155,12 +155,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                dbConnection.Open();
+                await dbConnection.OpenAsync();
                 const string query = "SELECT \"Id\" AS PrimaryId, \"DexId\" AS Provider, \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", " +
                                      "\"FeeTier\" AS FeeTier, \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\" " +
                                      "FROM \"Pools\"";
                 var pools = await dbConnection.QueryAsync<Pool>(query);
-                dbConnection.Close();
+                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Pool>, string>.Success(pools);
             }
             catch (Exception exception)
