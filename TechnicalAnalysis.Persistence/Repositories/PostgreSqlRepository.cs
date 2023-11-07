@@ -16,6 +16,7 @@ using Pool = TechnicalAnalysis.Domain.Entities.Pool;
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
     //TODO Change methods to async
+    //TODO Remove open & close connection (queryAsync will handle it)
     public class PostgreSqlRepository : IPostgreSqlRepository
     {
         private readonly string _connectionStringKey;
@@ -32,10 +33,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
                 const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol FROM \"Assets\"";
                 var assets = await dbConnection.QueryAsync<Asset>(query);
-                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Asset>, string>.Success(assets);
             }
             catch (Exception exception)
