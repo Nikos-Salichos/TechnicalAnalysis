@@ -2,9 +2,16 @@
 
 namespace TechnicalAnalysis.CommonModels.ApiRequests
 {
-    public class DataProviderTimeframeRequest
+    public struct DataProviderTimeframeRequest
     {
-        public DataProvider DataProvider { get; init; } = DataProvider.All;
-        public Timeframe Timeframe { get; init; } = Timeframe.Daily;
+        public DataProvider DataProvider { get; }
+        public Timeframe Timeframe { get; }
+
+        public DataProviderTimeframeRequest(DataProvider dataProvider, Timeframe timeframe)
+        {
+            DataProvider = dataProvider;
+            Timeframe = timeframe;
+        }
     }
+
 }
