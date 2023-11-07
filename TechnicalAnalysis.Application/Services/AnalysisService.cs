@@ -149,7 +149,7 @@ namespace TechnicalAnalysis.Application.Services
             return enhancedScan;
         }
 
-        private static Indicator CalculateCandlestickCloseBelowPivotPrice(PairExtended? pair)
+        private static Indicator CalculateCandlestickCloseBelowPivotPrice(PairExtended pair)
         {
             var closeBelowPivotPrice = new Indicator { Name = "closeBelowPivotPrice" };
 
@@ -166,7 +166,7 @@ namespace TechnicalAnalysis.Application.Services
             return closeBelowPivotPrice;
         }
 
-        private static Indicator CalculateStPatternSignals(PairExtended? pair)
+        private static Indicator CalculateStPatternSignals(PairExtended pair)
         {
             var stPatternSignals = new Indicator { Name = "StPatternSignals" };
 
@@ -183,7 +183,7 @@ namespace TechnicalAnalysis.Application.Services
             return stPatternSignals;
         }
 
-        private static Indicator PrintFractalTrend(PairExtended? pair)
+        private static Indicator PrintFractalTrend(PairExtended pair)
         {
             var fractalTrend = new Indicator { Name = "FractalTrend" };
             for (int i = 0; i < pair?.Candlesticks.Count; i++)
@@ -196,7 +196,7 @@ namespace TechnicalAnalysis.Application.Services
                     continue;
                 }
 
-                if ((fractalTrend.Signals.LastOrDefault() != null && fractalTrend?.Signals?.LastOrDefault()?.Sell == 1) || !fractalTrend.Signals.Any())
+                if ((fractalTrend?.Signals.LastOrDefault() != null && fractalTrend?.Signals?.LastOrDefault()?.Sell == 1) || fractalTrend?.Signals.Count == 0)
                 {
                     if ((candlestick.PriceTrend is Trend.Up && candlestick1.PriceTrend is not Trend.Up)
                         ||
@@ -211,7 +211,7 @@ namespace TechnicalAnalysis.Application.Services
                     }
                 }
 
-                if ((fractalTrend.Signals.LastOrDefault()?.Buy == 1) || !fractalTrend.Signals.Any())
+                if ((fractalTrend?.Signals.LastOrDefault()?.Buy == 1) || fractalTrend?.Signals.Count == 0)
                 {
                     if ((candlestick.PriceTrend is Trend.Down && candlestick1.PriceTrend is not Trend.Down)
                     ||
@@ -230,7 +230,7 @@ namespace TechnicalAnalysis.Application.Services
             return fractalTrend;
         }
 
-        private static Indicator PrintLowestHighSignals(PairExtended? pair)
+        private static Indicator PrintLowestHighSignals(PairExtended pair)
         {
             var lowestHighLowestLowFractal = new Indicator { Name = "lowestHighLowestLowFractal" };
 
@@ -273,7 +273,7 @@ namespace TechnicalAnalysis.Application.Services
             return lowestHighLowestLowFractal;
         }
 
-        private static Indicator PrintFlagNestedBodySignals(PairExtended? pair)
+        private static Indicator PrintFlagNestedBodySignals(PairExtended pair)
         {
             var indicator = new Indicator { Name = "FlagNestedBodySignals" };
             foreach (var candlestick in pair?.Candlesticks)
@@ -384,7 +384,7 @@ namespace TechnicalAnalysis.Application.Services
             return indicator;
         }
 
-        private static Indicator PrintResistanceBreakoutSignals(PairExtended? pair)
+        private static Indicator PrintResistanceBreakoutSignals(PairExtended pair)
         {
             var flagNestedCandlesticksBody = new Indicator { Name = "ResistanceBreakout" };
             decimal? profit = 0;
@@ -419,7 +419,7 @@ namespace TechnicalAnalysis.Application.Services
             return flagNestedCandlesticksBody;
         }
 
-        private static Indicator PrintPivotSignals(PairExtended? pair)
+        private static Indicator PrintPivotSignals(PairExtended pair)
         {
             var pivot = new Indicator { Name = "PivotPointSignals" };
             var candlesticks = pair?.Candlesticks;
