@@ -96,7 +96,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                dbConnection.Open();
+                await dbConnection.OpenAsync();
 
                 const string providerPairAssetSyncInfoQuery = @"
                                         SELECT
@@ -140,7 +140,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     providerSynchronizationFound?.CandlestickSyncInfos.Add(providerCandlestickSyncInfo);
                 }
 
-                dbConnection.Close();
+                await dbConnection.CloseAsync();
                 return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
             }
             catch (Exception exception)
