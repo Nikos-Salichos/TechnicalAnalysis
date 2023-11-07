@@ -32,10 +32,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                dbConnection.Open();
+                await dbConnection.OpenAsync();
                 const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol FROM \"Assets\"";
                 var assets = await dbConnection.QueryAsync<Asset>(query);
-                dbConnection.Close();
+                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Asset>, string>.Success(assets);
             }
             catch (Exception exception)
@@ -50,7 +50,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                dbConnection.Open();
+                await dbConnection.OpenAsync();
                 const string query = "SELECT \"Id\" AS PrimaryId, " +
                     "\"open_date\" AS OpenDate, " +
                     "\"open_price\" AS OpenPrice, " +
@@ -63,7 +63,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     " \"timeframe\" AS Timeframe, " +
                     "\"pair_id\" AS PairId FROM \"Candlesticks\"";
                 var candlesticks = await dbConnection.QueryAsync<Candlestick>(query);
-                dbConnection.Close();
+                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Candlestick>, string>.Success(candlesticks);
             }
             catch (Exception exception)
@@ -78,10 +78,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
-                dbConnection.Open();
+                await dbConnection.OpenAsync();
                 const string query = "SELECT \"id\" AS PrimaryId, \"symbol\" AS Symbol, \"asset0_id\" AS BaseAssetId, \"asset1_id\" AS QuoteAssetId, \"provider_id\" AS Provider, \"is_active\" AS IsActive, \"all_candles\" AS AllCandles, \"created_at\" AS CreatedAt FROM \"Pairs\"";
                 var pairs = await dbConnection.QueryAsync<Pair>(query);
-                dbConnection.Close();
+                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Pair>, string>.Success(pairs);
             }
             catch (Exception exception)
