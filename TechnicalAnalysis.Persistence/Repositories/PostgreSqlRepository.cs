@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using TechnicalAnalysis.CommonModels.BusinessModels;
-using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Entities;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
@@ -49,7 +48,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
                 const string query = "SELECT \"Id\" AS PrimaryId, " +
                     "\"open_date\" AS OpenDate, " +
                     "\"open_price\" AS OpenPrice, " +
@@ -62,7 +60,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     " \"timeframe\" AS Timeframe, " +
                     "\"pair_id\" AS PairId FROM \"Candlesticks\"";
                 var candlesticks = await dbConnection.QueryAsync<Candlestick>(query);
-                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Candlestick>, string>.Success(candlesticks);
             }
             catch (Exception exception)
@@ -77,10 +74,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
                 const string query = "SELECT \"id\" AS PrimaryId, \"symbol\" AS Symbol, \"asset0_id\" AS BaseAssetId, \"asset1_id\" AS QuoteAssetId, \"provider_id\" AS Provider, \"is_active\" AS IsActive, \"all_candles\" AS AllCandles, \"created_at\" AS CreatedAt FROM \"Pairs\"";
                 var pairs = await dbConnection.QueryAsync<Pair>(query);
-                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Pair>, string>.Success(pairs);
             }
             catch (Exception exception)
@@ -95,7 +90,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
 
                 const string providerPairAssetSyncInfoQuery = @"
                                         SELECT
@@ -118,13 +112,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 var providerPairAssetSyncInfos = await dbConnection.QueryAsync<ProviderPairAssetSyncInfo>(providerPairAssetSyncInfoQuery);
                 var providerCandlestickSyncInfos = await dbConnection.QueryAsync<ProviderCandlestickSyncInfo>(providerCandlestickSyncInfoQuery);
 
-                var providers = dbConnection.Query<string>("select 'Binance' union select 'Uniswap' union select 'Pancakeswap' " +
-                    "union select 'Alpaca' union select 'WallStreetZen' union select 'All'")
-                    .Select(x => Enum.Parse(typeof(DataProvider), x)).ToList();
-
-                var timeframes = dbConnection.Query<string>("select 'Daily' union select 'Weekly' union select 'OneHour'")
-                    .Select(x => Enum.Parse(typeof(Timeframe), x)).ToList();
-
                 var providerSynchronizations = new List<ProviderSynchronization>();
                 foreach (var providerPairAssetSyncInfo in providerPairAssetSyncInfos)
                 {
@@ -139,7 +126,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     providerSynchronizationFound?.CandlestickSyncInfos.Add(providerCandlestickSyncInfo);
                 }
 
-                await dbConnection.CloseAsync();
                 return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
             }
             catch (Exception exception)
@@ -154,12 +140,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
                 const string query = "SELECT \"Id\" AS PrimaryId, \"DexId\" AS Provider, \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", " +
                                      "\"FeeTier\" AS FeeTier, \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\" " +
                                      "FROM \"Pools\"";
                 var pools = await dbConnection.QueryAsync<Pool>(query);
-                await dbConnection.CloseAsync();
                 return Result<IEnumerable<Pool>, string>.Success(pools);
             }
             catch (Exception exception)
