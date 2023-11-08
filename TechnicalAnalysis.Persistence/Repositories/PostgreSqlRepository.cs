@@ -204,25 +204,25 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             const string query = "INSERT INTO \"Assets\" (\"Symbol\", \"CreatedDate\") VALUES (@Symbol, @CreatedDate)";
 
             NpgsqlTransaction? transaction = null;
-            IResult<IEnumerable<Asset>, string> result = null;
+            Result<IEnumerable<Asset>, string> result;
             try
             {
-                transaction = dbConnection.BeginTransaction();
+                transaction = await dbConnection.BeginTransactionAsync();
 
                 await dbConnection.ExecuteAsync(query, assets, transaction: transaction);
 
-                transaction.Commit();
+                await transaction.CommitAsync();
                 result = Result<IEnumerable<Asset>, string>.Success(assets);
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
-                transaction?.Rollback();
+                await transaction.RollbackAsync();
                 result = Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
             finally
             {
-                transaction?.Dispose();
+                await transaction.DisposeAsync();
             }
             return result;
         }
