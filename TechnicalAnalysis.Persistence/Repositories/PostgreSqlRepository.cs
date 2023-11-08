@@ -203,28 +203,24 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"Assets\" (\"Symbol\", \"CreatedDate\") VALUES (@Symbol, @CreatedDate)";
 
-            NpgsqlTransaction? transaction = null;
-            Result<IEnumerable<Asset>, string> result;
+            using var transaction = await dbConnection.BeginTransactionAsync();
+
             try
             {
-                transaction = await dbConnection.BeginTransactionAsync();
-
                 await dbConnection.ExecuteAsync(query, assets, transaction: transaction);
-
                 await transaction.CommitAsync();
-                result = Result<IEnumerable<Asset>, string>.Success(assets);
+                return Result<IEnumerable<Asset>, string>.Success(assets);
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
                 await transaction.RollbackAsync();
-                result = Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
+                return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
             finally
             {
                 await transaction.DisposeAsync();
             }
-            return result;
         }
 
         //TODO Change all bulk to use BeginBinaryImport
