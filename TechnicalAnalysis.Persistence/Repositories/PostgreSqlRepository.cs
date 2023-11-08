@@ -198,7 +198,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task<IResult<IEnumerable<Asset>, string>> InsertAssetsAsync(IEnumerable<Asset> assets)
+        public async Task<IResult<string, string>> InsertAssetsAsync(IEnumerable<Asset> assets)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"Assets\" (\"Symbol\", \"CreatedDate\") VALUES (@Symbol, @CreatedDate)";
@@ -209,13 +209,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 await dbConnection.ExecuteAsync(query, assets, transaction: transaction);
                 await transaction.CommitAsync();
-                return Result<IEnumerable<Asset>, string>.Success(assets);
+                return Result<string, string>.Success(string.Empty);
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
                 await transaction.RollbackAsync();
-                return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
+                return Result<string, string>.Fail(exception.ToString());
             }
             finally
             {
