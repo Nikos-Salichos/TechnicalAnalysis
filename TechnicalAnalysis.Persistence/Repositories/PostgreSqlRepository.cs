@@ -181,20 +181,20 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             NpgsqlTransaction? transaction = null;
             try
             {
-                transaction = dbConnection.BeginTransaction();
+                transaction = await dbConnection.BeginTransactionAsync();
 
                 await dbConnection.ExecuteAsync(query, pairs, transaction: transaction);
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPairsAsync), exception);
-                transaction?.Rollback();
+                await transaction.RollbackAsync();
             }
             finally
             {
-                transaction?.Dispose();
+                await transaction.DisposeAsync();
             }
         }
 
@@ -207,7 +207,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             IResult<IEnumerable<Asset>, string> result = null;
             try
             {
-                dbConnection.Open();
                 transaction = dbConnection.BeginTransaction();
 
                 await dbConnection.ExecuteAsync(query, assets, transaction: transaction);
