@@ -158,12 +158,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             try
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
                 const string query = "SELECT \"Id\" AS PrimaryId, \"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\" AS OpenPrice, \"High\" AS HighPrice, \"Low\" AS LowPrice, " +
                                      "\"Close\" AS ClosePrice, \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\" " +
                                      "FROM \"DexCandlesticks\"";
                 var dexCandlesticks = await dbConnection.QueryAsync<DexCandlestick>(query);
-                await dbConnection.CloseAsync();
                 return Result<IEnumerable<DexCandlestick>, string>.Success(dexCandlesticks);
             }
             catch (Exception exception)
