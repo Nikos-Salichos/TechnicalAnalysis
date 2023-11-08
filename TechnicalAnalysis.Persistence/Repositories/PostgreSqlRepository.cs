@@ -181,7 +181,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             NpgsqlTransaction? transaction = null;
             try
             {
-                dbConnection.Open();
                 transaction = dbConnection.BeginTransaction();
 
                 await dbConnection.ExecuteAsync(query, pairs, transaction: transaction);
