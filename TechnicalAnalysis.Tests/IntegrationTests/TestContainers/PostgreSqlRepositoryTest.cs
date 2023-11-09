@@ -4,6 +4,7 @@ using TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses;
 
 namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
 {
+    [Trait("Category", "Integration-PostgreSqlRepository")]
     public sealed class PostgreSqlRepositoryTest : BaseIntegrationTest
     {
         public PostgreSqlRepositoryTest(IntegrationTestWebAppFactory factory) : base(factory) { }
@@ -29,8 +30,8 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
         {
             List<Asset> assets = new List<Asset>
             {
-                new Asset { Symbol = "TestContainersAsset"},
-                new Asset { Symbol = "TestContainersAsset"},
+                new Asset { Symbol = "BTC"},
+                new Asset { Symbol = "BTC"},
             };
 
             var insertedAssets = await PostgreSqlRepository.InsertAssetsAsync(assets);
