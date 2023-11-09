@@ -4,6 +4,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Tests.ArchitectureTests
 {
+    [Trait("Category", "Architecture")]
     public class InfrastructurePersistenceTest
     {
         [Fact]
