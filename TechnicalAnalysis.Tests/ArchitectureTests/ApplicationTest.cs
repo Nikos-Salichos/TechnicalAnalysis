@@ -4,6 +4,7 @@ using TechnicalAnalysis.Domain.Interfaces.Application;
 
 namespace TechnicalAnalysis.Tests.ArchitectureTests
 {
+    [Trait("Category", "Architecture")]
     public class ApplicationTest
     {
         [Fact]
