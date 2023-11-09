@@ -203,6 +203,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO \"Assets\" (\"Symbol\", \"CreatedDate\") VALUES (@Symbol, @CreatedDate)";
 
+            await dbConnection.OpenAsync();
             using var transaction = await dbConnection.BeginTransactionAsync();
 
             try
@@ -219,6 +220,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             finally
             {
+                await dbConnection.CloseAsync();
                 await transaction.DisposeAsync();
             }
         }
@@ -226,9 +228,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         //TODO Change all bulk to use BeginBinaryImport
         public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
+            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             try
             {
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
                 using var writer = dbConnection.BeginBinaryImport("COPY \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") FROM STDIN BINARY");
@@ -287,6 +289,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
             }
+            finally
+            {
+                await dbConnection.CloseAsync();
+            }
         }
 
         public async Task InsertDexCandlesticksAsync(IEnumerable<DexCandlestick> candlesticks)
@@ -312,6 +318,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             finally
             {
+                await dbConnection.CloseAsync();
                 transaction?.Dispose();
             }
         }
@@ -339,6 +346,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             finally
             {
+                await dbConnection.CloseAsync();
                 transaction?.Dispose();
             }
         }
@@ -370,6 +378,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             finally
             {
+                await dbConnection.CloseAsync();
                 transaction?.Dispose();
             }
         }
@@ -399,6 +408,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             finally
             {
+                await dbConnection.CloseAsync();
                 transaction?.Dispose();
             }
         }
