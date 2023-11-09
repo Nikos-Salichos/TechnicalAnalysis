@@ -435,6 +435,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             finally
             {
+                await dbConnection.CloseAsync();
                 transaction?.Dispose();
             }
         }
