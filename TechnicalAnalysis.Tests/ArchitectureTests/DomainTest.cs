@@ -3,6 +3,7 @@ using NetArchTest.Rules;
 
 namespace TechnicalAnalysis.Tests.ArchitectureTests
 {
+    [Trait("Category", "Architecture")]
     public class DomainTest
     {
         [Fact]
