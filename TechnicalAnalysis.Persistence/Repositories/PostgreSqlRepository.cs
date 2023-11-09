@@ -304,22 +304,22 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             NpgsqlTransaction? transaction = null;
             try
             {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
+                await dbConnection.OpenAsync();
+                transaction = await dbConnection.BeginTransactionAsync();
 
                 await dbConnection.ExecuteAsync(query, candlesticks, transaction: transaction);
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
-                transaction?.Rollback();
+                await transaction?.RollbackAsync();
             }
             finally
             {
                 await dbConnection.CloseAsync();
-                transaction?.Dispose();
+                transaction?.DisposeAsync();
             }
         }
 
