@@ -43,7 +43,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public."Assets" (
     "Id" bigint NOT NULL,
     "Symbol" text,
-    "CreatedDate" date
+    "CreatedDate" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -134,12 +134,12 @@ CREATE TABLE public."DexCandlesticks" (
     "Id" bigint NOT NULL,
     "PoolContract" text,
     "PoolId" bigint,
-    "OpenDate" date,
+    "OpenDate" timestamp without time zone,
     "Open" numeric,
     "High" numeric,
     "Low" numeric,
     "Close" numeric,
-    "Timeframe" bigint,
+    "Timeframe" integer,
     "Fees" numeric,
     "Liquidity" bigint,
     "TotalValueLocked" numeric,
