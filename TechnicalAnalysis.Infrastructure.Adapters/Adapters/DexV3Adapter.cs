@@ -52,7 +52,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await Task.WhenAll(_mediator.Send(new DeleteDexCandlesticksCommand(candlestickIds)),
               _mediator.Send(new DeletePoolsCommand(poolIds)));
 
-            var apiResponse = await _dexV3HttpClient.GetMostActivePoolsAsync(100, 100, provider);
+            var apiResponse = await _dexV3HttpClient.GetMostActivePoolsAsync(10, 10, provider);
 
             if (apiResponse.IsError)
             {
