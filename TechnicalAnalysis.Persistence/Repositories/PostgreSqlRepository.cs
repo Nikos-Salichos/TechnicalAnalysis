@@ -351,7 +351,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfoAsync), exception);
-                transaction?.RollbackAsync();
+                await transaction?.RollbackAsync();
             }
             finally
             {
@@ -381,7 +381,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfoAsync), exception);
-                transaction?.Rollback();
+                await transaction?.RollbackAsync();
             }
             finally
             {
@@ -398,17 +398,17 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             NpgsqlTransaction? transaction = null;
             try
             {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
+                await dbConnection.OpenAsync();
+                transaction = await dbConnection.BeginTransactionAsync();
 
                 await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(DeleteDexCandlesticksByIdsAsync), exception);
-                transaction?.Rollback();
+                await transaction?.RollbackAsync();
             }
             finally
             {
