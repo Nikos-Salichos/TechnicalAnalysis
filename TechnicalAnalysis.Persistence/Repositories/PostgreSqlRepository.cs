@@ -173,114 +173,81 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task InsertPairsAsync(IEnumerable<Pair> pairs)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-
-            const string query = "INSERT INTO \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") " +
-                        "VALUES (@BaseAssetId, @QuoteAssetId, @Provider, @Symbol, @IsActive, @AllCandles, @CreatedAt)";
-
-            NpgsqlTransaction? transaction = null;
             try
             {
-                transaction = await dbConnection.BeginTransactionAsync();
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
 
-                await dbConnection.ExecuteAsync(query, pairs, transaction: transaction);
+                using var writer = dbConnection.BeginBinaryImport("COPY \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") FROM STDIN BINARY");
 
-                await transaction.CommitAsync();
+                foreach (var pair in pairs)
+                {
+                    await writer.StartRowAsync();
+                    await WriteParameter(writer, pair.BaseAssetId);
+                    await WriteParameter(writer, pair.QuoteAssetId);
+                    await WriteParameter(writer, pair.Provider);
+                    await WriteParameter(writer, pair.Symbol);
+                    await WriteParameter(writer, pair.IsActive);
+                    await WriteParameter(writer, pair.AllCandles);
+                    await WriteParameter(writer, pair.CreatedAt);
+                }
+
+                await writer.CompleteAsync();
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPairsAsync), exception);
-                await transaction.RollbackAsync();
-            }
-            finally
-            {
-                await transaction.DisposeAsync();
             }
         }
 
         public async Task<IResult<string, string>> InsertAssetsAsync(IEnumerable<Asset> assets)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "INSERT INTO \"Assets\" (\"Symbol\", \"CreatedDate\") VALUES (@Symbol, @CreatedDate)";
-
-            await dbConnection.OpenAsync();
-            using var transaction = await dbConnection.BeginTransactionAsync();
-
             try
             {
-                await dbConnection.ExecuteAsync(query, assets, transaction: transaction);
-                await transaction.CommitAsync();
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
+                using var writer = dbConnection.BeginBinaryImport("COPY \"Assets\" (\"Symbol\", \"CreatedDate\") FROM STDIN BINARY");
+
+                foreach (var asset in assets)
+                {
+                    await writer.StartRowAsync();
+                    await WriteParameter(writer, asset.Symbol);
+                    await WriteParameter(writer, asset.CreatedDate);
+                }
+
+                await writer.CompleteAsync();
                 return Result<string, string>.Success(string.Empty);
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
-                await transaction.RollbackAsync();
                 return Result<string, string>.Fail(exception.ToString());
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                await transaction.DisposeAsync();
             }
         }
 
         //TODO Change all bulk to use BeginBinaryImport
         public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             try
             {
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
                 using var writer = dbConnection.BeginBinaryImport("COPY \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") FROM STDIN BINARY");
-
                 foreach (var candlestick in candlesticks)
                 {
                     await writer.StartRowAsync();
-                    await writer.WriteAsync(candlestick.PairId);
-                    await writer.WriteAsync((int)candlestick.Timeframe);
-                    await writer.WriteAsync(candlestick.OpenDate);
-                    await writer.WriteAsync(candlestick.CloseDate);
 
-                    if (candlestick.OpenPrice.HasValue)
-                    {
-                        await writer.WriteAsync(candlestick.OpenPrice.Value);
-                    }
-                    else
-                    {
-                        await writer.WriteNullAsync();
-                    }
-
-                    if (candlestick.HighPrice.HasValue)
-                    {
-                        await writer.WriteAsync(candlestick.HighPrice.Value);
-                    }
-                    else
-                    {
-                        await writer.WriteNullAsync();
-                    }
-
-                    if (candlestick.LowPrice.HasValue)
-                    {
-                        await writer.WriteAsync(candlestick.LowPrice.Value);
-                    }
-                    else
-                    {
-                        await writer.WriteNullAsync();
-                    }
-
-                    if (candlestick.ClosePrice.HasValue)
-                    {
-                        await writer.WriteAsync(candlestick.ClosePrice.Value);
-                    }
-                    else
-                    {
-                        await writer.WriteNullAsync();
-                    }
-
-                    await writer.WriteAsync(candlestick.Volume);
-                    await writer.WriteAsync(candlestick.NumberOfTrades);
+                    await WriteParameter(writer, candlestick.PairId);
+                    await WriteParameter(writer, (int)candlestick.Timeframe);
+                    await WriteParameter(writer, candlestick.OpenDate);
+                    await WriteParameter(writer, candlestick.CloseDate);
+                    await WriteParameter(writer, candlestick?.OpenPrice);
+                    await WriteParameter(writer, candlestick?.HighPrice);
+                    await WriteParameter(writer, candlestick?.LowPrice);
+                    await WriteParameter(writer, candlestick?.ClosePrice);
+                    await WriteParameter(writer, candlestick?.Volume);
+                    await WriteParameter(writer, candlestick?.NumberOfTrades);
                 }
 
                 await writer.CompleteAsync();
@@ -289,65 +256,75 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
             }
-            finally
-            {
-                await dbConnection.CloseAsync();
-            }
         }
 
         public async Task InsertDexCandlesticksAsync(IEnumerable<DexCandlestick> candlesticks)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "INSERT INTO \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\")" +
-                     "VALUES (@PoolContract, @PoolId, @OpenDate, @OpenPrice, @HighPrice, @LowPrice, @ClosePrice, @Timeframe, @Fees, @Liquidity, @TotalValueLocked, @Volume, @NumberOfTrades)";
-
-            NpgsqlTransaction? transaction = null;
             try
             {
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
-                transaction = await dbConnection.BeginTransactionAsync();
 
-                await dbConnection.ExecuteAsync(query, candlesticks, transaction: transaction);
+                using var writer = dbConnection.BeginBinaryImport("COPY \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\") FROM STDIN BINARY");
 
-                await transaction.CommitAsync();
+                foreach (var candlestick in candlesticks)
+                {
+                    await writer.StartRowAsync();
+                    await WriteParameter(writer, candlestick.PoolContract);
+                    await WriteParameter(writer, candlestick.PoolId);
+                    await WriteParameter(writer, candlestick.OpenDate);
+                    await WriteParameter(writer, candlestick?.OpenPrice);
+                    await WriteParameter(writer, candlestick?.HighPrice);
+                    await WriteParameter(writer, candlestick?.LowPrice);
+                    await WriteParameter(writer, candlestick?.ClosePrice);
+                    await WriteParameter(writer, (int)candlestick?.Timeframe);
+                    await WriteParameter(writer, candlestick?.Fees);
+                    await WriteParameter(writer, candlestick?.Liquidity);
+                    await WriteParameter(writer, candlestick?.TotalValueLocked);
+                    await WriteParameter(writer, candlestick?.Volume);
+                    await WriteParameter(writer, candlestick?.NumberOfTrades);
+                }
+
+                await writer.CompleteAsync();
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
-                await transaction?.RollbackAsync();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                transaction?.DisposeAsync();
             }
         }
 
         public async Task InsertPoolsAsync(IEnumerable<Pool> pools)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "INSERT INTO \"Pools\" (\"DexId\", \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", \"FeeTier\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\")" +
-                                 "VALUES (@Provider, @PoolContract, @Token0Id, @Token0Contract, @Token1Id, @Token1Contract, @FeeTier, @Fees, @Liquidity, @TotalValueLocked, @Volume, @NumberOfTrades, @IsActive)";
-
-            NpgsqlTransaction? transaction = null;
             try
             {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
 
-                await dbConnection.ExecuteAsync(query, pools, transaction: transaction);
+                using var writer = dbConnection.BeginBinaryImport("COPY \"Pools\" (\"DexId\", \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", \"FeeTier\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\") FROM STDIN BINARY");
 
-                transaction.Commit();
+                foreach (var pool in pools)
+                {
+                    await writer.StartRowAsync();
+                    await WriteParameter(writer, (long)pool.Provider);
+                    await WriteParameter(writer, pool.PoolContract);
+                    await WriteParameter(writer, pool.Token0Id);
+                    await WriteParameter(writer, pool.Token0Contract);
+                    await WriteParameter(writer, pool.Token1Id);
+                    await WriteParameter(writer, pool.Token1Contract);
+                    await WriteParameter(writer, pool.FeeTier);
+                    await WriteParameter(writer, pool?.Fees);
+                    await WriteParameter(writer, pool?.Liquidity);
+                    await WriteParameter(writer, pool?.TotalValueLocked);
+                    await WriteParameter(writer, pool?.Volume);
+                    await WriteParameter(writer, pool?.NumberOfTrades);
+                    await WriteParameter(writer, pool?.IsActive);
+                }
+
+                await writer.CompleteAsync();
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPoolsAsync), exception);
-                transaction?.Rollback();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                transaction?.Dispose();
             }
         }
 
@@ -520,5 +497,19 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 transaction?.Dispose();
             }
         }
+
+
+        private static async Task WriteParameter(NpgsqlBinaryImporter writer, object value)
+        {
+            if (value == null || value is DBNull)
+            {
+                await writer.WriteNullAsync();
+            }
+            else
+            {
+                await writer.WriteAsync(value);
+            }
+        }
+
     }
 }
