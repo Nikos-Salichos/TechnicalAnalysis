@@ -371,12 +371,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             NpgsqlTransaction? transaction = null;
             try
             {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
+                await dbConnection.OpenAsync();
+                transaction = await dbConnection.BeginTransactionAsync();
 
                 await dbConnection.ExecuteAsync(query, candlestickSyncInfos, transaction: transaction);
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
             catch (Exception exception)
             {
@@ -386,7 +386,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             finally
             {
                 await dbConnection.CloseAsync();
-                transaction?.Dispose();
+                transaction?.DisposeAsync();
             }
         }
 
