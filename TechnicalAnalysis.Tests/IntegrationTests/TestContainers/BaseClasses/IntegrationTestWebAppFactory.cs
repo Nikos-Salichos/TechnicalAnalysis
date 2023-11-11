@@ -71,36 +71,24 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
         public async Task InitializeAsync()
         {
             await PostgreSqlContainer.StartAsync();
+            await InitializeDatabaseScriptAsync();
+        }
 
+        public async Task InitializeDatabaseScriptAsync()
+        {
             using var dbConnection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
             await dbConnection.OpenAsync();
 
-            const string query = @"
-                                CREATE TABLE public.""Assets"" (
-                                    ""Id"" bigint NOT NULL,
-                                    ""Symbol"" text UNIQUE,
-                                    ""CreatedDate"" date
-                                );
-                                
-                                ALTER TABLE public.""Assets"" OWNER TO postgres;
-                                
-                                ALTER TABLE public.""Assets"" ALTER COLUMN ""Id"" ADD GENERATED ALWAYS AS IDENTITY (
-                                    SEQUENCE NAME public.""Assets_Id_seq""
-                                    START WITH 1
-                                    INCREMENT BY 1
-                                    NO MINVALUE
-                                    NO MAXVALUE
-                                    CACHE 1
-                                );";
+            var scriptPath = Path.Combine(AppContext.BaseDirectory, "createTables.sql");
+            var script = await File.ReadAllTextAsync(scriptPath);
 
             // Combine all the SQL queries into one transaction
-            using var transaction = dbConnection.BeginTransaction();
-            await dbConnection.ExecuteAsync(query, transaction: transaction);
+            using var transaction = await dbConnection.BeginTransactionAsync();
+            await dbConnection.ExecuteAsync(script, transaction: transaction);
 
             // Commit the transaction to execute all queries
-            transaction.Commit();
+            await transaction.CommitAsync();
         }
-
 
         public new Task DisposeAsync()
         {
