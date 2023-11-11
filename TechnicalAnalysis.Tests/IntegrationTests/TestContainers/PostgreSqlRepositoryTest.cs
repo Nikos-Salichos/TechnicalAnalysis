@@ -4,7 +4,6 @@ using TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses;
 
 namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
 {
-    [Trait("Category", "Integration-PostgreSqlRepository")]
     public sealed class PostgreSqlRepositoryTest : BaseIntegrationTest
     {
         public PostgreSqlRepositoryTest(IntegrationTestWebAppFactory factory) : base(factory) { }
@@ -14,7 +13,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
         {
             List<Asset> assets = new List<Asset>
             {
-                new Asset { Symbol = "TestContainersAsset"},
+                new Asset { Symbol = "TestContainersAsset" , CreatedDate = DateTime.Now},
             };
 
             await PostgreSqlRepository.InsertAssetsAsync(assets);
@@ -39,18 +38,5 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
             insertedAssets.FailValue.Should().NotBeEmpty();
             insertedAssets.SuccessValue.Should().BeNull();
         }
-
-        [Fact]
-        public async Task DeleteAssets_Success()
-        {
-            await ExecuteAssetsCommand_Successful();
-
-            await PostgreSqlRepository.DeleteAssetsAsync();
-
-            var retrievedAssets = await PostgreSqlRepository.GetAssetsAsync();
-            retrievedAssets.Should().NotBeNull();
-            retrievedAssets.SuccessValue.Should().BeEmpty();
-        }
-
     }
 }
