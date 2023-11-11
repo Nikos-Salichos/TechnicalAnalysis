@@ -8,12 +8,20 @@ namespace TechnicalAnalysis.Infrastructure.Client
         public static void AddInfrastructurePersistenceModule(this IServiceCollection services)
         {
             services.AddSingleton<IAnalysisClient, AnalysisClient>();
+
             services.AddHttpClient("AnalysisClient", httpClient =>
             {
-                httpClient.BaseAddress = new Uri("https://api/v1/analysis/");
+                httpClient.BaseAddress = new Uri("https://host.docker.internal:3201/api/v1/analysis/");
 
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "HttpRequestsSample");
+            }).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler
+                {
+                    // Only for development purposes and never for production
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true
+                };
             });
         }
     }
