@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using TechnicalAnalysis.Application.Mediatr.Commands;
+using TechnicalAnalysis.Domain.Entities;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers
@@ -15,7 +16,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
 
         public async Task Handle(DeleteDexCandlesticksCommand request, CancellationToken cancellationToken)
         {
-            await _repository.DeleteDexCandlesticksByIdsAsync(request.Ids);
+            await _repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, "DexCandlesticks", "Id");
         }
     }
 }
