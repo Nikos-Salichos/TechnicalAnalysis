@@ -28,21 +28,27 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 
         private Task HandleException(HttpContext context, Exception exception)
         {
-            var errorDetail = new
-            {
-                exception.Message,
-                exception.InnerException,
-                exception.StackTrace
-            };
-
-            logger.LogCritical(exception, "An exception occurred: {@ExceptionData}", errorDetail);
-
-            var json = JsonSerializer.Serialize(errorDetail); // convert the object to a JSON string
+            logger.LogCritical("An exception occurred: {@ExceptionData}", exception);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            return context.Response.WriteAsync(json); // return the JSON string as the response
+            try
+            {
+                var json = JsonSerializer.Serialize(exception); // convert the object to a JSON string
+                return context.Response.WriteAsync(json); // return the JSON string as the response
+            }
+            catch (Exception)
+            {
+                var errorDetail = new
+                {
+                    ExceptionMessage = exception.Message,
+                    InnerExceptionMessage = exception?.InnerException?.Message,
+                    StackTrace = exception?.StackTrace
+                };
+
+                return context.Response.WriteAsync(errorDetail?.ToString() ?? string.Empty);
+            }
         }
     }
 }
