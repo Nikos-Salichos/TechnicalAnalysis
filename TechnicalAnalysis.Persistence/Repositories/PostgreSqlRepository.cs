@@ -178,7 +178,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                using var writer = dbConnection.BeginBinaryImport("COPY \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") FROM STDIN BINARY");
+                using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") FROM STDIN BINARY");
 
                 foreach (var pair in pairs)
                 {
@@ -206,7 +206,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
-                using var writer = dbConnection.BeginBinaryImport("COPY \"Assets\" (\"Symbol\", \"CreatedDate\") FROM STDIN BINARY");
+                using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\") FROM STDIN BINARY");
 
                 foreach (var asset in assets)
                 {
@@ -225,7 +225,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        //TODO Change all bulk to use BeginBinaryImport
         public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
             try
@@ -233,7 +232,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                using var writer = dbConnection.BeginBinaryImport("COPY \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") FROM STDIN BINARY");
+                using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") FROM STDIN BINARY");
                 foreach (var candlestick in candlesticks)
                 {
                     await writer.StartRowAsync();
@@ -265,7 +264,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                using var writer = dbConnection.BeginBinaryImport("COPY \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\") FROM STDIN BINARY");
+                using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\") FROM STDIN BINARY");
 
                 foreach (var candlestick in candlesticks)
                 {
@@ -300,7 +299,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                using var writer = dbConnection.BeginBinaryImport("COPY \"Pools\" (\"DexId\", \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", \"FeeTier\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\") FROM STDIN BINARY");
+                using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pools\" (\"DexId\", \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", \"FeeTier\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\") FROM STDIN BINARY");
 
                 foreach (var pool in pools)
                 {
@@ -390,10 +389,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task DeleteDexCandlesticksByIdsAsync(IEnumerable<long> ids)
+        public async Task DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName, string idColumnName)
         {
             using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "DELETE FROM \"DexCandlesticks\" WHERE \"Id\" = ANY(@Ids)";
+            string query = $"DELETE FROM \"{tableName}\" WHERE \"{idColumnName}\" = ANY(@Ids)";
 
             NpgsqlTransaction? transaction = null;
             try
@@ -407,7 +406,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(DeleteDexCandlesticksByIdsAsync), exception);
+                _logger.LogError("Method:{Method}, Exception{@exception}", $"Delete{typeof(T).Name}ByIdsAsync", exception);
                 await transaction?.RollbackAsync();
             }
             finally
@@ -416,88 +415,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 transaction?.Dispose();
             }
         }
-
-        public async Task DeletePoolsByIdsAsync(IEnumerable<long> ids)
-        {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "DELETE FROM \"Pools\" WHERE \"Id\" = ANY(@Ids)";
-
-            NpgsqlTransaction? transaction = null;
-            try
-            {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
-
-                await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
-
-                transaction.Commit();
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(DeletePoolsByIdsAsync), exception);
-                transaction?.Rollback();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                transaction?.Dispose();
-            }
-        }
-
-        public async Task DeleteTokensByIdsAsync(IEnumerable<long> ids)
-        {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "DELETE FROM \"Tokens\" WHERE \"Id\" = ANY(@Ids)";
-
-            NpgsqlTransaction? transaction = null;
-            try
-            {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
-
-                await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
-
-                transaction.Commit();
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(DeleteTokensByIdsAsync), exception);
-                transaction?.Rollback();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                transaction?.Dispose();
-            }
-        }
-
-        public async Task DeleteAssetsAsync()
-        {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            const string query = "DELETE FROM \"Assets\" ";
-
-            NpgsqlTransaction? transaction = null;
-            try
-            {
-                dbConnection.Open();
-                transaction = dbConnection.BeginTransaction();
-
-                await dbConnection.ExecuteAsync(query, transaction: transaction);
-
-                transaction.Commit();
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(DeleteTokensByIdsAsync), exception);
-                transaction?.Rollback();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                transaction?.Dispose();
-            }
-        }
-
 
         private static async Task WriteParameter(NpgsqlBinaryImporter writer, object value)
         {
