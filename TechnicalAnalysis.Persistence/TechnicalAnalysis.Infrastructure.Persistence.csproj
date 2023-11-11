@@ -27,4 +27,10 @@
 	  <ProjectReference Include="..\TechnicalAnalysis.Domain\TechnicalAnalysis.Domain.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="createTables.sql">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
