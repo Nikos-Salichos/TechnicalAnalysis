@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.JsonOutput;
@@ -12,63 +13,92 @@ namespace TechnicalAnalysis.Infrastructure.Client
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
         public AnalysisClient(IHttpClientFactory httpClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClientFactory.CreateClient("AnalysisClient");
         }
 
-        public async Task SynchronizeAsync(DataProvider provider = DataProvider.All)
+        public async Task SynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
         {
-            var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
-            var apiUrl = $"SynchronizeProviders?provider={provider}";
-            var response = await httpClient.GetAsync(apiUrl);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                throw new HttpRequestException($"Failed to synchronize providers. Status code: {response.StatusCode}, Content: {content}");
-            }
+            var apiUrl = $"SynchronizeProviders?dataProvider={provider}&timeframe={timeframe}";
+            await SendHttpRequestAsync<object>(apiUrl, HttpMethod.Get);
         }
 
-        public async Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All)
+        public Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(DataProvider provider)
         {
-            var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
             var apiUrl = $"PairsIndicators?provider={provider}";
-            var response = await httpClient.GetAsync(apiUrl);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var jsonStream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<IEnumerable<PartialPair>>(jsonStream, _jsonSerializerOptions)
-                    ?? Enumerable.Empty<PartialPair>();
-            }
-            else
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                throw new HttpRequestException($"Failed to get pairs indicators. Status code: {response.StatusCode}, Content: {content}");
-            }
+            return SendHttpRequestAsync<IEnumerable<PartialPair>>(apiUrl, HttpMethod.Get);
         }
 
-        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairName(string pairName)
+        public Task<IEnumerable<PairExtended>> GetIndicatorsByPairNameAsync(string pairName, Timeframe timeframe)
         {
-            var httpClient = _httpClientFactory.CreateClient("AnalysisClient");
-            var apiUrl = $"IndicatorsByPairName?pairName={pairName}";
-            var response = await httpClient.GetAsync(apiUrl);
+            const string apiUrl = "IndicatorsByPairName";
+            var requestData = new { PairName = pairName, Timeframe = timeframe };
+            return SendHttpRequestAsync<IEnumerable<PairExtended>>(apiUrl, HttpMethod.Get, requestData);
+        }
 
-            if (response.IsSuccessStatusCode)
+        private async Task<T> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null)
+        {
+            try
             {
+                HttpResponseMessage response;
+
+                if (httpMethod == HttpMethod.Get)
+                {
+                    var urlWithParams = apiUrl + (requestData != null ? ToQueryString(requestData) : "");
+                    response = await _httpClient.GetAsync(urlWithParams);
+                }
+                else if (httpMethod == HttpMethod.Post)
+                {
+                    var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
+                    response = await _httpClient.PostAsync(apiUrl, jsonContent);
+                }
+                else
+                {
+                    throw new ArgumentException($"Unsupported HTTP method: {httpMethod}");
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Failed to execute HTTP request. Status code: {response.StatusCode}, Content: {content}");
+                }
+
                 using var jsonStream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<IEnumerable<PairExtended>>(jsonStream, _jsonSerializerOptions)
-                    ?? Enumerable.Empty<PairExtended>();
+                return await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions)
+                    ?? default;
             }
-            else
+            catch (HttpRequestException ex)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                throw new HttpRequestException($"Failed to calculate pair's indicators. Status code: {response.StatusCode}, Content: {content}");
+                throw new HttpRequestException($"Failed to execute HTTP request. {ex.Message}", ex);
             }
         }
 
+        private static string ToQueryString(object requestData)
+        {
+            if (requestData is null)
+            {
+                return string.Empty;
+            }
+
+            var queryStringComponents = new List<string>();
+
+            foreach (var property in requestData.GetType().GetProperties())
+            {
+                var value = property.GetValue(requestData);
+                if (value != null)
+                {
+                    string escapedName = Uri.EscapeDataString(property.Name);
+                    string escapedValue = Uri.EscapeDataString(value.ToString());
+                    queryStringComponents.Add($"{escapedName}={escapedValue}");
+                }
+            }
+
+            return queryStringComponents.Count > 0
+                ? "?" + string.Join("&", queryStringComponents)
+                : string.Empty;
+        }
     }
 }
