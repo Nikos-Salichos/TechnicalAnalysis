@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.DistributedCache
 {
     public static class DistributedCacheExtension
     {
-        private static readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions defaultJsonSerializerOptions = new()
         {
             WriteIndented = true,
             NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
@@ -19,30 +19,32 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.DistributedCache
                                               TimeSpan? absoluteExpireTime = null,
                                               TimeSpan? slidingExpireTime = null)
         {
-            DateTime now = DateTime.UtcNow;
-            DateTime endOfDay = now.Date.AddDays(1).AddTicks(-1); // Set time to 23:59:59.9999999
+            var distributedCacheEntryOptions = GetDistributedCacheEntryOptions(absoluteExpireTime, slidingExpireTime);
 
-            DistributedCacheEntryOptions distributedCacheEntryOptions = new()
-            {
-                AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? endOfDay - now,
-                SlidingExpiration = slidingExpireTime
-            };
-
-            var jsonData = JsonSerializer.Serialize(data, jsonSerializerOptions);
+            var jsonData = JsonSerializer.Serialize(data, defaultJsonSerializerOptions);
             await cache.SetStringAsync(recordId, jsonData, distributedCacheEntryOptions, default);
         }
-
 
         public static async Task<T?> GetRecordAsync<T>(this IDistributedCache cache, string recordId)
         {
             var jsonData = await cache.GetStringAsync(recordId);
 
-            if (jsonData is null)
-            {
-                return default;
-            }
-
-            return JsonSerializer.Deserialize<T>(jsonData, jsonSerializerOptions);
+            return jsonData is null
+                ? default
+                : JsonSerializer.Deserialize<T>(jsonData, defaultJsonSerializerOptions);
         }
+
+        private static DistributedCacheEntryOptions GetDistributedCacheEntryOptions(TimeSpan? absoluteExpireTime,
+            TimeSpan? slidingExpireTime)
+        {
+            DateTime endOfDay = DateTime.UtcNow.Date.AddDays(1).AddTicks(-1); // Set time to 23:59:59.9999999
+
+            return new()
+            {
+                AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? endOfDay - DateTime.UtcNow,
+                SlidingExpiration = slidingExpireTime ?? TimeSpan.FromMinutes(10)
+            };
+        }
+
     }
 }
