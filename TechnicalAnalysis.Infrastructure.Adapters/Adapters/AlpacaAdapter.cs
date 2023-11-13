@@ -196,44 +196,38 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     toDatetime = DateTime.Now.Date.AddHours(DateTime.Now.Hour - 1).AddMinutes(59).AddSeconds(59);
                 }
 
-                var dateRanges = DatetimeExtension.GetDailyDateRanges(fromDatetime, toDatetime);
-                var mergedItems = new List<KeyValuePair<string, List<IBar>>>();
-
-                foreach (var dateRange in dateRanges)
+                foreach (var dateRange in DatetimeExtension.GetDailyDateRanges(fromDatetime, toDatetime))
                 {
                     var stockData = await _alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
                     if (stockData.IsError)
                     {
-                        _logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(SyncCandlesticks), stockData.IsError);
+                        _logger.LogWarning("Method: {Method}: {ResponseError}", nameof(SyncCandlesticks), stockData.IsError);
                         continue;
                     }
-                    mergedItems.AddRange(stockData.SuccessValue.Items.Select(kvp => new KeyValuePair<string, List<IBar>>(kvp.Key, kvp.Value.ToList())));
-                }
 
-                var mergedData = mergedItems
-                    .GroupBy(kvp => kvp.Key)
-                    .ToImmutableDictionary(group => group.Key, group => group.SelectMany(kvp => kvp.Value).ToList());
-
-                foreach (var key in mergedData.Keys)
-                {
-                    foreach (var value in mergedData.Values.SelectMany(v => v))
+                    foreach (var kvp in stockData.SuccessValue.Items)
                     {
-                        var builder = new CandlestickBuilder();
-                        var candlestick = builder
-                               .WithPoolOrPairId(fetchedPair.PrimaryId)
-                               .WithPoolOrPairName(key)
-                               .WithCloseDate(value.TimeUtc)
-                               .WithOpenDate(value.TimeUtc.Date)
-                               .WithOpenPrice(value.Open)
-                               .WithHighPrice(value.High)
-                               .WithLowPrice(value.Low)
-                               .WithClosePrice(value.Close)
-                               .WithTimeframe(Timeframe.Daily)
-                               .Build();
+                        foreach (var bar in kvp.Value)
+                        {
+                            var candlestick = new CandlestickBuilder()
+                                .WithPoolOrPairId(fetchedPair.PrimaryId)
+                                .WithPoolOrPairName(kvp.Key)
+                                .WithCloseDate(bar.TimeUtc)
+                                .WithOpenDate(bar.TimeUtc.Date)
+                                .WithOpenPrice(bar.Open)
+                                .WithHighPrice(bar.High)
+                                .WithLowPrice(bar.Low)
+                                .WithClosePrice(bar.Close)
+                                .WithTimeframe(Timeframe.Daily)
+                                .Build();
 
-                        newCandlesticks.Add(candlestick);
+                            newCandlesticks.Add(candlestick);
+                        }
                     }
                 }
+
+                // At this point, newCandlesticks contains all the built Candlestick objects
+
             }
 
             if (newCandlesticks.Count > 0)
