@@ -42,7 +42,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.DistributedCache
             return new()
             {
                 AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? endOfDay - DateTime.UtcNow,
-                SlidingExpiration = slidingExpireTime ?? TimeSpan.FromMinutes(10)
+                SlidingExpiration = slidingExpireTime ?? TimeSpan.FromMinutes(1)
             };
         }
 
