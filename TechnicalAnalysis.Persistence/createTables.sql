@@ -82,6 +82,9 @@ CREATE TABLE public."ProviderCandlestickSyncInfos" (
 
 ALTER TABLE public."ProviderCandlestickSyncInfos" OWNER TO postgres;
 
+ALTER TABLE public."ProviderCandlestickSyncInfos"
+ADD CONSTRAINT provider_timeframe_unique UNIQUE ("ProviderId", "TimeframeId");
+
 --
 -- Name: CandlestickSyncInfo_Id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -486,14 +489,6 @@ ALTER TABLE ONLY public."Timeframes"
 
 ALTER TABLE ONLY public."Assets"
     ADD CONSTRAINT unique_asset_symbol UNIQUE ("Symbol");
-
-
---
--- Name: ProviderCandlestickSyncInfos unique_providerCandlestickSyncInfos_providerId; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."ProviderCandlestickSyncInfos"
-    ADD CONSTRAINT "unique_providerCandlestickSyncInfos_providerId" UNIQUE ("ProviderId");
 
 
 --
