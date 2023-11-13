@@ -29,7 +29,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             {
                 _logger.LogInformation("Method {Method}, pairName {pairName}, toDateTime {toDateTime}, barTimeFrame {barTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
                 var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(_alpacaSettings.CurrentValue.ApiKey, _alpacaSettings.CurrentValue.ApiSecret));
-                HistoricalBarsRequest historicalBarsRequest = new HistoricalBarsRequest(pairName, fromDateTime, toDateTime, barTimeFrame);
+                HistoricalBarsRequest historicalBarsRequest = new HistoricalBarsRequest(pairName, fromDateTime, toDateTime, barTimeFrame)
+                {
+                    Adjustment = Adjustment.SplitsAndDividends
+                };
                 var stockData = await _retryPolicy.ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
                 _logger.LogInformation("Method: {Method}, deserializedData '{@stockData}' ", nameof(GetAlpacaData), stockData);
                 return Result<IMultiPage<IBar>, string>.Success(stockData);
