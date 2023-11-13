@@ -78,7 +78,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         {
             _logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
-            return Ok(pair);
+            return Ok();
         }
     }
 }
