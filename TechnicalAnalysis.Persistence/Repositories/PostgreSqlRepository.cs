@@ -185,7 +185,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     await writer.StartRowAsync();
                     await WriteParameter(writer, pair.BaseAssetId);
                     await WriteParameter(writer, pair.QuoteAssetId);
-                    await WriteParameter(writer, pair.Provider);
+                    await WriteParameter(writer, (int)pair.Provider);
                     await WriteParameter(writer, pair.Symbol);
                     await WriteParameter(writer, pair.IsActive);
                     await WriteParameter(writer, pair.AllCandles);
@@ -374,7 +374,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 transaction = await dbConnection.BeginTransactionAsync();
 
                 await dbConnection.ExecuteAsync(query, candlestickSyncInfos, transaction: transaction);
-
                 await transaction.CommitAsync();
             }
             catch (Exception exception)
