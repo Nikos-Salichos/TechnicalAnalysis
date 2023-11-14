@@ -39,15 +39,16 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 alpacaProvider.DataProvider = provider;
             }
 
-            var stockSymbols = new List<string> { "vt",
-                "vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
+            var stockSymbols = new List<string> { 
+/*                "vt","vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
                 "tsla", "aapl", "googl", "abnb", "JNJ", "XOM", "WMT", "META", "JPM","V", "KO", "PEP",
                 "MCD", "AVGO", "ACN", "NFLX",
                 "MA","BAC","MS","WCF","SCHW","RY","MSFT","NVDA","CRM","ABDE","VZ","IBM","EWH","MCHI","EWS",
                 "FEZ","IWM","SPY","DIA","DAX","VGK","QQQ",
                 "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","xom","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
                 "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA",
-                "BRK.A"
+                "BRK.A", */
+                "AMZN"
             };
 
             stockSymbols = stockSymbols.Distinct().ToList();
