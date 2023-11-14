@@ -55,6 +55,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateAdx(quotes, candlestickLookup);
             CalculateBollingerBands(quotes, candlestickLookup);
             CalculateDonchianChannel(quotes, candlestickLookup);
+            //CalculateKeltnerChannels(pair);
             CalculateKeltnerChannel(quotes, candlestickLookup);
             CalculateCci(quotes, candlestickLookup);
             CalculateAroon(quotes, candlestickLookup);
@@ -188,8 +189,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         period: 20,
                         upperBand: keltnerChannelResult.UpperBand,
                         centerline: keltnerChannelResult.Centerline,
-                        lowerBand: keltnerChannelResult.LowerBand,
-                        width: keltnerChannelResult.Width
+                        lowerBand: keltnerChannelResult.LowerBand
                     );
                     candlestick.KeltnerChannels.Add(keltner);
                 }
@@ -535,47 +535,41 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateHighestHigh(PairExtended pair)
         {
-            const int period = 5;
-            int count = pair.Candlesticks.Count;
+            const int period = 22;
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 int startIndex = Math.Max(i - (period - 1), 0); // Start from the current candlestick and go back 4 candlesticks or less if there are fewer than 5 candlesticks available
                 var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
                 var highestHigh = group.Max(c => c.HighPrice);
 
-                foreach (var candlestick in group)
+                var candlestick = pair.Candlesticks[i];
+                candlestick.Highests.Add(new Highest(candlestick.PrimaryId)
                 {
-                    candlestick.Highests.Add(new Highest(candlestick.PrimaryId)
-                    {
-                        Period = period,
-                        Value = highestHigh,
-                        PriceType = PriceType.High
-                    });
-                }
+                    Period = period,
+                    Value = highestHigh,
+                    PriceType = PriceType.High
+                });
             }
         }
 
         private static void CalculateHighestClose(PairExtended pair)
         {
             const int period = 22;
-            int count = pair.Candlesticks.Count;
 
-            for (int i = period - 1; i < count; i++) // Start from the 22nd candlestick, as we need to calculate over the last 22 candlesticks
+            for (int i = period - 1; i < pair.Candlesticks.Count; i++)
             {
                 int startIndex = i - (period - 1);
                 var group = pair.Candlesticks.GetRange(startIndex, period);
                 var highestClose = group.Max(c => c.ClosePrice);
 
-                foreach (var candlestick in group)
+                var candlestick = pair.Candlesticks[i];
+                candlestick.Highests.Add(new Highest(candlestick.PrimaryId)
                 {
-                    candlestick.Highests.Add(new Highest(candlestick.PrimaryId)
-                    {
-                        Period = period,
-                        Value = highestClose,
-                        PriceType = PriceType.Close
-                    });
-                }
+                    Period = period,
+                    Value = highestClose,
+                    PriceType = PriceType.Close
+                });
             }
         }
 
@@ -667,6 +661,40 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[counter];
                 double valueAtIndex = hvpValues.ElementAtOrDefault(counter);
                 candlestick?.Volatilities.Add(Volatility.Create(candlestick.PrimaryId, valueAtIndex, period));
+            }
+        }
+
+        private static void CalculateKeltnerChannels(PairExtended pair)
+        {
+            var stockData = new StockData(
+                 pair.Candlesticks.Select(x => x.OpenPrice != null ? (double)x.OpenPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.HighPrice != null ? (double)x.HighPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.LowPrice != null ? (double)x.LowPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.ClosePrice != null ? (double)x.ClosePrice : 0.0),
+                 pair.Candlesticks.Select(x => x.Volume != null ? (double)x.Volume : 0.0),
+                 pair.Candlesticks.Select(x => x.CloseDate));
+
+            var results = stockData.CalculateKeltnerChannels(MovingAvgType.ExponentialMovingAverage, 20, 10, 2);
+
+            var upperBandValues = results.OutputValues["UpperBand"];
+            var middleBandValues = results.OutputValues["MiddleBand"];
+            var lowerBandValues = results.OutputValues["LowerBand"];
+
+            for (int counter = 0; counter < pair.Candlesticks.Count; counter++)
+            {
+                var candlestick = pair.Candlesticks[counter];
+                double upperValueAtIndex = upperBandValues.ElementAtOrDefault(counter);
+                double middleValueAtIndex = middleBandValues.ElementAtOrDefault(counter);
+                double lowerValueAtIndex = lowerBandValues.ElementAtOrDefault(counter);
+
+                var keltner = KeltnerChannel.Create(
+                       candlestickId: candlestick.PrimaryId,
+                       period: 20,
+                       upperBand: upperValueAtIndex,
+                       centerline: middleValueAtIndex,
+                       lowerBand: lowerValueAtIndex
+                   );
+                candlestick.KeltnerChannels.Add(keltner);
             }
         }
 
