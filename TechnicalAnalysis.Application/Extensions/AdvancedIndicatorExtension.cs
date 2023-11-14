@@ -66,32 +66,21 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateHighestWilliamsVixFixValue(PairExtended pair)
         {
-            const int period = 22;
-            int count = pair.Candlesticks.Count;
+            const int period = 5;
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
-                var candlestick = pair.Candlesticks[i];
-                var highestClose = candlestick.Highests.FirstOrDefault(c => c.PriceType == PriceType.Close && c.Period == period);
-
-                if (highestClose is null)
-                {
-                    continue;
-                }
-
                 int startIndex = Math.Max(i - (period - 1), 0);
                 var group = pair.Candlesticks.GetRange(startIndex, Math.Min(period, i - startIndex + 1));
                 var vixFixHighestHigh = group.Max(candlestickGroup => candlestickGroup.VixFixes.FirstOrDefault()?.Value ?? 0);
 
-                foreach (var candlestickGroup in group)
+                var candlestick = pair.Candlesticks[i];
+                candlestick.Highests.Add(new Highest(candlestick.PrimaryId)
                 {
-                    candlestickGroup.Highests.Add(new Highest(candlestickGroup.PrimaryId)
-                    {
-                        Period = period,
-                        Value = vixFixHighestHigh,
-                        PriceType = PriceType.VixFix
-                    });
-                }
+                    Period = period,
+                    Value = vixFixHighestHigh,
+                    PriceType = PriceType.VixFix
+                });
             }
         }
 
@@ -580,7 +569,6 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
-
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
 
                 bool[] conditions = new bool[]
@@ -607,9 +595,9 @@ namespace TechnicalAnalysis.Application.Extensions
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
                 //TODO Enable it debug specific candlestick
-                /*                if (candlestick.CloseDate.Date == new DateTime(2023, 08, 15).Date)
-                                {
-                                }*/
+                if (candlestick.CloseDate.Date == new DateTime(2022, 12, 29).Date)
+                {
+                }
 
                 if (percentageTrueConditions >= 90 // TODO test it with candlesticks patterns
                 /*                &&
@@ -778,24 +766,38 @@ namespace TechnicalAnalysis.Application.Extensions
                 || lowestLow4 is not null && candlesticks[currentIndex - 4].LowPrice <= lowestLow4.Value;
         }
 
+        //TODO Refactor it
         private static bool GetHighestHighVixFix(IList<CandlestickExtended> candlesticks, int currentIndex)
         {
+            // Prepei na exei to highest high vix fix == me to value tou vix fix
             if (currentIndex < 0 || currentIndex >= candlesticks.Count)
             {
                 return false;
             }
 
-            var lowestLow = candlesticks[currentIndex].Lowests.FirstOrDefault();
-            var lowestLow1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5) : null;
-            var lowestLow2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5) : null;
-            var lowestLow3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5) : null;
-            var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5) : null;
+            var highestHighVixFix = candlesticks[currentIndex].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5);
 
-            return candlesticks[currentIndex].VixFixes.FirstOrDefault()?.Value <= lowestLow?.Value
-                || lowestLow1 is not null && candlesticks[currentIndex - 1].VixFixes.FirstOrDefault()?.Value <= lowestLow1.Value
-                || lowestLow2 is not null && candlesticks[currentIndex - 2].VixFixes.FirstOrDefault()?.Value <= lowestLow2.Value
-                || lowestLow3 is not null && candlesticks[currentIndex - 3].VixFixes.FirstOrDefault()?.Value <= lowestLow3.Value
-                || lowestLow4 is not null && candlesticks[currentIndex - 4].VixFixes.FirstOrDefault()?.Value <= lowestLow4.Value;
+            var highestHighVixFix1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count
+                ? candlesticks[currentIndex - 1].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                : null;
+
+            var highestHighVixFix2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count
+                ? candlesticks[currentIndex - 2].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                : null;
+
+            var highestHighVixFix3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count
+                ? candlesticks[currentIndex - 3].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                : null;
+
+            var highestHighVixFix4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count
+                ? candlesticks[currentIndex - 4].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                : null;
+
+            return candlesticks[currentIndex].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix?.Value
+                || highestHighVixFix1 is not null && candlesticks[currentIndex - 1].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix1.Value
+                || highestHighVixFix2 is not null && candlesticks[currentIndex - 2].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix2.Value
+                || highestHighVixFix3 is not null && candlesticks[currentIndex - 3].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix3.Value
+                || highestHighVixFix4 is not null && candlesticks[currentIndex - 4].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix4.Value;
         }
 
         private static bool GetFractalTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -1009,6 +1011,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
+            if (candlesticks[currentIndex].LowPrice <= (decimal)keltnerChannel?.LowerBand)
+            {
+                return true;
+            }
+
             return candlesticks[currentIndex].LowPrice <= (decimal)keltnerChannel?.LowerBand
                 || candlesticks[currentIndex - 1].LowPrice <= (decimal)keltnerChannel1?.LowerBand
                 || candlesticks[currentIndex - 2].LowPrice <= (decimal)keltnerChannel2?.LowerBand
@@ -1105,11 +1112,11 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             return
-                candlesticks[currentIndex].LowPrice <= pivot.Support3 ||
-                candlesticks[currentIndex - 1].LowPrice <= pivot1.Support3 ||
-                candlesticks[currentIndex - 2].LowPrice <= pivot2.Support3 ||
-                candlesticks[currentIndex - 3].LowPrice <= pivot3.Support3 ||
-                candlesticks[currentIndex - 4].LowPrice <= pivot4.Support3;
+                candlesticks[currentIndex].ClosePrice <= pivot.PivotPoint ||
+                candlesticks[currentIndex - 1].ClosePrice <= pivot1.PivotPoint ||
+                candlesticks[currentIndex - 2].ClosePrice <= pivot2.PivotPoint ||
+                candlesticks[currentIndex - 3].ClosePrice <= pivot3.PivotPoint ||
+                candlesticks[currentIndex - 4].ClosePrice <= pivot4.PivotPoint;
         }
 
         private static bool GetOversoldMacdConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
