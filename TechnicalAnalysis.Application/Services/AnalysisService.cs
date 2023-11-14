@@ -77,16 +77,17 @@ namespace TechnicalAnalysis.Application.Services
             var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOne();
             var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAll();
 
-            Indicator enhancedScan = CalculateStrongSignal(positionsCloseOneByOne);
+            Indicator enhancedScanPositions = CalculateEnhancedScanSignal(positionsCloseAll);
             List<Indicator> indicatorReports = new()
             {
-                enhancedScan
+                enhancedScanPositions
             };
 
             foreach (var pair in selectedPairs)
             {
                 pair.Candlesticks = pair.Candlesticks.OrderBy(c => c.OpenDate).ToList();
 
+                Indicator enhancedScan = CalculateEnhancedScanAllSignals(pair);
                 Indicator fractalTrend = PrintFractalTrend(pair);
                 Indicator lowestHighLowestLowFractalSignals = PrintLowestHighSignals(pair);
                 Indicator flagNestedBodySignals = PrintFlagNestedBodySignals(pair);
@@ -95,6 +96,7 @@ namespace TechnicalAnalysis.Application.Services
                 Indicator stPatterns = CalculateStPatternSignals(pair);
                 Indicator closeBelowPivotSignal = CalculateCandlestickCloseBelowPivotPrice(pair);
 
+                indicatorReports.Add(enhancedScan);
                 indicatorReports.Add(fractalTrend);
                 indicatorReports.Add(lowestHighLowestLowFractalSignals);
                 indicatorReports.Add(flagNestedBodySignals);
@@ -123,7 +125,7 @@ namespace TechnicalAnalysis.Application.Services
             return selectedPairs;
         }
 
-        private static Indicator CalculateStrongSignal(IEnumerable<Position> positionsCloseOneByOne)
+        private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsCloseOneByOne)
         {
             var enhancedScan = new Indicator { Name = "EnhancedScan" };
             foreach (var position in positionsCloseOneByOne)
@@ -164,6 +166,23 @@ namespace TechnicalAnalysis.Application.Services
             }
 
             return closeBelowPivotPrice;
+        }
+
+        private static Indicator CalculateEnhancedScanAllSignals(PairExtended pair)
+        {
+            var enhancedScan = new Indicator { Name = "EnhancedScanAllSignals" };
+
+            foreach (var candlestick in pair.Candlesticks
+                .Where(c => c.EnhancedScans?.FirstOrDefault()?.OrderOfSignal > 0))
+            {
+                var signalIndicator = new Signal
+                {
+                    OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                    Buy = 1,
+                };
+                enhancedScan.Signals.Add(signalIndicator);
+            }
+            return enhancedScan;
         }
 
         private static Indicator CalculateStPatternSignals(PairExtended pair)
