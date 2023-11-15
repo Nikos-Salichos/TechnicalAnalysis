@@ -74,7 +74,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("IndicatorsByPairName")]
         [EnableRateLimiting("fixed-by-ip")]
-        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName, Timeframe timeframe)
+        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName, [FromQuery] Timeframe timeframe)
         {
             _logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
