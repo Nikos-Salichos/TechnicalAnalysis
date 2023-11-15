@@ -13,10 +13,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FluentValidation" Version="11.7.1" />
+		<PackageReference Include="FluentValidation" Version="11.8.0" />
 		<PackageReference Include="MediatR" Version="12.1.1" />
 		<PackageReference Include="OoplesFinance.StockIndicators" Version="1.0.53" />
-		<PackageReference Include="Skender.Stock.Indicators" Version="2.4.11" />
+		<PackageReference Include="Skender.Stock.Indicators" Version="2.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>
