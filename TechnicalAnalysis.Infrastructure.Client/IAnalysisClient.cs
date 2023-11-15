@@ -1,5 +1,4 @@
-﻿using TechnicalAnalysis.CommonModels.BusinessModels;
-using TechnicalAnalysis.CommonModels.Enums;
+﻿using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.JsonOutput;
 
 namespace TechnicalAnalysis.Infrastructure.Client
@@ -8,6 +7,6 @@ namespace TechnicalAnalysis.Infrastructure.Client
     {
         Task SynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe);
         Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(DataProvider provider);
-        Task<IEnumerable<PairExtended>> GetIndicatorsByPairNameAsync(string pairName, Timeframe timeframe);
+        Task GetIndicatorsByPairNameAsync(string pairName, Timeframe timeframe);
     }
 }
