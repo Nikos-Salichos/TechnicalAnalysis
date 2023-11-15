@@ -26,17 +26,18 @@ namespace TechnicalAnalysis.Infrastructure.Client
             await SendHttpRequestAsync<object>(apiUrl, HttpMethod.Get);
         }
 
-        public Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(DataProvider provider)
+        public async Task<IEnumerable<PartialPair>> GetPairsIndicatorsAsync(DataProvider provider)
         {
             var apiUrl = $"PairsIndicators?provider={provider}";
-            return SendHttpRequestAsync<IEnumerable<PartialPair>>(apiUrl, HttpMethod.Get);
+            return await SendHttpRequestAsync<IEnumerable<PartialPair>>(apiUrl, HttpMethod.Get)
+                ?? Enumerable.Empty<PartialPair>();
         }
 
-        public Task<IEnumerable<PairExtended>> GetIndicatorsByPairNameAsync(string pairName, Timeframe timeframe)
+        public async Task GetIndicatorsByPairNameAsync(string pairName, Timeframe timeframe)
         {
             const string apiUrl = "IndicatorsByPairName";
             var requestData = new { PairName = pairName, Timeframe = timeframe };
-            return SendHttpRequestAsync<IEnumerable<PairExtended>>(apiUrl, HttpMethod.Get, requestData);
+            await SendHttpRequestAsync<IEnumerable<PairExtended>>(apiUrl, HttpMethod.Get, requestData);
         }
 
         private async Task<T> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null)
@@ -66,13 +67,25 @@ namespace TechnicalAnalysis.Infrastructure.Client
                     throw new HttpRequestException($"Failed to execute HTTP request. Status code: {response.StatusCode}, Content: {content}");
                 }
 
+                if (response.Content == null || response.Content.Headers.ContentLength == 0)
+                {
+                    // If T is a reference type or nullable, we can return default(T).
+                    // If T is a value type and cannot be null, this will return the default value for that type.
+                    return default;
+                }
+
                 using var jsonStream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions)
-                    ?? default;
+                var deserializedResponse = await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions);
+                if (deserializedResponse != null)
+                {
+                    return deserializedResponse;
+                }
+
+                throw new NullReferenceException("Deserialization returned null.");
             }
-            catch (HttpRequestException ex)
+            catch (Exception)
             {
-                throw new HttpRequestException($"Failed to execute HTTP request. {ex.Message}", ex);
+                throw;
             }
         }
 
