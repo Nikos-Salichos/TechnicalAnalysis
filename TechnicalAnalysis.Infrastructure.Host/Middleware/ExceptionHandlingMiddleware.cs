@@ -26,7 +26,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
             }
         }
 
-        private Task HandleException(HttpContext context, Exception exception)
+        private async Task HandleException(HttpContext context, Exception exception)
         {
             logger.LogCritical("An exception occurred: {@ExceptionData}", exception);
 
@@ -35,8 +35,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 
             try
             {
-                var json = JsonSerializer.Serialize(exception); // convert the object to a JSON string
-                return context.Response.WriteAsync(json); // return the JSON string as the response
+                var json = JsonSerializer.Serialize(exception);
+                await context.Response.WriteAsync(json);
+                return;
             }
             catch (Exception)
             {
@@ -47,7 +48,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
                     StackTrace = exception?.StackTrace
                 };
 
-                return context.Response.WriteAsync(errorDetail?.ToString() ?? string.Empty);
+                await context.Response.WriteAsync(errorDetail?.ToString() ?? string.Empty);
+                return;
             }
         }
     }
