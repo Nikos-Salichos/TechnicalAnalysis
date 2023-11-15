@@ -196,7 +196,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPairsAsync), exception);
+                _logger.LogError("Method:{Method}, Exception:{@exception}", nameof(InsertPairsAsync), exception);
             }
         }
 
