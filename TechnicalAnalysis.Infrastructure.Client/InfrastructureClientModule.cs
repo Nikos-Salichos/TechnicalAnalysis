@@ -15,13 +15,6 @@ namespace TechnicalAnalysis.Infrastructure.Client
 
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "HttpRequestsSample");
-            }).ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                return new HttpClientHandler
-                {
-                    // Only for development purposes and never for production
-                    ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true
-                };
             });
         }
     }
