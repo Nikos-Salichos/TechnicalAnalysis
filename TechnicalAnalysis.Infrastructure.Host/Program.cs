@@ -9,6 +9,7 @@ using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host;
 using TechnicalAnalysis.Infrastructure.Host.Hangfire;
 using TechnicalAnalysis.Infrastructure.Host.Middleware;
+using TechnicalAnalysis.Infrastructure.Host.Modules;
 using TechnicalAnalysis.Infrastructure.Host.Serilog;
 using TechnicalAnalysis.Infrastructure.Host.Services;
 using TechnicalAnalysis.Infrastructure.Persistence.Modules;
@@ -50,6 +51,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
+builder.AddInfrastructureHostModule();
 #endregion Layer Modules
 
 #region Brotli Compression
@@ -69,7 +71,6 @@ builder.Services.ConfigureRateLimit();
 builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
 builder.Services.AddHangfireServer();
 
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -82,17 +83,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseResponseCompression();
-
 app.UseHttpsRedirection();
 
-app.UseRateLimiter(); // Always first in middleware order
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<SecureHeadersMiddleware>();
 app.UseSerilogRequestLogging();
 
 app.UseCors();
+
+app.UseResponseCompression();
+
+app.AddCorrelationIdMiddleware();
+
+app.UseRateLimiter(); // First in pipeline
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<SecureHeadersMiddleware>();
 
 app.UseHangfireDashboard("/hangfire", new DashboardOptions()
 {
