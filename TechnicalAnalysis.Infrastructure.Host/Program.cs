@@ -91,9 +91,9 @@ app.UseCors();
 
 app.UseResponseCompression();
 
-app.AddCorrelationIdMiddleware();
+app.UseMiddleware<CorrelationIdMiddleware>();
 
-app.UseRateLimiter(); // First in pipeline
+app.UseRateLimiter();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<SecureHeadersMiddleware>();
