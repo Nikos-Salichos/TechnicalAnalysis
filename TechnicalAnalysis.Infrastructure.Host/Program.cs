@@ -9,7 +9,6 @@ using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host;
 using TechnicalAnalysis.Infrastructure.Host.Hangfire;
 using TechnicalAnalysis.Infrastructure.Host.Middleware;
-using TechnicalAnalysis.Infrastructure.Host.Modules;
 using TechnicalAnalysis.Infrastructure.Host.Serilog;
 using TechnicalAnalysis.Infrastructure.Host.Services;
 using TechnicalAnalysis.Infrastructure.Persistence.Modules;
@@ -51,7 +50,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
-builder.AddInfrastructureHostModule();
+// builder.AddInfrastructureHostModule();
 #endregion Layer Modules
 
 #region Brotli Compression
@@ -77,13 +76,13 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+//app.UseHsts();
 
 app.UseSerilogRequestLogging();
 
@@ -108,8 +107,9 @@ if (app.Environment.IsProduction())
     HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
 }
 
-// Authorization should come after Hangfire Dashboard.
-app.UseAuthorization();
+app.UseAuthentication(); //first line should be
+
+app.UseAuthorization(); //second line should be
 
 app.MapControllers();
 
