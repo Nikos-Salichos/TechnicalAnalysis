@@ -9,10 +9,10 @@
 	<ItemGroup>
 		<PackageReference Include="Alpaca.Markets" Version="6.2.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="7.0.12" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
-		<PackageReference Include="MimeKit" Version="4.2.0" />
-		<PackageReference Include="Polly" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+		<PackageReference Include="MimeKit" Version="4.3.0" />
+		<PackageReference Include="Polly" Version="8.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
