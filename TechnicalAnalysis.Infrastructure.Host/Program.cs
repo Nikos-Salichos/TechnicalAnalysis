@@ -50,7 +50,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
-// builder.AddInfrastructureHostModule();
 #endregion Layer Modules
 
 #region Brotli Compression
@@ -80,9 +79,11 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-//app.UseHsts();
+app.UseHsts();
+
+app.UseHttpsRedirection();
 
 app.UseSerilogRequestLogging();
 
@@ -94,7 +95,6 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.UseRateLimiter();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<SecureHeadersMiddleware>();
 
 app.UseHangfireDashboard("/hangfire", new DashboardOptions()
