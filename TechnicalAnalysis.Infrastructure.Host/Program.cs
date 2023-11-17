@@ -1,12 +1,10 @@
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.OpenApi.Models;
-using Serilog;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TechnicalAnalysis.Application.Modules;
 using TechnicalAnalysis.Infrastructure.Adapters.Modules;
-using TechnicalAnalysis.Infrastructure.Host;
 using TechnicalAnalysis.Infrastructure.Host.Hangfire;
 using TechnicalAnalysis.Infrastructure.Host.Middleware;
 using TechnicalAnalysis.Infrastructure.Host.Serilog;
@@ -22,8 +20,16 @@ builder.Configuration
 #endregion Read Configuration
 
 #region Serilog
-SerilogRegistration.SerilogConfiguration(builder);
+builder.SerilogConfiguration();
 #endregion Serilog
+
+#region Log Http Requests
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+    // options.CombineLogs = true;
+});
+#endregion Log Http Requests
 
 #region Cors
 builder.Services.ConfigureCors();
@@ -33,7 +39,6 @@ builder.Services.ConfigureCors();
 builder.Services.AddSwaggerGen(options =>
 {
     options.UseInlineDefinitionsForEnums();
-    options.SchemaFilter<EnumSchemaFilter>();
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 });
 #endregion Enums in Swagger
@@ -65,7 +70,6 @@ builder.Services.AddAntiforgery(options =>
 builder.Services.ConfigureRateLimit();
 #endregion Api Rate Limit
 
-
 builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
 builder.Services.AddHangfireServer();
 
@@ -85,7 +89,7 @@ app.UseHsts();
 
 app.UseHttpsRedirection();
 
-app.UseSerilogRequestLogging();
+// app.UseSerilogRequestLogging();
 
 app.UseCors();
 
