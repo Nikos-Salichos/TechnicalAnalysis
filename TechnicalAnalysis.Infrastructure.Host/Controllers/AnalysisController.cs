@@ -80,5 +80,12 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
             return Ok();
         }
+
+        [HttpGet("Indicators")]
+        [EnableRateLimiting("fixed-by-ip")]
+        public async Task<IActionResult> GetIndicatorsByPairNameAsyn1c()
+        {
+            return Ok("lala");
+        }
     }
 }
