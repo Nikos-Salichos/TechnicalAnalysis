@@ -3,16 +3,10 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands
 {
-    public class UpdateExchangeCommand : IRequest
+    public class UpdateExchangeCommand(ProviderPairAssetSyncInfo providerPairAssetSyncInfo,
+        ProviderCandlestickSyncInfo providerCandlestickSyncInfo) : IRequest
     {
-        public ProviderPairAssetSyncInfo ProviderPairAssetSyncInfo { get; }
-        public ProviderCandlestickSyncInfo ProviderCandlestickSyncInfo { get; }
-
-        public UpdateExchangeCommand(ProviderPairAssetSyncInfo providerPairAssetSyncInfo,
-            ProviderCandlestickSyncInfo providerCandlestickSyncInfo)
-        {
-            ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
-            ProviderCandlestickSyncInfo = providerCandlestickSyncInfo;
-        }
+        public ProviderPairAssetSyncInfo ProviderPairAssetSyncInfo { get; } = providerPairAssetSyncInfo;
+        public ProviderCandlestickSyncInfo ProviderCandlestickSyncInfo { get; } = providerCandlestickSyncInfo;
     }
 }
