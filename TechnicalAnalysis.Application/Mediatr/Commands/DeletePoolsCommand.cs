@@ -2,13 +2,8 @@
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands
 {
-    public class DeletePoolsCommand : IRequest
+    public class DeletePoolsCommand(IEnumerable<long> ids) : IRequest
     {
-        public IEnumerable<long> Ids { get; }
-
-        public DeletePoolsCommand(IEnumerable<long> ids)
-        {
-            Ids = ids;
-        }
+        public IEnumerable<long> Ids { get; } = ids;
     }
 }
