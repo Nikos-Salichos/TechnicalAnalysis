@@ -3,13 +3,8 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands
 {
-    public class InsertPairsCommand : IRequest
+    public class InsertPairsCommand(IEnumerable<PairExtended> pairs) : IRequest
     {
-        public IEnumerable<PairExtended> Pairs { get; }
-
-        public InsertPairsCommand(IEnumerable<PairExtended> pairs)
-        {
-            Pairs = pairs;
-        }
+        public IEnumerable<PairExtended> Pairs { get; } = pairs;
     }
 }
