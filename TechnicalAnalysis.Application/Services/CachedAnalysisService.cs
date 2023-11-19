@@ -9,47 +9,34 @@ using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Application.Services
 {
-    public class CachedAnalysisService : IAnalysisService
+    public class CachedAnalysisService(IAnalysisService inner, IDistributedCache distributedCache,
+        ICommunication communication, IRabbitMqService rabbitMqService) : IAnalysisService
     {
-        private readonly IAnalysisService _inner;
-        private readonly IDistributedCache _distributedCache;
-        private readonly ICommunication _communication;
-        private readonly IRabbitMqService _rabbitMqService;
-
-        public CachedAnalysisService(IAnalysisService inner, IDistributedCache distributedCache,
-            ICommunication communication, IRabbitMqService rabbitMqService)
-        {
-            _inner = inner;
-            _distributedCache = distributedCache;
-            _communication = communication;
-            _rabbitMqService = rabbitMqService;
-        }
-
         public Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
         {
-            return _inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
+            return inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
         }
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All, HttpContext? httpContext = null)
         {
             if (httpContext?.Request.Headers.ContainsKey("C-Invalid") == false)
             {
-                var cachedPairs = await _distributedCache.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
+                var cachedPairs = await distributedCache.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
                 if (cachedPairs is not null)
                 {
-                    await _communication.CreateAttachmentSendMessage(cachedPairs);
-                    _rabbitMqService.PublishMessage(cachedPairs);
-                    _rabbitMqService.PublishMessage(cachedPairs);
-                    var message = await _rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
+                    await communication.CreateAttachmentSendMessage(cachedPairs);
+                    rabbitMqService.PublishMessage(cachedPairs);
+                    rabbitMqService.PublishMessage(cachedPairs);
+                    var message = await rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
                     return cachedPairs;
                 }
             }
 
-            var pairs = await _inner.GetPairsIndicatorsAsync(provider, httpContext);
+            var pairs = await inner.GetPairsIndicatorsAsync(provider, httpContext);
 
-            await _distributedCache.SetRecordAsync(provider.ToString(), pairs, null, null);
-            await _communication.CreateAttachmentSendMessage(pairs);
-            _rabbitMqService.PublishMessage(pairs);
+            await distributedCache.SetRecordAsync(provider.ToString(), pairs, null, null);
+            await communication.CreateAttachmentSendMessage(pairs);
+            rabbitMqService.PublishMessage(pairs);
 
             return pairs;
         }
