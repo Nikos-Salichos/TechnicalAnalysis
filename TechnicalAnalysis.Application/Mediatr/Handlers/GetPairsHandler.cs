@@ -6,18 +6,11 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers
 {
-    public class GetPairsHandler : IRequestHandler<GetPairsQuery, IEnumerable<PairExtended>>
+    public class GetPairsHandler(IPostgreSqlRepository repository) : IRequestHandler<GetPairsQuery, IEnumerable<PairExtended>>
     {
-        private readonly IPostgreSqlRepository _repository;
-
-        public GetPairsHandler(IPostgreSqlRepository repository)
-        {
-            _repository = repository;
-        }
-
         public async Task<IEnumerable<PairExtended>> Handle(GetPairsQuery getCoinsQuery, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetPairsAsync();
+            var result = await repository.GetPairsAsync();
             if (result.IsError)
             {
                 return Enumerable.Empty<PairExtended>();
