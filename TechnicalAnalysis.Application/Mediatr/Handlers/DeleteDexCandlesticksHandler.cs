@@ -5,18 +5,11 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers
 {
-    public class DeleteDexCandlesticksHandler : IRequestHandler<DeleteDexCandlesticksCommand>
+    public class DeleteDexCandlesticksHandler(IPostgreSqlRepository repository) : IRequestHandler<DeleteDexCandlesticksCommand>
     {
-        private readonly IPostgreSqlRepository _repository;
-
-        public DeleteDexCandlesticksHandler(IPostgreSqlRepository repository)
-        {
-            _repository = repository;
-        }
-
         public async Task Handle(DeleteDexCandlesticksCommand request, CancellationToken cancellationToken)
         {
-            await _repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, "DexCandlesticks", "Id");
+            await repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, "DexCandlesticks", "Id");
         }
     }
 }
