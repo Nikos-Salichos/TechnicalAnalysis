@@ -6,17 +6,8 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Services
 {
-    public class SyncService : ISyncService
+    public class SyncService(ILogger<SyncService> logger, Func<DataProvider, IAdapter> adapterFactory) : ISyncService
     {
-        private readonly ILogger<SyncService> _logger;
-        private readonly Func<DataProvider, IAdapter> _adapterFactory;
-
-        public SyncService(ILogger<SyncService> logger, Func<DataProvider, IAdapter> adapterFactory)
-        {
-            _logger = logger;
-            _adapterFactory = adapterFactory;
-        }
-
         public Task SynchronizeProvidersAsync(DataProviderTimeframeRequest dataProviderTimeframeRequest)
         {
             return InternalSynchronizeProvidersAsync(dataProviderTimeframeRequest.DataProvider, dataProviderTimeframeRequest.Timeframe);
@@ -25,7 +16,7 @@ namespace TechnicalAnalysis.Application.Services
             {
                 var adaptersToSync = new List<Task>();
 
-                _logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
+                logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
 
                 if (provider == DataProvider.Binance || provider == DataProvider.All)
                 {
@@ -61,7 +52,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private async Task GetAndSyncAdapter(DataProvider provider, Timeframe timeframe)
         {
-            var adapter = _adapterFactory(provider);
+            var adapter = adapterFactory(provider);
             await adapter.Sync(provider, timeframe);
         }
     }
