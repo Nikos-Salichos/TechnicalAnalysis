@@ -14,19 +14,8 @@ using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Application.Services
 {
-    public class AnalysisService : IAnalysisService
+    public class AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration) : IAnalysisService
     {
-        private readonly IMediator _mediator;
-        private readonly ILogger<AnalysisService> _logger;
-        private readonly IConfiguration _configuration;
-
-        public AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration)
-        {
-            _logger = logger;
-            _mediator = mediator;
-            _configuration = configuration;
-        }
-
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
@@ -108,7 +97,7 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var indicator in indicatorReports)
             {
-                var baseDirectory = _configuration.GetSection("OutputFolder:Path").Value;
+                var baseDirectory = configuration.GetSection("OutputFolder:Path").Value;
 
                 if (string.IsNullOrWhiteSpace(baseDirectory))
                 {
@@ -462,9 +451,9 @@ namespace TechnicalAnalysis.Application.Services
 
         private IEnumerable<PairExtended> CalculateIndicators(IEnumerable<PairExtended> pairs)
         {
-            BasicIndicatorExtension.Logger = _logger;
-            AdvancedIndicatorExtension.Logger = _logger;
-            PairStatisticsExtension.Logger = _logger;
+            BasicIndicatorExtension.Logger = logger;
+            AdvancedIndicatorExtension.Logger = logger;
+            PairStatisticsExtension.Logger = logger;
 
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
@@ -477,11 +466,11 @@ namespace TechnicalAnalysis.Application.Services
 
         private async Task<IEnumerable<PairExtended>> FormatAssetsPairsCandlesticks()
         {
-            var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
-            var fetchedPairsTask = _mediator.Send(new GetPairsQuery());
-            var fetchedCandlesticksTask = _mediator.Send(new GetCandlesticksQuery());
-            var fetchedPoolsTask = _mediator.Send(new GetPoolsQuery());
-            var fetchedDexCandlesticksTask = _mediator.Send(new GetDexCandlesticksQuery());
+            var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
+            var fetchedPairsTask = mediator.Send(new GetPairsQuery());
+            var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
+            var fetchedPoolsTask = mediator.Send(new GetPoolsQuery());
+            var fetchedDexCandlesticksTask = mediator.Send(new GetDexCandlesticksQuery());
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask, fetchedPoolsTask, fetchedDexCandlesticksTask);
 
