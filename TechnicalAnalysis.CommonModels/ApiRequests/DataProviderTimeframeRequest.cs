@@ -2,16 +2,10 @@
 
 namespace TechnicalAnalysis.CommonModels.ApiRequests
 {
-    public struct DataProviderTimeframeRequest
+    public readonly struct DataProviderTimeframeRequest(DataProvider dataProvider, Timeframe timeframe)
     {
-        public DataProvider DataProvider { get; }
-        public Timeframe Timeframe { get; }
-
-        public DataProviderTimeframeRequest(DataProvider dataProvider, Timeframe timeframe)
-        {
-            DataProvider = dataProvider;
-            Timeframe = timeframe;
-        }
+        public DataProvider DataProvider { get; } = dataProvider;
+        public Timeframe Timeframe { get; } = timeframe;
     }
 
 }
