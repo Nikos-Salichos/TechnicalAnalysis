@@ -3,13 +3,8 @@ using TechnicalAnalysis.Domain.Entities;
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands
 {
-    public class InsertDexCandlesticksCommand : IRequest
+    public class InsertDexCandlesticksCommand(IEnumerable<DexCandlestick> dexCandlesticks) : IRequest
     {
-        public IEnumerable<DexCandlestick> DexCandlesticks { get; }
-
-        public InsertDexCandlesticksCommand(IEnumerable<DexCandlestick> dexCandlesticks)
-        {
-            DexCandlesticks = dexCandlesticks;
-        }
+        public IEnumerable<DexCandlestick> DexCandlesticks { get; } = dexCandlesticks;
     }
 }
