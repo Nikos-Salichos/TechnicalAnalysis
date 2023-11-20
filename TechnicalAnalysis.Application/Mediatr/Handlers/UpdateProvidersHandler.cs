@@ -4,19 +4,12 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers
 {
-    public class UpdateProvidersHandler : IRequestHandler<UpdateExchangeCommand>
+    public class UpdateProvidersHandler(IPostgreSqlRepository repository) : IRequestHandler<UpdateExchangeCommand>
     {
-        private readonly IPostgreSqlRepository _repository;
-
-        public UpdateProvidersHandler(IPostgreSqlRepository repository)
-        {
-            _repository = repository;
-        }
-
         public async Task Handle(UpdateExchangeCommand request, CancellationToken cancellationToken)
         {
-            await _repository.UpdateProviderPairAssetSyncInfoAsync(request.ProviderPairAssetSyncInfo);
-            await _repository.UpdateProviderCandlestickSyncInfoAsync(request.ProviderCandlestickSyncInfo);
+            await repository.UpdateProviderPairAssetSyncInfoAsync(request.ProviderPairAssetSyncInfo);
+            await repository.UpdateProviderCandlestickSyncInfoAsync(request.ProviderCandlestickSyncInfo);
         }
     }
 }
