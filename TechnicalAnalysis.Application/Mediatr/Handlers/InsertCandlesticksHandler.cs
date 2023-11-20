@@ -5,18 +5,11 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers
 {
-    public class InsertCandlesticksHandler : IRequestHandler<InsertCandlesticksCommand>
+    public class InsertCandlesticksHandler(IPostgreSqlRepository repository) : IRequestHandler<InsertCandlesticksCommand>
     {
-        private readonly IPostgreSqlRepository _repository;
-
-        public InsertCandlesticksHandler(IPostgreSqlRepository repository)
-        {
-            _repository = repository;
-        }
-
         public async Task Handle(InsertCandlesticksCommand request, CancellationToken cancellationToken)
         {
-            await _repository.InsertCandlesticksAsync(request.Candlesticks.ToEntity());
+            await repository.InsertCandlesticksAsync(request.Candlesticks.ToEntity());
         }
     }
 }
