@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -21,10 +20,10 @@ namespace TechnicalAnalysis.Application.Modules
             services.AddSingleton<IAnalysisService>(serviceProvider =>
             {
                 var analysisService = serviceProvider.GetRequiredService<AnalysisService>();
-                var distributedCache = serviceProvider.GetRequiredService<IDistributedCache>();
+                var redisRepository = serviceProvider.GetRequiredService<IRedisRepository>();
                 var communicationService = serviceProvider.GetRequiredService<ICommunication>();
                 var rabbitMqService = serviceProvider.GetRequiredService<IRabbitMqService>();
-                return new CachedAnalysisService(analysisService, distributedCache, communicationService, rabbitMqService);
+                return new CachedAnalysisService(analysisService, redisRepository, communicationService, rabbitMqService);
             });
 
             services.AddSingleton<ISyncService, SyncService>();
