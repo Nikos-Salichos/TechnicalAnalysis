@@ -5,18 +5,12 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers;
 
-public class GetAssetsHandler : IRequestHandler<GetAssetsQuery, IEnumerable<Asset>>
+public class GetAssetsHandler(IPostgreSqlRepository repository)
+    : IRequestHandler<GetAssetsQuery, IEnumerable<Asset>>
 {
-    private readonly IPostgreSqlRepository _repository;
-
-    public GetAssetsHandler(IPostgreSqlRepository repository)
-    {
-        _repository = repository;
-    }
-
     public async Task<IEnumerable<Asset>> Handle(GetAssetsQuery getAssetsQuery, CancellationToken cancellationToken)
     {
-        var result = await _repository.GetAssetsAsync();
+        var result = await repository.GetAssetsAsync();
         if (result.IsError)
         {
             return Enumerable.Empty<Asset>();
