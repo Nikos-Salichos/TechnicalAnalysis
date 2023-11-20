@@ -5,18 +5,11 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers
 {
-    public class GetPoolsHandler : IRequestHandler<GetPoolsQuery, IEnumerable<Pool>>
+    public class GetPoolsHandler(IPostgreSqlRepository repository) : IRequestHandler<GetPoolsQuery, IEnumerable<Pool>>
     {
-        private readonly IPostgreSqlRepository _repository;
-
-        public GetPoolsHandler(IPostgreSqlRepository repository)
-        {
-            _repository = repository;
-        }
-
         public async Task<IEnumerable<Pool>> Handle(GetPoolsQuery getPoolsQuery, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetPoolsAsync();
+            var result = await repository.GetPoolsAsync();
             if (result.IsError)
             {
                 return Enumerable.Empty<Pool>();
