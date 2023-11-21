@@ -11,38 +11,28 @@ using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
-    public class BinanceHttpClient : IBinanceHttpClient
+    public class BinanceHttpClient(IOptionsMonitor<BinanceSetting> binanceSettings, IHttpClientFactory httpClientFactory,
+        ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy) : IBinanceHttpClient
     {
-        private readonly IOptionsMonitor<BinanceSetting> _binanceSettings;
-        private readonly ILogger<BinanceHttpClient> _logger;
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
 
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy;
-
-        public BinanceHttpClient(IOptionsMonitor<BinanceSetting> binanceSettings, IHttpClientFactory httpClientFactory,
-            ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy)
-        {
-            _logger = logger;
-            _binanceSettings = binanceSettings;
-            _httpClient = httpClientFactory.CreateClient("default");
-            _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
-        }
+        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
 
         public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
         {
-            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(_binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
+            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
-            _logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
-               nameof(GetBinanceAssetsAndPairs), _binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
+            logger.LogInformation("Method: {Method}, _binanceSettings.CurrentValue.SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
+               nameof(GetBinanceAssetsAndPairs), binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                _logger.LogError("Method: {Method} {httpResponseMessage.StatusCode}", nameof(GetBinanceAssetsAndPairs), httpResponseMessage.StatusCode);
+                logger.LogError("Method: {Method} {httpResponseMessage.StatusCode}", nameof(GetBinanceAssetsAndPairs), httpResponseMessage.StatusCode);
                 return Result<BinanceExchangeInfoResponse, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
@@ -54,23 +44,23 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, _jsonSerializerOptions);
                 if (deserializedData is not null)
                 {
-                    _logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetBinanceAssetsAndPairs), deserializedData);
+                    logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetBinanceAssetsAndPairs), deserializedData);
                     return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
                 }
 
-                _logger.LogWarning("Method: {Method} Deserialization Failed", nameof(GetBinanceAssetsAndPairs));
+                logger.LogWarning("Method: {Method} Deserialization Failed", nameof(GetBinanceAssetsAndPairs));
                 return Result<BinanceExchangeInfoResponse, string>.Fail($"{nameof(GetBinanceAssetsAndPairs)} Deserialization Failed");
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method: {Method} {exception}", nameof(GetBinanceAssetsAndPairs), exception);
+                logger.LogError("Method: {Method} {exception}", nameof(GetBinanceAssetsAndPairs), exception);
                 return Result<BinanceExchangeInfoResponse, string>.Fail(exception.ToString());
             }
         }
 
         public async Task<IResult<object[][], string>> GetBinanceCandlesticks(IDictionary<string, string>? queryParams = null)
         {
-            var binanceCandlestickPath = _binanceSettings.CurrentValue.CandlestickPath;
+            var binanceCandlestickPath = binanceSettings.CurrentValue.CandlestickPath;
             if (queryParams != null)
             {
                 binanceCandlestickPath += "?" + string.Join("&", queryParams.Select(p => $"{p.Key}={p.Value}"));
@@ -78,18 +68,18 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             var headers = new Dictionary<string, string>
                     {
-                        { "X-MBX-APIKEY" , _binanceSettings.CurrentValue.ApiKey },
+                        { "X-MBX-APIKEY" , binanceSettings.CurrentValue.ApiKey },
                     };
             try
             {
                 using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
 
-                _logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode} ",
+                logger.LogInformation("Method: {Method}, binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode} ",
                     nameof(GetBinanceCandlesticks), binanceCandlestickPath, httpResponseMessage.StatusCode.ToString());
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    _logger.LogWarning("Method: {Method}: {httpResponseMessage.Content}", nameof(GetBinanceCandlesticks), httpResponseMessage.Content);
+                    logger.LogWarning("Method: {Method}: {httpResponseMessage.Content}", nameof(GetBinanceCandlesticks), httpResponseMessage.Content);
                     return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                 }
 
@@ -99,12 +89,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     return Result<object[][], string>.Success(deserializedData);
                 }
-                _logger.LogWarning("Method: {Method} {Deserialization Failed}", nameof(GetBinanceCandlesticks));
+                logger.LogWarning("Method: {Method} {Deserialization Failed}", nameof(GetBinanceCandlesticks));
                 return Result<object[][], string>.Fail($"{nameof(GetBinanceCandlesticks)} Deserialization Failed");
             }
             catch (Exception exception)
             {
-                _logger.LogWarning("Method: {Method}, exception {exception}", nameof(GetBinanceCandlesticks), exception);
+                logger.LogWarning("Method: {Method}, exception {exception}", nameof(GetBinanceCandlesticks), exception);
                 return Result<object[][], string>.Fail(exception.ToString());
             }
         }
