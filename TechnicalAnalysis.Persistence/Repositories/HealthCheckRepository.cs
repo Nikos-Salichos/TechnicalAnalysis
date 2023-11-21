@@ -6,14 +6,9 @@ using TechnicalAnalysis.Domain.Settings;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
-    public class HealthCheckRepository : IHealthCheck, IHealthCheckRepository
+    public class HealthCheckRepository(IOptionsMonitor<DatabaseSetting> databaseSettings) : IHealthCheck, IHealthCheckRepository
     {
-        private readonly string _connectionStringKey;
-
-        public HealthCheckRepository(IOptionsMonitor<DatabaseSetting> databaseSettings)
-        {
-            _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
-        }
+        private readonly string _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
