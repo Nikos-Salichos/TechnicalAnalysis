@@ -3,15 +3,9 @@ using Serilog.Context;
 
 namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
-    public class CorrelationIdMiddleware
+    public class CorrelationIdMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
         private const string _correlationIdHeader = "X-Correlation-Id";
-
-        public CorrelationIdMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
 
         public async Task Invoke(HttpContext context)
         {
@@ -20,7 +14,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 
             using (LogContext.PushProperty("correlation-id", correlationId))
             {
-                await _next.Invoke(context);
+                await next.Invoke(context);
             }
         }
 
@@ -45,7 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
         {
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers.Add(_correlationIdHeader, new[] { correlationId.ToString() });
+                context.Response.Headers.Append(_correlationIdHeader, new[] { correlationId.ToString() });
                 return Task.CompletedTask;
             });
         }
