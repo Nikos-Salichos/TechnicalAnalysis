@@ -14,18 +14,11 @@ using Pool = TechnicalAnalysis.Domain.Entities.Pool;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
-    //TODO Change methods to async
-    //TODO Remove open & close connection (queryAsync will handle it)
-    public class PostgreSqlRepository : IPostgreSqlRepository
-    {
-        private readonly string _connectionStringKey;
-        private readonly ILogger<PostgreSqlRepository> _logger;
 
-        public PostgreSqlRepository(IOptionsMonitor<DatabaseSetting> databaseSettings, ILogger<PostgreSqlRepository> logger)
-        {
-            _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
-            _logger = logger;
-        }
+    public class PostgreSqlRepository(IOptionsMonitor<DatabaseSetting> databaseSettings, ILogger<PostgreSqlRepository> logger)
+        : IPostgreSqlRepository
+    {
+        private readonly string _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
 
         public async Task<IResult<IEnumerable<Asset>, string>> GetAssetsAsync()
         {
@@ -38,7 +31,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetAssetsAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetAssetsAsync), exception);
                 return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
         }
@@ -64,7 +57,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetCandlesticksAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetCandlesticksAsync), exception);
                 return Result<IEnumerable<Candlestick>, string>.Fail(exception.ToString());
             }
         }
@@ -80,7 +73,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetPairsAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetPairsAsync), exception);
                 return Result<IEnumerable<Pair>, string>.Fail(exception.ToString());
             }
         }
@@ -130,7 +123,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetProvidersAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetProvidersAsync), exception);
                 return Result<IEnumerable<ProviderSynchronization>, string>.Fail(exception.ToString());
             }
         }
@@ -148,7 +141,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetPoolsAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetPoolsAsync), exception);
                 return Result<IEnumerable<Pool>, string>.Fail(exception.ToString());
             }
         }
@@ -166,7 +159,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetDexCandlestickssAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetDexCandlestickssAsync), exception);
                 return Result<IEnumerable<DexCandlestick>, string>.Fail(exception.ToString());
             }
         }
@@ -196,7 +189,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception:{@exception}", nameof(InsertPairsAsync), exception);
+                logger.LogError("Method:{Method}, Exception:{@exception}", nameof(InsertPairsAsync), exception);
             }
         }
 
@@ -220,7 +213,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
                 return Result<string, string>.Fail(exception.ToString());
             }
         }
@@ -253,7 +246,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
             }
         }
 
@@ -288,7 +281,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
             }
         }
 
@@ -323,7 +316,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPoolsAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPoolsAsync), exception);
             }
         }
 
@@ -349,7 +342,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfoAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfoAsync), exception);
                 await transaction?.RollbackAsync();
             }
             finally
@@ -378,7 +371,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfoAsync), exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfoAsync), exception);
                 await transaction?.RollbackAsync();
             }
             finally
@@ -405,13 +398,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method:{Method}, Exception{@exception}", $"Delete{typeof(T).Name}ByIdsAsync", exception);
+                logger.LogError("Method:{Method}, Exception{@exception}", $"Delete{typeof(T).Name}ByIdsAsync", exception);
                 await transaction?.RollbackAsync();
             }
             finally
             {
                 await dbConnection.CloseAsync();
-                transaction?.Dispose();
+                transaction?.DisposeAsync();
             }
         }
 
