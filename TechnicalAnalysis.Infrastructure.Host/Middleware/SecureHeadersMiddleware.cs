@@ -1,14 +1,7 @@
 ﻿namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
-    public class SecureHeadersMiddleware
+    public class SecureHeadersMiddleware(RequestDelegate requestDelegate)
     {
-        private readonly RequestDelegate _requestDelegate;
-
-        public SecureHeadersMiddleware(RequestDelegate requestDelegate)
-        {
-            _requestDelegate = requestDelegate;
-        }
-
         public async Task InvokeAsync(HttpContext httpContext)
         {
             AddHeaderIfNotExists(httpContext, "X-Frame-Options", "DENY");
@@ -18,7 +11,7 @@
             AddHeaderIfNotExists(httpContext, "Content-Security-Policy", "default-src 'self';");
 
             // Invoke the next middleware in the pipeline
-            await _requestDelegate(httpContext);
+            await requestDelegate(httpContext);
         }
 
         private static void AddHeaderIfNotExists(HttpContext context, string key, string value)
