@@ -15,22 +15,11 @@ using PairExtended = TechnicalAnalysis.CommonModels.BusinessModels.PairExtended;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class AlpacaAdapter : IAdapter
+    public class AlpacaAdapter(ILogger<AlpacaAdapter> logger, IMediator mediator, IAlpacaHttpClient alpacaHttpClient) : IAdapter
     {
-        private readonly ILogger<AlpacaAdapter> _logger;
-        private readonly IMediator _mediator;
-        private readonly IAlpacaHttpClient _alpacaHttpClient;
-
-        public AlpacaAdapter(ILogger<AlpacaAdapter> logger, IMediator mediator, IAlpacaHttpClient alpacaHttpClient)
-        {
-            _logger = logger;
-            _mediator = mediator;
-            _alpacaHttpClient = alpacaHttpClient;
-        }
-
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetProviderSynchronizationQuery());
+            var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var alpacaProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
             if (alpacaProvider == null)
@@ -53,7 +42,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             stockSymbols = stockSymbols.Distinct().ToList();
 
-            var fetchedAssets = await _mediator.Send(new GetAssetsQuery());
+            var fetchedAssets = await mediator.Send(new GetAssetsQuery());
 
             var fetchedAssetNames = fetchedAssets.Select(f => f.Symbol).ToList();
 
@@ -70,7 +59,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (alpacaProvider.IsProviderSyncedToday(timeframe) && allStockSymbolsExist)
             {
-                _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
+                logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
             }
 
@@ -80,7 +69,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             alpacaProvider.UpdateProviderInfo();
             var providerCandlestickSyncInfo = alpacaProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
-            await _mediator.Send(new UpdateExchangeCommand(alpacaProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
+            await mediator.Send(new UpdateExchangeCommand(alpacaProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
 
         private async Task SyncAssets(IEnumerable<Asset> fetchedAssets, IEnumerable<string> stockSymbols)
@@ -99,14 +88,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (newAssets.Count > 0)
             {
-                await _mediator.Send(new InsertAssetsCommand(newAssets));
+                await mediator.Send(new InsertAssetsCommand(newAssets));
             }
         }
 
         public async Task SyncPairs(IEnumerable<string> stockSymbols)
         {
-            var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
-            var fetchedPairsTask = _mediator.Send(new GetPairsQuery());
+            var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
+            var fetchedPairsTask = mediator.Send(new GetPairsQuery());
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask);
 
             var assets = (await fetchedAssetsTask).ToList();
@@ -141,15 +130,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (newPairs.Count > 0)
             {
-                await _mediator.Send(new InsertPairsCommand(newPairs));
+                await mediator.Send(new InsertPairsCommand(newPairs));
             }
         }
 
         public async Task SyncCandlesticks(Timeframe period = Timeframe.Daily)
         {
-            var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
-            var fetchedPairsTask = _mediator.Send(new GetPairsQuery());
-            var fetchedCandlesticksTask = _mediator.Send(new GetCandlesticksQuery());
+            var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
+            var fetchedPairsTask = mediator.Send(new GetPairsQuery());
+            var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask);
 
@@ -199,10 +188,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                 foreach (var dateRange in DatetimeExtension.GetDailyDateRanges(fromDatetime, toDatetime))
                 {
-                    var stockData = await _alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
+                    var stockData = await alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
                     if (stockData.IsError)
                     {
-                        _logger.LogWarning("Method: {Method}: {ResponseError}", nameof(SyncCandlesticks), stockData.IsError);
+                        logger.LogWarning("Method: {Method}: {ResponseError}", nameof(SyncCandlesticks), stockData.IsError);
                         continue;
                     }
 
@@ -233,7 +222,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (newCandlesticks.Count > 0)
             {
-                await _mediator.Send(new InsertCandlesticksCommand(newCandlesticks));
+                await mediator.Send(new InsertCandlesticksCommand(newCandlesticks));
             }
         }
     }
