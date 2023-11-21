@@ -4,20 +4,11 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class WallStreetZenAdapter : IAdapter
+    public class WallStreetZenAdapter(ILogger<WallStreetZenAdapter> logger, IWallStreetZenClient WallStreetZenClient) : IAdapter
     {
-        private readonly ILogger<WallStreetZenAdapter> _logger;
-        private readonly IWallStreetZenClient _wallStreetZenClient;
-
-        public WallStreetZenAdapter(ILogger<WallStreetZenAdapter> logger, IWallStreetZenClient WallStreetZenClient)
-        {
-            _logger = logger;
-            _wallStreetZenClient = WallStreetZenClient;
-        }
-
         public Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var stocks = _wallStreetZenClient.Sync();
+            var stocks = WallStreetZenClient.Sync();
             return Task.CompletedTask;
         }
     }
