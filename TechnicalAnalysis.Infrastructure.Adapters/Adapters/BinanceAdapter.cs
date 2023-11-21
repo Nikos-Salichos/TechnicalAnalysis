@@ -16,22 +16,11 @@ using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class BinanceAdapter : IAdapter
+    public class BinanceAdapter(IBinanceHttpClient binanceHttpClient, IMediator mediator, ILogger<BinanceAdapter> logger) : IAdapter
     {
-        private readonly IMediator _mediator;
-        private readonly IBinanceHttpClient _binanceHttpClient;
-        private readonly ILogger<BinanceAdapter> _logger;
-
-        public BinanceAdapter(IBinanceHttpClient binanceHttpClient, IMediator mediator, ILogger<BinanceAdapter> logger)
-        {
-            _binanceHttpClient = binanceHttpClient;
-            _mediator = mediator;
-            _logger = logger;
-        }
-
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
-            var exchanges = await _mediator.Send(new GetProviderSynchronizationQuery());
+            var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var binanceProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
             if (binanceProvider == null)
@@ -42,11 +31,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binanceProvider.IsProviderSyncedToday(timeframe))
             {
-                _logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
+                logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
                 return;
             }
 
-            var response = await _binanceHttpClient.GetBinanceAssetsAndPairs();
+            var response = await binanceHttpClient.GetBinanceAssetsAndPairs();
 
             if (response.IsError)
             {
@@ -59,9 +48,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await SyncAssets(tradeablePairs);
             await SyncPairs(tradeablePairs);
 
-            var fetchedAssetsTask = _mediator.Send(new GetAssetsQuery());
-            var fetchedPairsTask = _mediator.Send(new GetPairsQuery());
-            var fetchedCandlesticksTask = _mediator.Send(new GetCandlesticksQuery());
+            var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
+            var fetchedPairsTask = mediator.Send(new GetPairsQuery());
+            var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask);
 
@@ -75,7 +64,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             binanceProvider.UpdateProviderInfo();
             var providerCandlestickSyncInfo = binanceProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
-            await _mediator.Send(new UpdateExchangeCommand(binanceProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
+            await mediator.Send(new UpdateExchangeCommand(binanceProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
 
         private async Task SyncAssets(IEnumerable<BinanceSymbol> tradeablePairs)
@@ -88,19 +77,19 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
             newAssets = newAssets.Distinct(new BinanceAssetComparer()).ToList();
 
-            var fetchedAssets = await _mediator.Send(new GetAssetsQuery());
+            var fetchedAssets = await mediator.Send(new GetAssetsQuery());
 
             var missingAssets = newAssets.Except(fetchedAssets.ToContract(), new BinanceAssetComparer()).Distinct();
 
             if (missingAssets.Any())
             {
-                await _mediator.Send(new InsertAssetsCommand(missingAssets.ToDomain()));
+                await mediator.Send(new InsertAssetsCommand(missingAssets.ToDomain()));
             }
         }
 
         private async Task SyncPairs(IEnumerable<BinanceSymbol> tradeablePairs)
         {
-            var fetchedAssets = (await _mediator.Send(new GetAssetsQuery())).ToList();
+            var fetchedAssets = (await mediator.Send(new GetAssetsQuery())).ToList();
             var assetDictionary = fetchedAssets.ToContract().ToImmutableDictionary(asset => asset.Asset, asset => asset.Id);
 
             var binancePairs = tradeablePairs.Select(tradeablePair => new BinancePair
@@ -113,8 +102,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 IsActive = true,
             });
 
-            binancePairs = PairExtension.GetDollarPairs(fetchedAssets.ToContract(), binancePairs.ToList());
-            var fetchedPairs = await _mediator.Send(new GetPairsQuery());
+            binancePairs = PairExtension.GetUniqueDollarPairs(fetchedAssets.ToContract(), binancePairs.ToList());
+            var fetchedPairs = await mediator.Send(new GetPairsQuery());
             var newPairs = binancePairs.ToDomain().Where(pair => !fetchedPairs.Contains(pair, new PairExtendedEqualityComparer()));
 
             foreach (var dollarPair in newPairs)
@@ -124,7 +113,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (newPairs.Any())
             {
-                await _mediator.Send(new InsertPairsCommand(newPairs));
+                await mediator.Send(new InsertPairsCommand(newPairs));
             }
         }
 
@@ -204,11 +193,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                     { "limit", candlesPerCall },
                             }.ToImmutableDictionary();
 
-                        var response = await _binanceHttpClient.GetBinanceCandlesticks(queryParams);
+                        var response = await binanceHttpClient.GetBinanceCandlesticks(queryParams);
 
                         if (response.IsError)
                         {
-                            _logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(SyncCandlesticks), response.IsError);
+                            logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(SyncCandlesticks), response.IsError);
                             break;
                         }
 
@@ -269,7 +258,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             {
                 var pairsWithCandlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0);
                 var candlesticks = pairsWithCandlesticks.SelectMany(c => c.BinanceCandlesticks);
-                await _mediator.Send(new InsertCandlesticksCommand(candlesticks.ToDomain()));
+                await mediator.Send(new InsertCandlesticksCommand(candlesticks.ToDomain()));
             }
         }
     }
