@@ -8,19 +8,14 @@ namespace TechnicalAnalysis.Infrastructure.GatewayApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ApiGatewayController : ControllerBase
+    public class ApiGatewayController(IHttpClientFactory httpClientFactory) : ControllerBase
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient = httpClientFactory.CreateClient("gatewayapi");
 
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
-
-        public ApiGatewayController(IHttpClientFactory httpClientFactory)
-        {
-            _httpClient = httpClientFactory.CreateClient("gatewayapi");
-        }
 
         [HttpGet]
         public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName, [FromQuery] Timeframe timeframe)
@@ -30,7 +25,7 @@ namespace TechnicalAnalysis.Infrastructure.GatewayApi.Controllers
             return Ok(await SendHttpRequestAsync<IEnumerable<PairExtended>>(apiUrl, HttpMethod.Get, requestData));
         }
 
-        private async Task<T> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null)
+        private async Task<T?> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null)
         {
             try
             {
