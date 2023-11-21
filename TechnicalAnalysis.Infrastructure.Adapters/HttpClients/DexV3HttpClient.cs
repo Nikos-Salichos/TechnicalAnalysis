@@ -13,27 +13,17 @@ using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
-    public class DexV3HttpClient : IDexV3HttpClient
+    public class DexV3HttpClient(IOptionsMonitor<DexSetting> dexSettings, IHttpClientFactory httpClientFactory,
+        ILogger<DexV3HttpClient> logger, IPollyPolicy pollyPolicy) : IDexV3HttpClient
     {
-        private readonly IOptionsMonitor<DexSetting> _dexSettings;
-        private readonly ILogger<DexV3HttpClient> _logger;
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
 
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy;
-
-        public DexV3HttpClient(IOptionsMonitor<DexSetting> dexSettings, IHttpClientFactory httpClientFactory,
-            ILogger<DexV3HttpClient> logger, IPollyPolicy pollyPolicy)
-        {
-            _dexSettings = dexSettings;
-            _logger = logger;
-            _httpClient = httpClientFactory.CreateClient("default");
-            _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
-        }
+        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
 
         public Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
         {
@@ -96,8 +86,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             var dexEndpoint = provider switch
             {
-                DataProvider.Uniswap => _dexSettings.CurrentValue.UniswapEndpoint,
-                DataProvider.Pancakeswap => _dexSettings.CurrentValue.PancakeswapEndpoint,
+                DataProvider.Uniswap => dexSettings.CurrentValue.UniswapEndpoint,
+                DataProvider.Pancakeswap => dexSettings.CurrentValue.PancakeswapEndpoint,
                 _ => throw new InvalidOperationException("Unknown provider")
             };
 
@@ -109,12 +99,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => _httpClient.PostAsJsonAsync(endpoint, body));
 
-                    _logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
+                    logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, httpResponseMessage StatusCode {httpResponseMessage.StatusCode}, httpResponseMessage Content {httpResponseMessage.Content} ",
                             nameof(GetMostActivePoolsAsync), endpoint, httpResponseMessage.StatusCode, httpResponseMessage.Content);
 
                     if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        _logger.LogWarning("Method: {Method}: {httpResponseMessage.StatusCode}", nameof(GetMostActivePoolsAsync), httpResponseMessage.StatusCode);
+                        logger.LogWarning("Method: {Method}: {httpResponseMessage.StatusCode}", nameof(GetMostActivePoolsAsync), httpResponseMessage.StatusCode);
                         return Result<DexV3ApiResponse, string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                     }
 
@@ -122,15 +112,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, _jsonSerializerOptions);
                     if (deserializedData is not null)
                     {
-                        _logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetMostActivePoolsAsync), deserializedData);
+                        logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetMostActivePoolsAsync), deserializedData);
                         return Result<DexV3ApiResponse, string>.Success(deserializedData);
                     }
-                    _logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
+                    logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
                     return Result<DexV3ApiResponse, string>.Fail($"{nameof(GetMostActivePoolsAsync)} Deserialization Failed");
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogWarning("Method {Method}, exception {exception}", nameof(GetMostActivePoolsAsync), exception);
+                    logger.LogWarning("Method {Method}, exception {exception}", nameof(GetMostActivePoolsAsync), exception);
                     return Result<DexV3ApiResponse, string>.Fail(exception.ToString());
                 }
             }
