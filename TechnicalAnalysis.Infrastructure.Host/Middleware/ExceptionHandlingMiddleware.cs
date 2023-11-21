@@ -3,16 +3,9 @@ using System.Text.Json;
 
 namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
-    public class ExceptionHandlingMiddleware
+    public class ExceptionHandlingMiddleware(RequestDelegate requestDelegate, ILogger<ExceptionHandlingMiddleware> logger)
     {
-        public RequestDelegate requestDelegate;
-        private readonly ILogger<ExceptionHandlingMiddleware> logger;
-
-        public ExceptionHandlingMiddleware(RequestDelegate requestDelegate, ILogger<ExceptionHandlingMiddleware> logger)
-        {
-            this.requestDelegate = requestDelegate;
-            this.logger = logger;
-        }
+        public RequestDelegate requestDelegate = requestDelegate;
 
         public async Task Invoke(HttpContext context)
         {
