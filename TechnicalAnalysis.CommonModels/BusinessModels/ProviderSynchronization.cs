@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
     {
         public DataProvider DataProvider { get; set; }
         public ProviderPairAssetSyncInfo ProviderPairAssetSyncInfo { get; set; }
-        public List<ProviderCandlestickSyncInfo> CandlestickSyncInfos { get; set; } = new List<ProviderCandlestickSyncInfo>();
+        public List<ProviderCandlestickSyncInfo> CandlestickSyncInfos { get; set; } = [];
 
         public ProviderSynchronization(DataProvider dataProvider)
         {
