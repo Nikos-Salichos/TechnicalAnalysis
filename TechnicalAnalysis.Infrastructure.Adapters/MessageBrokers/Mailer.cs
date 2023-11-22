@@ -7,15 +7,8 @@ using TechnicalAnalysis.Domain.Messages;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
-    public class Mailer : IMailer
+    public class Mailer(IOptionsMonitor<MailSettings> settings) : IMailer
     {
-        private readonly IOptionsMonitor<MailSettings> _mailSettings;
-
-        public Mailer(IOptionsMonitor<MailSettings> settings)
-        {
-            _mailSettings = settings;
-        }
-
         public async Task SendAsync(MailData mailData, CancellationToken ct = default)
         {
             try
@@ -24,8 +17,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 
                 #region Sender / Receiver
                 // Sender
-                mail.From.Add(new MailboxAddress(_mailSettings.CurrentValue.DisplayName, mailData.From ?? _mailSettings.CurrentValue.From));
-                mail.Sender = new MailboxAddress(mailData.DisplayName ?? _mailSettings.CurrentValue.DisplayName, mailData.From ?? _mailSettings.CurrentValue.From);
+                mail.From.Add(new MailboxAddress(settings.CurrentValue.DisplayName, mailData.From ?? settings.CurrentValue.From));
+                mail.Sender = new MailboxAddress(mailData.DisplayName ?? settings.CurrentValue.DisplayName, mailData.From ?? settings.CurrentValue.From);
 
                 // Receiver
                 foreach (string mailAddress in mailData.To)
@@ -93,15 +86,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 
                 using var smtp = new SmtpClient();
 
-                if (_mailSettings.CurrentValue.UseSSL)
+                if (settings.CurrentValue.UseSSL)
                 {
-                    await smtp.ConnectAsync(_mailSettings.CurrentValue.Host, _mailSettings.CurrentValue.Port, SecureSocketOptions.SslOnConnect, ct);
+                    await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.SslOnConnect, ct);
                 }
-                else if (_mailSettings.CurrentValue.UseStartTls)
+                else if (settings.CurrentValue.UseStartTls)
                 {
-                    await smtp.ConnectAsync(_mailSettings.CurrentValue.Host, _mailSettings.CurrentValue.Port, SecureSocketOptions.StartTls, ct);
+                    await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.StartTls, ct);
                 }
-                await smtp.AuthenticateAsync(_mailSettings.CurrentValue.EmailAddress, _mailSettings.CurrentValue.Password, ct);
+                await smtp.AuthenticateAsync(settings.CurrentValue.EmailAddress, settings.CurrentValue.Password, ct);
                 await smtp.SendAsync(mail, ct);
                 await smtp.DisconnectAsync(true, ct);
 
