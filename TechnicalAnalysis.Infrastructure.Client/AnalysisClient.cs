@@ -6,19 +6,14 @@ using TechnicalAnalysis.CommonModels.JsonOutput;
 
 namespace TechnicalAnalysis.Infrastructure.Client
 {
-    public class AnalysisClient : IAnalysisClient
+    public class AnalysisClient(IHttpClientFactory httpClientFactory) : IAnalysisClient
     {
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly HttpClient _httpClient;
-
-        public AnalysisClient(IHttpClientFactory httpClientFactory)
-        {
-            _httpClient = httpClientFactory.CreateClient("AnalysisClient");
-        }
+        private readonly HttpClient _httpClient = httpClientFactory.CreateClient("AnalysisClient");
 
         public async Task SynchronizeProvidersAsync(DataProvider provider, Timeframe timeframe)
         {
