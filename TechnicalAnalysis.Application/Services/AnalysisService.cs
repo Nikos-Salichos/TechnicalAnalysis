@@ -63,8 +63,8 @@ namespace TechnicalAnalysis.Application.Services
 
             CalculateIndicators(selectedPairs);
 
-            var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOne();
-            var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAll();
+            var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOnBasedInFractalBreak();
+            var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAllBasedInFractalBreak();
 
             Indicator enhancedScanPositions = CalculateEnhancedScanSignal(positionsCloseAll);
             List<Indicator> indicatorReports = new()
