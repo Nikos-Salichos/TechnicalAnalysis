@@ -8,17 +8,8 @@ using TechnicalAnalysis.Domain.Messages;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
-    public class Communication : ICommunication
+    public class Communication(IMailer mailService, IConfiguration configuration) : ICommunication
     {
-        private readonly IConfiguration _configuration;
-        private readonly IMailer _mailService;
-
-        public Communication(IMailer mailService, IConfiguration configuration)
-        {
-            _mailService = mailService;
-            _configuration = configuration;
-        }
-
         public async Task CreateAttachmentSendMessage<T>(IEnumerable<T> data)
         {
             List<MimePart> mailInformation = new();
@@ -28,14 +19,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 
         public async Task SendMessage(List<MimePart> message)
         {
-            var receivers = _configuration.GetValue<string>("MailData:To") ?? string.Empty;
+            var receivers = configuration.GetValue<string>("MailData:To") ?? string.Empty;
             List<string> receiversList = receivers.Split(',').Select(r => r.Trim()).ToList();
 
-            var bccReceivers = _configuration.GetValue<string>("MailData:Bcc") ?? string.Empty;
+            var bccReceivers = configuration.GetValue<string>("MailData:Bcc") ?? string.Empty;
             List<string> bccReceiversList = bccReceivers.Split(',').Select(r => r.Trim()).ToList();
 
             MailData mailData = new MailData(receiversList, "Coins", null, message, null, null, null, null, bccReceiversList, null);
-            await _mailService.SendAsync(mailData, new CancellationToken());
+            await mailService.SendAsync(mailData, new CancellationToken());
         }
 
         public void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments, IEnumerable<T> data)
