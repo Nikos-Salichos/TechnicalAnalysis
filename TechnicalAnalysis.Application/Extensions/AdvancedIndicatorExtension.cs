@@ -571,8 +571,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
 
-                bool[] conditions = new bool[]
-                {
+                bool[] conditions =
+                [
                     GetOversoldRsiConditions(pair.Candlesticks, i),
                     GetOversoldStochasticConditions(pair.Candlesticks, i),
                     GetOversoldAdxConditions(pair.Candlesticks, i),
@@ -589,7 +589,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetHighestHighVixFix(pair.Candlesticks, i),
                     // GetOversoldMacdConditions(pair.Candlesticks, i), //It is bad for signal
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
-                };
+                ];
 
                 int trueConditionsCount = conditions.Count(condition => condition);
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
@@ -766,10 +766,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 || lowestLow4 is not null && candlesticks[currentIndex - 4].LowPrice <= lowestLow4.Value;
         }
 
-        //TODO Refactor it
         private static bool GetHighestHighVixFix(IList<CandlestickExtended> candlesticks, int currentIndex)
         {
-            // Prepei na exei to highest high vix fix == me to value tou vix fix
             if (currentIndex < 0 || currentIndex >= candlesticks.Count)
             {
                 return false;
