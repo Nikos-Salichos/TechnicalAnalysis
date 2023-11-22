@@ -9,13 +9,19 @@ using TechnicalAnalysis.Domain.Settings;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.RabbitMQ
 {
-    public class RabbitMqService : IRabbitMqService
+    public class RabbitMqService(IOptionsMonitor<RabbitMqSetting> rabbitMqSetting) : IRabbitMqService
     {
         private bool isFirstTime = true;
         private const string _queueName = "taQueue";
         private const string _exchangeName = "taExchange";
         private const string _routingKey = "taKey";
-        private ConnectionFactory connectionFactory;
+        private ConnectionFactory connectionFactory = new()
+        {
+            HostName = rabbitMqSetting.CurrentValue.Hostname,
+            Port = rabbitMqSetting.CurrentValue.Port,
+            UserName = rabbitMqSetting.CurrentValue.Username,
+            Password = rabbitMqSetting.CurrentValue.Password,
+        };
 
         private static readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -24,23 +30,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.RabbitMQ
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
         };
 
-        private readonly IOptionsMonitor<RabbitMqSetting> _rabbitMqSetting;
-
-        public RabbitMqService(IOptionsMonitor<RabbitMqSetting> rabbitMqSetting)
-        {
-            _rabbitMqSetting = rabbitMqSetting;
-        }
-
         public void PublishMessage<T>(T message)
         {
-            connectionFactory = new ConnectionFactory
-            {
-                HostName = _rabbitMqSetting.CurrentValue.Hostname,
-                Port = _rabbitMqSetting.CurrentValue.Port,
-                UserName = _rabbitMqSetting.CurrentValue.Username,
-                Password = _rabbitMqSetting.CurrentValue.Password,
-            };
-
             var connection = connectionFactory.CreateConnection();
             using var channel = connection.CreateModel();
 
