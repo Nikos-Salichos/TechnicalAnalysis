@@ -27,7 +27,7 @@ builder.SerilogConfiguration();
 builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
-    // options.CombineLogs = true;
+    options.CombineLogs = true;
 });
 #endregion Log Http Requests
 
@@ -88,8 +88,6 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHsts();
 
 app.UseHttpsRedirection();
-
-// app.UseSerilogRequestLogging();
 
 app.UseCors();
 
