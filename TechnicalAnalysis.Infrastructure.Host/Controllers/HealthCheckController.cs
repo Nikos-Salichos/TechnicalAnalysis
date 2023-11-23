@@ -7,20 +7,13 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 {
     [Route("api/healthcheck")]
     [ApiController]
-    public class HealthCheckController : ControllerBase
+    public class HealthCheckController(IHealthCheckRepository healthCheckService) : ControllerBase
     {
-        private readonly IHealthCheckRepository healthCheckRepository;
-
-        public HealthCheckController(IHealthCheckRepository healthCheckService)
-        {
-            healthCheckRepository = healthCheckService;
-        }
-
         [HttpGet("CheckPostgreSqlHealth")]
         public async Task<IActionResult> CheckHealthAsync()
         {
             HealthCheckContext healthCheckContext = new();
-            var report = await healthCheckRepository.CheckHealthAsync(healthCheckContext);
+            var report = await healthCheckService.CheckHealthAsync(healthCheckContext);
 
             return report.Status == HealthStatus.Healthy
                 ? Ok(report)
