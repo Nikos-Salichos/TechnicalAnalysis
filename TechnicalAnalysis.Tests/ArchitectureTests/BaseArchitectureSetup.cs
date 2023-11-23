@@ -9,6 +9,7 @@ namespace TechnicalAnalysis.Tests.ArchitectureTests
         public const string InfrastructureClientProject = "TechnicalAnalysis.Infrastructure.Client";
         public const string PresentationProject = "TechnicalAnalysis.Infrastructure.Host";
         public const string DomainProject = "TechnicalAnalysis.Domain";
-        public const string ContractsProject = "TechnicalAnalysis.Contracts";
+        public const string DomainProjectEntities = "TechnicalAnalysis.Domain.Entities";
+        public const string CommonModelsProject = "TechnicalAnalysis.CommonModels";
     }
 }
