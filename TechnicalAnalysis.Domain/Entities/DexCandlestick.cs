@@ -1,5 +1,5 @@
-﻿using TechnicalAnalysis.CommonModels.Enums;
-using TechnicalAnalysis.Domain.BaseClasses;
+﻿using TechnicalAnalysis.CommonModels.BaseClasses;
+using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.Domain.Entities
 {
