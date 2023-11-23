@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Tests.ArchitectureTests
                                .Should().NotHaveDependencyOnAny(BaseArchitectureSetup.InfrastructurePersistenceProject,
                                BaseArchitectureSetup.InfrastructureAdaptersProject, BaseArchitectureSetup.InfrastructureHostProject,
                                BaseArchitectureSetup.InfrastructureClientProject, BaseArchitectureSetup.PresentationProject,
-                               BaseArchitectureSetup.ContractsProject)
+                               BaseArchitectureSetup.CommonModelsProject)
                                .GetResult();
             result.IsSuccessful.Should().BeTrue();
         }
