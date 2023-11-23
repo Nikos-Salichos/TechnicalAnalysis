@@ -66,7 +66,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         {
             _logger.LogInformation("Method: {GetPairsIndicatorsAsync} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
             var pairs = await _analysisService.GetPairsIndicatorsAsync(provider, HttpContext);
-            return Ok(pairs);
+            return Ok();
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -79,13 +79,6 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             _logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
             var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
             return Ok();
-        }
-
-        [HttpGet("Indicators")]
-        [EnableRateLimiting("fixed-by-ip")]
-        public async Task<IActionResult> GetIndicatorsByPairNameAsyn1c()
-        {
-            return Ok("lala");
         }
     }
 }
