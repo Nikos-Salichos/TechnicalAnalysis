@@ -176,7 +176,7 @@ namespace TechnicalAnalysis.Application.Extensions
                             continue;
                         }
 
-                        if (currentCandlestick.Fractals.Any() || currentCandlestick.Fractals.Any())
+                        if (currentCandlestick.Fractals.Count > 0)
                         {
                             break;
                         }
