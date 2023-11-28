@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             using var connection = new NpgsqlConnection(_connectionStringKey);
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync(cancellationToken);
                 return HealthCheckResult.Healthy();
             }
             catch (Exception)
