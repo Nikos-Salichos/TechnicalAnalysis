@@ -8,18 +8,23 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static IEnumerable<BinancePair> GetUniqueDollarPairs(IEnumerable<BinanceAsset> assets, IEnumerable<BinancePair> fetchedPairs)
         {
-            var usdt = assets.FirstOrDefault(a => string.Equals(a.Asset, Constants.Usdt, StringComparison.InvariantCultureIgnoreCase));
-            var usdc = assets.FirstOrDefault(a => string.Equals(a.Asset, Constants.Usdc, StringComparison.InvariantCultureIgnoreCase));
-            var dai = assets.FirstOrDefault(a => string.Equals(a.Asset, Constants.Dai, StringComparison.InvariantCultureIgnoreCase));
-            var busd = assets.FirstOrDefault(a => string.Equals(a.Asset, Constants.Busd, StringComparison.InvariantCultureIgnoreCase));
+            // Retrieve the IDs for USDT, USDC, DAI, and BUSD from the assets
+            var assetIds = assets
+                .Where(a => string.Equals(a.Asset, Constants.Usdt, StringComparison.InvariantCultureIgnoreCase) ||
+                            string.Equals(a.Asset, Constants.Usdc, StringComparison.InvariantCultureIgnoreCase) ||
+                            string.Equals(a.Asset, Constants.Dai, StringComparison.InvariantCultureIgnoreCase) ||
+                            string.Equals(a.Asset, Constants.Busd, StringComparison.InvariantCultureIgnoreCase))
+                .Select(a => a.Id)
+                .ToHashSet();
 
-            var uniquePairsList = fetchedPairs.Where(fetchedPair => fetchedPair.QuoteAssetId == usdt?.Id).ToList();
-            var baseAssetIds = new HashSet<long>(uniquePairsList.Select(p => p.BaseAssetId));
-            uniquePairsList.AddRange(fetchedPairs.Where(fetchedPair => fetchedPair.QuoteAssetId == usdc?.Id && baseAssetIds.Add(fetchedPair.BaseAssetId)));
-            uniquePairsList.AddRange(fetchedPairs.Where(fetchedPair => fetchedPair.QuoteAssetId == dai?.Id && baseAssetIds.Add(fetchedPair.BaseAssetId)));
-            uniquePairsList.AddRange(fetchedPairs.Where(fetchedPair => fetchedPair.QuoteAssetId == busd?.Id && baseAssetIds.Add(fetchedPair.BaseAssetId)));
+            // Use a HashSet to keep track of unique BaseAssetIds
+            var uniqueBaseAssetIds = new HashSet<long>();
 
-            return uniquePairsList;
+            // Filter and add pairs to the list only if they haven't been added before
+            return fetchedPairs
+                .Where(fetchedPair => assetIds.Contains(fetchedPair.QuoteAssetId) &&
+                                       uniqueBaseAssetIds.Add(fetchedPair.BaseAssetId))
+                .ToList();
         }
 
         public static IEnumerable<PairExtended> MapPairsToAssets(this IEnumerable<PairExtended> pairs, IEnumerable<Asset> assets)
