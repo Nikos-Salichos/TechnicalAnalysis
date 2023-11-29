@@ -17,23 +17,23 @@ namespace TechnicalAnalysis.Tests.UnitTests
         {
             // Arrange
             var binanceAssets = new List<BinanceAsset> {
-            new BinanceAsset { Id = 1, Asset = "USDT" } ,
-            new BinanceAsset { Id = 2, Asset = "USDC" },
-            new BinanceAsset { Id = 3, Asset = "DAI" },
-            new BinanceAsset { Id = 4, Asset = "BUSD" },
-            new BinanceAsset { Id = 100, Asset = "ETH" },
-            new BinanceAsset { Id = 30, Asset = "ADA" },
+            new() { Id = 1, Asset = "USDT" } ,
+            new() { Id = 2, Asset = "USDC" },
+            new() { Id = 3, Asset = "DAI" },
+            new() { Id = 4, Asset = "BUSD" },
+            new() { Id = 100, Asset = "ETH" },
+            new() { Id = 30, Asset = "ADA" },
             };
 
             var binancePair = new List<BinancePair> {
-            new BinancePair { BaseAssetId = 10, QuoteAssetId = 1, Pair = "BTC-USDT"} ,
-            new BinancePair { BaseAssetId = 10, QuoteAssetId = 2, Pair = "BTC-USDC"} ,
-            new BinancePair { BaseAssetId = 20, QuoteAssetId = 2, Pair = "ETH-USDC"} ,
-            new BinancePair { BaseAssetId = 30, QuoteAssetId = 3, Pair = "ADA-DAI"} ,
-            new BinancePair { BaseAssetId = 10, QuoteAssetId = 4, Pair = "BTC-BUSD"} ,
-            new BinancePair { BaseAssetId = 50, QuoteAssetId = 4, Pair = "DOT-BUSD"} ,
-            new BinancePair { BaseAssetId = 10, QuoteAssetId = 100, Pair = "BTC-ETH"} ,
-            new BinancePair { BaseAssetId = 10, QuoteAssetId = 30, Pair = "BTC-ADA"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 1, Pair = "BTC-USDT"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 2, Pair = "BTC-USDC"} ,
+            new() { BaseAssetId = 20, QuoteAssetId = 2, Pair = "ETH-USDC"} ,
+            new() { BaseAssetId = 30, QuoteAssetId = 3, Pair = "ADA-DAI"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 4, Pair = "BTC-BUSD"} ,
+            new() { BaseAssetId = 50, QuoteAssetId = 4, Pair = "DOT-BUSD"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 100, Pair = "BTC-ETH"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 30, Pair = "BTC-ADA"} ,
             };
 
             // Act
