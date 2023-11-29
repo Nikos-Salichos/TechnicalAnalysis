@@ -2,7 +2,7 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
 {
-    public class PriceFunnel : BaseIndicator
+    public class PriceFunnel(long candlestickId) : BaseIndicator(candlestickId)
     {
         public bool IsFunnel { get; init; }
 
@@ -11,10 +11,5 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
         public decimal? HighestPriceOfFunnel { get; init; }
 
         public long FlagPoleCandlestickId { get; init; }
-
-        public PriceFunnel(long candlestickId) : base(candlestickId)
-        {
-        }
-
     }
 }
