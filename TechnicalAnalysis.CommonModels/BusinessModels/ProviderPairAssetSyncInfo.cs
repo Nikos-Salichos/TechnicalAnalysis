@@ -13,10 +13,5 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         {
             DataProvider = dataProvider;
         }
-
-        public ProviderPairAssetSyncInfo()
-        {
-
-        }
     }
 }
