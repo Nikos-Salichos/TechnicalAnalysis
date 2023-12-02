@@ -33,7 +33,6 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         }
     }
 
-
     public class PairExtendedEqualityComparer : IEqualityComparer<PairExtended>
     {
         public bool Equals(PairExtended? x, PairExtended? y)
@@ -48,12 +47,9 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
                    x.Provider == y.Provider;
         }
 
-        public int GetHashCode(PairExtended obj)
-        {
-            return obj.BaseAssetId.GetHashCode() ^
-                   obj.QuoteAssetId.GetHashCode() ^
-                   obj.Provider.GetHashCode();
-        }
+        public int GetHashCode(PairExtended pairExtended)
+            => HashCode.Combine(pairExtended.BaseAssetId.GetHashCode(),
+                pairExtended.QuoteAssetId.GetHashCode(),
+                pairExtended.Provider.GetHashCode());
     }
-
 }
