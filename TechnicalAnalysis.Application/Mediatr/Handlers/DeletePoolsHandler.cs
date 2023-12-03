@@ -9,6 +9,6 @@ public class DeletePoolsHandler(IPostgreSqlRepository repository) : IRequestHand
 {
     public async Task Handle(DeletePoolsCommand request, CancellationToken cancellationToken)
     {
-        await repository.DeleteEntitiesByIdsAsync<Pool>(request.Ids, "Pools", "Id");
+        await repository.DeleteEntitiesByIdsAsync<Pool>(request.Ids, "Pools");
     }
 }
