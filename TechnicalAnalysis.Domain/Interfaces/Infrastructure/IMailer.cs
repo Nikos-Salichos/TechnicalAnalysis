@@ -4,6 +4,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface IMailer
     {
-        Task SendAsync(MailData mailData, CancellationToken ct);
+        Task SendAsync(MailData mailData, CancellationToken cancellationToken);
     }
 }
