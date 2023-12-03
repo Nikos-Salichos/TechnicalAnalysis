@@ -21,7 +21,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 
         private async Task HandleException(HttpContext context, Exception exception)
         {
-            logger.LogCritical("An exception occurred: {@Exception}", exception);
+            logger.LogError("An exception occurred: {@Exception}", exception);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
