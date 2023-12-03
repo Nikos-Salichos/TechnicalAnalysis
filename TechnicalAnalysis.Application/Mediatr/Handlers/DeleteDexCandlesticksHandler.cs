@@ -9,7 +9,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
     {
         public async Task Handle(DeleteDexCandlesticksCommand request, CancellationToken cancellationToken)
         {
-            await repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, "DexCandlesticks", "Id");
+            await repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, "DexCandlesticks");
         }
     }
 }
