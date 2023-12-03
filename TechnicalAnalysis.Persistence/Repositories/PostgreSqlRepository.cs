@@ -321,38 +321,26 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task UpdateProviderPairAssetSyncInfoAsync(ProviderPairAssetSyncInfo providerPairAssetSyncInfos)
+        public async Task UpdateProviderPairAssetSyncInfoAsync(ProviderPairAssetSyncInfo providerPairAssetSyncInfo)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-
             const string query = "INSERT INTO \"ProviderPairAssetSyncInfos\" (\"ProviderId\", \"LastAssetSync\", \"LastPairSync\") " +
                                  "VALUES (@DataProvider, @LastAssetSync, @LastPairSync) " +
                                  "ON CONFLICT (\"ProviderId\") DO UPDATE SET " +
                                  "\"LastAssetSync\" = EXCLUDED.\"LastAssetSync\", " +
                                  "\"LastPairSync\" = EXCLUDED.\"LastPairSync\"";
 
-            NpgsqlTransaction? transaction = null;
             try
             {
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
-                transaction = await dbConnection.BeginTransactionAsync();
 
-                await dbConnection.ExecuteAsync(query, providerPairAssetSyncInfos, transaction: transaction);
-
+                using var transaction = await dbConnection.BeginTransactionAsync();
+                await dbConnection.ExecuteAsync(query, providerPairAssetSyncInfo, transaction: transaction);
                 await transaction.CommitAsync();
             }
             catch (Exception exception)
             {
                 logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfoAsync), exception);
-                await transaction?.RollbackAsync();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                if (transaction != null)
-                {
-                    await transaction.DisposeAsync();
-                }
             }
         }
 
@@ -378,33 +366,33 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName, string idColumnName)
+        public async Task DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            string query = $"DELETE FROM \"{tableName}\" WHERE \"{idColumnName}\" = ANY(@Ids)";
+            var validTableNames = new HashSet<string> { "DexCandlesticks", "Pools" };
+            if (!validTableNames.Contains(tableName))
+            {
+                throw new ArgumentException("Invalid table");
+            }
 
-            NpgsqlTransaction? transaction = null;
+            async Task DeleteEntitiesAsync()
+            {
+                string query = $"DELETE FROM \"{tableName}\" WHERE \"Id\" = ANY(@Ids)";
+
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
+
+                using var transaction = await dbConnection.BeginTransactionAsync();
+                await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
+                await transaction.CommitAsync();
+            }
+
             try
             {
-                await dbConnection.OpenAsync();
-                transaction = await dbConnection.BeginTransactionAsync();
-
-                await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
-
-                await transaction.CommitAsync();
+                await DeleteEntitiesAsync();
             }
             catch (Exception exception)
             {
                 logger.LogError("Method:{Method}, Exception{@exception}", $"Delete{typeof(T).Name}ByIdsAsync", exception);
-                await transaction?.RollbackAsync();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                if (transaction != null)
-                {
-                    await transaction.DisposeAsync();
-                }
             }
         }
 
