@@ -120,7 +120,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 }
                 catch (Exception exception)
                 {
-                    logger.LogWarning("Method {Method}, exception {exception}", nameof(GetMostActivePoolsAsync), exception);
+                    logger.LogError("Method {Method}, exception {exception}", nameof(GetMostActivePoolsAsync), exception);
                     return Result<DexV3ApiResponse, string>.Fail(exception.ToString());
                 }
             }
