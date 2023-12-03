@@ -19,6 +19,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
         Task UpdateProviderCandlestickSyncInfoAsync(ProviderCandlestickSyncInfo providerCandlestickSyncInfos);
         Task InsertPoolsAsync(IEnumerable<Pool> pools);
         Task InsertDexCandlesticksAsync(IEnumerable<DexCandlestick> candlesticks);
-        Task DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName, string idColumnName);
+        Task DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName);
     }
 }
