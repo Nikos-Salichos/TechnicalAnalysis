@@ -89,12 +89,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     return Result<object[][], string>.Success(deserializedData);
                 }
-                logger.LogWarning("Method: {Method} {Deserialization Failed}", nameof(GetBinanceCandlesticks));
+                logger.LogWarning("Method: {Method} Deserialization Failed", nameof(GetBinanceCandlesticks));
                 return Result<object[][], string>.Fail($"{nameof(GetBinanceCandlesticks)} Deserialization Failed");
             }
             catch (Exception exception)
             {
-                logger.LogWarning("Method: {Method}, exception {exception}", nameof(GetBinanceCandlesticks), exception);
+                logger.LogError("Method: {Method}, exception {exception}", nameof(GetBinanceCandlesticks), exception);
                 return Result<object[][], string>.Fail(exception.ToString());
             }
         }
