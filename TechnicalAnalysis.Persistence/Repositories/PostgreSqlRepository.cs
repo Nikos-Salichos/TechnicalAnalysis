@@ -14,7 +14,6 @@ using Pool = TechnicalAnalysis.Domain.Entities.Pool;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
-
     public class PostgreSqlRepository(IOptionsMonitor<DatabaseSetting> databaseSettings, ILogger<PostgreSqlRepository> logger)
         : IPostgreSqlRepository
     {
@@ -108,8 +107,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 var providerSynchronizations = new List<ProviderSynchronization>();
                 foreach (var providerPairAssetSyncInfo in providerPairAssetSyncInfos)
                 {
-                    var providerSynchronization = new ProviderSynchronization(providerPairAssetSyncInfo.DataProvider);
-                    providerSynchronization.ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
+                    var providerSynchronization = new ProviderSynchronization(providerPairAssetSyncInfo.DataProvider)
+                    {
+                        ProviderPairAssetSyncInfo = providerPairAssetSyncInfo
+                    };
                     providerSynchronizations.Add(providerSynchronization);
                 }
 
@@ -348,36 +349,32 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             finally
             {
                 await dbConnection.CloseAsync();
-                transaction?.DisposeAsync();
+                if (transaction != null)
+                {
+                    await transaction.DisposeAsync();
+                }
             }
         }
 
-        public async Task UpdateProviderCandlestickSyncInfoAsync(ProviderCandlestickSyncInfo candlestickSyncInfos)
+        public async Task UpdateProviderCandlestickSyncInfoAsync(ProviderCandlestickSyncInfo candlestickSyncInfo)
         {
-            using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "INSERT INTO public.\"ProviderCandlestickSyncInfos\" (\"ProviderId\", \"TimeframeId\", \"LastCandlestickSync\") " +
                                  "VALUES (@DataProvider, @Timeframe, @LastCandlestickSync) " +
                                  "ON CONFLICT (\"ProviderId\", \"TimeframeId\") DO UPDATE SET " +
                                  "\"LastCandlestickSync\" = EXCLUDED.\"LastCandlestickSync\"";
 
-            NpgsqlTransaction? transaction = null;
             try
             {
+                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
-                transaction = await dbConnection.BeginTransactionAsync();
 
-                await dbConnection.ExecuteAsync(query, candlestickSyncInfos, transaction: transaction);
+                using var transaction = await dbConnection.BeginTransactionAsync();
+                await dbConnection.ExecuteAsync(query, candlestickSyncInfo, transaction: transaction);
                 await transaction.CommitAsync();
             }
             catch (Exception exception)
             {
                 logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfoAsync), exception);
-                await transaction?.RollbackAsync();
-            }
-            finally
-            {
-                await dbConnection.CloseAsync();
-                transaction?.DisposeAsync();
             }
         }
 
@@ -404,7 +401,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             finally
             {
                 await dbConnection.CloseAsync();
-                transaction?.DisposeAsync();
+                if (transaction != null)
+                {
+                    await transaction.DisposeAsync();
+                }
             }
         }
 
