@@ -30,7 +30,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
             catch (Exception exception)
             {
-                logger.LogWarning("Method {Method}, exception {exception}", nameof(GetAlpacaData), exception);
+                logger.LogError("Method {Method}, exception {exception}", nameof(GetAlpacaData), exception);
                 return Result<IMultiPage<IBar>, string>.Fail(exception.ToString());
             }
         }
