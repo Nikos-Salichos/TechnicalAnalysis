@@ -35,7 +35,6 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public Task<IActionResult> SynchronizeProvidersAsync([FromQuery] DataProvider dataProvider, Timeframe timeframe)
         {
             var dataProviderTimeframeRequest = new DataProviderTimeframeRequest(dataProvider, timeframe);
-
             _logger.LogInformation("Method: {SynchronizeProvidersAsync} , dataProviderTimeframeRequest {@dataProviderTimeframeRequest}",
                  nameof(SynchronizeProvidersAsync), dataProviderTimeframeRequest);
 
