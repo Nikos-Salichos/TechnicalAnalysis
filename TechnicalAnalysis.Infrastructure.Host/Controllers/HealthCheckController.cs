@@ -7,8 +7,10 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 {
     [Route("api/healthcheck")]
     [ApiController]
-    public class HealthCheckController(IHealthCheckRepository healthCheckService) : ControllerBase
+    public class HealthCheckController(IHealthCheckRepository healthCheckService, ILogger<HealthCheckController> logger) : ControllerBase
     {
+        private readonly ILogger<HealthCheckController> _logger = logger;
+
         [HttpGet("CheckPostgreSqlHealth")]
         public async Task<IActionResult> CheckHealthAsync()
         {
