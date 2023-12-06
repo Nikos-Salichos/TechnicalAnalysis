@@ -13,5 +13,10 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         {
             DataProvider = dataProvider;
         }
+
+        public ProviderCandlestickSyncInfo()
+        {
+
+        }
     }
 }
