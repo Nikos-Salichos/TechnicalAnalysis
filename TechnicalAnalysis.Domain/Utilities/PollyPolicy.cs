@@ -5,18 +5,13 @@ using TechnicalAnalysis.Domain.Interfaces;
 
 namespace TechnicalAnalysis.Domain.Utilities
 {
-    public class PollyPolicy : IPollyPolicy
+    public class PollyPolicy(ILogger<PollyPolicy> logger) : IPollyPolicy
     {
-        private readonly ILogger<PollyPolicy> _logger;
-
-        public PollyPolicy(ILogger<PollyPolicy> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<PollyPolicy> _logger = logger;
 
         public IAsyncPolicy<T> CreatePolicies<T>(int retries, TimeSpan timeout)
         {
-            Random random = new Random();
+            Random random = new();
 
             return Policy.WrapAsync(
                     Policy.TimeoutAsync<T>(timeout, TimeoutStrategy.Optimistic, onTimeoutAsync: (context, timespan, task) =>
@@ -30,7 +25,7 @@ namespace TechnicalAnalysis.Domain.Utilities
                             return TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
                                         + TimeSpan.FromMilliseconds(random.Next(0, 1000));
                         },
-                        onRetry: (exception, delay, retryAttempt, context) =>
+                        onRetry: (exception, delay, retryAttempt, _) =>
                         {
                             _logger.LogError("Retry attempt {retryAttempt} of {retries}. Delaying for {delay.TotalSeconds} seconds. Exception: {exception}",
                                 retryAttempt, retries, delay.TotalSeconds, exception.Exception);
