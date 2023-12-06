@@ -13,5 +13,11 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         {
             DataProvider = dataProvider;
         }
+
+        //Need it for Dapper
+        public ProviderPairAssetSyncInfo()
+        {
+
+        }
     }
 }
