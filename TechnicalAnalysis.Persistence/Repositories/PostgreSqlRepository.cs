@@ -379,7 +379,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 string query = $"DELETE FROM \"{tableName}\" WHERE \"Id\" = ANY(@Ids)";
 
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
                 using var transaction = await dbConnection.BeginTransactionAsync();
