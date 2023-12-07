@@ -42,7 +42,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             try
             {
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 const string query = "SELECT \"Id\" AS PrimaryId, " +
                     "\"open_date\" AS OpenDate, " +
                     "\"open_price\" AS OpenPrice, " +
