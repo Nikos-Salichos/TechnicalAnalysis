@@ -134,7 +134,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             try
             {
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 const string query = "SELECT \"Id\" AS PrimaryId, \"DexId\" AS Provider, \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", " +
                                      "\"FeeTier\" AS FeeTier, \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\" " +
                                      "FROM \"Pools\"";
