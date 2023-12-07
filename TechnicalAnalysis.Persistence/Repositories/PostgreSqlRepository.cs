@@ -357,7 +357,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                using var transaction = await dbConnection.BeginTransactionAsync();
+                await using var transaction = await dbConnection.BeginTransactionAsync();
                 await dbConnection.ExecuteAsync(query, candlestickSyncInfo, transaction: transaction);
                 await transaction.CommitAsync();
             }
