@@ -8,7 +8,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
 {
     public static class InfrastructureHostModule
     {
-        public static IServiceCollection AddInfrastructureHostModule(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureHostModule(this IServiceCollection services)
         {
             //Set Json options for controllers
             services.AddControllers().AddJsonOptions(options =>
