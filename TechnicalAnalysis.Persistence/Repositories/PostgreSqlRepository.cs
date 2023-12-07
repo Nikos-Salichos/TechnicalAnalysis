@@ -201,7 +201,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
-                using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\") FROM STDIN BINARY");
+                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\") FROM STDIN BINARY");
 
                 foreach (var asset in assets)
                 {
