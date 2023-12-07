@@ -152,7 +152,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             try
             {
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 const string query = "SELECT \"Id\" AS PrimaryId, \"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\" AS OpenPrice, \"High\" AS HighPrice, \"Low\" AS LowPrice, " +
                                      "\"Close\" AS ClosePrice, \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\" " +
                                      "FROM \"DexCandlesticks\"";
