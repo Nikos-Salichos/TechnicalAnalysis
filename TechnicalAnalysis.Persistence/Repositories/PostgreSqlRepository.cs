@@ -68,7 +68,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             try
             {
-                using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
                 const string query = "SELECT \"id\" AS PrimaryId, \"symbol\" AS Symbol, \"asset0_id\" AS BaseAssetId, \"asset1_id\" AS QuoteAssetId, \"provider_id\" AS Provider, \"is_active\" AS IsActive, \"all_candles\" AS AllCandles, \"created_at\" AS CreatedAt FROM \"Pairs\"";
                 var pairs = await dbConnection.QueryAsync<Pair>(query);
                 return Result<IEnumerable<Pair>, string>.Success(pairs);
