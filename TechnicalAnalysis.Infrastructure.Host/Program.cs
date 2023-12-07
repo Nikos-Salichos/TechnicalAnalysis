@@ -1,12 +1,10 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.OpenApi.Models;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using TechnicalAnalysis.Application.Modules;
 using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host.Hangfire;
 using TechnicalAnalysis.Infrastructure.Host.Middleware;
+using TechnicalAnalysis.Infrastructure.Host.Modules;
 using TechnicalAnalysis.Infrastructure.Host.Serilog;
 using TechnicalAnalysis.Infrastructure.Host.Services;
 using TechnicalAnalysis.Infrastructure.Persistence.Modules;
@@ -23,43 +21,12 @@ builder.Configuration
 builder.SerilogConfiguration();
 #endregion Serilog
 
-#region Log Http Requests
-builder.Services.AddHttpLogging(options =>
-{
-    options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
-    options.CombineLogs = true;
-});
-#endregion Log Http Requests
-
-#region Cors
-builder.Services.ConfigureCors();
-#endregion Cors
-
-#region Enums in Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    options.UseInlineDefinitionsForEnums();
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-});
-#endregion Enums in Swagger
-
-#region Accept Json in Controller
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-});
-#endregion Accept Json in Controller
-
 #region Layer Modules
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
+builder.Services.AddInfrastructureHostModule(builder.Configuration);
 #endregion Layer Modules
-
-#region Brotli Compression
-builder.Services.ConfigureCompression();
-#endregion Brotli Compression
 
 builder.Services.AddAntiforgery(options =>
 {
@@ -70,8 +37,11 @@ builder.Services.AddAntiforgery(options =>
 builder.Services.ConfigureRateLimit();
 #endregion Api Rate Limit
 
-builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
-builder.Services.AddHangfireServer();
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
+    builder.Services.AddHangfireServer();
+}
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -99,13 +69,12 @@ app.UseRateLimiter();
 
 app.UseMiddleware<SecureHeadersMiddleware>();
 
-app.UseHangfireDashboard("/hangfire", new DashboardOptions()
-{
-    Authorization = new[] { new DashboardNoAuthorizationFilter() }
-});
-
 if (app.Environment.IsProduction())
 {
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+    {
+        Authorization = new[] { new DashboardNoAuthorizationFilter() }
+    });
     HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
 }
 
