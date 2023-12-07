@@ -354,7 +354,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
             try
             {
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
                 await using var transaction = await dbConnection.BeginTransactionAsync();
