@@ -23,10 +23,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             try
             {
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol FROM \"Assets\"";
-                var assets = await dbConnection.QueryAsync<Asset>(query);
-                return Result<IEnumerable<Asset>, string>.Success(assets);
+                return await ExecutionTimeLogger.LogExecutionTime(async () =>
+                {
+                    await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                    const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol FROM \"Assets\"";
+                    var assets = await dbConnection.QueryAsync<Asset>(query);
+                    return Result<IEnumerable<Asset>, string>.Success(assets);
+                }, logger, nameof(GetAssetsAsync));
             }
             catch (Exception exception)
             {
@@ -107,10 +110,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 var providerSynchronizations = new List<ProviderSynchronization>();
                 foreach (var providerPairAssetSyncInfo in providerPairAssetSyncInfos)
                 {
-                    var providerSynchronization = new ProviderSynchronization(providerPairAssetSyncInfo.DataProvider)
-                    {
-                        ProviderPairAssetSyncInfo = providerPairAssetSyncInfo
-                    };
+                    var providerSynchronization = ProviderSynchronization.Create(providerPairAssetSyncInfo.DataProvider);
+                    providerSynchronization.ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
                     providerSynchronizations.Add(providerSynchronization);
                 }
 
