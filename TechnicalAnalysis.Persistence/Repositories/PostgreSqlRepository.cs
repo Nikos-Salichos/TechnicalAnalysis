@@ -173,7 +173,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") FROM STDIN BINARY");
+                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") FROM STDIN BINARY");
 
                 foreach (var pair in pairs)
                 {
@@ -199,7 +199,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             try
             {
-                using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
                 using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\") FROM STDIN BINARY");
 
