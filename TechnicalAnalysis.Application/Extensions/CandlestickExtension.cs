@@ -45,7 +45,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 var candles = pair.BinanceCandlesticks.OrderBy(c => c.OpenTime);
                 BinanceCandlestick previousCandle = null;
-                foreach (var currentCandle in candles) // skip first candle since we've already set expectedStartTime and expectedEndTime
+                foreach (var currentCandle in candles)
                 {
                     if (previousCandle != null)
                     {
@@ -63,7 +63,7 @@ namespace TechnicalAnalysis.Application.Extensions
                             }
                         }
                     }
-                    previousCandle = currentCandle; // update previousCandle for the next iteration
+                    previousCandle = currentCandle;
                 }
 
                 if (missingDates.Count > 0)
@@ -107,13 +107,23 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static Timeframe ToTimeFrame(this string period)
         {
-            return period.ToLower() switch
+            if (string.Equals(period, "1d", StringComparison.InvariantCultureIgnoreCase))
             {
-                "1d" => Timeframe.Daily,
-                "1w" => Timeframe.Weekly,
-                "1h" => Timeframe.OneHour,
-                _ => throw new ArgumentException($"Invalid period: {period}"),
-            };
+                return Timeframe.Daily;
+            }
+            else if (string.Equals(period, "1w", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return Timeframe.Weekly;
+            }
+            else if (string.Equals(period, "1h", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return Timeframe.OneHour;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid period: {period}");
+            }
         }
+
     }
 }
