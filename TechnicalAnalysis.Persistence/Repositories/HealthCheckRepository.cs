@@ -12,7 +12,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            using var connection = new NpgsqlConnection(_connectionStringKey);
+            await using var connection = new NpgsqlConnection(_connectionStringKey);
             try
             {
                 await connection.OpenAsync(cancellationToken);
