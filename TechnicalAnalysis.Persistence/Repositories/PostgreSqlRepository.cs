@@ -104,22 +104,36 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                                             FROM
                                                 public.""ProviderCandlestickSyncInfos"" p";
 
-                var providerPairAssetSyncInfos = await dbConnection.QueryAsync<ProviderPairAssetSyncInfo>(providerPairAssetSyncInfoQuery);
-                var providerCandlestickSyncInfos = await dbConnection.QueryAsync<ProviderCandlestickSyncInfo>(providerCandlestickSyncInfoQuery);
+                var syncInfos = await dbConnection.QueryMultipleAsync(providerPairAssetSyncInfoQuery + ";" + providerCandlestickSyncInfoQuery);
 
-                var providerSynchronizations = new List<ProviderSynchronization>();
-                foreach (var providerPairAssetSyncInfo in providerPairAssetSyncInfos)
-                {
-                    var providerSynchronization = ProviderSynchronization.Create(providerPairAssetSyncInfo.DataProvider);
-                    providerSynchronization.ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
-                    providerSynchronizations.Add(providerSynchronization);
-                }
+                var providerPairAssetSyncInfos = await syncInfos.ReadAsync<ProviderPairAssetSyncInfo>();
+                var providerCandlestickSyncInfos = await syncInfos.ReadAsync<ProviderCandlestickSyncInfo>();
 
-                foreach (var providerCandlestickSyncInfo in providerCandlestickSyncInfos)
-                {
-                    var providerSynchronizationFound = providerSynchronizations.Find(p => p.DataProvider == providerCandlestickSyncInfo.DataProvider);
-                    providerSynchronizationFound?.CandlestickSyncInfos.Add(providerCandlestickSyncInfo);
-                }
+                var providerSynchronizations = providerPairAssetSyncInfos
+                            .GroupJoin(providerCandlestickSyncInfos, pair => pair.DataProvider, candlestick => candlestick.DataProvider,
+                                (pair, candlesticks) => new ProviderSynchronization
+                                {
+                                    ProviderPairAssetSyncInfo = pair,
+                                    CandlestickSyncInfos = candlesticks.ToList()
+                                })
+                            .ToList();
+
+                //var providerPairAssetSyncInfos = await dbConnection.QueryAsync<ProviderPairAssetSyncInfo>(providerPairAssetSyncInfoQuery);
+                //var providerCandlestickSyncInfos = await dbConnection.QueryAsync<ProviderCandlestickSyncInfo>(providerCandlestickSyncInfoQuery);
+
+                /*                var providerSynchronizations = new List<ProviderSynchronization>();
+                                foreach (var providerPairAssetSyncInfo in providerPairAssetSyncInfos)
+                                {
+                                    var providerSynchronization = ProviderSynchronization.Create(providerPairAssetSyncInfo.DataProvider);
+                                    providerSynchronization.ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
+                                    providerSynchronizations.Add(providerSynchronization);
+                                }
+
+                                foreach (var providerCandlestickSyncInfo in providerCandlestickSyncInfos)
+                                {
+                                    var providerSynchronizationFound = providerSynchronizations.Find(p => p.DataProvider == providerCandlestickSyncInfo.DataProvider);
+                                    providerSynchronizationFound?.CandlestickSyncInfos.Add(providerCandlestickSyncInfo);
+                                }*/
 
                 return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
             }
@@ -335,7 +349,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                using var transaction = await dbConnection.BeginTransactionAsync();
+                await using var transaction = await dbConnection.BeginTransactionAsync();
                 await dbConnection.ExecuteAsync(query, providerPairAssetSyncInfo, transaction: transaction);
                 await transaction.CommitAsync();
             }
@@ -375,7 +389,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 throw new ArgumentException("Invalid table");
             }
 
-            async Task DeleteEntitiesAsync()
+            try
             {
                 string query = $"DELETE FROM \"{tableName}\" WHERE \"Id\" = ANY(@Ids)";
 
@@ -385,11 +399,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 await using var transaction = await dbConnection.BeginTransactionAsync();
                 await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
                 await transaction.CommitAsync();
-            }
-
-            try
-            {
-                await DeleteEntitiesAsync();
             }
             catch (Exception exception)
             {
