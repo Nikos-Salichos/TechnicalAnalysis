@@ -5,19 +5,8 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
     public class ProviderPairAssetSyncInfo : BaseEntity
     {
-        public DataProvider DataProvider { get; set; }
+        public DataProvider DataProvider { get; init; }
         public DateTime LastAssetSync { get; set; }
         public DateTime LastPairSync { get; set; }
-
-        public ProviderPairAssetSyncInfo(DataProvider dataProvider)
-        {
-            DataProvider = dataProvider;
-        }
-
-        //Need it for Dapper
-        public ProviderPairAssetSyncInfo()
-        {
-
-        }
     }
 }
