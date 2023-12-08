@@ -33,7 +33,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
         [JsonPropertyOrder(9)]
         public long? NumberOfTrades { get; init; }
 
-        public string Period { get; set; }
+        public string Period { get; set; } = string.Empty;
 
         public long PairId { get; set; }
     }
