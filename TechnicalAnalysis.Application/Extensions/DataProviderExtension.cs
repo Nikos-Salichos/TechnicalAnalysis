@@ -7,8 +7,8 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static bool IsProviderSyncedToday(this ProviderSynchronization provider, Timeframe timeframe)
         {
-            if (provider?.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
-                && provider?.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date
+            if (provider?.ProviderPairAssetSyncInfo?.LastAssetSync.Date == DateTime.UtcNow.Date
+                && provider?.ProviderPairAssetSyncInfo?.LastPairSync.Date == DateTime.UtcNow.Date
                 && provider.CandlestickSyncInfos.Any(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
                     && candlestickSyncInfo.Timeframe == timeframe
@@ -22,8 +22,8 @@ namespace TechnicalAnalysis.Application.Extensions
 
             int dayDifference = (currentDayOfWeek - DayOfWeek.Monday + 7) % 7;
 
-            if (provider?.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
-            && provider?.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date
+            if (provider?.ProviderPairAssetSyncInfo?.LastAssetSync.Date == DateTime.UtcNow.Date
+            && provider?.ProviderPairAssetSyncInfo?.LastPairSync.Date == DateTime.UtcNow.Date
             && provider.CandlestickSyncInfos.Any(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
                     && dayDifference > 0
@@ -38,6 +38,10 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static void UpdateProviderInfo(this ProviderSynchronization provider)
         {
+            if (provider is null)
+            {
+                return;
+            }
             var currentTime = DateTime.UtcNow;
             provider.ProviderPairAssetSyncInfo.LastAssetSync = currentTime;
             provider.ProviderPairAssetSyncInfo.LastPairSync = currentTime;
@@ -50,12 +54,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             if (providerCandlestickSyncInfoProviderFound is null)
             {
-                var newProviderCandlestickSyncInfo = new ProviderCandlestickSyncInfo(providerSynchronization.DataProvider)
-                {
-                    Timeframe = timeframe,
-                    LastCandlestickSync = DateTime.UtcNow
-                };
-
+                var newProviderCandlestickSyncInfo = ProviderCandlestickSyncInfo.Create(providerSynchronization.DataProvider, timeframe, DateTime.UtcNow);
                 providerSynchronization.CandlestickSyncInfos.Add(newProviderCandlestickSyncInfo);
                 return newProviderCandlestickSyncInfo;
             }
