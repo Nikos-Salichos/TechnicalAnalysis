@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(IEnumerable<PairExtended> pairs)
         {
-            var preCalcCandlesticks = pairs.ToImmutableDictionary(
+            var preCalculationCandlesticks = pairs.ToImmutableDictionary(
                 pair => pair.PrimaryId,
                 pair => pair
                     .Candlesticks
@@ -30,15 +30,8 @@ namespace TechnicalAnalysis.Application.Extensions
             );
 
             // Outside of the loop
-            ConcurrentDictionary<long, double[]> preCalcCandlestickArrays = new ConcurrentDictionary<long, double[]>();
+            ConcurrentDictionary<long, double[]> preCalcCandlestickArrays = new();
 
-            // Convert to arrays once, for faster access
-            foreach (var preCalcCandlestick in preCalcCandlesticks)
-            {
-                preCalcCandlestickArrays[preCalcCandlestick.Key] = preCalcCandlestick.Value.ToArray();
-            }
-
-            // Main loop
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair =>
             {
                 if (pair.Candlesticks.Count == 0)
@@ -80,14 +73,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
             });
-
-
-
-
-
         }
-
-
 
     }
 }
