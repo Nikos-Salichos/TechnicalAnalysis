@@ -22,11 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var alpacaProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
-            if (alpacaProvider == null)
-            {
-                alpacaProvider = new ProviderSynchronization(provider);
-                alpacaProvider.DataProvider = provider;
-            }
+            alpacaProvider ??= ProviderSynchronization.Create(provider);
 
             var stockSymbols = new List<string> {
                 "vt","vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
