@@ -3,13 +3,12 @@ using NetArchTest.Rules;
 
 namespace TechnicalAnalysis.Tests.ArchitectureTests
 {
-    [Trait("Category", "Architecture")]
     public class ContractTest
     {
         [Fact]
         public void CommonModels_ShouldNotHaveAnyDependency()
         {
-            var noDependenciesResult = Types.InNamespace(BaseArchitectureSetup.CommonModelsProject)
+            var result = Types.InNamespace(typeof(CommonModels.BaseClasses.BaseEntity).Namespace)
                 .Should()
                 .NotHaveDependencyOnAny(BaseArchitectureSetup.InfrastructurePersistenceProject,
                     BaseArchitectureSetup.InfrastructureAdaptersProject,
@@ -19,7 +18,7 @@ namespace TechnicalAnalysis.Tests.ArchitectureTests
                     BaseArchitectureSetup.DomainProject)
                 .GetResult();
 
-            noDependenciesResult.IsSuccessful.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
         }
     }
 }
