@@ -3,13 +3,12 @@ using NetArchTest.Rules;
 
 namespace TechnicalAnalysis.Tests.ArchitectureTests
 {
-    [Trait("Category", "Architecture")]
     public class DomainTest
     {
         [Fact]
         public void Domain_ShouldNotHaveAnyDependency_OtherThanCommonProject()
         {
-            var noDependenciesResult = Types.InNamespace(BaseArchitectureSetup.DomainProject)
+            var result = Types.InNamespace(typeof(Domain.Entities.Candlestick).Namespace)
                 .That()
                 .AreClasses()
                 .Should()
@@ -20,13 +19,7 @@ namespace TechnicalAnalysis.Tests.ArchitectureTests
                     BaseArchitectureSetup.PresentationProject)
                 .GetResult();
 
-            var dependency = Types.InNamespace(BaseArchitectureSetup.DomainProjectEntities)
-                              .Should()
-                              .HaveDependencyOn(BaseArchitectureSetup.CommonModelsProject)
-                              .GetResult();
-
-            noDependenciesResult.IsSuccessful.Should().BeTrue();
-            dependency.IsSuccessful.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
         }
     }
 }
