@@ -37,10 +37,11 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
             {
                 // Register the database configuration
                 var configurationBuilder = new ConfigurationBuilder();
-                configurationBuilder.AddInMemoryCollection(new Dictionary<string, string>
+                configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     {"ConnectionStrings:PostgreSqlTechnicalAnalysisDockerCompose", connectionString}
                 });
+
                 var configuration = configurationBuilder.Build();
 
                 services.AddSingleton<IConfiguration>(configuration);
