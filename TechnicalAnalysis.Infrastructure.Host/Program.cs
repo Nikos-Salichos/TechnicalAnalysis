@@ -25,7 +25,7 @@ builder.SerilogConfiguration();
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
-builder.Services.AddInfrastructureHostModule(builder.Configuration);
+builder.Services.AddInfrastructureHostModule();
 #endregion Layer Modules
 
 builder.Services.AddAntiforgery(options =>
