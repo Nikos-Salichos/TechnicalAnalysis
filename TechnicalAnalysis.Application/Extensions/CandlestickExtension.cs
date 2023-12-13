@@ -31,8 +31,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
             else if (property.PropertyType == typeof(long) || property.PropertyType == typeof(long?))
             {
-                long.TryParse(cell.ToString(), out var value);
-                property.SetValue(candlestick, value);
+                if (long.TryParse(cell.ToString(), out var value))
+                {
+                    property.SetValue(candlestick, value);
+                }
             }
         }
 
