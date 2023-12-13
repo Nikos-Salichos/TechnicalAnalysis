@@ -24,7 +24,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (dexV3Provider == null)
             {
-                dexV3Provider = new ProviderSynchronization(provider);
+                dexV3Provider = new ProviderSynchronization();
                 dexV3Provider.DataProvider = provider;
             }
 
