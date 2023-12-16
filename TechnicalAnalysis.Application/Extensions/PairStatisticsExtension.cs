@@ -1,9 +1,7 @@
 ﻿using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using TechnicalAnalysis.CommonModels.BusinessModels;
-using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Application.Extensions
 {
@@ -29,10 +27,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     .ToList()
             );
 
-            // Outside of the loop
-            ConcurrentDictionary<long, double[]> preCalcCandlestickArrays = new();
-
-            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair =>
+            foreach (var pair in pairs)
             {
                 if (pair.Candlesticks.Count == 0)
                 {
@@ -50,8 +45,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 nameof(pair.QuoteAssetContract), pair.QuoteAssetContract,
                 nameof(pair.QuoteAssetName), pair.QuoteAssetName);
 
-                var currentPairOrderedCandles = preCalcCandlestickArrays[pair.PrimaryId];
-                int currentPairOrderedCandlesLength = currentPairOrderedCandles.Length;
+                var currentPairOrderedCandles = preCalculationCandlesticks[pair.PrimaryId];
+                int currentPairOrderedCandlesLength = currentPairOrderedCandles.Count;
 
                 foreach (var correlatedPair in pairs)
                 {
@@ -60,8 +55,8 @@ namespace TechnicalAnalysis.Application.Extensions
                         continue;
                     }
 
-                    var otherPairOrderedCandles = preCalcCandlestickArrays[correlatedPair.PrimaryId];
-                    int desiredLength = Math.Min(otherPairOrderedCandles.Length, currentPairOrderedCandlesLength);
+                    var otherPairOrderedCandles = preCalculationCandlesticks[correlatedPair.PrimaryId];
+                    int desiredLength = Math.Min(otherPairOrderedCandles.Count, currentPairOrderedCandlesLength);
 
                     for (int i = 0; i < desiredLength; i++)
                     {
@@ -72,7 +67,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         pair.Candlesticks[i].CorrelationPerPair.TryAdd(correlatedPair.BaseAssetName, correlation);
                     }
                 }
-            });
+            }
         }
 
     }
