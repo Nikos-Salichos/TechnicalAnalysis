@@ -113,27 +113,11 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                             .GroupJoin(providerCandlestickSyncInfos, pair => pair.DataProvider, candlestick => candlestick.DataProvider,
                                 (pair, candlesticks) => new ProviderSynchronization
                                 {
+                                    DataProvider = pair.DataProvider,
                                     ProviderPairAssetSyncInfo = pair,
                                     CandlestickSyncInfos = candlesticks.ToList()
                                 })
                             .ToList();
-
-                //var providerPairAssetSyncInfos = await dbConnection.QueryAsync<ProviderPairAssetSyncInfo>(providerPairAssetSyncInfoQuery);
-                //var providerCandlestickSyncInfos = await dbConnection.QueryAsync<ProviderCandlestickSyncInfo>(providerCandlestickSyncInfoQuery);
-
-                /*                var providerSynchronizations = new List<ProviderSynchronization>();
-                                foreach (var providerPairAssetSyncInfo in providerPairAssetSyncInfos)
-                                {
-                                    var providerSynchronization = ProviderSynchronization.Create(providerPairAssetSyncInfo.DataProvider);
-                                    providerSynchronization.ProviderPairAssetSyncInfo = providerPairAssetSyncInfo;
-                                    providerSynchronizations.Add(providerSynchronization);
-                                }
-
-                                foreach (var providerCandlestickSyncInfo in providerCandlestickSyncInfos)
-                                {
-                                    var providerSynchronizationFound = providerSynchronizations.Find(p => p.DataProvider == providerCandlestickSyncInfo.DataProvider);
-                                    providerSynchronizationFound?.CandlestickSyncInfos.Add(providerCandlestickSyncInfo);
-                                }*/
 
                 return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
             }
