@@ -458,6 +458,7 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
 
+            //TODO I need to pass all pairs
             pairs.CalculatePairStatistics();
 
             CountPairsWithEnhancedScanIsBuy(pairs);
