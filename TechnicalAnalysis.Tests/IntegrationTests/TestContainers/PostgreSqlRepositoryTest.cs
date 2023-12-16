@@ -13,7 +13,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
         {
             List<Asset> assets = new List<Asset>
             {
-                new Asset { Symbol = "TestContainersAsset" , CreatedDate = DateTime.Now},
+                new Asset { Symbol = "TestContainersAsset" },
             };
 
             await PostgreSqlRepository.InsertAssetsAsync(assets);
