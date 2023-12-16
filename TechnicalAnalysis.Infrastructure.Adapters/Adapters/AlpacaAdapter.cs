@@ -179,7 +179,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 else if (latestCandlestickOpenTime == default && period == Timeframe.OneHour)
                 {
                     fromDatetime = DateTime.UtcNow.AddHours(1).Date.AddHours(DateTime.UtcNow.AddHours(1).Hour).AddYears(-10);
-                    toDatetime = DateTime.Now.Date.AddHours(DateTime.Now.Hour - 1).AddMinutes(59).AddSeconds(59);
+                    toDatetime = DateTime.UtcNow.Date.AddHours(DateTime.UtcNow.Hour - 1).AddMinutes(59).AddSeconds(59);
                 }
 
                 foreach (var dateRange in DatetimeExtension.GetDailyDateRanges(fromDatetime, toDatetime))
