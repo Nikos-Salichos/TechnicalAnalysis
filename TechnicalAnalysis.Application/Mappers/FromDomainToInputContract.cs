@@ -36,7 +36,6 @@ namespace TechnicalAnalysis.Application.Mappers
                 Provider = pair.Provider,
                 IsActive = pair.IsActive,
                 AllCandles = pair.AllCandles,
-                CreatedAt = pair.CreatedAt,
                 BinanceCandlesticks = pair.Candlesticks.ConvertAll(c => c.ToContract())
             };
         }
