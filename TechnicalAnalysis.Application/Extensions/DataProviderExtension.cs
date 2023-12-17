@@ -7,9 +7,14 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static bool IsProviderSyncedToday(this ProviderSynchronization provider, Timeframe timeframe)
         {
-            if (provider?.ProviderPairAssetSyncInfo?.LastAssetSync.Date == DateTime.UtcNow.Date
-                && provider?.ProviderPairAssetSyncInfo?.LastPairSync.Date == DateTime.UtcNow.Date
-                && provider.CandlestickSyncInfos.Any(candlestickSyncInfo =>
+            if (provider is null)
+            {
+                return false;
+            }
+
+            if (provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
+                && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date
+                && provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
                     && candlestickSyncInfo.Timeframe == timeframe
                     && timeframe == Timeframe.Daily))
@@ -22,9 +27,9 @@ namespace TechnicalAnalysis.Application.Extensions
 
             int dayDifference = (currentDayOfWeek - DayOfWeek.Monday + 7) % 7;
 
-            if (provider?.ProviderPairAssetSyncInfo?.LastAssetSync.Date == DateTime.UtcNow.Date
-            && provider?.ProviderPairAssetSyncInfo?.LastPairSync.Date == DateTime.UtcNow.Date
-            && provider.CandlestickSyncInfos.Any(candlestickSyncInfo =>
+            if (provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
+            && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date
+            && provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
                     && dayDifference > 0
                     && candlestickSyncInfo.Timeframe == timeframe
@@ -42,9 +47,8 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 return;
             }
-            var currentTime = DateTime.UtcNow;
-            provider.ProviderPairAssetSyncInfo.LastAssetSync = currentTime;
-            provider.ProviderPairAssetSyncInfo.LastPairSync = currentTime;
+            provider.ProviderPairAssetSyncInfo.LastAssetSync = DateTime.UtcNow;
+            provider.ProviderPairAssetSyncInfo.LastPairSync = DateTime.UtcNow;
         }
 
         public static ProviderCandlestickSyncInfo GetOrCreateProviderCandlestickSyncInfo(this ProviderSynchronization providerSynchronization, DataProvider provider, Timeframe timeframe)
@@ -54,7 +58,12 @@ namespace TechnicalAnalysis.Application.Extensions
 
             if (providerCandlestickSyncInfoProviderFound is null)
             {
-                var newProviderCandlestickSyncInfo = ProviderCandlestickSyncInfo.Create(providerSynchronization.DataProvider, timeframe, DateTime.UtcNow);
+                var newProviderCandlestickSyncInfo = new ProviderCandlestickSyncInfo
+                {
+                    DataProvider = providerSynchronization.DataProvider,
+                    Timeframe = timeframe,
+                    LastCandlestickSync = DateTime.UtcNow
+                };
                 providerSynchronization.CandlestickSyncInfos.Add(newProviderCandlestickSyncInfo);
                 return newProviderCandlestickSyncInfo;
             }
