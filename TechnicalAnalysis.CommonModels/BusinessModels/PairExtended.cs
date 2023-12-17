@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public string BaseAssetName { get; set; } = string.Empty;
         public string QuoteAssetName { get; set; } = string.Empty;
         public DataProvider Provider { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
         public bool AllCandles { get; init; }
         public DateTime CreatedAt { get; init; }
         public string FeeTier { get; init; } = string.Empty;
