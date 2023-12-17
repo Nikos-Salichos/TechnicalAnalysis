@@ -1,7 +1,7 @@
 ﻿using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Logging;
-using System.Collections.Immutable;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Application.Extensions
 {
@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(IEnumerable<PairExtended> pairs)
         {
-            var preCalculationCandlesticks = pairs.ToImmutableDictionary(
+            var preCalculationCandlesticks = pairs.ToDictionary(
                 pair => pair.PrimaryId,
                 pair => pair
                     .Candlesticks
@@ -24,29 +24,20 @@ namespace TechnicalAnalysis.Application.Extensions
                     .Select(c => c.ClosePrice)
                     .Where(d => d.HasValue)
                     .Select(d => (double)d.Value)
-                    .ToList()
+                    .ToArray()
             );
 
-            foreach (var pair in pairs)
+            var candlestickLength = pairs.ToDictionary(pair => pair.PrimaryId, pair => pair.Candlesticks.Count);
+
+            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair =>
             {
-                if (pair.Candlesticks.Count == 0)
+                int currentPairLength = candlestickLength[pair.PrimaryId];
+                if (currentPairLength == 0)
                 {
                     return;
                 }
 
-                Logger.LogInformation("Method name: {MethodName} - Pair details - {PairPropertyName}: {PairName}, " +
-                "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
-                "{BaseAssetNamePropertyName}: {BaseAssetName}, " +
-                "{QuoteAssetContractPropertyName}: {QuoteAssetContract}, " +
-                "{QuoteAssetNamePropertyName}: {QuoteAssetName}", nameof(CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks),
-                nameof(pair.Symbol), pair.Symbol,
-                nameof(pair.BaseAssetContract), pair.BaseAssetContract,
-                nameof(pair.BaseAssetName), pair.BaseAssetName,
-                nameof(pair.QuoteAssetContract), pair.QuoteAssetContract,
-                nameof(pair.QuoteAssetName), pair.QuoteAssetName);
-
-                var currentPairOrderedCandles = preCalculationCandlesticks[pair.PrimaryId];
-                int currentPairOrderedCandlesLength = currentPairOrderedCandles.Count;
+                var currentPairCandles = preCalculationCandlesticks[pair.PrimaryId];
 
                 foreach (var correlatedPair in pairs)
                 {
@@ -55,19 +46,19 @@ namespace TechnicalAnalysis.Application.Extensions
                         continue;
                     }
 
-                    var otherPairOrderedCandles = preCalculationCandlesticks[correlatedPair.PrimaryId];
-                    int desiredLength = Math.Min(otherPairOrderedCandles.Count, currentPairOrderedCandlesLength);
+                    var otherPairCandles = preCalculationCandlesticks[correlatedPair.PrimaryId];
+                    int desiredLength = Math.Min(otherPairCandles.Length, currentPairLength);
 
                     for (int i = 0; i < desiredLength; i++)
                     {
-                        var currentCandlestickSubset = currentPairOrderedCandles.Take(i + 1).ToArray();
-                        var currentOtherPairCandlestickSubset = otherPairOrderedCandles.Take(i + 1).ToArray();
+                        var currentCandlestickSubset = new ArraySegment<double>(currentPairCandles, 0, i + 1);
+                        var currentOtherPairCandlestickSubset = new ArraySegment<double>(otherPairCandles, 0, i + 1);
 
                         var correlation = Correlation.Pearson(currentOtherPairCandlestickSubset, currentCandlestickSubset);
                         pair.Candlesticks[i].CorrelationPerPair.TryAdd(correlatedPair.BaseAssetName, correlation);
                     }
                 }
-            }
+            });
         }
 
     }
