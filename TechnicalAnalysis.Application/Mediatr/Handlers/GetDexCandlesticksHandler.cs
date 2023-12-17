@@ -10,7 +10,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
     {
         public async Task<IEnumerable<DexCandlestick>> Handle(GetDexCandlesticksQuery getDexCandlesticksQuery, CancellationToken cancellationToken)
         {
-            var result = await repository.GetDexCandlestickssAsync();
+            var result = await repository.GetDexCandlesticksAsync();
             if (result.IsError)
             {
                 return Enumerable.Empty<DexCandlestick>();
