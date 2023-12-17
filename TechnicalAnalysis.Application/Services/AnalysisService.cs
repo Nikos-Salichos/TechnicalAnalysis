@@ -11,6 +11,7 @@ using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.JsonOutput;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Utilities;
+using Indicator = TechnicalAnalysis.CommonModels.JsonOutput.Indicator;
 
 namespace TechnicalAnalysis.Application.Services
 {
@@ -204,7 +205,7 @@ namespace TechnicalAnalysis.Application.Services
                     continue;
                 }
 
-                if ((fractalTrend?.Signals.LastOrDefault() != null && fractalTrend?.Signals?.LastOrDefault()?.Sell == 1) || fractalTrend?.Signals.Count == 0)
+                if ((fractalTrend.Signals.Count > 0 && fractalTrend.Signals[fractalTrend.Signals.Count - 1].Sell == 1) || fractalTrend.Signals.Count == 0)
                 {
                     if ((candlestick.PriceTrend is Trend.Up && candlestick1.PriceTrend is not Trend.Up)
                         ||
@@ -284,7 +285,13 @@ namespace TechnicalAnalysis.Application.Services
         private static Indicator PrintFlagNestedBodySignals(PairExtended pair)
         {
             var indicator = new Indicator { Name = "FlagNestedBodySignals" };
-            foreach (var candlestick in pair?.Candlesticks)
+
+            if (pair.Candlesticks.Count == 0)
+            {
+                return indicator;
+            }
+
+            foreach (var candlestick in pair.Candlesticks)
             {
                 foreach (var signal in candlestick.FlagsNestedCandlesticksBody)
                 {
@@ -397,11 +404,17 @@ namespace TechnicalAnalysis.Application.Services
             var flagNestedCandlesticksBody = new Indicator { Name = "ResistanceBreakout" };
             decimal? profit = 0;
             decimal? loss = 0;
-            foreach (var candlestick in pair?.Candlesticks)
+
+            if (pair.Candlesticks.Count == 0)
+            {
+                return flagNestedCandlesticksBody;
+            }
+
+            foreach (var candlestick in pair.Candlesticks)
             {
                 foreach (var signal in candlestick.ResistanceBreakouts.Where(e => e.IsBuy))
                 {
-                    var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                    var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
 
                     var signalIndicator = new Signal
                     {
@@ -459,7 +472,7 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
 
             //TODO I need to pass all pairs
-            pairs.CalculatePairStatistics();
+            //pairs.CalculatePairStatistics();
 
             CountPairsWithEnhancedScanIsBuy(pairs);
             return pairs;
@@ -496,24 +509,22 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var pair in pairs)
             {
-                foreach (var candlestick in pair.Candlesticks)
+                foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0))
                 {
-                    var enhancedScan = candlestick.EnhancedScans.FirstOrDefault();
-                    if (enhancedScan?.EnhancedScanIsBuy == true)
+                    if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
                     {
-                        if (marketStatistic.NumberOfPairsEnhancedScanPerDate.TryGetValue(candlestick.CloseDate, out var pairsWithEnhanced))
+                        if (!marketStatistic.NumberOfPairsEnhancedScanPerDate.TryGetValue(candlestick.CloseDate, out var pairsWithEnhanced))
                         {
-                            pairsWithEnhanced.Add(pair);
-                        }
-                        else
-                        {
-                            pairsWithEnhanced = new List<PairExtended> { pair };
+                            pairsWithEnhanced = new HashSet<PairExtended>();
                             marketStatistic.NumberOfPairsEnhancedScanPerDate[candlestick.CloseDate] = pairsWithEnhanced;
                         }
+
+                        pairsWithEnhanced.Add(pair);
                     }
                 }
             }
 
+            //TODO 1/3 of pairs as condition
             var percentagesPerDate = marketStatistic.CalculateAllPercentages();
         }
     }
