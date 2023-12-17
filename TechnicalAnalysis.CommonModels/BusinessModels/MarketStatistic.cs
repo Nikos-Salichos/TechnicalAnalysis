@@ -3,10 +3,12 @@
 public class MarketStatistic
 {
     public double NumberOfPairs { get; init; }
-    public IDictionary<DateTime, List<PairExtended>> NumberOfPairsEnhancedScanPerDate { get; set; } = new Dictionary<DateTime, List<PairExtended>>();
+
+    public SortedDictionary<DateTime, HashSet<PairExtended>> NumberOfPairsEnhancedScanPerDate { get; set; } = [];
+
     public IDictionary<DateTime, double> CalculateAllPercentages()
     {
-        var percentages = new Dictionary<DateTime, double>();
+        var percentages = new Dictionary<DateTime, double>(NumberOfPairsEnhancedScanPerDate.Count);
         foreach (var (date, pairs) in NumberOfPairsEnhancedScanPerDate)
         {
             var percentage = pairs.Count / NumberOfPairs * 100;
