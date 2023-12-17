@@ -20,7 +20,7 @@ namespace TechnicalAnalysis.Application.Services
             if (httpContext?.Request.Headers.ContainsKey("C-Invalid") == false)
             {
                 var cachedPairs = await redisRepository.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
-                if (cachedPairs is not null)
+                if (cachedPairs is not null && cachedPairs.Any())
                 {
                     await communication.CreateAttachmentSendMessage(cachedPairs);
                     rabbitMqService.PublishMessage(cachedPairs);
