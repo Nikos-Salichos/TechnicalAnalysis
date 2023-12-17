@@ -110,6 +110,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
+        //TODO need to add average position
         private static void CalculateStPattern(PairExtended pair)
         {
             CandlestickExtended? currentBullFractalCandlestick = null;
@@ -161,51 +162,50 @@ namespace TechnicalAnalysis.Application.Extensions
                 decimal? highPriceOfCurrentFractal = currentBearFractalCandlestick.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value;
                 decimal? lowPriceOfCurrentFractal = currentBullFractalCandlestick.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value;
 
-                var fractalDifference = highPriceOfCurrentFractal - lowPriceOfCurrentFractal;
+                bool openPosition = false;
 
-                var candlestickAverageRange = candlestick.AverageRanges.FirstOrDefault()?.Value;
-                if (fractalDifference <= candlestickAverageRange / 2)
+                for (int j = i; j < pair.Candlesticks.Count; j++)
                 {
-                    for (int j = i; j < pair.Candlesticks.Count; j++)
+                    var currentCandlestick = pair.Candlesticks[j];
+                    var candlestick1 = pair.Candlesticks[j - 1];
+
+                    if (candlestick1 is null)
                     {
-                        var currentCandlestick = pair.Candlesticks[j];
-                        var candlestick1 = pair.Candlesticks[j - 1];
+                        continue;
+                    }
 
-                        if (candlestick1 is null)
+                    if (currentCandlestick.Fractals.Count > 0)
+                    {
+                        break;
+                    }
+
+                    if (currentCandlestick.ClosePrice >= currentBearFractalCandlestick.ClosePrice && !openPosition)
+                    {
+                        var candlestickFound = pair.Candlesticks.Find(c => c.CloseDate == currentCandlestick.CloseDate);
+
+                        if (candlestick1?.StPatternSignals.Count > 0 && candlestick1.StPatternSignals.FirstOrDefault().IsBuy)
                         {
-                            continue;
-                        }
-
-                        if (currentCandlestick.Fractals.Count > 0)
-                        {
-                            break;
-                        }
-
-                        if (currentCandlestick.ClosePrice >= currentBearFractalCandlestick.ClosePrice)
-                        {
-                            var candlestickFound = pair.Candlesticks.Find(c => c.CloseDate == currentCandlestick.CloseDate);
-
-                            if (candlestick1?.StPatternSignals.Count > 0 && candlestick1.StPatternSignals.FirstOrDefault().IsBuy)
+                            candlestickFound?.StPatternSignals.Add(new StPatternSignal(candlestickFound.PrimaryId)
                             {
-                                candlestickFound?.StPatternSignals.Add(new StPatternSignal(candlestickFound.PrimaryId)
-                                {
-                                    IsBuy = true,
-                                    IsSell = true,
-                                    NumberOfSignal = candlestick1.StPatternSignals.FirstOrDefault().NumberOfSignal + 1
-                                });
-                            }
-                            else
+                                IsBuy = true,
+                                IsSell = true,
+                                NumberOfSignal = candlestick1.StPatternSignals.FirstOrDefault().NumberOfSignal + 1
+                            });
+                            openPosition = true;
+                        }
+                        else
+                        {
+                            candlestickFound?.StPatternSignals.Add(new StPatternSignal(candlestickFound.PrimaryId)
                             {
-                                candlestickFound?.StPatternSignals.Add(new StPatternSignal(candlestickFound.PrimaryId)
-                                {
-                                    IsBuy = true,
-                                    IsSell = true,
-                                    NumberOfSignal = 1
-                                });
-                            }
+                                IsBuy = true,
+                                IsSell = true,
+                                NumberOfSignal = 1
+                            });
+                            openPosition = true;
                         }
                     }
                 }
+
             }
         }
 
