@@ -2,6 +2,7 @@
 {
     public enum DataProvider
     {
+        None = 0,
         Binance = 1,
         Uniswap = 2,
         Pancakeswap = 3,
