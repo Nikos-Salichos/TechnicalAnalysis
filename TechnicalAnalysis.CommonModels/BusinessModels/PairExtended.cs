@@ -29,7 +29,6 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         [JsonConstructor]
         public PairExtended()
         {
-
         }
     }
 
