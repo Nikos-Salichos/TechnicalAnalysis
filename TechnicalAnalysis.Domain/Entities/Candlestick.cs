@@ -16,5 +16,4 @@ namespace TechnicalAnalysis.Domain.Entities
         public DateTime CloseDate { get; init; }
         public long? NumberOfTrades { get; init; }
     }
-
 }
