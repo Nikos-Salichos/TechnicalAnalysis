@@ -10,9 +10,16 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
     public class Communication(IMailer mailService, IConfiguration configuration) : ICommunication
     {
+        private static readonly JsonSerializerOptions DefaultJsonSerializerOptions = new()
+        {
+            WriteIndented = true,
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+        };
+
         public async Task CreateAttachmentSendMessage<T>(IEnumerable<T> data)
         {
-            List<MimePart> mailInformation = new();
+            List<MimePart> mailInformation = [];
             CreateAttachment(nameof(data), ".json", mailInformation, data.ToList());
             await SendMessage(mailInformation);
         }
@@ -31,12 +38,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 
         public void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments, IEnumerable<T> data)
         {
-            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
-            });
+            string json = JsonSerializer.Serialize(data, DefaultJsonSerializerOptions);
 
             var byteArray = Encoding.UTF8.GetBytes(json);
 
