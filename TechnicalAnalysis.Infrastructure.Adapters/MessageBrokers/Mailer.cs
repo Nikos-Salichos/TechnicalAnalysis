@@ -1,5 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
@@ -7,9 +8,9 @@ using TechnicalAnalysis.Domain.Messages;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
-    public class Mailer(IOptionsMonitor<MailSettings> settings) : IMailer
+    public class Mailer(ILogger<Mailer> logger, IOptionsMonitor<MailSettings> settings) : IMailer
     {
-        public async Task SendAsync(MailData mailData, CancellationToken ct = default)
+        public async Task SendAsync(MailData mailData, CancellationToken cancellationToken)
         {
             try
             {
@@ -88,20 +89,21 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 
                 if (settings.CurrentValue.UseSSL)
                 {
-                    await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.SslOnConnect, ct);
+                    await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.SslOnConnect, cancellationToken);
                 }
                 else if (settings.CurrentValue.UseStartTls)
                 {
-                    await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.StartTls, ct);
+                    await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.StartTls, cancellationToken);
                 }
-                await smtp.AuthenticateAsync(settings.CurrentValue.EmailAddress, settings.CurrentValue.Password, ct);
-                await smtp.SendAsync(mail, ct);
-                await smtp.DisconnectAsync(true, ct);
+                await smtp.AuthenticateAsync(settings.CurrentValue.EmailAddress, settings.CurrentValue.Password, cancellationToken);
+                await smtp.SendAsync(mail, cancellationToken);
+                await smtp.DisconnectAsync(true, cancellationToken);
 
                 #endregion
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                logger.LogInformation("Method: {Method} failed to send email {exception}", nameof(SendAsync), exception);
                 throw;
             }
         }
