@@ -55,7 +55,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateAdx(quotes, candlestickLookup);
             CalculateBollingerBands(quotes, candlestickLookup);
             CalculateDonchianChannel(quotes, candlestickLookup);
-            //CalculateKeltnerChannels(pair);
+            CalculateKeltnerChannels(pair);
             CalculateKeltnerChannel(quotes, candlestickLookup);
             CalculateCci(quotes, candlestickLookup);
             CalculateAroon(quotes, candlestickLookup);
@@ -88,57 +88,57 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                     if (candlestick?.OpenPrice < lowerBandValue)
                     {
-                        candlestick?.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
+                        candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
                             Period = 20,
                             StandardDeviation = 2,
-                            MiddleBand = (decimal?)bollingerBandResult?.Sma,
-                            UpperBand = (decimal?)bollingerBandResult?.UpperBand,
-                            LowerBand = (decimal?)bollingerBandResult?.LowerBand,
-                            PercentageBandwidth = (decimal?)bollingerBandResult?.PercentB,
-                            Width = (decimal?)bollingerBandResult?.Width,
+                            MiddleBand = (decimal?)bollingerBandResult.Sma,
+                            UpperBand = (decimal?)bollingerBandResult.UpperBand,
+                            LowerBand = (decimal?)bollingerBandResult.LowerBand,
+                            PercentageBandwidth = (decimal?)bollingerBandResult.PercentB,
+                            Width = (decimal?)bollingerBandResult.Width,
                             OpenPriceOutOfBollinger = true
                         });
                     }
                     else if (candlestick?.HighPrice < lowerBandValue)
                     {
-                        candlestick?.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
+                        candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
                             Period = 20,
                             StandardDeviation = 2,
-                            MiddleBand = (decimal?)bollingerBandResult?.Sma,
-                            UpperBand = (decimal?)bollingerBandResult?.UpperBand,
-                            LowerBand = (decimal?)bollingerBandResult?.LowerBand,
-                            PercentageBandwidth = (decimal?)bollingerBandResult?.PercentB,
-                            Width = (decimal?)bollingerBandResult?.Width,
+                            MiddleBand = (decimal?)bollingerBandResult.Sma,
+                            UpperBand = (decimal?)bollingerBandResult.UpperBand,
+                            LowerBand = (decimal?)bollingerBandResult.LowerBand,
+                            PercentageBandwidth = (decimal?)bollingerBandResult.PercentB,
+                            Width = (decimal?)bollingerBandResult.Width,
                             WholeCandlestickOutOfBollinger = true
                         });
                     }
                     else if (candlestick?.ClosePrice < lowerBandValue)
                     {
-                        candlestick?.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
+                        candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
                             Period = 20,
                             StandardDeviation = 2,
-                            MiddleBand = (decimal?)bollingerBandResult?.Sma,
-                            UpperBand = (decimal?)bollingerBandResult?.UpperBand,
-                            LowerBand = (decimal?)bollingerBandResult?.LowerBand,
-                            PercentageBandwidth = (decimal?)bollingerBandResult?.PercentB,
-                            Width = (decimal?)bollingerBandResult?.Width,
+                            MiddleBand = (decimal?)bollingerBandResult.Sma,
+                            UpperBand = (decimal?)bollingerBandResult.UpperBand,
+                            LowerBand = (decimal?)bollingerBandResult.LowerBand,
+                            PercentageBandwidth = (decimal?)bollingerBandResult.PercentB,
+                            Width = (decimal?)bollingerBandResult.Width,
                             ClosePriceOutOfBollinger = true
                         });
                     }
                     else if (candlestick?.LowPrice < lowerBandValue)
                     {
-                        candlestick?.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
+                        candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
                             Period = 20,
                             StandardDeviation = 2,
-                            MiddleBand = (decimal?)bollingerBandResult?.Sma,
-                            UpperBand = (decimal?)bollingerBandResult?.UpperBand,
-                            LowerBand = (decimal?)bollingerBandResult?.LowerBand,
-                            PercentageBandwidth = (decimal?)bollingerBandResult?.PercentB,
-                            Width = (decimal?)bollingerBandResult?.Width,
+                            MiddleBand = (decimal?)bollingerBandResult.Sma,
+                            UpperBand = (decimal?)bollingerBandResult.UpperBand,
+                            LowerBand = (decimal?)bollingerBandResult.LowerBand,
+                            PercentageBandwidth = (decimal?)bollingerBandResult.PercentB,
+                            Width = (decimal?)bollingerBandResult.Width,
                             LowPriceOutOfBollinger = true
                         });
                     }
@@ -148,11 +148,11 @@ namespace TechnicalAnalysis.Application.Extensions
                         {
                             Period = 20,
                             StandardDeviation = 2,
-                            MiddleBand = (decimal?)bollingerBandResult?.Sma,
-                            UpperBand = (decimal?)bollingerBandResult?.UpperBand,
-                            LowerBand = (decimal?)bollingerBandResult?.LowerBand,
-                            PercentageBandwidth = (decimal?)bollingerBandResult?.PercentB,
-                            Width = (decimal?)bollingerBandResult?.Width,
+                            MiddleBand = (decimal?)bollingerBandResult.Sma,
+                            UpperBand = (decimal?)bollingerBandResult.UpperBand,
+                            LowerBand = (decimal?)bollingerBandResult.LowerBand,
+                            PercentageBandwidth = (decimal?)bollingerBandResult.PercentB,
+                            Width = (decimal?)bollingerBandResult.Width,
                         });
                     }
                 }
@@ -513,8 +513,8 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 // Validate indices and range
                 if (startIndex >= 0 && startIndex < count && // Make sure startIndex is valid
-                    i >= 0 && i < count &&                   // Make sure i is valid
-                    i - startIndex + 1 <= count - startIndex) // Make sure the range is valid
+                i >= 0 && i < count &&                   // Make sure i is valid
+                i - startIndex + 1 <= count - startIndex) // Make sure the range is valid
                 {
                     var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
 
@@ -576,7 +576,8 @@ namespace TechnicalAnalysis.Application.Extensions
         private static void CalculateFractalLowestHigh(PairExtended pair)
         {
             var candlesticksWithBearFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2) is not null)
-                                                                .OrderBy(c => c.OpenDate).ToList();
+                                                                .OrderBy(c => c.OpenDate)
+                                                                .ToList();
 
             int count = 1;
             for (int i = 0; i < candlesticksWithBearFractals.Count; i++)
@@ -627,7 +628,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (FractalBull?.Value <= FractalBull1?.Value)
                 {
                     count++;
-                    var candlestickInPair = pair.Candlesticks.FirstOrDefault(c => c.OpenDate == candlestick.OpenDate);
+                    var candlestickInPair = pair.Candlesticks.Find(c => c.OpenDate == candlestick.OpenDate);
                     candlestickInPair?.FractalLowests.Add(new FractalLowest(candlestick.PrimaryId,
                         count,
                         PriceType.Low,
