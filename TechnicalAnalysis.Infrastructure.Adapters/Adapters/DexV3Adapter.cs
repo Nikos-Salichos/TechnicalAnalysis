@@ -22,11 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var dexV3Provider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
-            if (dexV3Provider == null)
-            {
-                dexV3Provider = new ProviderSynchronization();
-                dexV3Provider.DataProvider = provider;
-            }
+            dexV3Provider ??= new ProviderSynchronization { DataProvider = provider };
 
             if (dexV3Provider.IsProviderSyncedToday(timeframe))
             {
@@ -58,17 +54,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             dexV3Provider.UpdateProviderInfo();
             var providerCandlestickSyncInfo = dexV3Provider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(dexV3Provider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
-
-            //var poolsOrderByTotalValueLocked = pools.Where(p => p.TotalValueLocked > 0).GetTop100PoolsByOrdering(p => p.TotalValueLocked);
-            //var poolsOrderByLiquidity = pools.Where(p => p.Liquidity > 0).GetTop100PoolsByOrdering(p => p.Liquidity);
-            //var poolsOrderByVolume = pools.Where(p => p.Volume > 0).GetTop100PoolsByOrdering(p => p.Volume);
-            //var poolsOrderByVolumeToTvlRatio = pools.Where(p => p.VolumeToTVLRatio > 0).GetTop100PoolsByOrdering(p => p.VolumeToTVLRatio);
-            //var poolsOrderByLiquidityToTvlRatio = pools.Where(p => p.LiquidityToTVLRatio > 0).GetTop100PoolsByOrdering(p => p.LiquidityToTVLRatio);
-            //var poolsOrderByTxCount = pools.Where(p => p.TxCount > 0).GetTop100PoolsByOrdering(p => p.TxCount, false);
-            //var poolsOrderByFees = pools.Where(p => p.Fees > 0).GetTop100PoolsByOrdering(p => p.Fees, false);
-
-            //Top Pools based on Max Volume of Pool Data
-            //var poolsOrderByMaxVolumeInPoolData = pools.Where(p => p.ConsecutiveHigherTvlPoolData > 0 && p.Liquidity > 0).GetTop100PoolsByOrdering(p => p.ConsecutiveHigherTvlPoolData, false);
         }
 
         private async Task<IEnumerable<PairExtended>> FormatDexAssetsPoolsCandlesticks(DataProvider provider)
@@ -135,7 +120,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
         private async Task SavePools(IEnumerable<Pool> pools, DataProvider provider)
         {
-            List<PairExtended> newPairs = new();
+            List<PairExtended> newPairs = [];
 
             var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPoolsTask = mediator.Send(new GetPoolsQuery());
@@ -183,7 +168,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             var pools = fetchedPoolsTask.Where(p => p.Provider == provider);
 
-            List<CandlestickExtended> newCandlesticks = new();
+            List<CandlestickExtended> newCandlesticks = [];
             foreach (var pool in poolResponse.Pools)
             {
                 var fetchedPoolFound = pools.FirstOrDefault(x => string.Equals(x.PoolContract, pool.PoolId));
@@ -258,6 +243,5 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await mediator.Send(new InsertDexCandlesticksCommand(newCandlesticks.DexToEntityCandlestick()));
         }
-
     }
 }
