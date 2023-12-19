@@ -22,21 +22,27 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var alpacaProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
 
-            alpacaProvider ??= ProviderSynchronization.Create(provider);
+            alpacaProvider ??= new ProviderSynchronization
+            {
+                DataProvider = provider,
+                ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
+            };
 
             var stockSymbols = new List<string> {
                 "vt","vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
-                "tsla", "aapl", "googl", "abnb", "JNJ", "XOM", "WMT", "META", "JPM","V", "KO", "PEP",
+                "tsla", "aapl", "googl", "abnb", "JNJ", "XOM","xom", "WMT", "META", "JPM","V", "KO", "PEP",
                 "MCD", "AVGO", "ACN", "NFLX",
                 "MA","BAC","MS","WCF","SCHW","RY","MSFT","NVDA","CRM","ABDE","VZ","IBM","EWH","MCHI","EWS",
                 "FEZ","IWM","SPY","DIA","DAX","VGK","QQQ",
-                "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","xom","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
+                "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
                 "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA",
                 "BRK.A",
                 "AMZN"
             };
 
-            stockSymbols = stockSymbols.Distinct().ToList();
+            stockSymbols = stockSymbols.Select(symbol => symbol.ToUpper())
+                                       .Distinct(StringComparer.InvariantCultureIgnoreCase)
+                                       .ToList();
 
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
 
@@ -61,7 +67,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await SyncAssets(fetchedAssets, stockSymbols);
             await SyncPairs(stockSymbols);
-            await SyncCandlesticks(Timeframe.Daily);
+            await SyncCandlesticks(timeframe);
 
             alpacaProvider.UpdateProviderInfo();
             var providerCandlestickSyncInfo = alpacaProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
@@ -111,7 +117,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                 if (pairExists is null)
                 {
-                    PairExtended newPair = new PairExtended
+                    PairExtended newPair = new()
                     {
                         BaseAssetId = baseAsset.PrimaryId,
                         BaseAssetName = baseAsset.Symbol,
@@ -211,9 +217,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         }
                     }
                 }
-
-                // At this point, newCandlesticks contains all the built Candlestick objects
-
             }
 
             if (newCandlesticks.Count > 0)
