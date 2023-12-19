@@ -25,7 +25,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binanceProvider == null)
             {
-                binanceProvider = ProviderSynchronization.Create(provider);
+                binanceProvider = new ProviderSynchronization { DataProvider = provider };
             }
 
             if (binanceProvider.IsProviderSyncedToday(timeframe))
