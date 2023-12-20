@@ -28,7 +28,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\TechnicalAnalysis.Application\TechnicalAnalysis.Application.csproj" />
 		<ProjectReference Include="..\TechnicalAnalysis.Infrastructure.Adapters\TechnicalAnalysis.Infrastructure.Adapters.csproj" />
-		<ProjectReference Include="..\TechnicalAnalysis.Persistence\TechnicalAnalysis.Infrastructure.Persistence.csproj" />
+		<ProjectReference Include="..\TechnicalAnalysis.Infrastructure.Persistence\TechnicalAnalysis.Infrastructure.Persistence.csproj" />
 	</ItemGroup>
 
 </Project>
