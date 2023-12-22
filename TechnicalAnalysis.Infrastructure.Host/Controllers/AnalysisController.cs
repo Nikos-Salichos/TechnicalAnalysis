@@ -10,21 +10,10 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 {
     [Route("api/v1/analysis")]
     [ApiController]
-    public class AnalysisController : ControllerBase
+    public class AnalysisController(ISyncService syncService, IAnalysisService analysisService, ILogger<AnalysisController> logger,
+         IValidator<DataProviderTimeframeRequest> dataProviderTimeframeRequest) : ControllerBase
     {
-        private readonly ISyncService _syncService;
-        private readonly IAnalysisService _analysisService;
-        private readonly ILogger<AnalysisController> _logger;
-        private readonly IValidator<DataProviderTimeframeRequest> _dataProviderTimeframeRequest;
-
-        public AnalysisController(ISyncService syncService, IAnalysisService analysisService, ILogger<AnalysisController> logger,
-             IValidator<DataProviderTimeframeRequest> dataProviderTimeframeRequest)
-        {
-            _syncService = syncService;
-            _analysisService = analysisService;
-            _logger = logger;
-            _dataProviderTimeframeRequest = dataProviderTimeframeRequest;
-        }
+        private readonly IValidator<DataProviderTimeframeRequest> _dataProviderTimeframeRequest = dataProviderTimeframeRequest;
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -35,13 +24,13 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public Task<IActionResult> SynchronizeProvidersAsync([FromQuery] DataProvider dataProvider, Timeframe timeframe)
         {
             var dataProviderTimeframeRequest = new DataProviderTimeframeRequest(dataProvider, timeframe);
-            _logger.LogInformation("Method: {SynchronizeProvidersAsync} , dataProviderTimeframeRequest {@dataProviderTimeframeRequest}",
+            logger.LogInformation("Method: {SynchronizeProvidersAsync} , dataProviderTimeframeRequest {@dataProviderTimeframeRequest}",
                  nameof(SynchronizeProvidersAsync), dataProviderTimeframeRequest);
 
             var validationResult = _dataProviderTimeframeRequest.Validate(dataProviderTimeframeRequest);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Method: {SynchronizeProvidersAsync} , validationResult {@validationResult}",
+                logger.LogWarning("Method: {SynchronizeProvidersAsync} , validationResult {@validationResult}",
                     nameof(SynchronizeProvidersAsync), validationResult);
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage);
                 return Task.FromResult<IActionResult>(BadRequest(errors));
@@ -51,7 +40,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
             async Task<IActionResult> SynchronizeInternalAsync(DataProviderTimeframeRequest request)
             {
-                await _syncService.SynchronizeProvidersAsync(request);
+                await syncService.SynchronizeProvidersAsync(request);
                 return Ok();
             }
         }
@@ -63,8 +52,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [EnableRateLimiting("fixed-by-ip")]
         public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] DataProvider provider = DataProvider.All)
         {
-            _logger.LogInformation("Method: {GetPairsIndicatorsAsync} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
-            var pairs = await _analysisService.GetPairsIndicatorsAsync(provider, HttpContext);
+            logger.LogInformation("Method: {GetPairsIndicatorsAsync} , request {request}", nameof(GetPairsIndicatorsAsync), provider);
+            var pairs = await analysisService.GetPairsIndicatorsAsync(provider, HttpContext);
             return Ok();
         }
 
@@ -75,8 +64,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [EnableRateLimiting("fixed-by-ip")]
         public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName, [FromQuery] Timeframe timeframe)
         {
-            _logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
-            var pair = await _analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
+            logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
+            var pair = await analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
             return Ok();
         }
     }
