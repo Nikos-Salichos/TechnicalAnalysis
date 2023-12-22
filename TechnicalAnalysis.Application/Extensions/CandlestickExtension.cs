@@ -46,17 +46,15 @@ namespace TechnicalAnalysis.Application.Extensions
             foreach (var pair in pairs.Where(s => s.IsActive))
             {
                 var candles = pair.BinanceCandlesticks.OrderBy(c => c.OpenTime);
-                BinanceCandlestick previousCandle = null;
+                BinanceCandlestick? previousCandle = null;
                 foreach (var currentCandle in candles)
                 {
                     if (previousCandle != null)
                     {
-                        int daysInMonth = DateTime.DaysInMonth(previousCandle.OpenTime.Year, previousCandle.OpenTime.Month);
                         var difference = currentCandle.OpenTime - previousCandle.CloseTime;
 
                         if (difference > TimeSpan.FromMinutes(1))
                         {
-                            var missingDays = (int)Math.Floor(difference.TotalDays) - 1;
                             var startRange = previousCandle.OpenTime.AddDays(1);
                             var endRange = currentCandle.CloseTime.AddDays(-1);
                             for (var date = startRange; date <= endRange; date = date.AddDays(1))
@@ -79,12 +77,12 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static void FillMissingDates(this IEnumerable<BinancePair> pairs)
         {
-            foreach (var pair in pairs)
+            foreach (var pair in pairs.Select(p => p.BinanceCandlesticks))
             {
-                for (int i = 1; i < pair.BinanceCandlesticks.Count; i++)
+                for (int i = 1; i < pair.Count; i++)
                 {
-                    BinanceCandlestick currentCandle = pair.BinanceCandlesticks[i];
-                    BinanceCandlestick previousCandle = pair.BinanceCandlesticks[i - 1];
+                    BinanceCandlestick currentCandle = pair[i];
+                    BinanceCandlestick previousCandle = pair[i - 1];
                     TimeSpan timeBetweenCandles = currentCandle.OpenTime - previousCandle.CloseTime;
                     if (timeBetweenCandles > TimeSpan.FromDays(1))
                     {
@@ -99,13 +97,14 @@ namespace TechnicalAnalysis.Application.Extensions
                                 OpenTime = newOpenTime,
                                 CloseTime = newCloseTime
                             };
-                            pair.BinanceCandlesticks.Add(newCandlestick);
+                            pair.Add(newCandlestick);
                             missingCandleTime = missingCandleTime.AddDays(1); // Update the missingCandleTime
-                        };
+                        }
                     }
                 }
             }
         }
+
 
         public static Timeframe ToTimeFrame(this string period)
         {
