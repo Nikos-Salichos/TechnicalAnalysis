@@ -17,12 +17,12 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 		<PackageReference Include="Moq" Version="4.20.70" />
 		<PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
-		<PackageReference Include="Npgsql" Version="8.0.0" />
+		<PackageReference Include="Npgsql" Version="8.0.1" />
 		<PackageReference Include="Testcontainers" Version="3.6.0" />
 		<PackageReference Include="Testcontainers.PostgreSql" Version="3.6.0" />
-		<PackageReference Include="WireMock.Net" Version="1.5.40" />
-		<PackageReference Include="xunit" Version="2.6.2" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+		<PackageReference Include="WireMock.Net" Version="1.5.44" />
+		<PackageReference Include="xunit" Version="2.6.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.5">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
@@ -36,7 +36,7 @@
 		<ProjectReference Include="..\TechnicalAnalysis.CommonModels\TechnicalAnalysis.CommonModels.csproj" />
 		<ProjectReference Include="..\TechnicalAnalysis.Domain\TechnicalAnalysis.Domain.csproj" />
 		<ProjectReference Include="..\TechnicalAnalysis.Infrastructure.Host\TechnicalAnalysis.Infrastructure.Host.csproj" />
-		<ProjectReference Include="..\TechnicalAnalysis.Persistence\TechnicalAnalysis.Infrastructure.Persistence.csproj" />
+		<ProjectReference Include="..\TechnicalAnalysis.Infrastructure.Persistence\TechnicalAnalysis.Infrastructure.Persistence.csproj" />
 	</ItemGroup>
 
 </Project>
