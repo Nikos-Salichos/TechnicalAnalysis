@@ -157,7 +157,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
 
             var pairsHashSet = new HashSet<(string poolContractAddress, DataProvider Provider)>(pairs.Select(p => (p.ContractAddress, p.Provider)));
-            List<PairExtended> uniquePairs = newPairs.Where(np => !pairsHashSet.Contains((np.ContractAddress, np.Provider))).ToList();
+            var uniquePairs = newPairs.Where(np => !pairsHashSet.Contains((np.ContractAddress, np.Provider))).ToList();
 
             await mediator.Send(new InsertPoolsCommand(uniquePairs.DexToEntityPool()));
         }
