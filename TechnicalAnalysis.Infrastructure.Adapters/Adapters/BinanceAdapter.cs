@@ -53,7 +53,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask);
 
-            var assets = await fetchedAssetsTask;
             var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == provider).ToList();
             var candlesticks = await fetchedCandlesticksTask;
 
@@ -233,7 +232,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                             var validator = new BinanceCandlestickValidator();
                             var result = validator.Validate(newCandlestick);
 
-                            bool candlestickExists = binancePair.BinanceCandlesticks.Any(c =>
+                            bool candlestickExists = binancePair.BinanceCandlesticks.Exists(c =>
                                 c.OpenTime.EqualsYearMonthDayHourMinute(newCandlestick.OpenTime) &&
                                 c.CloseTime.EqualsYearMonthDayHourMinute(newCandlestick.CloseTime));
 
