@@ -74,7 +74,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (existingPair != null)
                 {
                     pair.BinanceCandlesticks = pair.BinanceCandlesticks
-                        .Where(binanceCandlestick => !existingPair.BinanceCandlesticks.Any(existingCandlestick =>
+                        .Where(binanceCandlestick => !existingPair.BinanceCandlesticks.Exists(existingCandlestick =>
                             binanceCandlestick.OpenTime.EqualsYearMonthDayHourMinute(existingCandlestick.OpenTime)
                          && binanceCandlestick.CloseTime.EqualsYearMonthDayHourMinute(existingCandlestick.CloseTime)
                          && binanceCandlestick.Period == existingCandlestick.Period))
