@@ -39,7 +39,12 @@ builder.Services.ConfigureRateLimit();
 
 if (builder.Environment.IsProduction())
 {
-    builder.Services.AddHangfire(x => x.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose")));
+    builder.Services.AddHangfire(configuration =>
+    {
+        var connectionString = builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose");
+        configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString));
+    });
+
     builder.Services.AddHangfireServer();
 }
 
