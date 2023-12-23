@@ -21,12 +21,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
-            var binanceProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
+            var binanceProvider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
 
-            if (binanceProvider == null)
+            binanceProvider ??= new ProviderSynchronization
             {
-                binanceProvider = new ProviderSynchronization { DataProvider = provider };
-            }
+                ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
+            };
 
             if (binanceProvider.IsProviderSyncedToday(timeframe))
             {
