@@ -60,7 +60,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 var newProviderCandlestickSyncInfo = new ProviderCandlestickSyncInfo
                 {
-                    DataProvider = providerSynchronization.DataProvider,
+                    DataProvider = providerSynchronization.ProviderPairAssetSyncInfo.DataProvider,
                     Timeframe = timeframe,
                     LastCandlestickSync = DateTime.UtcNow
                 };
