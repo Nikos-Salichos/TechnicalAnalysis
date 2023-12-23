@@ -113,7 +113,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                             .GroupJoin(providerCandlestickSyncInfos, pair => pair.DataProvider, candlestick => candlestick.DataProvider,
                                 (pair, candlesticks) => new ProviderSynchronization()
                                 {
-                                    DataProvider = pair.DataProvider,
                                     ProviderPairAssetSyncInfo = pair,
                                     CandlestickSyncInfos = candlesticks.ToList()
                                 })
