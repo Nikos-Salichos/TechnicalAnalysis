@@ -501,9 +501,9 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                foreach (var flagNestedCandlestickBody in candlestick1?.FlagsNestedCandlesticksBody.Where(f => f.NumberOfNestedCandlestickBodies > 3))
+                foreach (var flagNestedCandlestickBody in candlestick1.FlagsNestedCandlesticksBody.Where(f => f.NumberOfNestedCandlestickBodies > 3))
                 {
-                    var candlestickFlagPole = pair?.Candlesticks.Find(c => c.PrimaryId == candlestick1?.FlagsNestedCandlesticksBody?.FirstOrDefault()?.FlagPoleCandlestickId);
+                    var candlestickFlagPole = pair?.Candlesticks.Find(c => c.PrimaryId == flagNestedCandlestickBody.FlagPoleCandlestickId);
 
                     if (candlestick.ClosePrice > candlestickFlagPole?.HighPrice)
                     {
@@ -613,14 +613,14 @@ namespace TechnicalAnalysis.Application.Extensions
                                 )*/
                 )
                 {
-                    if (candlestick1?.EnhancedScans.Count > 0 &&
-                        candlestick1.EnhancedScans.FirstOrDefault().EnhancedScanIsBuy)
+                    var firstEnhancedScan = candlestick1?.EnhancedScans.FirstOrDefault();
+                    if (firstEnhancedScan?.EnhancedScanIsBuy == true)
                     {
                         candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId)
                         {
                             EnhancedScanIsBuy = true,
                             EnhancedScanIsSell = false,
-                            OrderOfSignal = candlestick1.EnhancedScans.FirstOrDefault().OrderOfSignal + 1
+                            OrderOfSignal = firstEnhancedScan.OrderOfSignal + 1
                         });
                     }
                     else
@@ -632,6 +632,7 @@ namespace TechnicalAnalysis.Application.Extensions
                             OrderOfSignal = 1
                         });
                     }
+
                 }
             }
         }
