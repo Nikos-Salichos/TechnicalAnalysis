@@ -20,9 +20,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
-            var dexV3Provider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
+            var dexV3Provider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
 
-            dexV3Provider ??= new ProviderSynchronization { DataProvider = provider };
+            dexV3Provider ??= new ProviderSynchronization
+            {
+                ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
+            };
 
             if (dexV3Provider.IsProviderSyncedToday(timeframe))
             {
