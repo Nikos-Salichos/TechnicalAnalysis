@@ -510,10 +510,10 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 int startIndex = Math.Max(i - (period - 1), 0); // Start from the current candlestick and go back 4 candlesticks or less if there are fewer than 5 candlesticks available
 
-                // Validate indices and range
-                if (startIndex >= 0 && startIndex < count && // Make sure startIndex is valid
-                i >= 0 && i < count &&                   // Make sure i is valid
-                i - startIndex + 1 <= count - startIndex) // Make sure the range is valid
+                //TODO Debug it and remove code that is redundant
+                if (startIndex >= 0 && startIndex < count &&
+                i >= 0 && i < count &&
+                i - startIndex + 1 <= count - startIndex)
                 {
                     var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
 
