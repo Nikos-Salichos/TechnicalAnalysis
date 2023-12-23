@@ -20,11 +20,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         public async Task Sync(DataProvider provider, Timeframe timeframe)
         {
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
-            var alpacaProvider = exchanges.FirstOrDefault(p => p.DataProvider == provider);
+            var alpacaProvider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
 
             alpacaProvider ??= new ProviderSynchronization
             {
-                DataProvider = provider,
                 ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
             };
 
