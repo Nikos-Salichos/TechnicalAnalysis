@@ -22,14 +22,8 @@ namespace TechnicalAnalysis.Domain.Utilities
             FailValue = failValue;
         }
 
-        public static Result<TSuccess, TFail> Success(TSuccess value)
-        {
-            return new Result<TSuccess, TFail>(value);
-        }
+        public static Result<TSuccess, TFail> Success(TSuccess value) => new(value);
 
-        public static Result<TSuccess, TFail> Fail(TFail failValue)
-        {
-            return new Result<TSuccess, TFail>(failValue);
-        }
+        public static Result<TSuccess, TFail> Fail(TFail failValue) => new(failValue);
     }
 }
