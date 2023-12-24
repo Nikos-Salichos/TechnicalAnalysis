@@ -10,7 +10,6 @@
             AddHeaderIfNotExists(httpContext, "Referrer-Policy", "no-referrer");
             AddHeaderIfNotExists(httpContext, "Content-Security-Policy", "default-src 'self';");
 
-            // Invoke the next middleware in the pipeline
             await requestDelegate(httpContext);
         }
 
