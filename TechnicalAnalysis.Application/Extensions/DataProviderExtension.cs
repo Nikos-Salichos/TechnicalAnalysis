@@ -27,18 +27,13 @@ namespace TechnicalAnalysis.Application.Extensions
 
             int dayDifference = (currentDayOfWeek - DayOfWeek.Monday + 7) % 7;
 
-            if (provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
+            return provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
             && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date
             && provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
                     && dayDifference > 0
                     && candlestickSyncInfo.Timeframe == timeframe
-                    && timeframe == Timeframe.Weekly))
-            {
-                return true;
-            }
-
-            return false;
+                    && timeframe == Timeframe.Weekly);
         }
 
         public static void UpdateProviderInfo(this ProviderSynchronization provider)
