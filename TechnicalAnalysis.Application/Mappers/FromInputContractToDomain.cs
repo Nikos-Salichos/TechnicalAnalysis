@@ -76,7 +76,7 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithFees(dexCandlestick.FeesRawData.ReduceDigitsToFitDecimalLength())
                           .WithLiquidity(dexCandlestick.LiquidityRawData.ReduceDigitsToFitLongLength())
                           .WithNumberOfTrades(dexCandlestick.NumberOfTrades.ReduceDigitsToFitLongLength())
-                          .WithTotalValueLockedUsd(dexCandlestick?.TotalValueLockedRawData?.ReduceDigitsToFitDecimalLength())
+                          .WithTotalValueLockedUsd(dexCandlestick.TotalValueLockedRawData?.ReduceDigitsToFitDecimalLength())
                           .Build();
         }
 
