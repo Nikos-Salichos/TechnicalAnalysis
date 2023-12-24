@@ -15,17 +15,19 @@ namespace TechnicalAnalysis.Application.Services
             return inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
         }
 
-        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider = DataProvider.All, HttpContext? httpContext = null)
+        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
         {
             if (httpContext?.Request.Headers.ContainsKey("C-Invalid") == false)
             {
                 var cachedPairs = await redisRepository.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
-                if (cachedPairs is not null && cachedPairs.Any())
+                if (cachedPairs?.Any() == true)
                 {
                     await communication.CreateAttachmentSendMessage(cachedPairs);
                     rabbitMqService.PublishMessage(cachedPairs);
-                    rabbitMqService.PublishMessage(cachedPairs);
+
+                    //Example how to consume message
                     var message = await rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
+
                     return cachedPairs;
                 }
             }
