@@ -67,10 +67,12 @@ namespace TechnicalAnalysis.Application.Services
             var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOnBasedInFractalBreak();
             var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAllBasedInFractalBreak();
 
-            Indicator enhancedScanPositions = CalculateEnhancedScanSignal(positionsCloseAll);
+            Indicator enhancedScanPositionsCloseOneByOne = CalculateEnhancedScanSignal(positionsCloseOneByOne, "EnhanchedScan_CloseOneByOne");
+            Indicator enhancedScanPositionsCloseAll = CalculateEnhancedScanSignal(positionsCloseAll, "EnhanchedScan_CloseAll");
             var indicatorReports = new List<Indicator>()
             {
-                enhancedScanPositions
+                enhancedScanPositionsCloseOneByOne,
+                enhancedScanPositionsCloseAll
             };
 
             foreach (var pair in selectedPairs)
@@ -115,10 +117,10 @@ namespace TechnicalAnalysis.Application.Services
             return selectedPairs;
         }
 
-        private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsCloseOneByOne)
+        private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsStrategy, string name)
         {
-            var enhancedScan = new Indicator { Name = "EnhancedScan" };
-            foreach (var position in positionsCloseOneByOne)
+            var enhancedScan = new Indicator { Name = name };
+            foreach (var position in positionsStrategy)
             {
                 var openPosition = new Signal
                 {
