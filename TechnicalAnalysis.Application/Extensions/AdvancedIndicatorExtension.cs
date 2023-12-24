@@ -596,7 +596,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2022, 12, 29).Date)
+                if (candlestick.CloseDate.Date == new DateTime(2022, 11, 3).Date)
                 {
                 }
 
@@ -826,7 +826,12 @@ namespace TechnicalAnalysis.Application.Extensions
                 candlestick1.FractalTrend is Trend.Down ||
                 candlestick2.FractalTrend is Trend.Down ||
                 candlestick3.FractalTrend is Trend.Down ||
-                candlestick4.FractalTrend is Trend.Down;
+                candlestick4.FractalTrend is Trend.Down ||
+                candlestick.FractalTrend is Trend.Sideways ||
+                candlestick1.FractalTrend is Trend.Sideways ||
+                candlestick2.FractalTrend is Trend.Sideways ||
+                candlestick3.FractalTrend is Trend.Sideways ||
+                candlestick4.FractalTrend is Trend.Sideways;
         }
 
         private static bool GetPriceTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -1009,11 +1014,6 @@ namespace TechnicalAnalysis.Application.Extensions
              || !decimal.TryParse(keltnerChannel4.LowerBand.ToString(), out decimal _))
             {
                 return false;
-            }
-
-            if (candlesticks[currentIndex].LowPrice <= (decimal)keltnerChannel?.LowerBand)
-            {
-                return true;
             }
 
             return candlesticks[currentIndex].LowPrice <= (decimal)keltnerChannel?.LowerBand
