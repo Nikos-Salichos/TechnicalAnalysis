@@ -2,7 +2,7 @@
 {
     public static class Constants
     {
-        public const string Usd = "Usd";
+        public const string Usd = "USD";
         public const string Usdc = "USDC";
         public const string Usdt = "USDT";
         public const string Dai = "DAI";
