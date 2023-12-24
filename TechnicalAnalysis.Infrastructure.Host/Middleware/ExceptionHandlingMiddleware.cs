@@ -5,8 +5,6 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
     public class ExceptionHandlingMiddleware(RequestDelegate requestDelegate, ILogger<ExceptionHandlingMiddleware> logger)
     {
-        public RequestDelegate requestDelegate = requestDelegate;
-
         public async Task Invoke(HttpContext context)
         {
             try
@@ -26,24 +24,15 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            try
+            var errorDetail = new
             {
-                var json = JsonSerializer.Serialize(exception);
-                await context.Response.WriteAsync(json);
-                return;
-            }
-            catch (Exception)
-            {
-                var errorDetail = new
-                {
-                    ExceptionMessage = exception.Message,
-                    InnerExceptionMessage = exception?.InnerException?.Message,
-                    StackTrace = exception?.StackTrace
-                };
+                ExceptionMessage = exception.Message,
+                InnerExceptionMessage = exception.InnerException?.Message,
+                exception.StackTrace
+            };
 
-                await context.Response.WriteAsync(errorDetail?.ToString() ?? string.Empty);
-                return;
-            }
+            var json = JsonSerializer.Serialize(errorDetail);
+            await context.Response.WriteAsync(json);
         }
     }
 }
