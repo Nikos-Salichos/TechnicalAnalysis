@@ -42,7 +42,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             return new()
             {
                 AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? endOfDay - DateTime.UtcNow,
-                SlidingExpiration = slidingExpireTime ?? TimeSpan.FromMinutes(1)
+                SlidingExpiration = slidingExpireTime ?? endOfDay - DateTime.UtcNow
             };
         }
     }
