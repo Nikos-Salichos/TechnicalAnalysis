@@ -8,14 +8,17 @@ using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
+using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 using TechnicalAnalysis.CommonModels.JsonOutput;
 using TechnicalAnalysis.Domain.Interfaces.Application;
+using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Utilities;
 using Indicator = TechnicalAnalysis.CommonModels.JsonOutput.Indicator;
 
 namespace TechnicalAnalysis.Application.Services
 {
-    public class AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration) : IAnalysisService
+    public class AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration, IRedisRepository redisRepository)
+        : IAnalysisService
     {
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
         {
@@ -30,39 +33,57 @@ namespace TechnicalAnalysis.Application.Services
                 _ => pairs
             };
 
-            if (!pairs.Any())
+            if (pairs.Count is 0)
             {
                 return Enumerable.Empty<PairExtended>();
             }
 
-            CalculateIndicators(pairs);
+            CalculateTechnicalIndicators(pairs);
 
             var filteredPairs = pairs.OrderByDescending(pair => pair.CreatedAt)
-                             .Select(pair =>
-                             {
-                                 pair.Candlesticks = pair.Candlesticks
-                                                 .OrderByDescending(c => c.CloseDate)
-                                                 .GroupBy(c => c.PoolOrPairId)
-                                                 .SelectMany(c => c.OrderByDescending(x => x.CloseDate).Take(1))
-                                                 .ToList();
-                                 return pair;
-                             })
-                             .Where(pair => pair.Candlesticks.Count > 0);
+                               .Select(pair =>
+                               {
+                                   pair.Candlesticks = pair.Candlesticks
+                                                   .Where(c => c.EnhancedScans.Count > 0)
+                                                   .OrderByDescending(c => c.CloseDate)
+                                                   .GroupBy(c => c.PoolOrPairId)
+                                                   .Select(group => group.First()) // Take the first item of each group
+                                                   .ToList();
+                                   return pair;
+                               })
+                               .Where(pair => pair.Candlesticks.Count > 0);
 
             return filteredPairs;
         }
 
         public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
         {
-            var pairs = await FormatAssetsPairsCandlesticks();
-            var selectedPairs = pairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
+            var fetchedPairs = await FormatAssetsPairsCandlesticks();
+            var cachedPairs = new List<PairExtended>();
 
-            if (!selectedPairs.Any())
+            foreach (var pair in fetchedPairs)
             {
-                return Enumerable.Empty<PairExtended>();
+                var cachedPair = await redisRepository.GetRecordAsync<PairExtended>(pair.Symbol);
+                if (cachedPair?.HasCalculateDailyTechnicalAnalysis == true)
+                {
+                    cachedPairs.Add(cachedPair);
+                }
             }
 
-            CalculateIndicators(selectedPairs);
+            var pairsToCalculate = fetchedPairs.Except(cachedPairs).ToList();
+            if (pairsToCalculate.Count > 0)
+            {
+                CalculateTechnicalIndicators(pairsToCalculate);
+                foreach (var pair in pairsToCalculate)
+                {
+                    await redisRepository.SetRecordAsync(pair.Symbol, pair, null, null);
+                }
+            }
+
+            var allPairs = cachedPairs.Concat(pairsToCalculate);
+
+            var selectedPairs = allPairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
+            await CalculateMarketStatistics(allPairs, selectedPairs);
 
             var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOnBasedInFractalBreak();
             var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAllBasedInFractalBreak();
@@ -100,14 +121,9 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var indicator in indicatorReports)
             {
-                var baseDirectory = configuration.GetSection("OutputFolder:Path").Value;
-
-                if (string.IsNullOrWhiteSpace(baseDirectory))
-                {
-                    return Enumerable.Empty<PairExtended>();
-                }
-
                 var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
+
+                var baseDirectory = GetBaseDirectory();
                 string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
                 await JsonHelper.SerializeToJson(outputPair, candlestickFileName);
                 string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-{indicator.Name}.json");
@@ -115,6 +131,18 @@ namespace TechnicalAnalysis.Application.Services
             }
 
             return selectedPairs;
+        }
+
+        private string GetBaseDirectory()
+        {
+            var baseDirectory = configuration.GetSection("OutputFolder:Path").Value;
+
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+            {
+                return string.Empty;
+            }
+
+            return baseDirectory;
         }
 
         private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsStrategy, string name)
@@ -165,7 +193,7 @@ namespace TechnicalAnalysis.Application.Services
             var enhancedScan = new Indicator { Name = "EnhancedScanAllSignals" };
 
             foreach (var candlestick in pair.Candlesticks
-                .Where(c => c.EnhancedScans?.FirstOrDefault()?.OrderOfSignal > 0))
+                .Where(c => c.EnhancedScans?.FirstOrDefault()?.OrderOfSignal >= 0))
             {
                 var signalIndicator = new Signal
                 {
@@ -443,7 +471,39 @@ namespace TechnicalAnalysis.Application.Services
             return pivot;
         }
 
-        private void CalculateIndicators(IEnumerable<PairExtended> pairs)
+        private async Task CalculateMarketStatistics(IEnumerable<PairExtended> pairs, IEnumerable<PairExtended> selectedPairs)
+        {
+            var marketStatistic = await CountPairsWithEnhancedScanIsBuy(pairs);
+
+            if (selectedPairs is null)
+            {
+                return;
+            }
+
+            foreach (var pair in selectedPairs)
+            {
+                // Clear EnhancedScans for each candlestick in the current pair
+                foreach (var candlestick in pair.Candlesticks)
+                {
+                    candlestick.EnhancedScans.Clear();
+                }
+
+                // Create a dictionary for candlesticks by date for the current pair
+                var candlesticksByDate = pair.Candlesticks.ToDictionary(c => c.CloseDate, c => c);
+
+                // Add new EnhancedScan entries based on marketStatistic
+                foreach (var kvp in marketStatistic.DailyStatistics)
+                {
+                    if (kvp.Value.PairsWithEnhancedScan.Contains(pair.Symbol)
+                        && candlesticksByDate.TryGetValue(kvp.Key, out var candlestick))
+                    {
+                        candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId) { EnhancedScanIsBuy = true });
+                    }
+                }
+            }
+        }
+
+        private void CalculateTechnicalIndicators(IEnumerable<PairExtended> pairs)
         {
             BasicIndicatorExtension.Logger = logger;
             AdvancedIndicatorExtension.Logger = logger;
@@ -451,14 +511,12 @@ namespace TechnicalAnalysis.Application.Services
 
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
+            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.HasCalculateDailyTechnicalAnalysis = true);
 
-            //TODO I need to pass all pairs
-            //pairs.CalculatePairStatistics();
-
-            CountPairsWithEnhancedScanIsBuy(pairs);
+            // pairs.CalculatePairStatistics();
         }
 
-        private async Task<IEnumerable<PairExtended>> FormatAssetsPairsCandlesticks()
+        private async Task<List<PairExtended>> FormatAssetsPairsCandlesticks()
         {
             var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
@@ -483,29 +541,54 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
-        private static void CountPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> CountPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
         {
-            var marketStatistic = new MarketStatistic { NumberOfPairs = pairs.Count() };
+            var marketStatistic = new MarketStatistic();
 
             foreach (var pair in pairs)
             {
-                foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0))
+                // Dictionary to keep track of dates where the pair has a candlestick record
+                var datesWithCandlestick = new HashSet<DateTime>();
+
+                foreach (var candlestick in pair.Candlesticks)
                 {
-                    if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
+                    // Add the date of the candlestick to the set
+                    datesWithCandlestick.Add(candlestick.CloseDate);
+
+                    // Check for enhanced scan and if it's a buy
+                    if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
                     {
-                        if (!marketStatistic.NumberOfPairsEnhancedScanPerDate.TryGetValue(candlestick.CloseDate, out var pairsWithEnhanced))
+                        if (!marketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStat))
                         {
-                            pairsWithEnhanced = [];
-                            marketStatistic.NumberOfPairsEnhancedScanPerDate[candlestick.CloseDate] = pairsWithEnhanced;
+                            dailyStat ??= new DailyStatistic();
+                            marketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStat;
                         }
 
-                        pairsWithEnhanced.Add(pair);
+                        dailyStat.PairsWithEnhancedScan.Add(pair.Symbol);
                     }
+                }
+
+                // Update the NumberOfPairs for each date where this pair has a candlestick record
+                foreach (var date in datesWithCandlestick)
+                {
+                    if (!marketStatistic.DailyStatistics.TryGetValue(date, out var dailyStat))
+                    {
+                        dailyStat ??= new DailyStatistic();
+                        marketStatistic.DailyStatistics[date] = dailyStat;
+                    }
+
+                    dailyStat.NumberOfPairs++;
                 }
             }
 
-            //TODO 1/3 of pairs as condition
-            var percentagesPerDate = marketStatistic.CalculateAllPercentages();
+            marketStatistic.CalculateAndFilterPercentages(50);
+
+            var baseDirectory = GetBaseDirectory();
+
+            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(MarketStatistic)}.json");
+            await JsonHelper.SerializeToJson(marketStatistic, jsonFileName);
+
+            return marketStatistic;
         }
     }
 }
