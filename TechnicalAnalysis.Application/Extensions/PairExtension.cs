@@ -23,8 +23,7 @@ namespace TechnicalAnalysis.Application.Extensions
             // Filter and add pairs to the list only if they haven't been added before
             return fetchedPairs
                 .Where(fetchedPair => assetIds.Contains(fetchedPair.QuoteAssetId) &&
-                                       uniqueBaseAssetIds.Add(fetchedPair.BaseAssetId))
-                .ToList();
+                                       uniqueBaseAssetIds.Add(fetchedPair.BaseAssetId)).ToList();
         }
 
         public static IEnumerable<PairExtended> MapPairsToAssets(this IEnumerable<PairExtended> pairs, IEnumerable<Asset> assets)
