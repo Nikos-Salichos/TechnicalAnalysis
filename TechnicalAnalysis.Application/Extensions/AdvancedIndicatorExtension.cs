@@ -570,7 +570,16 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
-                var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
+
+                //TODO Enable it debug specific candlestick
+                if (candlestick.CloseDate.Date == new DateTime(2022, 1, 12).Date)
+                {
+                }
+
+                if (IsAscendingGreenCandlestickPattern(pair.Candlesticks, i))
+                {
+                    continue;
+                }
 
                 bool[] conditions =
                 [
@@ -595,11 +604,6 @@ namespace TechnicalAnalysis.Application.Extensions
                 int trueConditionsCount = conditions.Count(condition => condition);
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
-                //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2022, 11, 3).Date)
-                {
-                }
-
                 if (percentageTrueConditions >= 90 // TODO test it with candlesticks patterns
                 /*                &&
                                 (
@@ -613,7 +617,9 @@ namespace TechnicalAnalysis.Application.Extensions
                                 )*/
                 )
                 {
+                    var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
                     var firstEnhancedScan = candlestick1?.EnhancedScans.FirstOrDefault();
+
                     if (firstEnhancedScan?.EnhancedScanIsBuy == true)
                     {
                         candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId)
@@ -635,6 +641,31 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 }
             }
+        }
+
+        private static bool IsAscendingGreenCandlestickPattern(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 2 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var currentCandlestick = candlesticks[currentIndex];
+            var candlestick1 = candlesticks[currentIndex - 1];
+            var candlestick2 = candlesticks[currentIndex - 2];
+
+            bool isHigherHighCurrent = currentCandlestick.HighPrice > candlestick1.HighPrice;
+            bool isHigherLowCurrent = currentCandlestick.LowPrice > candlestick1.LowPrice;
+
+            if (isHigherHighCurrent && isHigherLowCurrent)
+            {
+                return true;
+            }
+
+            bool isHigherHighPrevious = candlestick1.HighPrice > candlestick2.HighPrice;
+            bool isHigherLowPrevious = candlestick1.LowPrice > candlestick2.LowPrice;
+
+            return isHigherHighCurrent && isHigherLowCurrent && isHigherHighPrevious && isHigherLowPrevious;
         }
 
         private static void CalculateCandlestickPatterns(PairExtended pair)
