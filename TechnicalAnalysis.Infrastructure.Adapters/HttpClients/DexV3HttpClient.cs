@@ -5,7 +5,6 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Contracts.Input.DexV3;
-using TechnicalAnalysis.Domain.Interfaces;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 using TechnicalAnalysis.Domain.Settings;
@@ -108,7 +107,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                         return Result<DexV3ApiResponse, string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                     }
 
-                    using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                    await using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
                     var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, _jsonSerializerOptions);
                     if (deserializedData is not null)
                     {
