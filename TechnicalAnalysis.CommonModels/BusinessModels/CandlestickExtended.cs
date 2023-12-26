@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Text.Json.Serialization;
-using TechnicalAnalysis.CommonModels.BaseClasses;
+﻿using TechnicalAnalysis.CommonModels.BaseClasses;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 using TechnicalAnalysis.CommonModels.Indicators.Basic;
@@ -11,7 +9,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
     public class CandlestickExtended : BaseEntity
     {
         public long PoolOrPairId { get; set; }
-        public string PoolOrPairName { get; set; }
+        public string PoolOrPairName { get; set; } = string.Empty;
         public decimal? OpenPrice { get; set; }
         public decimal? HighPrice { get; set; }
         public decimal? LowPrice { get; set; }
@@ -30,7 +28,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public IList<Cci> Ccis { get; init; } = new List<Cci>();
         public IList<MovingAverage> MovingAverages { get; init; } = new List<MovingAverage>();
         public IList<Ichimoku> Ichimokus { get; init; } = new List<Ichimoku>();
-        public IList<EnhancedScan> EnhancedScans { get; } = new List<EnhancedScan>();
+        public IList<EnhancedScan> EnhancedScans { get; init; } = new List<EnhancedScan>();
         public IList<Lowest> Lowests { get; init; } = new List<Lowest>();
         public IList<Highest> Highests { get; init; } = new List<Highest>();
         public IList<DragonFlyDoji> DragonFlyDojis { get; init; } = new List<DragonFlyDoji>();
@@ -58,7 +56,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public IList<VixFix> VixFixes { get; init; } = new List<VixFix>();
         public Trend FractalTrend { get; set; }
         public Trend PriceTrend { get; set; }
-        public IDictionary<string, double> CorrelationPerPair { get; init; } = new ConcurrentDictionary<string, double>();
+        public IDictionary<string, double> CorrelationPerPair { get; init; } = new Dictionary<string, double>();
         public long? NumberOfTrades { get; set; }
         public long TxCount { get; set; }
         public long? Liquidity { get; set; }
@@ -161,12 +159,6 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
                   ? null
                   : Liquidity / TotalValueLockedUsd;
             }
-        }
-
-        [JsonConstructor]
-        public CandlestickExtended()
-        {
-
         }
     }
 
