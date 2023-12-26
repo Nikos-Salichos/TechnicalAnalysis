@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Polly;
 using System.Text.Json;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
-using TechnicalAnalysis.Domain.Interfaces;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 using TechnicalAnalysis.Domain.Settings;
@@ -39,7 +38,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             try
             {
                 using var content = httpResponseMessage.Content;
-                using var jsonStream = await content.ReadAsStreamAsync();
+                await using var jsonStream = await content.ReadAsStreamAsync();
 
                 var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, _jsonSerializerOptions);
                 if (deserializedData is not null)
@@ -83,7 +82,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                 }
 
-                using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                await using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
                 var deserializedData = await JsonSerializer.DeserializeAsync<object[][]>(jsonStream, _jsonSerializerOptions);
                 if (deserializedData is not null)
                 {
