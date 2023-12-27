@@ -5,13 +5,13 @@ namespace TechnicalAnalysis.Application.Helpers
 {
     public static class JsonHelper
     {
+        private static readonly JsonSerializerOptions options = new JsonSerializerOptions
+        {
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+        };
+
         public static async Task SerializeToJsonArray<T>(T item, string fileName)
         {
-            var options = new JsonSerializerOptions
-            {
-                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
-            };
-
             // Wrap the serialized JSON in an array
             var wrappedJson = JsonSerializer.Serialize(item, options);
             var wrappedJsonArray = "[" + wrappedJson + "]";
@@ -22,12 +22,7 @@ namespace TechnicalAnalysis.Application.Helpers
 
         public static async Task SerializeToJson<T>(T item, string fileName)
         {
-            var options = new JsonSerializerOptions
-            {
-                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
-            };
-
-            using FileStream createStream = new FileStream(fileName, FileMode.Create);
+            await using FileStream createStream = new FileStream(fileName, FileMode.Create);
             await JsonSerializer.SerializeAsync(createStream, item, options);
         }
     }
