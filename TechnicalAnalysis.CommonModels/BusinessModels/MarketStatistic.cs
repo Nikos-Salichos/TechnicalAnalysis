@@ -2,19 +2,31 @@
 
 public class MarketStatistic
 {
-    public double NumberOfPairs { get; init; }
+    public SortedDictionary<DateTime, DailyStatistic> DailyStatistics { get; set; } = [];
 
-    public SortedDictionary<DateTime, HashSet<PairExtended>> NumberOfPairsEnhancedScanPerDate { get; set; } = [];
-
-    public IDictionary<DateTime, double> CalculateAllPercentages()
+    public void CalculateAndFilterPercentages(double thresholdPercentage)
     {
-        var percentages = new Dictionary<DateTime, double>(NumberOfPairsEnhancedScanPerDate.Count);
-        foreach (var (date, pairs) in NumberOfPairsEnhancedScanPerDate)
+        var keysToRemove = new List<DateTime>();
+
+        foreach (var kvp in DailyStatistics)
         {
-            var percentage = pairs.Count / NumberOfPairs * 100;
-            percentages.Add(date, percentage);
+            var dailyStats = kvp.Value;
+            double percentage = dailyStats.PairsWithEnhancedScan.Count / (double)dailyStats.NumberOfPairs * 100;
+
+            if (percentage < thresholdPercentage)
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+            else
+            {
+                dailyStats.Percentage = percentage;
+            }
         }
 
-        return percentages;
+        foreach (var key in keysToRemove)
+        {
+            DailyStatistics.Remove(key);
+        }
     }
+
 }
