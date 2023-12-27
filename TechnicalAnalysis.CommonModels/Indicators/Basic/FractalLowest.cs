@@ -9,10 +9,10 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Basic
         public decimal? Price { get; init; }
         public PriceType PriceType { get; init; }
 
-        public FractalLowest(long candlestickId, long concecutive, PriceType priceType, decimal? price)
+        public FractalLowest(long candlestickId, long consecutive, PriceType priceType, decimal? price)
             : base(candlestickId)
         {
-            Consecutive = concecutive;
+            Consecutive = consecutive;
             PriceType = priceType;
             Price = price;
         }
