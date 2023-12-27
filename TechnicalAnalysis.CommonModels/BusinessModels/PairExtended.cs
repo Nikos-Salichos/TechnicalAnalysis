@@ -1,10 +1,9 @@
-﻿using System.Text.Json.Serialization;
-using TechnicalAnalysis.CommonModels.BaseClasses;
+﻿using TechnicalAnalysis.CommonModels.BaseClasses;
 using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
-    public class PairExtended : BaseEntity
+    public class PairExtended : BaseEntity, IEquatable<PairExtended>
     {
         public string Symbol { get; set; } = string.Empty;
         public string ContractAddress { get; init; } = string.Empty;
@@ -24,31 +23,26 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public decimal? TotalValueLocked { get; init; }
         public decimal? Volume { get; init; }
         public long? NumberOfTrades { get; init; }
-        public List<CandlestickExtended> Candlesticks { get; set; } = new List<CandlestickExtended>();
+        public List<CandlestickExtended> Candlesticks { get; set; } = [];
+        public bool HasCalculateDailyTechnicalAnalysis { get; set; }
 
-        [JsonConstructor]
-        public PairExtended()
+        public bool Equals(PairExtended? other)
         {
-        }
-    }
-
-    public class PairExtendedEqualityComparer : IEqualityComparer<PairExtended>
-    {
-        public bool Equals(PairExtended? x, PairExtended? y)
-        {
-            if (x == null || y == null)
+            if (ReferenceEquals(this, other))
             {
-                return false;
+                return true;
             }
 
-            return x.BaseAssetId == y.BaseAssetId &&
-                   x.QuoteAssetId == y.QuoteAssetId &&
-                   x.Provider == y.Provider;
+            return other != null
+                && BaseAssetId == other.BaseAssetId
+                && QuoteAssetId == other.QuoteAssetId
+                && Provider == other.Provider;
         }
 
-        public int GetHashCode(PairExtended pairExtended)
-            => HashCode.Combine(pairExtended.BaseAssetId.GetHashCode(),
-                pairExtended.QuoteAssetId.GetHashCode(),
-                pairExtended.Provider.GetHashCode());
+        public override bool Equals(object? obj) => obj is not null && Equals(obj as PairExtended);
+
+        public override int GetHashCode() => HashCode.Combine(BaseAssetId, QuoteAssetId, Provider);
     }
+
+
 }
