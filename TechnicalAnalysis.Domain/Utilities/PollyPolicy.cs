@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Timeout;
-using TechnicalAnalysis.Domain.Interfaces;
+using TechnicalAnalysis.Domain.Interfaces.Utilities;
 
 namespace TechnicalAnalysis.Domain.Utilities
 {
