@@ -73,11 +73,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 newAssets.Add(new BinanceAsset { Id = 0, Asset = item.BaseAsset });
                 newAssets.Add(new BinanceAsset { Id = 0, Asset = item.QuoteAsset });
             }
-            newAssets = newAssets.Distinct(new BinanceAssetComparer()).ToList();
+            newAssets = newAssets.Distinct().ToList();
 
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
 
-            var missingAssets = newAssets.Except(fetchedAssets.ToContract(), new BinanceAssetComparer()).Distinct();
+            var missingAssets = newAssets.Except(fetchedAssets.ToContract()).Distinct();
 
             if (missingAssets.Any())
             {
@@ -88,7 +88,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         private async Task SyncPairs(IEnumerable<BinanceSymbol> tradeablePairs)
         {
             var fetchedAssets = (await mediator.Send(new GetAssetsQuery())).ToList();
-            var assetDictionary = fetchedAssets.ToContract().ToImmutableDictionary(asset => asset.Asset, asset => asset.Id);
+            var assetDictionary = fetchedAssets.ToContract().ToDictionary(asset => asset.Asset, asset => asset.Id);
 
             var binancePairs = tradeablePairs.Select(tradeablePair => new BinancePair
             {
@@ -102,7 +102,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             binancePairs = PairExtension.GetUniqueDollarPairs(fetchedAssets.ToContract(), binancePairs.ToList());
             var fetchedPairs = await mediator.Send(new GetPairsQuery());
-            var newPairs = binancePairs.ToDomain().Where(pair => !fetchedPairs.Contains(pair, new PairExtendedEqualityComparer()));
+            var newPairs = binancePairs.ToDomain().Where(pair => !fetchedPairs.Contains(pair));
 
             foreach (var dollarPair in newPairs)
             {
