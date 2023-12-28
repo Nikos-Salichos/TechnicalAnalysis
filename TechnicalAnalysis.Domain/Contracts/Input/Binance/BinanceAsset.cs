@@ -1,21 +1,22 @@
 ﻿namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
 {
-    public class BinanceAsset
+    public sealed class BinanceAsset : IEquatable<BinanceAsset>
     {
         public long Id { get; init; }
-        public string Asset { get; init; }
-    }
+        public string Asset { get; init; } = string.Empty;
 
-    public class BinanceAssetComparer : IEqualityComparer<BinanceAsset>
-    {
-        public bool Equals(BinanceAsset? x, BinanceAsset? y)
+        public bool Equals(BinanceAsset? other)
         {
-            return x?.Asset == y?.Asset;
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return other != null && Asset == other.Asset;
         }
 
-        public int GetHashCode(BinanceAsset obj)
-        {
-            return obj.Asset.GetHashCode();
-        }
+        public override bool Equals(object? obj) => obj is not null && Equals(obj as BinanceAsset);
+
+        public override int GetHashCode() => HashCode.Combine(Asset);
     }
 }
