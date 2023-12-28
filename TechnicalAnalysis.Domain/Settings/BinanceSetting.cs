@@ -2,8 +2,8 @@
 {
     public class BinanceSetting
     {
-        public string ApiKey { get; init; }
-        public string SymbolsPairsPath { get; init; }
-        public string CandlestickPath { get; set; }
+        public string ApiKey { get; init; } = string.Empty;
+        public string SymbolsPairsPath { get; init; } = string.Empty;
+        public string CandlestickPath { get; set; } = string.Empty;
     }
 }
