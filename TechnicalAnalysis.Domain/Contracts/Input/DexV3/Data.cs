@@ -20,6 +20,6 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.DexV3
         public string? Close { get; init; }
 
         [JsonPropertyName("tvlUSD")]
-        public string? TotalValueLockedRawData { get; init; }
+        public new string? TotalValueLockedRawData { get; init; }
     }
 }
