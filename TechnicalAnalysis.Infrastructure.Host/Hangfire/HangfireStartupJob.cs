@@ -13,9 +13,12 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
 
             if (syncService != null)
             {
-                BackgroundJob.Enqueue(() => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                    CommonModels.Enums.DataProvider.All,
-                    CommonModels.Enums.Timeframe.Daily)));
+                RecurringJob.AddOrUpdate(
+                    "SynchronizeProvidersJob", // Unique identifier for the job
+                    () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.All,
+                        CommonModels.Enums.Timeframe.Daily)),
+                    Cron.Daily);
             }
         }
     }
