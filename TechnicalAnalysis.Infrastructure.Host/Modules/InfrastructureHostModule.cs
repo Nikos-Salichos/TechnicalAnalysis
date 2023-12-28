@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TechnicalAnalysis.Infrastructure.Host.Filters;
 
 namespace TechnicalAnalysis.Infrastructure.Host.Modules
 {
@@ -22,6 +23,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
             {
                 options.UseInlineDefinitionsForEnums();
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                options.OperationFilter<ApiKeyHeaderFilter>();
             });
 
             //Log Http Requests
@@ -31,7 +33,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
                 options.CombineLogs = true;
             });
 
-            //Configure Cords
+            //Configure Cors
             services.AddCors(options => options.AddDefaultPolicy(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
