@@ -69,7 +69,7 @@ namespace TechnicalAnalysis.Infrastructure.Client
                     return default;
                 }
 
-                using var jsonStream = await response.Content.ReadAsStreamAsync();
+                await using var jsonStream = await response.Content.ReadAsStreamAsync();
                 var deserializedResponse = await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions);
                 if (deserializedResponse != null)
                 {
