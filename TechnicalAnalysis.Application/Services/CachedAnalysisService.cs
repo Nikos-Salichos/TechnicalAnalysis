@@ -10,9 +10,21 @@ namespace TechnicalAnalysis.Application.Services
     public class CachedAnalysisService(IAnalysisService inner, IRedisRepository redisRepository,
         ICommunication communication, IRabbitMqService rabbitMqService) : IAnalysisService
     {
-        public Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
+        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
         {
-            return inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
+            var cachedPair = await redisRepository.GetRecordAsync<PairExtended>(pairName);
+            if (cachedPair != null)
+            {
+                return new List<PairExtended> { cachedPair };
+            }
+
+            var pairs = await inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
+            if (pairs.Any())
+            {
+                await redisRepository.SetRecordAsync(pairName, pairs.FirstOrDefault(), null, null);
+            }
+
+            return pairs;
         }
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
