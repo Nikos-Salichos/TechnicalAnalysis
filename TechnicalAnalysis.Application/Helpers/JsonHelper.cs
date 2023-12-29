@@ -22,7 +22,7 @@ namespace TechnicalAnalysis.Application.Helpers
 
         public static async Task SerializeToJson<T>(T item, string fileName)
         {
-            await using FileStream createStream = new FileStream(fileName, FileMode.Create);
+            await using FileStream createStream = new(fileName, FileMode.Create);
             await JsonSerializer.SerializeAsync(createStream, item, options);
         }
     }
