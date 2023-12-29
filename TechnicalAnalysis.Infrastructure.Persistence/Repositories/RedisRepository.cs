@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
@@ -11,39 +12,54 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             WriteIndented = true,
             NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
         };
 
-        public async Task SetRecordAsync<T>(string recordId,
-                                          T data,
-                                          TimeSpan? absoluteExpireTime = null,
-                                          TimeSpan? slidingExpireTime = null)
+        public async Task SetRecordAsync<T>(string recordId, T data, TimeSpan? absoluteExpireTime = null, TimeSpan? slidingExpireTime = null)
         {
             var distributedCacheEntryOptions = GetDistributedCacheEntryOptions(absoluteExpireTime, slidingExpireTime);
 
-            var jsonData = JsonSerializer.Serialize(data, defaultJsonSerializerOptions);
-            await distributedCache.SetStringAsync(recordId, jsonData, distributedCacheEntryOptions, default);
+            await using var compressedStream = new MemoryStream();
+            await using (var brotliStream = new BrotliStream(compressedStream, CompressionMode.Compress))
+                await JsonSerializer.SerializeAsync(brotliStream, data, defaultJsonSerializerOptions);
+
+            await distributedCache.SetAsync(recordId, compressedStream.ToArray(), distributedCacheEntryOptions);
         }
 
         public async Task<T?> GetRecordAsync<T>(string recordId)
         {
-            var jsonData = await distributedCache.GetStringAsync(recordId);
+            // Get the compressed data as a byte array
+            var compressedData = await distributedCache.GetAsync(recordId);
 
-            return jsonData is null
-                ? default
-                : JsonSerializer.Deserialize<T>(jsonData, defaultJsonSerializerOptions);
+            if (compressedData is null || compressedData.Length == 0)
+            {
+                return default;
+            }
+
+            // Decompress and deserialize the data in one step
+            await using var compressedStream = new MemoryStream(compressedData);
+            await using var brotliStream = new BrotliStream(compressedStream, CompressionMode.Decompress);
+            return await JsonSerializer.DeserializeAsync<T>(brotliStream, defaultJsonSerializerOptions);
         }
 
         private static DistributedCacheEntryOptions GetDistributedCacheEntryOptions(TimeSpan? absoluteExpireTime,
             TimeSpan? slidingExpireTime)
         {
-            DateTime endOfDay = DateTime.UtcNow.Date.AddDays(1).AddTicks(-1); // Set time to 23:59:59.9999999
+            var now = DateTime.UtcNow;
+            var midnightUtc = now.Date.AddDays(1);
+            var timeUntilMidnightUtc = midnightUtc - now;
 
-            return new()
+            // Ensure there's always a non-zero duration
+            timeUntilMidnightUtc = timeUntilMidnightUtc > TimeSpan.Zero
+                ? timeUntilMidnightUtc
+                : TimeSpan.FromSeconds(1);
+
+            return new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? endOfDay - DateTime.UtcNow,
-                SlidingExpiration = slidingExpireTime ?? endOfDay - DateTime.UtcNow
+                AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? timeUntilMidnightUtc,
+                SlidingExpiration = slidingExpireTime ?? timeUntilMidnightUtc
             };
         }
+
+
     }
 }
