@@ -220,11 +220,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                 // Get the corresponding property.
                                 PropertyInfo property = properties[i++];
 
-                                if (property.Name == "Volume") // Skip the Volume property
-                                {
-                                    continue;
-                                }
-
                                 // Convert the cell value to the property type and set it on the candlestick object.
                                 CandlestickExtension.ParseCandlestickData(newCandlestick, cell, property);
                             }
