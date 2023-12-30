@@ -78,7 +78,5 @@ namespace TechnicalAnalysis.Application.Services
 
             return pairs;
         }
-
-
     }
 }
