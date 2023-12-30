@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 using System.Text.Json;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
+using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 using TechnicalAnalysis.Domain.Settings;
@@ -14,11 +15,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy) : IBinanceHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-
-        private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
-        {
-            PropertyNameCaseInsensitive = true
-        };
 
         private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
 
@@ -40,7 +36,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 using var content = httpResponseMessage.Content;
                 await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, _jsonSerializerOptions);
+                var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
                 if (deserializedData is not null)
                 {
                     logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetBinanceAssetsAndPairs), deserializedData);
@@ -65,10 +61,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 binanceCandlestickPath += "?" + string.Join("&", queryParams.Select(p => $"{p.Key}={p.Value}"));
             }
 
-            var headers = new Dictionary<string, string>
-                    {
-                        { "X-MBX-APIKEY" , binanceSettings.CurrentValue.ApiKey },
-                    };
             try
             {
                 using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
@@ -83,7 +75,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 }
 
                 await using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var deserializedData = await JsonSerializer.DeserializeAsync<object[][]>(jsonStream, _jsonSerializerOptions);
+                var deserializedData = await JsonSerializer.DeserializeAsync<object[][]>(jsonStream, JsonHelper.JsonSerializerOptions);
                 if (deserializedData is not null)
                 {
                     return Result<object[][], string>.Success(deserializedData);
@@ -98,9 +90,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
         }
 
-        public void Dispose()
-        {
-            _httpClient.Dispose();
-        }
+        //TODO I do not need it
+        /*        public void Dispose()
+                {
+                    _httpClient.Dispose();
+                }*/
     }
 }
