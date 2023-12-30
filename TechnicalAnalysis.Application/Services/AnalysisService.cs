@@ -3,21 +3,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TechnicalAnalysis.Application.Extensions;
-using TechnicalAnalysis.Application.Helpers;
 using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 using TechnicalAnalysis.CommonModels.JsonOutput;
+using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Application;
-using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Utilities;
 using Indicator = TechnicalAnalysis.CommonModels.JsonOutput.Indicator;
 
 namespace TechnicalAnalysis.Application.Services
 {
-    public class AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration, IRedisRepository redisRepository)
+    public class AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration)
         : IAnalysisService
     {
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
@@ -59,31 +58,16 @@ namespace TechnicalAnalysis.Application.Services
         public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
         {
             var fetchedPairs = await FormatAssetsPairsCandlesticks();
-            var cachedPairs = new List<PairExtended>();
+            var selectedPairs = fetchedPairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
 
-            foreach (var pair in fetchedPairs)
+            if (!selectedPairs.Any())
             {
-                var cachedPair = await redisRepository.GetRecordAsync<PairExtended>(pair.Symbol);
-                if (cachedPair?.HasCalculateDailyTechnicalAnalysis == true)
-                {
-                    cachedPairs.Add(cachedPair);
-                }
+                return Enumerable.Empty<PairExtended>();
             }
 
-            var pairsToCalculate = fetchedPairs.Except(cachedPairs).ToList();
-            if (pairsToCalculate.Count > 0)
-            {
-                CalculateTechnicalIndicators(pairsToCalculate);
-                foreach (var pair in pairsToCalculate)
-                {
-                    await redisRepository.SetRecordAsync(pair.Symbol, pair, null, null);
-                }
-            }
+            CalculateTechnicalIndicators(fetchedPairs);
 
-            var allPairs = cachedPairs.Concat(pairsToCalculate);
-
-            var selectedPairs = allPairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
-            await CalculateMarketStatistics(allPairs, selectedPairs);
+            await CalculateMarketStatistics(fetchedPairs, selectedPairs);
 
             var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOnBasedInFractalBreak();
             var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAllBasedInFractalBreak();
@@ -100,23 +84,16 @@ namespace TechnicalAnalysis.Application.Services
             {
                 pair.Candlesticks = pair.Candlesticks.OrderBy(c => c.OpenDate).ToList();
 
-                Indicator enhancedScan = CalculateEnhancedScanAllSignals(pair);
-                Indicator fractalTrend = PrintFractalTrend(pair);
-                Indicator lowestHighLowestLowFractalSignals = PrintLowestHighSignals(pair);
-                Indicator flagNestedBodySignals = PrintFlagNestedBodySignals(pair);
-                Indicator pivotSignals = PrintPivotSignals(pair);
-                Indicator resistanceSignals = PrintResistanceBreakoutSignals(pair);
-                Indicator stPatterns = CalculateStPatternSignals(pair);
-                Indicator closeBelowPivotSignal = CalculateCandlestickCloseBelowPivotPrice(pair);
-
-                indicatorReports.Add(enhancedScan);
-                indicatorReports.Add(fractalTrend);
-                indicatorReports.Add(lowestHighLowestLowFractalSignals);
-                indicatorReports.Add(flagNestedBodySignals);
-                indicatorReports.Add(pivotSignals);
-                indicatorReports.Add(resistanceSignals);
-                indicatorReports.Add(stPatterns);
-                indicatorReports.Add(closeBelowPivotSignal);
+                indicatorReports.Add(CalculateEnhancedScanAllSignals(pair));
+                indicatorReports.Add(PrintFractalTrend(pair));
+                indicatorReports.Add(PrintLowestHighSignals(pair));
+                indicatorReports.Add(PrintFlagNestedBodySignals(pair));
+                indicatorReports.Add(PrintFlagNestedRangeSignals(pair));
+                indicatorReports.Add(PrintFunnelSignals(pair));
+                indicatorReports.Add(PrintPivotSignals(pair));
+                indicatorReports.Add(PrintResistanceBreakoutSignals(pair));
+                indicatorReports.Add(CalculateStPatternSignals(pair));
+                indicatorReports.Add(CalculateCandlestickCloseBelowPivotPrice(pair));
             }
 
             foreach (var indicator in indicatorReports)
@@ -377,6 +354,117 @@ namespace TechnicalAnalysis.Application.Services
                     }
                 }
 
+                foreach (var signal in candlestick.PriceFunnels)
+                {
+                    if (signal.NumberOfFunnelCandlesticks > 3 &&
+                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
+                    {
+                        var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+
+                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        {
+                            var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                            if (signalFound is not null)
+                            {
+                                continue;
+                            }
+
+                            var signalIndicator = new Signal
+                            {
+                                OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                                Buy = 1,
+                                EntryPrice = candlestick.ClosePrice
+                            };
+
+                            indicator.Signals.Add(signalIndicator);
+                        }
+                    }
+                }
+            }
+            return indicator;
+        }
+
+        private static Indicator PrintFlagNestedRangeSignals(PairExtended pair)
+        {
+            var indicator = new Indicator { Name = "FlagNestedRangeSignals" };
+
+            if (pair.Candlesticks.Count == 0)
+            {
+                return indicator;
+            }
+
+            foreach (var candlestick in pair.Candlesticks)
+            {
+                foreach (var signal in candlestick.FlagsNestedCandlesticksRange)
+                {
+                    if (signal.NumberOfNestedCandlestickRanges > 3 &&
+                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
+                    {
+                        var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        {
+                            var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                            if (signalFound is not null)
+                            {
+                                continue;
+                            }
+
+                            var signalIndicator = new Signal
+                            {
+                                OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                                Buy = 1,
+                                EntryPrice = candlestick.ClosePrice
+                            };
+
+                            indicator.Signals.Add(signalIndicator);
+                        }
+                    }
+                }
+
+                foreach (var signal in candlestick.PriceFunnels)
+                {
+                    if (signal.NumberOfFunnelCandlesticks > 3 &&
+                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
+                    {
+                        var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+
+                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        {
+                            var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                            if (signalFound is not null)
+                            {
+                                continue;
+                            }
+
+                            var signalIndicator = new Signal
+                            {
+                                OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                                Buy = 1,
+                                EntryPrice = candlestick.ClosePrice
+                            };
+
+                            indicator.Signals.Add(signalIndicator);
+                        }
+                    }
+                }
+            }
+            return indicator;
+        }
+
+        private static Indicator PrintFunnelSignals(PairExtended pair)
+        {
+            var indicator = new Indicator { Name = "FunnelSignals" };
+
+            if (pair.Candlesticks.Count == 0)
+            {
+                return indicator;
+            }
+
+            foreach (var candlestick in pair.Candlesticks)
+            {
                 foreach (var signal in candlestick.PriceFunnels)
                 {
                     if (signal.NumberOfFunnelCandlesticks > 3 &&
