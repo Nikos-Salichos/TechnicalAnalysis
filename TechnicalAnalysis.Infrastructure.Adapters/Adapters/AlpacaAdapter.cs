@@ -210,6 +210,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                 .WithLowPrice(bar.Low)
                                 .WithClosePrice(bar.Close)
                                 .WithTimeframe(Timeframe.Daily)
+                                .WithVolume(bar.Volume)
                                 .Build();
 
                             newCandlesticks.Add(candlestick);
