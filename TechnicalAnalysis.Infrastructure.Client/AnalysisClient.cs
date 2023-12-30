@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.JsonOutput;
@@ -10,7 +11,10 @@ namespace TechnicalAnalysis.Infrastructure.Client
     {
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
-            PropertyNameCaseInsensitive = true
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true,
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
         };
 
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("AnalysisClient");
@@ -35,53 +39,41 @@ namespace TechnicalAnalysis.Infrastructure.Client
             await SendHttpRequestAsync<IEnumerable<PairExtended>>(apiUrl, HttpMethod.Get, requestData);
         }
 
-        private async Task<T> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null)
+        private async Task<T?> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null)
         {
-            try
+            HttpResponseMessage response;
+
+            if (httpMethod == HttpMethod.Get)
             {
-                HttpResponseMessage response;
-
-                if (httpMethod == HttpMethod.Get)
-                {
-                    var urlWithParams = apiUrl + (requestData != null ? ToQueryString(requestData) : "");
-                    response = await _httpClient.GetAsync(urlWithParams);
-                }
-                else if (httpMethod == HttpMethod.Post)
-                {
-                    var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
-                    response = await _httpClient.PostAsync(apiUrl, jsonContent);
-                }
-                else
-                {
-                    throw new ArgumentException($"Unsupported HTTP method: {httpMethod}");
-                }
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    throw new HttpRequestException($"Failed to execute HTTP request. Status code: {response.StatusCode}, Content: {content}");
-                }
-
-                if (response.Content == null || response.Content.Headers.ContentLength == 0)
-                {
-                    // If T is a reference type or nullable, we can return default(T).
-                    // If T is a value type and cannot be null, this will return the default value for that type.
-                    return default;
-                }
-
-                await using var jsonStream = await response.Content.ReadAsStreamAsync();
-                var deserializedResponse = await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions);
-                if (deserializedResponse != null)
-                {
-                    return deserializedResponse;
-                }
-
-                throw new NullReferenceException("Deserialization returned null.");
+                var urlWithParams = apiUrl + (requestData != null ? ToQueryString(requestData) : "");
+                response = await _httpClient.GetAsync(urlWithParams);
             }
-            catch (Exception)
+            else if (httpMethod == HttpMethod.Post)
             {
-                throw;
+                var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
+                response = await _httpClient.PostAsync(apiUrl, jsonContent);
             }
+            else
+            {
+                throw new ArgumentException($"Unsupported HTTP method: {httpMethod}");
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Failed to execute HTTP request. Status code: {response.StatusCode}, Content: {content}");
+            }
+
+            if (response.Content == null || response.Content.Headers.ContentLength == 0)
+            {
+                // If T is a reference type or nullable, we can return default(T).
+                // If T is a value type and cannot be null, this will return the default value for that type.
+                return default;
+            }
+
+            await using var jsonStream = await response.Content.ReadAsStreamAsync();
+            var deserializedResponse = await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions);
+            return deserializedResponse ?? default;
         }
 
         private static string ToQueryString(object requestData)
