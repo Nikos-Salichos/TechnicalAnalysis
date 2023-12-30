@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Contracts.Input.DexV3;
+using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 using TechnicalAnalysis.Domain.Settings;
@@ -16,11 +17,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<DexV3HttpClient> logger, IPollyPolicy pollyPolicy) : IDexV3HttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-
-        private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
 
         private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
 
@@ -108,7 +104,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     }
 
                     await using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                    var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, _jsonSerializerOptions);
+                    var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
                     if (deserializedData is not null)
                     {
                         logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetMostActivePoolsAsync), deserializedData);
