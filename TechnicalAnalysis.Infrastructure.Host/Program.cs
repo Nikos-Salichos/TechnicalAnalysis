@@ -60,6 +60,11 @@ app.UseSwaggerUI();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+if (builder.Environment.IsProduction())
+{
+    app.UseMiddleware<ApiKeyMiddleware>();
+}
+
 app.UseHsts();
 
 app.UseHttpsRedirection();
@@ -91,4 +96,7 @@ app.MapControllers();
 
 app.Run();
 
+/// <summary>
+/// I need to declare Program for test containers nuget (integration testing)
+/// </summary>
 public partial class Program { }
