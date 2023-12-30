@@ -8,7 +8,7 @@
         public const string Dai = "DAI";
         public const string Busd = "BUSD";
 
-        public const int RsiPeriod = 14;
+        public const int RsiPeriod = 7;
         public const double RsiOverbought = 70;
         public const double RsiOversold = 30;
         public const double StochasticOverbought = 80;
