@@ -1,18 +1,13 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using System.IO.Compression;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
     public class RedisRepository(IDistributedCache distributedCache) : IRedisRepository
     {
-        private static readonly JsonSerializerOptions defaultJsonSerializerOptions = new()
-        {
-            WriteIndented = true,
-            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-        };
 
         public async Task SetRecordAsync<T>(string recordId, T data, TimeSpan? absoluteExpireTime = null, TimeSpan? slidingExpireTime = null)
         {
@@ -20,7 +15,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
             await using var compressedStream = new MemoryStream();
             await using (var brotliStream = new BrotliStream(compressedStream, CompressionMode.Compress))
-                await JsonSerializer.SerializeAsync(brotliStream, data, defaultJsonSerializerOptions);
+                await JsonSerializer.SerializeAsync(brotliStream, data, JsonHelper.JsonSerializerOptions);
 
             await distributedCache.SetAsync(recordId, compressedStream.ToArray(), distributedCacheEntryOptions);
         }
@@ -38,7 +33,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             // Decompress and deserialize the data in one step
             await using var compressedStream = new MemoryStream(compressedData);
             await using var brotliStream = new BrotliStream(compressedStream, CompressionMode.Decompress);
-            return await JsonSerializer.DeserializeAsync<T>(brotliStream, defaultJsonSerializerOptions);
+            return await JsonSerializer.DeserializeAsync<T>(brotliStream, JsonHelper.JsonSerializerOptions);
         }
 
         private static DistributedCacheEntryOptions GetDistributedCacheEntryOptions(TimeSpan? absoluteExpireTime,
