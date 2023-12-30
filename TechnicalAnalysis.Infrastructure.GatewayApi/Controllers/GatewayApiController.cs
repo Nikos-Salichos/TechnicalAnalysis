@@ -55,9 +55,9 @@ namespace TechnicalAnalysis.Infrastructure.GatewayApi.Controllers
                 return default;
             }
 
-            using var jsonStream = await response.Content.ReadAsStreamAsync();
+            await using var jsonStream = await response.Content.ReadAsStreamAsync();
             var deserializedResponse = await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions);
-            return deserializedResponse ?? throw new NullReferenceException("Deserialization returned null.");
+            return deserializedResponse ?? default;
         }
 
         private static string ToQueryString(object requestData)
