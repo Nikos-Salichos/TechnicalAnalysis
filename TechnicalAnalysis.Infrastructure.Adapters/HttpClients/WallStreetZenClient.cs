@@ -38,6 +38,31 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             return stocks;
         }
 
+        /*        public void GetFearAndGreed()
+                {
+                    const string urlStockForecast = "https://alternative.me/crypto/fear-and-greed-index/";
+                    var web = new HtmlWeb();
+                    var document = web.Load(urlStockForecast);
+                    var innerText = document.DocumentNode.InnerText;
+                    var todayStatusDiv = document.DocumentNode.SelectSingleNode("//div[@class='fng-value']//div[@class='status']");
+                    var todayValueDiv = document.DocumentNode.SelectSingleNode("//div[@class='fng-value']//div[@class='fng-circle']");
+
+                    if (todayStatusDiv != null && todayValueDiv != null)
+                    {
+                        string todayStatus = todayStatusDiv.InnerText.Trim();
+                        string todayValue = todayValueDiv.InnerText.Trim();
+                        Console.WriteLine("The extracted status is: " + todayStatus);
+                        Console.WriteLine("The extracted value is: " + todayValue);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Value not found");
+                    }
+
+                    //Example how to pick same div for example for yesterday
+                    // var yesterdayValueNode = document.DocumentNode.SelectSingleNode("(//div[@class='fng-value'])[2]/div/div[@class='fng-circle']");
+                }*/
+
         private static void GetStockForecast(Stock stock)
         {
             var urlStockForecast = $"https://www.wallstreetzen.com/stocks/us/{stock.Exchange}/{stock.Symbol}/stock-forecast";
