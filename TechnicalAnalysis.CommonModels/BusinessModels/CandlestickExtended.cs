@@ -51,9 +51,10 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public IList<FractalLowest> FractalLowests { get; init; } = new List<FractalLowest>();
         public IList<StandardPivotPoint> StandardPivotPoints { get; init; } = new List<StandardPivotPoint>();
         public IList<AverageRange> AverageRanges { get; init; } = new List<AverageRange>();
-        public IList<StPatternSignal> StPatternSignals { get; init; } = new List<StPatternSignal>();
         public IList<CloseRelativeToPivot> CloseRelativeToPivots { get; init; } = new List<CloseRelativeToPivot>();
         public IList<VixFix> VixFixes { get; init; } = new List<VixFix>();
+        public IList<VerticalHorizontalFilter> VerticalHorizontalFilters { get; init; } = new List<VerticalHorizontalFilter>();
+        public IList<VerticalHorizontalFilterRange> VerticalHorizontalFilterRanges { get; init; } = new List<VerticalHorizontalFilterRange>();
         public Trend FractalTrend { get; set; }
         public Trend PriceTrend { get; set; }
         public IDictionary<string, double> CorrelationPerPair { get; init; } = new Dictionary<string, double>();
