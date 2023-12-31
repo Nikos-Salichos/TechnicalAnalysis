@@ -8,7 +8,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
     public class RedisRepository(IDistributedCache distributedCache) : IRedisRepository
     {
-
         public async Task SetRecordAsync<T>(string recordId, T data, TimeSpan? absoluteExpireTime = null, TimeSpan? slidingExpireTime = null)
         {
             var distributedCacheEntryOptions = GetDistributedCacheEntryOptions(absoluteExpireTime, slidingExpireTime);
