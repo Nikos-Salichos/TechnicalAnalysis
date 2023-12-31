@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
 using TechnicalAnalysis.Domain.Entities;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
@@ -18,6 +19,26 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         : IPostgreSqlRepository
     {
         private readonly string _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
+
+        public async Task<IResult<IEnumerable<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndexAsync()
+        {
+            try
+            {
+                return await ExecutionTimeLogger.LogExecutionTime(async () =>
+                {
+                    await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                    const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"TimestampAsDateTime\" FROM \"CryptoFearAndGreedIndex\"";
+
+                    var assets = await dbConnection.QueryAsync<CryptoFearAndGreedData>(query);
+                    return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(assets);
+                }, logger, nameof(GetCryptoFearAndGreedIndexAsync));
+            }
+            catch (Exception exception)
+            {
+                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetCryptoFearAndGreedIndexAsync), exception);
+                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(exception.ToString());
+            }
+        }
 
         public async Task<IResult<IEnumerable<Asset>, string>> GetAssetsAsync()
         {
@@ -160,6 +181,31 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetDexCandlesticksAsync), exception);
                 return Result<IEnumerable<DexCandlestick>, string>.Fail(exception.ToString());
+            }
+        }
+
+        public async Task InsertCryptoFearAndGreedIndex(IEnumerable<CryptoFearAndGreedData> indexes)
+        {
+            try
+            {
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
+
+                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"CryptoFearAndGreedIndex\" (\"Value\", \"ValueClassification\", \"TimestampAsDateTime\") FROM STDIN BINARY");
+
+                foreach (var index in indexes)
+                {
+                    await writer.StartRowAsync();
+                    await WriteParameter(writer, index.Value);
+                    await WriteParameter(writer, index.ValueClassification);
+                    await WriteParameter(writer, index.TimestampAsDateTime);
+                }
+
+                await writer.CompleteAsync();
+            }
+            catch (Exception exception)
+            {
+                logger.LogError("Method:{Method}, Exception:{@exception}", nameof(InsertCryptoFearAndGreedIndex), exception);
             }
         }
 
