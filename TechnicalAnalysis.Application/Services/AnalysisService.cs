@@ -55,10 +55,10 @@ namespace TechnicalAnalysis.Application.Services
             return filteredPairs;
         }
 
-        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
+        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe)
         {
             var fetchedPairs = await FormatAssetsPairsCandlesticks();
-            var selectedPairs = fetchedPairs.Where(p => p.Symbol.Equals(pairName, StringComparison.InvariantCultureIgnoreCase));
+            var selectedPairs = fetchedPairs.Where(p => pairNames.Contains(p.Symbol, StringComparer.InvariantCultureIgnoreCase));
 
             if (!selectedPairs.Any())
             {
@@ -92,7 +92,6 @@ namespace TechnicalAnalysis.Application.Services
                 indicatorReports.Add(PrintFunnelSignals(pair));
                 indicatorReports.Add(PrintPivotSignals(pair));
                 indicatorReports.Add(PrintResistanceBreakoutSignals(pair));
-                indicatorReports.Add(CalculateStPatternSignals(pair));
                 indicatorReports.Add(CalculateCandlestickCloseBelowPivotPrice(pair));
             }
 
@@ -114,12 +113,9 @@ namespace TechnicalAnalysis.Application.Services
         {
             var baseDirectory = configuration.GetSection("OutputFolder:Path").Value;
 
-            if (string.IsNullOrWhiteSpace(baseDirectory))
-            {
-                return string.Empty;
-            }
-
-            return baseDirectory;
+            return string.IsNullOrWhiteSpace(baseDirectory)
+                ? string.Empty
+                : baseDirectory;
         }
 
         private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsStrategy, string name)
@@ -180,23 +176,6 @@ namespace TechnicalAnalysis.Application.Services
                 enhancedScan.Signals.Add(signalIndicator);
             }
             return enhancedScan;
-        }
-
-        private static Indicator CalculateStPatternSignals(PairExtended pair)
-        {
-            var stPatternSignals = new Indicator { Name = "StPatternSignals" };
-
-            foreach (var candlestick in pair.Candlesticks.Where(c => c.StPatternSignals.FirstOrDefault()?.NumberOfSignal == 1))
-            {
-                var signalIndicator = new Signal
-                {
-                    OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                    Buy = 1,
-                };
-                stPatternSignals.Signals.Add(signalIndicator);
-            }
-
-            return stPatternSignals;
         }
 
         private static Indicator PrintFractalTrend(PairExtended pair)
@@ -568,6 +547,8 @@ namespace TechnicalAnalysis.Application.Services
                 return;
             }
 
+            var cryptoFearAndGreedIndex = await mediator.Send(new GetCryptoFearAndGreedIndexQuery());
+
             foreach (var pair in selectedPairs)
             {
                 // Clear EnhancedScans for each candlestick in the current pair
@@ -585,7 +566,12 @@ namespace TechnicalAnalysis.Application.Services
                     if (kvp.Value.PairsWithEnhancedScan.Contains(pair.Symbol)
                         && candlesticksByDate.TryGetValue(kvp.Key, out var candlestick))
                     {
-                        candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId) { EnhancedScanIsBuy = true });
+                        var cryptoFearAndGreedIndexFound = cryptoFearAndGreedIndex.FirstOrDefault(c => c.TimestampAsDateTime.Date == kvp.Key.Date);
+                        if (cryptoFearAndGreedIndexFound?.ValueClassification != "ExtremeGreed"
+                            && cryptoFearAndGreedIndexFound?.ValueClassification != "Greed")
+                        {
+                            candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId) { EnhancedScanIsBuy = true });
+                        }
                     }
                 }
             }
