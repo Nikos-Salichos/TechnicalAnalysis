@@ -15,7 +15,9 @@ namespace TechnicalAnalysis.Application.Modules
     {
         public static void AddApplicationModule(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<AnalysisService>();  // Register the original service
+            // Register the original service
+            services.AddSingleton<AnalysisService>();
+
             // Register the decorator
             services.AddSingleton<IAnalysisService>(serviceProvider =>
             {
@@ -30,7 +32,6 @@ namespace TechnicalAnalysis.Application.Modules
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-            //Use in IOptionsMonitor<>
             services.AddOptions<AlpacaSetting>().Bind(configuration.GetSection("AlpacaSettings"));
             services.AddOptions<BinanceSetting>().Bind(configuration.GetSection("BinanceSettings"));
             services.AddOptions<DexSetting>().Bind(configuration.GetSection("DexSettings"));
