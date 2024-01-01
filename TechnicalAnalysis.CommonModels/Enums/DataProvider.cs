@@ -9,5 +9,6 @@
         Alpaca = 4,
         WallStreetZen = 5,
         All = 6,
+        AlternativeMeCryptoAndFearIndex = 7
     }
 }
