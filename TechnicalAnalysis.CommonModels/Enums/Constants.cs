@@ -20,6 +20,7 @@
         public const double MacdOversold = 0;
         public const double RateOfChangeOversold = -10;
         public const int RateOfChangePeriod = 7;
+        public const double VerticalHorizontalFilterRangeLimit = 0.40;
 
         public const int decimalPlacesRound = 20;
     }
