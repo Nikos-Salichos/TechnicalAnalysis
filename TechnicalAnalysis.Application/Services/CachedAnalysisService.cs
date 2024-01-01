@@ -10,21 +10,33 @@ namespace TechnicalAnalysis.Application.Services
     public class CachedAnalysisService(IAnalysisService inner, IRedisRepository redisRepository,
         ICommunication communication, IRabbitMqService rabbitMqService) : IAnalysisService
     {
-        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(string pairName, Timeframe timeframe)
+        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe)
         {
-            var cachedPair = await redisRepository.GetRecordAsync<PairExtended>(pairName);
-            if (cachedPair != null)
+            var pairsFromCache = new List<PairExtended>();
+
+            foreach (var pairName in pairNames)
             {
-                //  return new List<PairExtended> { cachedPair };
+                var cachedPair = await redisRepository.GetRecordAsync<PairExtended>(pairName);
+                if (cachedPair != null)
+                {
+                    pairsFromCache.Add(cachedPair);
+                }
             }
 
-            var pairs = await inner.GetIndicatorsByPairNamesAsync(pairName, timeframe);
-            if (pairs.Any())
+            if (pairNames.Count() == pairsFromCache.Count)
             {
-                await redisRepository.SetRecordAsync(pairName, pairs.FirstOrDefault(), null, null);
+                return pairsFromCache;
             }
 
-            return pairs;
+            var fetchedPairs = await inner.GetIndicatorsByPairNamesAsync(pairNames, timeframe);
+
+            foreach (var pair in fetchedPairs)
+            {
+                await redisRepository.SetRecordAsync(pair.Symbol, pair, null, null);
+                pairsFromCache.Add(pair);
+            }
+
+            return pairsFromCache;
         }
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
@@ -48,32 +60,58 @@ namespace TechnicalAnalysis.Application.Services
 
             var filteredPairs = pairs
                .OrderByDescending(pair => pair.CreatedAt)
-               .Select(pair =>
-               {
-                   var enhancedScans = pair.Candlesticks
-                       .Where(c => c.EnhancedScans.Count > 0)
-                       .OrderByDescending(c => c.CloseDate)
-                       .GroupBy(c => c.PoolOrPairId)
-                       .Select(group => new
-                       {
-                           CandlestickCloseDate = group.First().CloseDate,
-                           group.First().EnhancedScans
-                       })
-                       .ToList();
+                 .Select(pair =>
+                 {
+                     var enhancedScans = pair.Candlesticks
+                         .Where(c => c.EnhancedScans.Count > 0)
+                         .OrderByDescending(c => c.CloseDate)
+                         .GroupBy(c => c.PoolOrPairId)
+                         .Select(group => new
+                         {
+                             CandlestickCloseDate = group.First().CloseDate,
+                             group.First().EnhancedScans
+                         })
+                         .ToList();
 
-                   return new
-                   {
-                       pair.Symbol,
-                       EnhancedScans = enhancedScans
-                   };
-               })
-               .Where(result => result.EnhancedScans.Count > 0)
-               .ToList();
+                     return new
+                     {
+                         pair.Symbol,
+                         EnhancedScans = enhancedScans
+                     };
+                 })
+                 .Where(result => result.EnhancedScans.Count > 0)
+                 .ToList();
 
-            var sortedPairs = filteredPairs.OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate).ToList();
+            var sortedPairsByEnhanced = filteredPairs.OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate).ToList();
+
+            /*            var vhfPairs = pairs
+                           .OrderByDescending(pair => pair.CreatedAt)
+                           .Select(pair =>
+                           {
+                               var enhancedScans = pair.Candlesticks
+                                   .Where(c => c.VerticalHorizontalFilterRanges.Count > 0)
+                                   .OrderByDescending(c => c.CloseDate)
+                                   .GroupBy(c => c.PoolOrPairId)
+                                   .Select(group => new
+                                   {
+                                       CandlestickCloseDate = group.First().CloseDate,
+                                       group.First().VerticalHorizontalFilterRanges
+                                   })
+                                   .ToList();
+
+                               return new
+                               {
+                                   pair.Symbol,
+                                   VerticalHorizontalFilterRanges = enhancedScans
+                               };
+                           })
+                           .Where(result => result.VerticalHorizontalFilterRanges.Count > 0)
+                           .ToList();
+
+                        var sortedPairsByRange = vhfPairs.OrderByDescending(result => result.VerticalHorizontalFilterRanges.FirstOrDefault()?.CandlestickCloseDate).ToList();*/
 
             await redisRepository.SetRecordAsync(provider.ToString(), pairs, null, null);
-            await communication.CreateAttachmentSendMessage(sortedPairs);
+            await communication.CreateAttachmentSendMessage(sortedPairsByEnhanced);
             rabbitMqService.PublishMessage(pairs);
 
             return pairs;
