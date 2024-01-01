@@ -27,7 +27,7 @@ namespace TechnicalAnalysis.Domain.Extensions
             }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(stringWithComma), "The provided string cannot be converted to a long number.");
+                return null;
             }
         }
 
@@ -50,7 +50,7 @@ namespace TechnicalAnalysis.Domain.Extensions
             }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(stringWithComma), "The provided string cannot be converted to a decimal number.");
+                return null;
             }
         }
     }
