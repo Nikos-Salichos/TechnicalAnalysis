@@ -43,6 +43,11 @@ namespace TechnicalAnalysis.Application.Services
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.WallStreetZen, timeframe));
                 }
 
+                if (provider == DataProvider.AlternativeMeCryptoAndFearIndex || provider == DataProvider.All)
+                {
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.AlternativeMeCryptoAndFearIndex, timeframe));
+                }
+
                 if (adaptersToSync.Count > 0)
                 {
                     await Task.WhenAll(adaptersToSync);
