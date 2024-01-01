@@ -2,13 +2,9 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class AverageRange : BaseIndicator
+    public class AverageRange(long candlestickId) : BaseIndicator(candlestickId)
     {
         public decimal? Value { get; init; }
         public long Period { get; init; }
-
-        public AverageRange(long candlestickId) : base(candlestickId)
-        {
-        }
     }
 }
