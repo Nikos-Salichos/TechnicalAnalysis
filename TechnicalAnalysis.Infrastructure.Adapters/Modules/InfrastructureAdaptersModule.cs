@@ -17,26 +17,23 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
     {
         public static void AddInfrastructureAdapterModule(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
-
             services.AddSingleton<BinanceAdapter>();
             services.AddSingleton<AlpacaAdapter>();
             services.AddSingleton<DexV3Adapter>();
             services.AddSingleton<WallStreetZenAdapter>();
+            services.AddSingleton<CryptoFearAndGreedAdapter>();
 
             services.AddSingleton<Func<DataProvider, IAdapter>>(serviceProvider => provider =>
             {
-                IAdapter adapter = provider switch
+                return provider switch
                 {
-                    DataProvider.Binance => serviceProvider.GetService<BinanceAdapter>(),
-                    DataProvider.Alpaca => serviceProvider.GetService<AlpacaAdapter>(),
-                    DataProvider.Uniswap or DataProvider.Pancakeswap => serviceProvider.GetService<DexV3Adapter>(),
-                    DataProvider.WallStreetZen => serviceProvider.GetService<WallStreetZenAdapter>(),
-                    DataProvider.All => throw new NotImplementedException($"Exchange {provider} has not been implemented found"),
-                    _ => throw new ArgumentOutOfRangeException($"Exchange {provider} not found")
+                    DataProvider.Binance => serviceProvider.GetRequiredService<BinanceAdapter>(),
+                    DataProvider.Alpaca => serviceProvider.GetRequiredService<AlpacaAdapter>(),
+                    DataProvider.Uniswap or DataProvider.Pancakeswap => serviceProvider.GetRequiredService<DexV3Adapter>(),
+                    DataProvider.WallStreetZen => serviceProvider.GetRequiredService<WallStreetZenAdapter>(),
+                    DataProvider.AlternativeMeCryptoAndFearIndex => serviceProvider.GetRequiredService<CryptoFearAndGreedAdapter>(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(provider), $"Exchange {provider} not found")
                 };
-
-                return adapter ?? throw new InvalidOperationException($"Could not resolve adapter for {provider}");
             });
 
             services.AddHttpClient("default")
@@ -49,11 +46,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<IDexV3HttpClient, DexV3HttpClient>();
             services.AddSingleton<IAlpacaHttpClient, AlpacaHttpClient>();
             services.AddSingleton<IWallStreetZenClient, WallStreetZenClient>();
+            services.AddSingleton<ICryptoFearAndGreedHttpClient, CryptoFearAndGreedHttpClient>();
             services.AddSingleton<IPollyPolicy, PollyPolicy>();
 
-            services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
-            var mailSettings = configuration.GetSection(nameof(MailSettings)).Get<MailSettings>();
-
+            services.AddOptions<MailSettings>().Bind(configuration.GetSection(nameof(MailSettings)));
             services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMq"));
 
             services.AddSingleton<IMailer, Mailer>();
