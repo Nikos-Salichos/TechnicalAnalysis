@@ -39,20 +39,25 @@ namespace TechnicalAnalysis.Application.Services
 
             CalculateTechnicalIndicators(pairs);
 
-            var filteredPairs = pairs.OrderByDescending(pair => pair.CreatedAt)
-                               .Select(pair =>
-                               {
-                                   pair.Candlesticks = pair.Candlesticks
-                                                   .Where(c => c.EnhancedScans.Count > 0)
-                                                   .OrderByDescending(c => c.CloseDate)
-                                                   .GroupBy(c => c.PoolOrPairId)
-                                                   .Select(group => group.First()) // Take the first item of each group
-                                                   .ToList();
-                                   return pair;
-                               })
-                               .Where(pair => pair.Candlesticks.Count > 0);
+            var filteredPairs = FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
 
             return filteredPairs;
+        }
+
+        private static IEnumerable<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
+        {
+            return pairs.OrderByDescending(pair => pair.CreatedAt)
+                        .Select(pair =>
+                        {
+                            pair.Candlesticks = pair.Candlesticks
+                                                .Where(predicate)
+                                                .OrderByDescending(c => c.CloseDate)
+                                                .GroupBy(c => c.PoolOrPairId)
+                                                .Select(group => group.First()) // Take the first item of each group
+                                                .ToList();
+                            return pair;
+                        })
+                        .Where(pair => pair.Candlesticks.Count > 0);
         }
 
         public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe)
@@ -69,41 +74,45 @@ namespace TechnicalAnalysis.Application.Services
 
             await CalculateMarketStatistics(fetchedPairs, selectedPairs);
 
-            var positionsCloseOneByOne = selectedPairs.AverageDownStrategyCloseOneByOnBasedInFractalBreak();
-            var positionsCloseAll = selectedPairs.AverageDownStrategyCloseAllBasedInFractalBreak();
+            var indicatorReportsPerPair = new Dictionary<PairExtended, List<Indicator>>();
 
-            Indicator enhancedScanPositionsCloseOneByOne = CalculateEnhancedScanSignal(positionsCloseOneByOne, "EnhanchedScan_CloseOneByOne");
-            Indicator enhancedScanPositionsCloseAll = CalculateEnhancedScanSignal(positionsCloseAll, "EnhanchedScan_CloseAll");
-            var indicatorReports = new List<Indicator>()
+            foreach (var selectedPair in selectedPairs)
             {
-                enhancedScanPositionsCloseOneByOne,
-                enhancedScanPositionsCloseAll
-            };
+                selectedPair.Candlesticks = selectedPair.Candlesticks.OrderBy(c => c.OpenDate).ToList();
 
-            foreach (var pair in selectedPairs)
-            {
-                pair.Candlesticks = pair.Candlesticks.OrderBy(c => c.OpenDate).ToList();
+                var positionsCloseOneByOne = selectedPair.AverageDownStrategyCloseOneByOnBasedInFractalBreak();
+                var positionsCloseAll = selectedPair.AverageDownStrategyCloseAllBasedInFractalBreak();
 
-                indicatorReports.Add(CalculateEnhancedScanAllSignals(pair));
-                indicatorReports.Add(PrintFractalTrend(pair));
-                indicatorReports.Add(PrintLowestHighSignals(pair));
-                indicatorReports.Add(PrintFlagNestedBodySignals(pair));
-                indicatorReports.Add(PrintFlagNestedRangeSignals(pair));
-                indicatorReports.Add(PrintFunnelSignals(pair));
-                indicatorReports.Add(PrintPivotSignals(pair));
-                indicatorReports.Add(PrintResistanceBreakoutSignals(pair));
-                indicatorReports.Add(CalculateCandlestickCloseBelowPivotPrice(pair));
+                var indicatorReports = new List<Indicator>
+                {
+                    CalculateEnhancedScanSignal(positionsCloseOneByOne, "EnhancedScan_CloseOneByOne", selectedPair.Symbol),
+                    CalculateEnhancedScanSignal(positionsCloseAll, "EnhancedScan_CloseAll", selectedPair.Symbol),
+                    CalculateEnhancedScanAllSignals(selectedPair),
+                    PrintFractalTrend(selectedPair),
+                    PrintLowestHighSignals(selectedPair),
+                    PrintFlagNestedBodySignals(selectedPair),
+                    PrintFlagNestedRangeSignals(selectedPair),
+                    PrintFunnelSignals(selectedPair),
+                    PrintResistanceBreakoutSignals(selectedPair),
+                    CalculateCandlestickCloseBelowPivotPrice(selectedPair)
+                };
+
+                indicatorReportsPerPair.Add(selectedPair, indicatorReports);
             }
 
-            foreach (var indicator in indicatorReports)
-            {
-                var outputPair = selectedPairs.FirstOrDefault()?.ToOutputContract();
+            // Now indicatorReportsPerPair contains the generated indicators for each selected pair.
 
-                var baseDirectory = GetBaseDirectory();
-                string candlestickFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-candlesticks.json");
-                await JsonHelper.SerializeToJson(outputPair, candlestickFileName);
-                string signalFileName = Path.Combine(baseDirectory, $"{outputPair?.Symbol}-{indicator.Name}.json");
-                await JsonHelper.SerializeToJsonArray(indicator, signalFileName);
+
+            var baseDirectory = GetBaseDirectory();
+            foreach (var indicatorReportPerPair in indicatorReportsPerPair)
+            {
+                foreach (var indicatorReport in indicatorReportPerPair.Value)
+                {
+                    string candlestickFileName = Path.Combine(baseDirectory, $"{indicatorReportPerPair.Key.Symbol}-candlesticks.json");
+                    await JsonHelper.SerializeToJson(indicatorReportPerPair.Key.ToOutputContract(), candlestickFileName);
+                    string signalFileName = Path.Combine(baseDirectory, $"{indicatorReportPerPair.Key.Symbol}-{indicatorReport.Name}.json");
+                    await JsonHelper.SerializeToJsonArray(indicatorReport, signalFileName);
+                }
             }
 
             return selectedPairs;
@@ -118,9 +127,9 @@ namespace TechnicalAnalysis.Application.Services
                 : baseDirectory;
         }
 
-        private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsStrategy, string name)
+        private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsStrategy, string indicatorName, string pairSymbol)
         {
-            var enhancedScan = new Indicator { Name = name };
+            var enhancedScan = new Indicator { Name = indicatorName, PairName = pairSymbol };
             foreach (var position in positionsStrategy)
             {
                 var openPosition = new Signal
@@ -148,7 +157,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var closeBelowPivotPrice = new Indicator { Name = "closeBelowPivotPrice" };
 
-            foreach (var candlestick in pair.Candlesticks.Where(c => c.CloseRelativeToPivots.FirstOrDefault()?.NumberOfConsecutiveCandlestickBelowPivot >= 5))
+            foreach (var candlestick in pair.Candlesticks.Where(c => c.CloseRelativeToPivots.FirstOrDefault()?.NumberOfConsecutiveCandlestickBelowPivot >= 3))
             {
                 var signalIndicator = new Signal
                 {
@@ -163,7 +172,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator CalculateEnhancedScanAllSignals(PairExtended pair)
         {
-            var enhancedScan = new Indicator { Name = "EnhancedScanAllSignals" };
+            var enhancedScan = new Indicator { Name = "EnhancedScanAllSignals", PairName = pair.Symbol };
 
             foreach (var candlestick in pair.Candlesticks
                 .Where(c => c.EnhancedScans?.FirstOrDefault()?.OrderOfSignal >= 0))
@@ -180,7 +189,8 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintFractalTrend(PairExtended pair)
         {
-            var fractalTrend = new Indicator { Name = "FractalTrend" };
+            var fractalTrend = new Indicator { Name = "FractalTrend", PairName = pair.Symbol };
+
             for (int i = 0; i < pair?.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
@@ -227,7 +237,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintLowestHighSignals(PairExtended pair)
         {
-            var lowestHighLowestLowFractal = new Indicator { Name = "lowestHighLowestLowFractal" };
+            var lowestHighLowestLowFractal = new Indicator { Name = "lowestHighLowestLowFractal", PairName = pair.Symbol };
 
             var lastSignal = string.Empty;
             for (int i = 0; i < pair?.Candlesticks.Count; i++)
@@ -270,7 +280,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintFlagNestedBodySignals(PairExtended pair)
         {
-            var indicator = new Indicator { Name = "FlagNestedBodySignals" };
+            var indicator = new Indicator { Name = "FlagNestedBodySignals", PairName = pair.Symbol };
 
             if (pair.Candlesticks.Count == 0)
             {
@@ -366,7 +376,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintFlagNestedRangeSignals(PairExtended pair)
         {
-            var indicator = new Indicator { Name = "FlagNestedRangeSignals" };
+            var indicator = new Indicator { Name = "FlagNestedRangeSignals", PairName = pair.Symbol };
 
             if (pair.Candlesticks.Count == 0)
             {
@@ -435,7 +445,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintFunnelSignals(PairExtended pair)
         {
-            var indicator = new Indicator { Name = "FunnelSignals" };
+            var indicator = new Indicator { Name = "FunnelSignals", PairName = pair.Symbol };
 
             if (pair.Candlesticks.Count == 0)
             {
@@ -477,7 +487,7 @@ namespace TechnicalAnalysis.Application.Services
 
         private static Indicator PrintResistanceBreakoutSignals(PairExtended pair)
         {
-            var flagNestedCandlesticksBody = new Indicator { Name = "ResistanceBreakout" };
+            var flagNestedCandlesticksBody = new Indicator { Name = "ResistanceBreakout", PairName = pair.Symbol };
             decimal? profit = 0;
             decimal? loss = 0;
 
@@ -514,28 +524,6 @@ namespace TechnicalAnalysis.Application.Services
             decimal? profitAndLoss = profit + loss;
 
             return flagNestedCandlesticksBody;
-        }
-
-        private static Indicator PrintPivotSignals(PairExtended pair)
-        {
-            var pivot = new Indicator { Name = "PivotPointSignals" };
-            var candlesticks = pair?.Candlesticks;
-
-            // Start the loop from the second candlestick to avoid index -1
-            for (int i = 1; i < candlesticks?.Count; i++)
-            {
-                var candlestick = candlesticks[i];
-                foreach (var standardPivotPoint in candlestick.CloseRelativeToPivots.Where(c => c.NumberOfConsecutiveCandlestickBelowPivot > 3))
-                {
-                    var signalIndicator = new Signal
-                    {
-                        OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                        Buy = 1
-                    };
-                    pivot.Signals.Add(signalIndicator);
-                }
-            }
-            return pivot;
         }
 
         private async Task CalculateMarketStatistics(IEnumerable<PairExtended> pairs, IEnumerable<PairExtended> selectedPairs)
