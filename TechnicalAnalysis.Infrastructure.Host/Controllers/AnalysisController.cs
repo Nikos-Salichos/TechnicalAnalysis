@@ -26,14 +26,12 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             [FromQuery] Timeframe timeframe = Timeframe.Daily)
         {
             var request = new DataProviderTimeframeRequest(dataProvider, timeframe);
-            logger.LogInformation("Method: {SynchronizeProvidersAsync} , dataProviderTimeframeRequest {@dataProviderTimeframeRequest}",
-                 nameof(SynchronizeProvidersAsync), request);
+            logger.LogInformation("dataProviderTimeframeRequest {@dataProviderTimeframeRequest}", request);
 
             var validationResult = _dataProviderTimeframeRequest.Validate(request);
             if (!validationResult.IsValid)
             {
-                logger.LogWarning("Method: {SynchronizeProvidersAsync} , validationResult {@validationResult}",
-                    nameof(SynchronizeProvidersAsync), validationResult);
+                logger.LogWarning("validationResult {@validationResult}", validationResult);
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage);
                 return Task.FromResult<IActionResult>(BadRequest(errors));
             }
@@ -64,10 +62,10 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("IndicatorsByPairName")]
         [EnableRateLimiting("fixed-by-ip")]
-        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName, [FromQuery] Timeframe timeframe)
+        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] IEnumerable<string> pairNames, [FromQuery] Timeframe timeframe)
         {
-            logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairName);
-            await analysisService.GetIndicatorsByPairNamesAsync(pairName, timeframe);
+            logger.LogInformation("Method: {GetIndicatorsByPairNameAsync} , request {request}", nameof(GetIndicatorsByPairNameAsync), pairNames);
+            await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe);
             return Ok();
         }
     }
