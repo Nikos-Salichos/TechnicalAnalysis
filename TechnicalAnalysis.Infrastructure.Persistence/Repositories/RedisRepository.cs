@@ -8,6 +8,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
     public class RedisRepository(IDistributedCache distributedCache) : IRedisRepository
     {
+        private static string NormalizeRecordId(string recordId) => recordId.ToUpperInvariant();
+
         public async Task SetRecordAsync<T>(string recordId, T data, TimeSpan? absoluteExpireTime = null, TimeSpan? slidingExpireTime = null)
         {
             var distributedCacheEntryOptions = GetDistributedCacheEntryOptions(absoluteExpireTime, slidingExpireTime);
@@ -16,13 +18,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await using (var brotliStream = new BrotliStream(compressedStream, CompressionMode.Compress))
                 await JsonSerializer.SerializeAsync(brotliStream, data, JsonHelper.JsonSerializerOptions);
 
-            await distributedCache.SetAsync(recordId, compressedStream.ToArray(), distributedCacheEntryOptions);
+            await distributedCache.SetAsync(NormalizeRecordId(recordId), compressedStream.ToArray(), distributedCacheEntryOptions);
         }
 
         public async Task<T?> GetRecordAsync<T>(string recordId)
         {
             // Get the compressed data as a byte array
-            var compressedData = await distributedCache.GetAsync(recordId);
+            var compressedData = await distributedCache.GetAsync(NormalizeRecordId(recordId));
 
             if (compressedData is null || compressedData.Length == 0)
             {
