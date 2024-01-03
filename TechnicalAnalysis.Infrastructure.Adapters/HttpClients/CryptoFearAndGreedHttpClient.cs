@@ -22,7 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                logger.LogError("Method: {Method} {httpResponseMessage.StatusCode}", nameof(GetCryptoFearAndGreedIndex), httpResponseMessage.StatusCode);
+                logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
                 return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
@@ -34,16 +34,16 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 var deserializedData = await JsonSerializer.DeserializeAsync<CryptoFearAndGreedIndex>(jsonStream, JsonHelper.JsonSerializerOptions);
                 if (deserializedData is not null)
                 {
-                    logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetCryptoFearAndGreedIndex), deserializedData);
+                    logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
                     return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(deserializedData.CryptoFearAndGreedDatas);
                 }
 
-                logger.LogWarning("Method: {Method} Deserialization Failed", nameof(GetCryptoFearAndGreedIndex));
+                logger.LogWarning("Deserialization Failed");
                 return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail($"{nameof(GetCryptoFearAndGreedIndex)} Deserialization Failed");
             }
             catch (Exception exception)
             {
-                logger.LogError("Method: {Method} {exception}", nameof(GetCryptoFearAndGreedIndex), exception);
+                logger.LogError("{exception}", exception);
                 return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(exception.ToString());
             }
         }
