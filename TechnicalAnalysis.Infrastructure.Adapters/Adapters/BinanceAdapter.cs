@@ -30,7 +30,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binanceProvider.IsProviderSyncedToday(timeframe))
             {
-                logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
+                logger.LogInformation("{Provider} synchronized for today", provider);
                 return;
             }
 
@@ -195,7 +195,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                         if (response.IsError)
                         {
-                            logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(SyncCandlesticks), response.IsError);
+                            logger.LogWarning("{apiResponse.IsError}", response.IsError);
                             break;
                         }
 
