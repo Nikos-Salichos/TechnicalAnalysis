@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (dexV3Provider.IsProviderSyncedToday(timeframe))
             {
-                logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
+                logger.LogInformation("{Provider} synchronized for today", provider);
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (apiResponse.IsError)
             {
-                logger.LogWarning("Method: {Method}: {apiResponse.IsError}", nameof(Sync), apiResponse.IsError);
+                logger.LogWarning("{apiResponse.IsError}", apiResponse.IsError);
                 return;
             }
 
