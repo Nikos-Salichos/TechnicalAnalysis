@@ -5,6 +5,7 @@ using TechnicalAnalysis.Application.Mediatr.Commands;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
@@ -24,30 +25,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (alternativeMeCryptoAndFearProvider.IsProviderSyncedToday(timeframe))
             {
-                logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
+                logger.LogInformation("{Provider} synchronized for today", provider);
                 return;
             }
 
             var cryptoFearAndGreedIndexData = await mediator.Send(new GetCryptoFearAndGreedIndexQuery());
-            int numberOfDates = 10000; // 10000 means all in provider
-            if (cryptoFearAndGreedIndexData.Any())
-            {
-                var latestDataBasedOnDatetime = cryptoFearAndGreedIndexData
-                                                             .Select(e => e.TimestampAsDateTime)
-                                                             .DefaultIfEmpty(DateTime.MinValue)
-                                                             .Max();
 
-                DateTime today = DateTime.Today;
-
-                TimeSpan difference = today - latestDataBasedOnDatetime;
-                numberOfDates = difference.Days;
-                if (numberOfDates is 0)
-                {
-                    return;
-                }
-            }
-
-            var response = await cryptoFearAndGreedHttpClient.GetCryptoFearAndGreedIndex(numberOfDates);
+            var calculatedDates = CalculateNumberOfDates(cryptoFearAndGreedIndexData);
+            var response = await cryptoFearAndGreedHttpClient.GetCryptoFearAndGreedIndex(calculatedDates);
 
             if (response.IsError)
             {
@@ -59,6 +44,23 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             alternativeMeCryptoAndFearProvider.UpdateProviderInfo();
             var providerCandlestickSyncInfo = alternativeMeCryptoAndFearProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(alternativeMeCryptoAndFearProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
+        }
+
+        private static int CalculateNumberOfDates(IEnumerable<CryptoFearAndGreedData> cryptoFearAndGreedData)
+        {
+            const int providerAllDaysParam = 1000;
+
+            if (!cryptoFearAndGreedData.Any())
+            {
+                return providerAllDaysParam;
+            }
+
+            var latestDataBasedOnDatetime = cryptoFearAndGreedData.Max(e => e.TimestampAsDateTime);
+            int numberOfDates = (DateTime.Today - latestDataBasedOnDatetime).Days;
+
+            return numberOfDates is 0
+                ? numberOfDates
+                : providerAllDaysParam;
         }
     }
 }
