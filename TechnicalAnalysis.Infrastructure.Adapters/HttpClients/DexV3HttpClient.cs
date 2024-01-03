@@ -99,7 +99,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
                     if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        logger.LogWarning("Method: {Method}: {httpResponseMessage.StatusCode}", nameof(GetMostActivePoolsAsync), httpResponseMessage.StatusCode);
+                        logger.LogWarning("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
                         return Result<DexV3ApiResponse, string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                     }
 
@@ -107,7 +107,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
                     if (deserializedData is not null)
                     {
-                        logger.LogInformation("Method: {Method}, deserializedData '{@deserializedData}' ", nameof(GetMostActivePoolsAsync), deserializedData);
+                        logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
                         return Result<DexV3ApiResponse, string>.Success(deserializedData);
                     }
                     logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
