@@ -60,7 +60,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (alpacaProvider.IsProviderSyncedToday(timeframe) && allStockSymbolsExist)
             {
-                logger.LogInformation("Method: {Method} {Provider} synchronized for today", nameof(Sync), provider);
+                logger.LogInformation("{Provider} synchronized for today", provider);
                 return;
             }
 
@@ -192,7 +192,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     var stockData = await alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
                     if (stockData.IsError)
                     {
-                        logger.LogWarning("Method: {Method}: {ResponseError}", nameof(SyncCandlesticks), stockData.IsError);
+                        logger.LogWarning("{ResponseError}", stockData.IsError);
                         continue;
                     }
 
