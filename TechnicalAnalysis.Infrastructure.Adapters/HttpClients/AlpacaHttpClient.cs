@@ -24,7 +24,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     Adjustment = Adjustment.SplitsAndDividends
                 };
                 var stockData = await _retryPolicy.ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
-                logger.LogInformation("Method: {Method}, deserializedData '{@stockData}' ", nameof(GetAlpacaData), stockData);
+                logger.LogInformation("deserializedData '{@stockData}' ", stockData);
                 return Result<IMultiPage<IBar>, string>.Success(stockData);
             }
             catch (Exception exception)
