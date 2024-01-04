@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Application.Services
             {
                 var adaptersToSync = new List<Task>();
 
-                logger.LogInformation("Method: {Method} Synchronization started for {Provider}", nameof(SynchronizeProvidersAsync), provider);
+                logger.LogInformation("Synchronization started for {Provider}", provider);
 
                 if (provider == DataProvider.Binance || provider == DataProvider.All)
                 {
