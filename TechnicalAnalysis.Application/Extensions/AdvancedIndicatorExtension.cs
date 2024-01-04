@@ -494,6 +494,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetPriceTrend(pair.Candlesticks, i),
                     GetHighestHighVixFix(pair.Candlesticks, i),
                     GetOnBalanceVolumeCondition(pair.Candlesticks, i),
+                    GetPsychologicalLineCondition(pair.Candlesticks, i),
                     // GetVolumeCondition(pair.Candlesticks, i)
                     // GetOversoldMacdConditions(pair.Candlesticks, i), //It is bad for signal
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
@@ -1148,6 +1149,42 @@ namespace TechnicalAnalysis.Application.Extensions
                 obvLowest2 <= (decimal?)obv2 &&
                 obvLowest3 <= (decimal?)obv3 &&
                 obvLowest4 <= (decimal?)obv4;
+        }
+
+        private static bool GetPsychologicalLineCondition(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var valueLowest = candlesticks[currentIndex].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value;
+            var valueLowest1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+
+            if (valueLowest == null || valueLowest1 == null || valueLowest2 == null || valueLowest3 == null || valueLowest4 == null)
+            {
+                return false;
+            }
+
+            var value = candlesticks[currentIndex].OnBalanceVolumes.FirstOrDefault()?.Value;
+            var value1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var value2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var value3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var value4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+
+            if (value == null || value1 == null || value2 == null || value3 == null || value4 == null)
+            {
+                return false;
+            }
+
+            return valueLowest <= (decimal?)value &&
+                valueLowest1 <= (decimal?)value1 &&
+                valueLowest2 <= (decimal?)value2 &&
+                valueLowest3 <= (decimal?)value3 &&
+                valueLowest4 <= (decimal?)value4;
         }
 
         private static bool GetVolumeCondition(IList<CandlestickExtended> candlesticks, int currentIndex)
