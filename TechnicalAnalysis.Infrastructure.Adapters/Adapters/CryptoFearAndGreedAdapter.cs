@@ -58,7 +58,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var latestDataBasedOnDatetime = cryptoFearAndGreedData.Max(e => e.TimestampAsDateTime);
             int numberOfDates = (DateTime.Today - latestDataBasedOnDatetime).Days;
 
-            return numberOfDates is 0
+            return numberOfDates is not 0
                 ? numberOfDates
                 : providerAllDaysParam;
         }
