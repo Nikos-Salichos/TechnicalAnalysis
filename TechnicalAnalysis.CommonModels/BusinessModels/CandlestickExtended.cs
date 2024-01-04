@@ -55,6 +55,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public IList<VixFix> VixFixes { get; init; } = new List<VixFix>();
         public IList<VerticalHorizontalFilter> VerticalHorizontalFilters { get; init; } = new List<VerticalHorizontalFilter>();
         public IList<VerticalHorizontalFilterRange> VerticalHorizontalFilterRanges { get; init; } = new List<VerticalHorizontalFilterRange>();
+        public IList<OnBalanceVolume> OnBalanceVolumes { get; init; } = new List<OnBalanceVolume>();
         public Trend FractalTrend { get; set; }
         public Trend PriceTrend { get; set; }
         public IDictionary<string, double> CorrelationPerPair { get; init; } = new Dictionary<string, double>();
