@@ -35,7 +35,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetCryptoFearAndGreedIndexAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(exception.ToString());
             }
         }
@@ -54,7 +54,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetAssetsAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
             }
         }
@@ -80,7 +80,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetCandlesticksAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<IEnumerable<Candlestick>, string>.Fail(exception.ToString());
             }
         }
@@ -96,7 +96,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetPairsAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<IEnumerable<Pair>, string>.Fail(exception.ToString());
             }
         }
@@ -143,7 +143,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetProvidersAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<IEnumerable<ProviderSynchronization>, string>.Fail(exception.ToString());
             }
         }
@@ -161,7 +161,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetPoolsAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<IEnumerable<Pool>, string>.Fail(exception.ToString());
             }
         }
@@ -179,7 +179,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(GetDexCandlesticksAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<IEnumerable<DexCandlestick>, string>.Fail(exception.ToString());
             }
         }
@@ -205,7 +205,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception:{@exception}", nameof(InsertCryptoFearAndGreedIndex), exception);
+                logger.LogError("Exception:{@exception}", exception);
             }
         }
 
@@ -234,7 +234,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception:{@exception}", nameof(InsertPairsAsync), exception);
+                logger.LogError("Exception:{@exception}", exception);
             }
         }
 
@@ -258,7 +258,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertAssetsAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
                 return Result<string, string>.Fail(exception.ToString());
             }
         }
@@ -291,7 +291,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertCandlesticksAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
             }
         }
 
@@ -326,7 +326,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertDexCandlesticksAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
             }
         }
 
@@ -361,7 +361,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(InsertPoolsAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
             }
         }
 
@@ -384,7 +384,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderPairAssetSyncInfoAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
             }
         }
 
@@ -406,7 +406,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             catch (Exception exception)
             {
-                logger.LogError("Method:{Method}, Exception{@exception}", nameof(UpdateProviderCandlestickSyncInfoAsync), exception);
+                logger.LogError("Exception{@exception}", exception);
             }
         }
 
