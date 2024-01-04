@@ -71,11 +71,14 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateFractalLowestHigh(pair);
             CalculateHighestHigh(pair);
             CalculateLowestLow(pair);
+            CalculateLowestLowOnBalanceVolume(pair);
 
             CalculateHighestClose(pair);
 
             CalculateVolatility(pair);
             CalculateAverageRange(pair);
+            CalculateVerticalHorizontalFilter(pair);
+            CalculateOnBalanceVolumeOscilator(pair);
         }
 
         private static void CalculateBollingerBands(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
@@ -532,6 +535,37 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
+        private static void CalculateLowestLowOnBalanceVolume(PairExtended pair)
+        {
+            const int period = 7;
+            int count = pair.Candlesticks.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                int startIndex = Math.Max(i - (period - 1), 0); // Start from the current candlestick and go back 4 candlesticks or less if there are fewer than 5 candlesticks available
+
+                //TODO Debug it and remove code that is redundant
+                if (startIndex >= 0 && startIndex < count &&
+                i >= 0 && i < count &&
+                i - startIndex + 1 <= count - startIndex)
+                {
+                    var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
+
+                    var lowestLow = group.Min(c => c.LowPrice);
+
+                    foreach (var candlestick in group)
+                    {
+                        candlestick.Lowests.Add(new Lowest(candlestick.PrimaryId)
+                        {
+                            Period = period,
+                            Value = lowestLow,
+                            PriceType = PriceType.OnBalanceVolume
+                        });
+                    }
+                }
+            }
+        }
+
         private static void CalculateHighestHigh(PairExtended pair)
         {
             const int period = 22;
@@ -698,5 +732,58 @@ namespace TechnicalAnalysis.Application.Extensions
                 });
             }
         }
+
+        private static void CalculateVerticalHorizontalFilter(PairExtended pair)
+        {
+            var stockData = new StockData(
+                 pair.Candlesticks.Select(x => x.OpenPrice != null ? (double)x.OpenPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.HighPrice != null ? (double)x.HighPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.LowPrice != null ? (double)x.LowPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.ClosePrice != null ? (double)x.ClosePrice : 0.0),
+                 pair.Candlesticks.Select(x => x.Volume != null ? (double)x.Volume : 0.0),
+                 pair.Candlesticks.Select(x => x.CloseDate));
+
+            const int period = 21;
+
+            var results = stockData.CalculateVerticalHorizontalFilter(MovingAvgType.ExponentialMovingAverage, period);
+
+            var vhfValues = results.OutputValues["Vhf"];  // Retrieve the "Vhf" values list
+
+            for (int counter = 0; counter < pair.Candlesticks.Count; counter++)
+            {
+                var candlestick = pair.Candlesticks[counter];
+                double valueAtIndex = vhfValues.ElementAtOrDefault(counter);
+                candlestick?.VerticalHorizontalFilters.Add(new VerticalHorizontalFilter(candlestick.PrimaryId, period, valueAtIndex));
+            }
+        }
+
+        private static void CalculateOnBalanceVolumeOscilator(PairExtended pair)
+        {
+            var stockData = new StockData(
+                 pair.Candlesticks.Select(x => x.OpenPrice != null ? (double)x.OpenPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.HighPrice != null ? (double)x.HighPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.LowPrice != null ? (double)x.LowPrice : 0.0),
+                 pair.Candlesticks.Select(x => x.ClosePrice != null ? (double)x.ClosePrice : 0.0),
+                 pair.Candlesticks.Select(x => x.Volume != null ? (double)x.Volume : 0.0),
+                 pair.Candlesticks.Select(x => x.CloseDate));
+
+            const int period = 7;
+
+            var results = stockData.CalculateOnBalanceVolume(MovingAvgType.SimpleMovingAverage, period);
+
+            var obvValues = results.OutputValues["Obv"];
+
+            if (string.Equals(pair.BaseAssetName, "voo", StringComparison.InvariantCultureIgnoreCase))
+            {
+            }
+
+            for (int counter = 0; counter < pair.Candlesticks.Count; counter++)
+            {
+                var candlestick = pair.Candlesticks[counter];
+                double valueAtIndex = obvValues.ElementAtOrDefault(counter);
+                candlestick?.OnBalanceVolumes.Add(new OnBalanceVolume(candlestick.PrimaryId, period, valueAtIndex));
+            }
+        }
+
     }
 }
