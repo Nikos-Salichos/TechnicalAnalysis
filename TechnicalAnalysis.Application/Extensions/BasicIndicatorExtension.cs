@@ -16,12 +16,12 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static void CalculateBasicIndicators(this PairExtended pair)
         {
-            Logger.LogInformation("Method name: {MethodName} - Pair details - {PairPropertyName}: {PairName}, " +
+            Logger.LogInformation("Pair details - {PairPropertyName}: {PairName}, " +
                 "{PairPropertyContractAddress}: {PairContractAddress}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
                 "{BaseAssetNamePropertyName}: {BaseAssetName}, " +
                 "{QuoteAssetContractPropertyName}: {QuoteAssetContract}, " +
-                "{QuoteAssetNamePropertyName}: {QuoteAssetName}", nameof(CalculateBasicIndicators),
+                "{QuoteAssetNamePropertyName}: {QuoteAssetName}",
                 nameof(pair.Symbol), pair.Symbol,
                 nameof(pair.ContractAddress), pair.ContractAddress,
                 nameof(pair.BaseAssetContract), pair.BaseAssetContract,
@@ -37,7 +37,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 candlestick.OpenPrice.HasValue
                 && candlestick.HighPrice.HasValue
                 && candlestick.ClosePrice.HasValue
-                && candlestick.LowPrice.HasValue)
+                && candlestick.LowPrice.HasValue
+                && candlestick.Volume.HasValue)
                 .Select(candlestick => new Quote
                 {
                     Open = candlestick.OpenPrice.Value,
@@ -45,6 +46,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     Low = candlestick.LowPrice.Value,
                     Close = candlestick.ClosePrice.Value,
                     Date = candlestick.CloseDate,
+                    Volume = candlestick.Volume.Value
                 })
                 .OrderBy(q => q.Date);
 
@@ -71,14 +73,14 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateFractalLowestHigh(pair);
             CalculateHighestHigh(pair);
             CalculateLowestLow(pair);
-            CalculateLowestLowOnBalanceVolume(pair);
 
             CalculateHighestClose(pair);
 
             CalculateVolatility(pair);
             CalculateAverageRange(pair);
             CalculateVerticalHorizontalFilter(pair);
-            CalculateOnBalanceVolumeOscilator(pair);
+            CalculateOnBalanceVolumeOscilator(pair, quotes, candlestickLookup);
+            CalculatePsychologicalLine(pair);
         }
 
         private static void CalculateBollingerBands(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
@@ -507,72 +509,30 @@ namespace TechnicalAnalysis.Application.Extensions
         private static void CalculateLowestLow(PairExtended pair)
         {
             const int period = 5;
-            int count = pair.Candlesticks.Count;
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
-                int startIndex = Math.Max(i - (period - 1), 0); // Start from the current candlestick and go back 4 candlesticks or less if there are fewer than 5 candlesticks available
+                int startIndex = Math.Max(i - (period - 1), 0);
+                var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
+                var lowestLow = group.Min(c => c.LowPrice);
 
-                //TODO Debug it and remove code that is redundant
-                if (startIndex >= 0 && startIndex < count &&
-                i >= 0 && i < count &&
-                i - startIndex + 1 <= count - startIndex)
+                var candlestick = pair.Candlesticks[i];
+                candlestick.Lowests.Add(new Lowest(candlestick.PrimaryId)
                 {
-                    var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
-
-                    var lowestLow = group.Min(c => c.LowPrice);
-
-                    foreach (var candlestick in group)
-                    {
-                        candlestick.Lowests.Add(new Lowest(candlestick.PrimaryId)
-                        {
-                            Period = period,
-                            Value = lowestLow,
-                            PriceType = PriceType.Low
-                        });
-                    }
-                }
-            }
-        }
-
-        private static void CalculateLowestLowOnBalanceVolume(PairExtended pair)
-        {
-            const int period = 7;
-            int count = pair.Candlesticks.Count;
-
-            for (int i = 0; i < count; i++)
-            {
-                int startIndex = Math.Max(i - (period - 1), 0); // Start from the current candlestick and go back 4 candlesticks or less if there are fewer than 5 candlesticks available
-
-                //TODO Debug it and remove code that is redundant
-                if (startIndex >= 0 && startIndex < count &&
-                i >= 0 && i < count &&
-                i - startIndex + 1 <= count - startIndex)
-                {
-                    var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
-
-                    var lowestLow = group.Min(c => c.LowPrice);
-
-                    foreach (var candlestick in group)
-                    {
-                        candlestick.Lowests.Add(new Lowest(candlestick.PrimaryId)
-                        {
-                            Period = period,
-                            Value = lowestLow,
-                            PriceType = PriceType.OnBalanceVolume
-                        });
-                    }
-                }
+                    Period = period,
+                    Value = lowestLow,
+                    PriceType = PriceType.Low
+                });
             }
         }
 
         private static void CalculateHighestHigh(PairExtended pair)
         {
-            const int period = 22;
+            const int period = 5;
 
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
-                int startIndex = Math.Max(i - (period - 1), 0); // Start from the current candlestick and go back 4 candlesticks or less if there are fewer than 5 candlesticks available
+                int startIndex = Math.Max(i - (period - 1), 0);
                 var group = pair.Candlesticks.GetRange(startIndex, i - startIndex + 1);
                 var highestHigh = group.Max(c => c.HighPrice);
 
@@ -757,31 +717,89 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateOnBalanceVolumeOscilator(PairExtended pair)
+        private static void CalculateOnBalanceVolumeOscilator(PairExtended pair, IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            var stockData = new StockData(
-                 pair.Candlesticks.Select(x => x.OpenPrice != null ? (double)x.OpenPrice : 0.0),
-                 pair.Candlesticks.Select(x => x.HighPrice != null ? (double)x.HighPrice : 0.0),
-                 pair.Candlesticks.Select(x => x.LowPrice != null ? (double)x.LowPrice : 0.0),
-                 pair.Candlesticks.Select(x => x.ClosePrice != null ? (double)x.ClosePrice : 0.0),
-                 pair.Candlesticks.Select(x => x.Volume != null ? (double)x.Volume : 0.0),
-                 pair.Candlesticks.Select(x => x.CloseDate));
-
-            const int period = 7;
-
-            var results = stockData.CalculateOnBalanceVolume(MovingAvgType.SimpleMovingAverage, period);
-
-            var obvValues = results.OutputValues["Obv"];
-
-            if (string.Equals(pair.BaseAssetName, "voo", StringComparison.InvariantCultureIgnoreCase))
+            foreach (var indicatorResult in quotes.GetObv())
             {
+                if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
+                {
+                    candlestick?.OnBalanceVolumes.Add(new OnBalanceVolume(candlestick.PrimaryId, indicatorResult.Obv));
+                }
             }
 
-            for (int counter = 0; counter < pair.Candlesticks.Count; counter++)
+            CalculateLowestLowOnBalanceVolume();
+
+            void CalculateLowestLowOnBalanceVolume()
             {
-                var candlestick = pair.Candlesticks[counter];
-                double valueAtIndex = obvValues.ElementAtOrDefault(counter);
-                candlestick?.OnBalanceVolumes.Add(new OnBalanceVolume(candlestick.PrimaryId, period, valueAtIndex));
+                const int period = 5;
+
+                for (int i = 0; i < pair.Candlesticks.Count; i++)
+                {
+                    int startIndex = Math.Max(i - (period - 1), 0);
+
+                    var lowest = pair.Candlesticks.Skip(startIndex)
+                                                     .Take(i - startIndex + 1)
+                                                     .Min(c => c.OnBalanceVolumes.FirstOrDefault()?.Value ?? double.MaxValue);
+
+                    if (lowest != double.MaxValue)
+                    {
+                        pair.Candlesticks[i].Lowests.Add(new Lowest(pair.Candlesticks[i].PrimaryId)
+                        {
+                            Period = period,
+                            Value = (decimal)lowest,
+                            PriceType = PriceType.OnBalanceVolume
+                        });
+                    }
+                }
+            }
+        }
+
+        private static void CalculatePsychologicalLine(PairExtended pair)
+        {
+            const int period = 5;
+            foreach (var candlestickWithIndex in pair.Candlesticks.Select((candlestick, index) => new { candlestick, index }))
+            {
+                int startIndex = Math.Max(candlestickWithIndex.index - period + 1, 0);
+
+                int risingPeriodsCount = pair.Candlesticks
+                                            .Skip(startIndex)
+                                            .Take(candlestickWithIndex.index - startIndex + 1)
+                                            .Where((cs, i) => i + startIndex > 0 && cs.ClosePrice > pair.Candlesticks[i + startIndex - 1].ClosePrice)
+                                            .Count();
+
+                if (candlestickWithIndex.index >= period - 1)
+                {
+                    var psyValue = (decimal)risingPeriodsCount / period * 100;
+                    candlestickWithIndex.candlestick.PsychologicalLines.Add(new PsychologicalLine(candlestickWithIndex.candlestick.PrimaryId, period, (double)psyValue));
+                }
+            }
+
+            CalculateLowestLowPsychologicalLine();
+
+            void CalculateLowestLowPsychologicalLine()
+            {
+                const int period = 5;
+
+                for (int i = 0; i < pair.Candlesticks.Count; i++)
+                {
+                    int startIndex = Math.Max(i - (period - 1), 0);
+
+                    var lowest = pair
+                        .Candlesticks
+                        .Skip(startIndex)
+                        .Take(i - startIndex + 1)
+                        .Min(c => c.PsychologicalLines.FirstOrDefault()?.Value ?? double.MaxValue);
+
+                    if (lowest != double.MaxValue)
+                    {
+                        pair.Candlesticks[i].Lowests.Add(new Lowest(pair.Candlesticks[i].PrimaryId)
+                        {
+                            Period = period,
+                            Value = (decimal)lowest,
+                            PriceType = PriceType.PsychologicalLine
+                        });
+                    }
+                }
             }
         }
 
