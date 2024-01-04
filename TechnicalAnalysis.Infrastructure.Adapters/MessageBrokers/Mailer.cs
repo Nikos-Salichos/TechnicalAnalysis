@@ -103,7 +103,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             }
             catch (Exception exception)
             {
-                logger.LogInformation("Method: {Method} failed to send email {exception}", nameof(SendAsync), exception);
+                logger.LogInformation("Failed to send email '{@exception}'", exception);
                 throw;
             }
         }
