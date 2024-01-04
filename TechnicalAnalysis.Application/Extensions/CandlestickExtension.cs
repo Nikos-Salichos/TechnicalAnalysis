@@ -105,7 +105,6 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-
         public static Timeframe ToTimeFrame(this string period)
         {
             if (string.Equals(period, "1d", StringComparison.InvariantCultureIgnoreCase))
