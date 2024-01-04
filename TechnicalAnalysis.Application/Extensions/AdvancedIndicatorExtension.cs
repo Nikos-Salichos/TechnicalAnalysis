@@ -13,11 +13,11 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static void CalculateSignalIndicators(this PairExtended pair)
         {
-            Logger.LogInformation("Method name: {MethodName} - Pair details - {PairPropertyName}: {PairName}, " +
+            Logger.LogInformation("Pair details - {PairPropertyName}: {PairName}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
                 "{BaseAssetNamePropertyName}: {BaseAssetName}, " +
                 "{QuoteAssetContractPropertyName}: {QuoteAssetContract}, " +
-                "{QuoteAssetNamePropertyName}: {QuoteAssetName}", nameof(CalculateSignalIndicators),
+                "{QuoteAssetNamePropertyName}: {QuoteAssetName}",
                 nameof(pair.Symbol), pair.Symbol,
                 nameof(pair.BaseAssetContract), pair.BaseAssetContract,
                 nameof(pair.BaseAssetName), pair.BaseAssetName,
@@ -45,7 +45,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             CalculateEnchanced(pair);
             CalculateResistanceBreakout(pair);
-            CalculateStPattern(pair);
+            CalculateVerticalHorizontalFilterRange(pair);
         }
 
         private static void CalculateWilliamsVixFix(PairExtended pair)
@@ -110,106 +110,6 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        //TODO need to add average position
-        private static void CalculateStPattern(PairExtended pair)
-        {
-            CandlestickExtended? currentBullFractalCandlestick = null;
-            CandlestickExtended? previousBullFractalCandlestick = null;
-            CandlestickExtended? secondPreviousBullFractalCandlestick = null;
-
-            CandlestickExtended? currentBearFractalCandlestick = null;
-            CandlestickExtended? previousBearFractalCandlestick = null;
-            CandlestickExtended? secondPreviousBearFractalCandlestick = null;
-
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
-            {
-                var candlestick3 = i >= 2
-                    ? pair.Candlesticks[i - 2]
-                    : null;
-
-                if (candlestick3 is null)
-                {
-                    continue;
-                }
-
-                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2))
-                {
-                    if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
-                    {
-                        secondPreviousBullFractalCandlestick = previousBullFractalCandlestick;
-                        previousBullFractalCandlestick = currentBullFractalCandlestick;
-                        currentBullFractalCandlestick = candlestick3;
-                    }
-                }
-
-                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2))
-                {
-                    if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick?.PrimaryId)
-                    {
-                        secondPreviousBearFractalCandlestick = previousBearFractalCandlestick;
-                        previousBearFractalCandlestick = currentBearFractalCandlestick;
-                        currentBearFractalCandlestick = candlestick3;
-                    }
-                }
-
-                if (currentBullFractalCandlestick is null
-                    || previousBullFractalCandlestick is null
-                    || currentBearFractalCandlestick is null
-                    || previousBearFractalCandlestick is null)
-                {
-                    continue;
-                }
-
-                decimal? highPriceOfCurrentFractal = currentBearFractalCandlestick.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value;
-                decimal? lowPriceOfCurrentFractal = currentBullFractalCandlestick.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value;
-
-                bool openPosition = false;
-
-                for (int j = i; j < pair.Candlesticks.Count; j++)
-                {
-                    var currentCandlestick = pair.Candlesticks[j];
-                    var candlestick1 = pair.Candlesticks[j - 1];
-
-                    if (candlestick1 is null)
-                    {
-                        continue;
-                    }
-
-                    if (currentCandlestick.Fractals.Count > 0)
-                    {
-                        break;
-                    }
-
-                    if (currentCandlestick.ClosePrice >= currentBearFractalCandlestick.ClosePrice && !openPosition)
-                    {
-                        var candlestickFound = pair.Candlesticks.Find(c => c.CloseDate == currentCandlestick.CloseDate);
-
-                        if (candlestick1?.StPatternSignals.Count > 0 && candlestick1.StPatternSignals.FirstOrDefault().IsBuy)
-                        {
-                            candlestickFound?.StPatternSignals.Add(new StPatternSignal(candlestickFound.PrimaryId)
-                            {
-                                IsBuy = true,
-                                IsSell = true,
-                                NumberOfSignal = candlestick1.StPatternSignals.FirstOrDefault().NumberOfSignal + 1
-                            });
-                            openPosition = true;
-                        }
-                        else
-                        {
-                            candlestickFound?.StPatternSignals.Add(new StPatternSignal(candlestickFound.PrimaryId)
-                            {
-                                IsBuy = true,
-                                IsSell = true,
-                                NumberOfSignal = 1
-                            });
-                            openPosition = true;
-                        }
-                    }
-                }
-
-            }
-        }
-
         private static void CalculatePriceFunnel(PairExtended pair)
         {
             for (int i = 0; i < pair.Candlesticks.Count; i++)
@@ -251,14 +151,14 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
 
                 if (candlestick1?.BollingerBands?.FirstOrDefault()?.BandWidth >= candlestick?.BollingerBands?.FirstOrDefault()?.BandWidth
-                    && candlestick1?.BollingerBands?.FirstOrDefault()?.UpperBand - candlestick1?.BollingerBands?.FirstOrDefault()?.LowerBand
-                    >= candlestick?.BollingerBands?.FirstOrDefault()?.UpperBand - candlestick?.BollingerBands?.FirstOrDefault()?.LowerBand
-                    && candlestick?.Adxs?.FirstOrDefault()?.PlusDi <= 25
-                    && candlestick?.Adxs?.FirstOrDefault()?.MinusDi <= 25)
+                    && candlestick1.BollingerBands?.FirstOrDefault()?.UpperBand - candlestick1.BollingerBands?.FirstOrDefault()?.LowerBand
+                    >= candlestick.BollingerBands?.FirstOrDefault()?.UpperBand - candlestick.BollingerBands?.FirstOrDefault()?.LowerBand
+                    && candlestick.Adxs?.FirstOrDefault()?.PlusDi <= 25
+                    && candlestick.Adxs?.FirstOrDefault()?.MinusDi <= 25)
                 {
                     count++;
 
-                    candlestick?.BollingerBandsFunnels.Add(new BollingerBandsFunnel(candlestick.PrimaryId)
+                    candlestick.BollingerBandsFunnels.Add(new BollingerBandsFunnel(candlestick.PrimaryId)
                     {
                         IsBollingerBandsFunnel = true,
                         NumberOfBollingerBandsFunnelCandlesticks = count,
@@ -309,6 +209,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 CandlestickExtended initialCandlestick = pair.Candlesticks[i];
                 int count = 0;
 
+                //For testing purposes
+                if (initialCandlestick.CloseDate.Date == new DateTime(2023, 12, 13).Date && pair.BaseAssetName == "ADA")
+                {
+                }
+
                 for (int j = i + 1; j < pair.Candlesticks.Count; j++)
                 {
                     CandlestickExtended nestedCandlestick = pair.Candlesticks[j];
@@ -354,8 +259,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (candlestick3.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal
-                                                            && f.WindowPeriod == 2) is not null)
+                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BullFractal
+                                                            && f.WindowPeriod == 2))
                 {
                     if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
                     {
@@ -365,7 +270,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                if (candlestick3.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2) is not null)
+                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2))
                 {
                     if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick?.PrimaryId)
                     {
@@ -410,16 +315,6 @@ namespace TechnicalAnalysis.Application.Extensions
                     candlestick.FractalTrend = Trend.Sideways;
                 }
             }
-
-            /*            for (int i = 1; i < pair.Candlesticks.Count; i++)
-                        {
-                            var candlestick = pair.Candlesticks[i];
-                            var candlestick1 = pair.Candlesticks[i - 1];
-                            if (candlestick.PriceTrend == Trend.None)
-                            {
-                                candlestick.PriceTrend = candlestick1.FractalTrend;
-                            }
-                        }*/
         }
 
         private static void CalculateFractalTrendBasedOnCandlestickPrice(PairExtended pair)
@@ -437,8 +332,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (candlestick3.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal
-                                                              && f.WindowPeriod == 2) is not null)
+                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BullFractal
+                                                              && f.WindowPeriod == 2))
                 {
                     if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
                     {
@@ -446,8 +341,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                if (candlestick3.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal
-                                                              && f.WindowPeriod == 2) is not null)
+                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BearFractal
+                                                              && f.WindowPeriod == 2))
                 {
                     if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick?.PrimaryId)
                     {
@@ -535,7 +430,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         {
                             var candlestick = pair.Candlesticks[j];
 
-                            if (candlestick.ClosePrice >= signalCandlestick.ClosePrice + signalCandlestick.Body * 2
+                            if (candlestick.ClosePrice >= signalCandlestick.ClosePrice + (signalCandlestick.Body * 2)
                                 && !signalCandlestick.ResistanceBreakouts[0].IsPositionClosed)
                             {
                                 signalCandlestick.ResistanceBreakouts[0].ClosePosition = true;
@@ -572,13 +467,14 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2022, 1, 12).Date)
+                if (candlestick.CloseDate.Date == new DateTime(2023, 01, 03).Date
+                    && string.Equals(pair.BaseAssetName, "AAPL", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
                 if (IsAscendingGreenCandlestickPattern(pair.Candlesticks, i))
                 {
-                    continue;
+                    // continue;
                 }
 
                 bool[] conditions =
@@ -597,6 +493,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetFractalTrend(pair.Candlesticks, i),
                     GetPriceTrend(pair.Candlesticks, i),
                     GetHighestHighVixFix(pair.Candlesticks, i),
+                    GetOnBalanceVolumeCondition(pair.Candlesticks, i),
+                    // GetVolumeCondition(pair.Candlesticks, i)
                     // GetOversoldMacdConditions(pair.Candlesticks, i), //It is bad for signal
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
                 ];
@@ -604,7 +502,19 @@ namespace TechnicalAnalysis.Application.Extensions
                 int trueConditionsCount = conditions.Count(condition => condition);
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
-                if (percentageTrueConditions >= 90 // TODO test it with candlesticks patterns
+                int threshold = 90;
+
+                //Try dynamic percentage based on volatility
+                /* if (candlestick.Volatilities.FirstOrDefault().VolatilityValue < 50)
+                 {
+                     threshold = 85;
+                 }
+                 else if (candlestick.Volatilities.FirstOrDefault().VolatilityValue >= 50)
+                 {
+                     threshold = 90;
+                 }*/
+
+                if (percentageTrueConditions >= threshold // TODO test it with candlesticks patterns
                 /*                &&
                                 (
                                     candlestick?.DragonFlyDojis.FirstOrDefault()?.IsDragonFlyDoji == true
@@ -638,7 +548,58 @@ namespace TechnicalAnalysis.Application.Extensions
                             OrderOfSignal = 1
                         });
                     }
+                }
+            }
+        }
 
+        private static void CalculateVerticalHorizontalFilterRange(PairExtended pair)
+        {
+            int count = 0;
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            {
+                CandlestickExtended currentCandlestick = pair.Candlesticks[i];
+
+                var verticalHorizontalFilter = currentCandlestick.VerticalHorizontalFilters?.FirstOrDefault();
+                if (verticalHorizontalFilter?.Value is 0)
+                {
+                    continue;
+                }
+
+                //TODO Enable it debug specific candlestick
+                if (currentCandlestick.CloseDate.Date == new DateTime(2023, 12, 8).Date
+                    && string.Equals(pair.BaseAssetName, "JTO", StringComparison.InvariantCultureIgnoreCase))
+                {
+                }
+
+                bool hasVertialHorizontalFilterRange = verticalHorizontalFilter?.Value <= Constants.VerticalHorizontalFilterRangeLimit;
+                bool hasAdxRange = currentCandlestick?.Adxs?.FirstOrDefault()?.PlusDi <= 25
+                    && currentCandlestick?.Adxs?.FirstOrDefault()?.MinusDi <= 25
+                    && currentCandlestick?.Adxs?.FirstOrDefault()?.Value <= 25;
+
+                bool hasStochasticRange = currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD <= 80
+                    && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK <= 25
+                    && currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD >= 20
+                    && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK >= 20;
+
+                bool hasRsiRange = currentCandlestick?.Rsis?.FirstOrDefault()?.Value <= 70 &&
+                    currentCandlestick?.Rsis?.FirstOrDefault()?.Value >= 30;
+
+                //TODO Calculate vixfix under a specific level <-- new strategy, just added it here as note
+                bool hasBollingerBandsRange = currentCandlestick?.ClosePrice <= currentCandlestick?.BollingerBands?.FirstOrDefault()?.UpperBand
+                    && currentCandlestick?.ClosePrice >= currentCandlestick?.BollingerBands?.FirstOrDefault()?.LowerBand;
+
+                if (hasVertialHorizontalFilterRange && hasRsiRange)
+                {
+                    count++;
+
+                    var verticalHorizontalFilterRange = new VerticalHorizontalFilterRange(
+                        currentCandlestick.PrimaryId, Constants.VerticalHorizontalFilterRangeLimit, count);
+
+                    currentCandlestick.VerticalHorizontalFilterRanges.Add(verticalHorizontalFilterRange);
+                }
+                else
+                {
+                    count = 0;
                 }
             }
         }
@@ -654,18 +615,21 @@ namespace TechnicalAnalysis.Application.Extensions
             var candlestick1 = candlesticks[currentIndex - 1];
             var candlestick2 = candlesticks[currentIndex - 2];
 
+            bool isCurrentCandlestickBullish = currentCandlestick.ClosePrice > candlestick1.OpenPrice;
+            bool isCandlestick1Bullish = candlestick1.ClosePrice > candlestick1.OpenPrice;
+            bool isCandlestick2Bullish = candlestick2.ClosePrice > candlestick2.OpenPrice;
+
+            bool areThreeLatestCandlesticksBullish = isCurrentCandlestickBullish && isCandlestick1Bullish && isCandlestick2Bullish;
+
             bool isHigherHighCurrent = currentCandlestick.HighPrice > candlestick1.HighPrice;
-            bool isHigherLowCurrent = currentCandlestick.LowPrice > candlestick1.LowPrice;
-
-            if (isHigherHighCurrent && isHigherLowCurrent)
-            {
-                return true;
-            }
-
             bool isHigherHighPrevious = candlestick1.HighPrice > candlestick2.HighPrice;
+
+            bool isHigherLowCurrent = currentCandlestick.LowPrice > candlestick1.LowPrice;
             bool isHigherLowPrevious = candlestick1.LowPrice > candlestick2.LowPrice;
 
-            return isHigherHighCurrent && isHigherLowCurrent && isHigherHighPrevious && isHigherLowPrevious;
+            bool isValidWhiteSoldiersPattern = isHigherHighCurrent && isHigherHighPrevious && isHigherLowCurrent && isHigherLowPrevious;
+
+            return areThreeLatestCandlesticksBullish && isValidWhiteSoldiersPattern;
         }
 
         private static void CalculateCandlestickPatterns(PairExtended pair)
@@ -689,8 +653,8 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             if (
                 candlestick.Range >= 2 * candlestick.Body
-                && candlestick.ClosePrice >= candlestick.HighPrice - candlestick.Range * 0.5m
-                && candlestick.OpenPrice >= candlestick.HighPrice - candlestick.Range * 0.5m
+                && candlestick.ClosePrice >= candlestick.HighPrice - (candlestick.Range * 0.5m)
+                && candlestick.OpenPrice >= candlestick.HighPrice - (candlestick.Range * 0.5m)
                 && candlestick.BodyToRangeRatio <= Constants.BodyOneToTenOfRangeRatio
                 && candlestick.OpenPrice >= candlestick.TopTwentyPercentOfRangeInPriceUnit
                 && candlestick.ClosePrice >= candlestick.TopTwentyPercentOfRangeInPriceUnit
@@ -793,10 +757,10 @@ namespace TechnicalAnalysis.Application.Extensions
             var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.FirstOrDefault(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
 
             return candlesticks[currentIndex].LowPrice <= lowestLow?.Value
-                || lowestLow1 is not null && candlesticks[currentIndex - 1].LowPrice <= lowestLow1.Value
-                || lowestLow2 is not null && candlesticks[currentIndex - 2].LowPrice <= lowestLow2.Value
-                || lowestLow3 is not null && candlesticks[currentIndex - 3].LowPrice <= lowestLow3.Value
-                || lowestLow4 is not null && candlesticks[currentIndex - 4].LowPrice <= lowestLow4.Value;
+                || (lowestLow1 is not null && candlesticks[currentIndex - 1].LowPrice <= lowestLow1.Value)
+                || (lowestLow2 is not null && candlesticks[currentIndex - 2].LowPrice <= lowestLow2.Value)
+                || (lowestLow3 is not null && candlesticks[currentIndex - 3].LowPrice <= lowestLow3.Value)
+                || (lowestLow4 is not null && candlesticks[currentIndex - 4].LowPrice <= lowestLow4.Value);
         }
 
         private static bool GetHighestHighVixFix(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -825,10 +789,10 @@ namespace TechnicalAnalysis.Application.Extensions
                 : null;
 
             return candlesticks[currentIndex].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix?.Value
-                || highestHighVixFix1 is not null && candlesticks[currentIndex - 1].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix1.Value
-                || highestHighVixFix2 is not null && candlesticks[currentIndex - 2].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix2.Value
-                || highestHighVixFix3 is not null && candlesticks[currentIndex - 3].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix3.Value
-                || highestHighVixFix4 is not null && candlesticks[currentIndex - 4].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix4.Value;
+                || (highestHighVixFix1 is not null && candlesticks[currentIndex - 1].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix1.Value)
+                || (highestHighVixFix2 is not null && candlesticks[currentIndex - 2].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix2.Value)
+                || (highestHighVixFix3 is not null && candlesticks[currentIndex - 3].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix3.Value)
+                || (highestHighVixFix4 is not null && candlesticks[currentIndex - 4].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix4.Value);
         }
 
         private static bool GetFractalTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -1072,11 +1036,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlesticks[currentIndex]?.LowPrice != null && donchianChannel?.LowerBand is not null && candlesticks[currentIndex].LowPrice <= (decimal)donchianChannel.LowerBand
-                || candlesticks[currentIndex - 1]?.LowPrice is not null && donchianChannel1?.LowerBand != null && candlesticks[currentIndex - 1].LowPrice <= (decimal)donchianChannel1.LowerBand
-                || candlesticks[currentIndex - 2]?.LowPrice is not null && donchianChannel2?.LowerBand != null && candlesticks[currentIndex - 2].LowPrice <= (decimal)donchianChannel2.LowerBand
-                || candlesticks[currentIndex - 3]?.LowPrice != null && donchianChannel3?.LowerBand is not null && candlesticks[currentIndex - 3].LowPrice <= (decimal)donchianChannel3.LowerBand
-                || candlesticks[currentIndex - 4]?.LowPrice != null && donchianChannel4?.LowerBand is not null && candlesticks[currentIndex - 4].LowPrice <= (decimal)donchianChannel4.LowerBand;
+            return (candlesticks[currentIndex]?.LowPrice != null && donchianChannel?.LowerBand is not null && candlesticks[currentIndex].LowPrice <= (decimal)donchianChannel.LowerBand)
+                || (candlesticks[currentIndex - 1]?.LowPrice is not null && donchianChannel1?.LowerBand != null && candlesticks[currentIndex - 1].LowPrice <= (decimal)donchianChannel1.LowerBand)
+                || (candlesticks[currentIndex - 2]?.LowPrice is not null && donchianChannel2?.LowerBand != null && candlesticks[currentIndex - 2].LowPrice <= (decimal)donchianChannel2.LowerBand)
+                || (candlesticks[currentIndex - 3]?.LowPrice != null && donchianChannel3?.LowerBand is not null && candlesticks[currentIndex - 3].LowPrice <= (decimal)donchianChannel3.LowerBand)
+                || (candlesticks[currentIndex - 4]?.LowPrice != null && donchianChannel4?.LowerBand is not null && candlesticks[currentIndex - 4].LowPrice <= (decimal)donchianChannel4.LowerBand);
         }
 
         private static bool GetOversoldAroonConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -1150,6 +1114,65 @@ namespace TechnicalAnalysis.Application.Extensions
                 candlesticks[currentIndex - 4].ClosePrice <= pivot4.PivotPoint;
         }
 
+        private static bool GetOnBalanceVolumeCondition(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var obvLowest = candlesticks[currentIndex].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value;
+            var obvLowest1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+
+            if (obvLowest == null || obvLowest1 == null || obvLowest2 == null || obvLowest3 == null || obvLowest4 == null)
+            {
+                return false;
+            }
+
+            var obv = candlesticks[currentIndex].OnBalanceVolumes.FirstOrDefault()?.Value;
+            var obv1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var obv2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var obv3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var obv4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+
+            if (obv == null || obv1 == null || obv2 == null || obv3 == null || obv4 == null)
+            {
+                return false;
+            }
+
+            return obvLowest <= (decimal?)obv &&
+                obvLowest1 <= (decimal?)obv1 &&
+                obvLowest2 <= (decimal?)obv2 &&
+                obvLowest3 <= (decimal?)obv3 &&
+                obvLowest4 <= (decimal?)obv4;
+        }
+
+        private static bool GetVolumeCondition(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var volume = candlesticks[currentIndex].Volume;
+            var volume1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Volume : null;
+            var volume2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Volume : null;
+            var volume3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Volume : null;
+
+            if (volume == null || volume1 == null || volume2 == null || volume3 == null)
+            {
+                return false;
+            }
+
+            decimal minVolume = Math.Min((decimal)volume1, Math.Min((decimal)volume2, (decimal)volume3));
+            decimal maxVolume = Math.Max((decimal)volume1, Math.Max((decimal)volume2, (decimal)volume3));
+
+            return volume <= minVolume || volume >= maxVolume;
+        }
+
         private static bool GetOversoldMacdConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
         {
             if (currentIndex < 0 || currentIndex >= candlesticks.Count)
@@ -1202,6 +1225,5 @@ namespace TechnicalAnalysis.Application.Extensions
 
             return rateOfChange?.Value >= rateOfChange1?.Value;
         }
-
     }
 }
