@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
-    public class PairExtended : BaseEntity, IEquatable<PairExtended>
+    public sealed class PairExtended : BaseEntity, IEquatable<PairExtended>
     {
         public string Symbol { get; set; } = string.Empty;
         public string ContractAddress { get; init; } = string.Empty;
@@ -24,7 +24,6 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public decimal? Volume { get; init; }
         public long? NumberOfTrades { get; init; }
         public List<CandlestickExtended> Candlesticks { get; set; } = [];
-        public bool HasCalculateDailyTechnicalAnalysis { get; set; }
 
         public bool Equals(PairExtended? other)
         {
