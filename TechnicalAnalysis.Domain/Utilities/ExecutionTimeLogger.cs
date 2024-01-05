@@ -30,7 +30,7 @@ namespace TechnicalAnalysis.Domain.Utilities
 
             stopwatch.Stop();
 
-            logger.LogInformation("Method {MethodName} took {ElapsedMilliseconds} milliseconds to execute.",
+            logger.LogInformation("Invoked {MethodName} took {ElapsedMilliseconds} milliseconds to execute.",
                        methodName, stopwatch.ElapsedMilliseconds);
 
             return result;
