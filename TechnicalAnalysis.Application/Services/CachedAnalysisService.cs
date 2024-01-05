@@ -78,7 +78,7 @@ namespace TechnicalAnalysis.Application.Services
                      {
                          pair.Symbol,
                          EnhancedScans = enhancedScans,
-                         enhancedScans.First().EnhancedScans.First().OrderOfSignal
+                         enhancedScans[0].EnhancedScans[0].OrderOfSignal
                      };
                  })
                  .Where(result => result.EnhancedScans.Count > 0)
