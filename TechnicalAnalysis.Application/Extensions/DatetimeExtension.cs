@@ -25,7 +25,7 @@
                 batchStart = batchEnd.AddDays(1).Date;
             }
 
-            if (daysRemaining > 0 || daysRemaining == 0 && endDate - startDate == new TimeSpan(23, 59, 59))
+            if (daysRemaining > 0 || (daysRemaining == 0 && endDate - startDate == new TimeSpan(23, 59, 59)))
             {
                 var lastBatchEnd = endDate.Date.Add(new TimeSpan(23, 59, 59));
                 daysRemaining = (int)(endDate - batchStart).TotalDays;
@@ -56,7 +56,7 @@
                 var lastBatchEnd = endDate < maxEndDate ? endDate : maxEndDate;
 
                 DateTime lastBatchStart;
-                DateTime initialStart = lastBatchEnd.AddDays(-(weeksRemaining * 7 + 1));
+                DateTime initialStart = lastBatchEnd.AddDays(-((weeksRemaining * 7) + 1));
                 if (initialStart.DayOfWeek == DayOfWeek.Monday)
                 {
                     lastBatchStart = initialStart.Date;
@@ -69,7 +69,7 @@
 
                 if (lastBatchEnd.DayOfWeek == DayOfWeek.Sunday)
                 {
-                    lastBatchStart = lastBatchEnd.AddDays(-(weeksRemaining * 7 + 1));
+                    lastBatchStart = lastBatchEnd.AddDays(-((weeksRemaining * 7) + 1));
                     dateRanges.Add((lastBatchStart, lastBatchEnd));
                 }
                 else
@@ -97,6 +97,5 @@
             dateRanges.Add((currentStart, endDate));
             return dateRanges;
         }
-
     }
 }
