@@ -8,5 +8,7 @@
         Low = 3,
         Close = 4,
         VixFix = 5,
+        OnBalanceVolume = 6,
+        PsychologicalLine = 7,
     }
 }
