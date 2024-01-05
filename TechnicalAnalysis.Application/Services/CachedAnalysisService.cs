@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Application.Services
                 var cachedPair = await redisRepository.GetRecordAsync<PairExtended>(pairName);
                 if (cachedPair != null)
                 {
-                    pairsFromCache.Add(cachedPair);
+                    //pairsFromCache.Add(cachedPair);
                 }
             }
 
@@ -65,6 +65,7 @@ namespace TechnicalAnalysis.Application.Services
                      var enhancedScans = pair.Candlesticks
                          .Where(c => c.EnhancedScans.Count > 0)
                          .OrderByDescending(c => c.CloseDate)
+                         .ThenBy(c => c.EnhancedScans.OrderBy(es => es.OrderOfSignal))
                          .GroupBy(c => c.PoolOrPairId)
                          .Select(group => new
                          {
@@ -76,13 +77,17 @@ namespace TechnicalAnalysis.Application.Services
                      return new
                      {
                          pair.Symbol,
-                         EnhancedScans = enhancedScans
+                         EnhancedScans = enhancedScans,
+                         enhancedScans.First().EnhancedScans.First().OrderOfSignal
                      };
                  })
                  .Where(result => result.EnhancedScans.Count > 0)
                  .ToList();
 
-            var sortedPairsByEnhanced = filteredPairs.OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate).ToList();
+            var sortedPairsByEnhanced = filteredPairs
+                .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate)
+                .ThenBy(result => result.OrderOfSignal)
+                .ToList();
 
             /*            var vhfPairs = pairs
                            .OrderByDescending(pair => pair.CreatedAt)
