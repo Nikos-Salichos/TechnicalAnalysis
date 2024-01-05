@@ -56,6 +56,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public IList<VerticalHorizontalFilter> VerticalHorizontalFilters { get; init; } = new List<VerticalHorizontalFilter>();
         public IList<VerticalHorizontalFilterRange> VerticalHorizontalFilterRanges { get; init; } = new List<VerticalHorizontalFilterRange>();
         public IList<OnBalanceVolume> OnBalanceVolumes { get; init; } = new List<OnBalanceVolume>();
+        public IList<PsychologicalLine> PsychologicalLines { get; init; } = new List<PsychologicalLine>();
         public Trend FractalTrend { get; set; }
         public Trend PriceTrend { get; set; }
         public IDictionary<string, double> CorrelationPerPair { get; init; } = new Dictionary<string, double>();
