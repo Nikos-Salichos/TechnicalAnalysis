@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             var candlestickLength = pairs.ToDictionary(pair => pair.PrimaryId, pair => pair.Candlesticks.Count);
 
-            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair =>
+            Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair =>
             {
                 int currentPairLength = candlestickLength[pair.PrimaryId];
                 if (currentPairLength == 0)
