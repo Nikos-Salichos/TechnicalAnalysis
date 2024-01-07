@@ -7,8 +7,8 @@ using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
-using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 using TechnicalAnalysis.CommonModels.JsonOutput;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
 using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Utilities;
@@ -37,7 +37,7 @@ namespace TechnicalAnalysis.Application.Services
                 return Enumerable.Empty<PairExtended>();
             }
 
-            CalculateTechnicalIndicators(pairs);
+            await CalculateTechnicalIndicators(pairs);
 
             var filteredPairs = FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
 
@@ -70,9 +70,7 @@ namespace TechnicalAnalysis.Application.Services
                 return Enumerable.Empty<PairExtended>();
             }
 
-            CalculateTechnicalIndicators(fetchedPairs);
-
-            await CalculateMarketStatistics(fetchedPairs, selectedPairs);
+            await CalculateTechnicalIndicators(fetchedPairs);
 
             var indicatorReportsPerPair = new Dictionary<PairExtended, List<Indicator>>();
 
@@ -526,54 +524,94 @@ namespace TechnicalAnalysis.Application.Services
             return flagNestedCandlesticksBody;
         }
 
-        private async Task CalculateMarketStatistics(IEnumerable<PairExtended> pairs, IEnumerable<PairExtended> selectedPairs)
+        private static void CalculateMarketStatistics(MarketStatistic marketStatistic, IEnumerable<PairExtended> selectedPairs, IEnumerable<CryptoFearAndGreedData> cryptoFearAndGreedData)
         {
-            var marketStatistic = await CountPairsWithEnhancedScanIsBuy(pairs);
+            var cryptoFearAndGreedIndexDict = cryptoFearAndGreedData.ToDictionary(c => c.TimestampAsDateTime.Date, c => c);
+            var dailyStatisticsDict = marketStatistic.DailyStatistics.GroupBy(ds => ds.Key.Date).ToDictionary(g => g.Key, g => g.Select(ds => ds.Value).ToList());
 
-            if (selectedPairs is null)
+            Parallel.ForEach(selectedPairs, ParallelConfig.GetOptions(), pair =>
             {
-                return;
-            }
-
-            var cryptoFearAndGreedIndex = await mediator.Send(new GetCryptoFearAndGreedIndexQuery());
-
-            foreach (var pair in selectedPairs)
-            {
-                // Clear EnhancedScans for each candlestick in the current pair
-                foreach (var candlestick in pair.Candlesticks)
+                Parallel.ForEach(pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0), candlestick =>
                 {
-                    candlestick.EnhancedScans.Clear();
-                }
+                    KeyValuePair<DateTime, DailyStatistic> dailyStatisticFound = marketStatistic.DailyStatistics.FirstOrDefault(d => d.Key.Date == candlestick.CloseDate.Date);
 
-                // Create a dictionary for candlesticks by date for the current pair
-                var candlesticksByDate = pair.Candlesticks.ToDictionary(c => c.CloseDate, c => c);
-
-                // Add new EnhancedScan entries based on marketStatistic
-                foreach (var kvp in marketStatistic.DailyStatistics)
-                {
-                    if (kvp.Value.PairsWithEnhancedScan.Contains(pair.Symbol)
-                        && candlesticksByDate.TryGetValue(kvp.Key, out var candlestick))
+                    if (!dailyStatisticsDict.TryGetValue(candlestick.CloseDate.Date, out var dailyStatistic))
                     {
-                        var cryptoFearAndGreedIndexFound = cryptoFearAndGreedIndex.FirstOrDefault(c => c.TimestampAsDateTime.Date == kvp.Key.Date);
-                        if (cryptoFearAndGreedIndexFound?.ValueClassification != "ExtremeGreed"
-                            && cryptoFearAndGreedIndexFound?.ValueClassification != "Greed")
+                        candlestick.EnhancedScans.Clear();
+                        return;
+                    }
+
+                    // Check if the pair is in the statistic
+                    if (dailyStatisticFound.Value.PairsWithEnhancedScan.Contains(pair.Symbol))
+                    {
+                        if (!cryptoFearAndGreedIndexDict.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
+                                   || cryptoFearAndGreedIndex.ValueClassification == "ExtremeGreed"
+                                   || cryptoFearAndGreedIndex.ValueClassification == "Greed")
                         {
-                            candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId) { EnhancedScanIsBuy = true });
+                            candlestick.EnhancedScans.Clear();
                         }
                     }
-                }
-            }
+                    else
+                    {
+                        // Clear enhanced scans if the pair is not in the statistic
+                        candlestick.EnhancedScans.Clear();
+                    }
+
+                });
+            });
+
+
+            /*            Parallel.ForEach(selectedPairs, ParallelConfig.GetOptions(), pair =>
+                        {
+                            foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0))
+                            {
+                                KeyValuePair<DateTime, DailyStatistic> dailyStatisticFound = marketStatistic.DailyStatistics.FirstOrDefault(d => d.Key.Date == candlestick.CloseDate.Date);
+
+                                if (dailyStatisticFound.Equals(default(KeyValuePair<DateTime, DailyStatistic>)))
+                                {
+                                    candlestick.EnhancedScans.Clear();
+                                    continue;
+                                }
+
+                                // Check if the pair is in the statistic
+                                if (dailyStatisticFound.Value.PairsWithEnhancedScan.Contains(pair.Symbol))
+                                {
+                                    // Find crypto fear and greed index for the date
+                                    var cryptoFearAndGreedIndex = cryptoFearAndGreedData.FirstOrDefault(c => c.TimestampAsDateTime.Date == candlestick.CloseDate.Date);
+
+                                    // Clear enhanced scans based on value classification
+                                    if (cryptoFearAndGreedIndex?.ValueClassification is null
+                                        || cryptoFearAndGreedIndex.ValueClassification == "ExtremeGreed"
+                                        || cryptoFearAndGreedIndex.ValueClassification == "Greed")
+                                    {
+                                        candlestick.EnhancedScans.Clear();
+                                    }
+                                }
+                                else
+                                {
+                                    // Clear enhanced scans if the pair is not in the statistic
+                                    candlestick.EnhancedScans.Clear();
+                                }
+
+                            }
+                        });
+            */
         }
 
-        private void CalculateTechnicalIndicators(IEnumerable<PairExtended> pairs)
+        private async Task CalculateTechnicalIndicators(IEnumerable<PairExtended> pairs)
         {
+            var cryptoFearAndGreedDataTask = mediator.Send(new GetCryptoFearAndGreedIndexQuery());
+
             BasicIndicatorExtension.Logger = logger;
             AdvancedIndicatorExtension.Logger = logger;
             PairStatisticsExtension.Logger = logger;
 
-            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateBasicIndicators());
-            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.CalculateSignalIndicators());
-            Parallel.ForEach(pairs, ParallelOption.GetOptions(), pair => pair.HasCalculateDailyTechnicalAnalysis = true);
+            Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
+            Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators());
+
+            var marketStatistic = await CountPairsWithEnhancedScanIsBuy(pairs);
+            var cryptoFearAndGreedData = (await cryptoFearAndGreedDataTask).OrderByDescending(c => c.TimestampAsDateTime);
+            CalculateMarketStatistics(marketStatistic, pairs, cryptoFearAndGreedData);
 
             // pairs.CalculatePairStatistics();
         }
@@ -646,7 +684,6 @@ namespace TechnicalAnalysis.Application.Services
             marketStatistic.CalculateAndFilterPercentages(50);
 
             var baseDirectory = GetBaseDirectory();
-
             string jsonFileName = Path.Combine(baseDirectory, $"{nameof(MarketStatistic)}.json");
             await JsonHelper.SerializeToJson(marketStatistic, jsonFileName);
 
