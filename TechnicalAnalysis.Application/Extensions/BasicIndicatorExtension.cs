@@ -76,7 +76,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             CalculateHighestClose(pair);
 
-            CalculateVolatility(pair);
+            CalculateHistoricalVolatility(pair);
             CalculateAverageRange(pair);
             CalculateVerticalHorizontalFilter(pair);
             CalculateOnBalanceVolumeOscilator(pair, quotes, candlestickLookup);
@@ -634,7 +634,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateVolatility(PairExtended pair)
+        private static void CalculateHistoricalVolatility(PairExtended pair)
         {
             var stockData = new StockData(
                  pair.Candlesticks.Select(x => x.OpenPrice != null ? (double)x.OpenPrice : 0.0),
@@ -646,9 +646,9 @@ namespace TechnicalAnalysis.Application.Extensions
 
             const int period = 21;
 
-            var results = stockData.CalculateHistoricalVolatilityPercentile(MovingAvgType.ExponentialMovingAverage, period, 252);
+            var results = stockData.CalculateHistoricalVolatility(MovingAvgType.ExponentialMovingAverage, period);
 
-            var hvpValues = results.OutputValues["Hvp"];  // Retrieve the "Hvp" values list
+            var hvpValues = results.OutputValues["Hv"];
 
             for (int counter = 0; counter < pair.Candlesticks.Count; counter++)
             {
