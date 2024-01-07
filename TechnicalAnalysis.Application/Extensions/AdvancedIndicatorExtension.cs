@@ -4,6 +4,7 @@ using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 using TechnicalAnalysis.CommonModels.Indicators.Basic;
 using TechnicalAnalysis.CommonModels.Indicators.CandlestickFormations;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
 
 namespace TechnicalAnalysis.Application.Extensions
 {
@@ -11,8 +12,9 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static ILogger Logger { get; set; }
 
-        public static void CalculateSignalIndicators(this PairExtended pair)
+        public static void CalculateSignalIndicators(this PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
         {
+
             Logger.LogInformation("Pair details - {PairPropertyName}: {PairName}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
                 "{BaseAssetNamePropertyName}: {BaseAssetName}, " +
@@ -43,7 +45,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateWilliamsVixFix(pair);
             CalculateHighestWilliamsVixFixValue(pair);
 
-            CalculateEnchanced(pair);
+            CalculateEnchanced(pair, cryptoFearAndGreedDataPerDatetime);
             CalculateResistanceBreakout(pair);
             CalculateVerticalHorizontalFilterRange(pair);
         }
@@ -460,21 +462,28 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateEnchanced(PairExtended pair)
+        private static void CalculateEnchanced(PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
         {
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2023, 01, 03).Date
-                    && string.Equals(pair.BaseAssetName, "AAPL", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2018, 11, 17).Date
+                    && string.Equals(pair.Symbol, "BTC-USDT", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
                 if (IsAscendingGreenCandlestickPattern(pair.Candlesticks, i))
                 {
                     // continue;
+                }
+
+                bool? greedAndFearCondition = null;
+                if (!cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
+                    && (cryptoFearAndGreedIndex?.ValueClassification != "ExtremeGreed" || cryptoFearAndGreedIndex?.ValueClassification != "Greed"))
+                {
+                    greedAndFearCondition = true;
                 }
 
                 bool[] conditions =
@@ -500,10 +509,18 @@ namespace TechnicalAnalysis.Application.Extensions
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
                 ];
 
+                if (greedAndFearCondition.HasValue && pair.Provider
+                    is DataProvider.Binance
+                    or DataProvider.Uniswap
+                    or DataProvider.Pancakeswap)
+                {
+                    conditions = [.. conditions, greedAndFearCondition.Value];
+                }
+
                 int trueConditionsCount = conditions.Count(condition => condition);
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
-                int threshold = 90;
+                const int threshold = 100;
 
                 //Try dynamic percentage based on volatility
                 /* if (candlestick.Volatilities.FirstOrDefault().VolatilityValue < 50)
