@@ -539,7 +539,7 @@ namespace TechnicalAnalysis.Application.Services
                         continue;
                     }
 
-                    var isPairInStatistic = dailyStatistics.TrueForAll(ds => !ds.PairsWithEnhancedScan.Contains(pair.Symbol));
+                    var isPairInStatistic = dailyStatistics.Exists(ds => !ds.PairsWithEnhancedScan.Contains(pair.Symbol));
                     if (!isPairInStatistic)
                     {
                         candlestick.EnhancedScans.Clear();
@@ -562,8 +562,8 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime));
 
-            // var marketStatistic = await CountPairsWithEnhancedScanIsBuy(pairs);
-            // CalculateMarketStatistics(marketStatistic, pairs);
+            var marketStatistic = await CountPairsWithEnhancedScanIsBuy(pairs);
+            CalculateMarketStatistics(marketStatistic, pairs);
 
             // pairs.CalculatePairStatistics();
         }
@@ -611,13 +611,13 @@ namespace TechnicalAnalysis.Application.Services
                     // Check for enhanced scan and if it's a buy
                     if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
                     {
-                        if (!marketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStat))
+                        if (!marketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStatistic))
                         {
-                            dailyStat ??= new DailyStatistic();
-                            marketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStat;
+                            dailyStatistic ??= new DailyStatistic();
+                            marketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStatistic;
                         }
 
-                        dailyStat.PairsWithEnhancedScan.Add(pair.Symbol);
+                        dailyStatistic.PairsWithEnhancedScan.Add(pair.Symbol);
                     }
                 }
 
@@ -634,7 +634,7 @@ namespace TechnicalAnalysis.Application.Services
                 }
             }
 
-            marketStatistic.CalculateAndFilterPercentages(50);
+            marketStatistic.CalculateAndFilterPercentages(25);
 
             var baseDirectory = GetBaseDirectory();
             string jsonFileName = Path.Combine(baseDirectory, $"{nameof(MarketStatistic)}.json");
