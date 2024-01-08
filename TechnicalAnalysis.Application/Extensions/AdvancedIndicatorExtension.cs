@@ -14,7 +14,6 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static void CalculateSignalIndicators(this PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
         {
-
             Logger.LogInformation("Pair details - {PairPropertyName}: {PairName}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
                 "{BaseAssetNamePropertyName}: {BaseAssetName}, " +
@@ -469,21 +468,14 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2018, 11, 17).Date
-                    && string.Equals(pair.Symbol, "BTC-USDT", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2024, 01, 07).Date
+                    && string.Equals(pair.Symbol, "FLM-USDT", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
                 if (IsAscendingGreenCandlestickPattern(pair.Candlesticks, i))
                 {
                     // continue;
-                }
-
-                bool? greedAndFearCondition = null;
-                if (!cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
-                    && (cryptoFearAndGreedIndex?.ValueClassification != "ExtremeGreed" || cryptoFearAndGreedIndex?.ValueClassification != "Greed"))
-                {
-                    greedAndFearCondition = true;
                 }
 
                 bool[] conditions =
@@ -509,18 +501,23 @@ namespace TechnicalAnalysis.Application.Extensions
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
                 ];
 
-                if (greedAndFearCondition.HasValue && pair.Provider
-                    is DataProvider.Binance
-                    or DataProvider.Uniswap
-                    or DataProvider.Pancakeswap)
+                bool? greedAndFearCondition = null;
+                if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
+                    && cryptoFearAndGreedIndex is not null && pair.Provider
+                        is DataProvider.Binance
+                        or DataProvider.Uniswap
+                        or DataProvider.Pancakeswap)
                 {
+                    greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassification == "ExtremeFear" || cryptoFearAndGreedIndex.ValueClassification == "Fear"
+                        || cryptoFearAndGreedIndex.ValueClassification == "Neutral"
+;
                     conditions = [.. conditions, greedAndFearCondition.Value];
                 }
 
                 int trueConditionsCount = conditions.Count(condition => condition);
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
-                const int threshold = 100;
+                const int threshold = 90;
 
                 //Try dynamic percentage based on volatility
                 /* if (candlestick.Volatilities.FirstOrDefault().VolatilityValue < 50)
