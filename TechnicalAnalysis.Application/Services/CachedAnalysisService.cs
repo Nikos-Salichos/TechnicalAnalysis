@@ -115,7 +115,7 @@ namespace TechnicalAnalysis.Application.Services
 
                         var sortedPairsByRange = vhfPairs.OrderByDescending(result => result.VerticalHorizontalFilterRanges.FirstOrDefault()?.CandlestickCloseDate).ToList();*/
 
-            await redisRepository.SetRecordAsync(provider.ToString(), pairs, null, null);
+            await redisRepository.SetRecordAsync(provider.ToString(), sortedPairsByEnhanced, null, null);
             await communication.CreateAttachmentSendMessage(sortedPairsByEnhanced);
             rabbitMqService.PublishMessage(pairs);
 
