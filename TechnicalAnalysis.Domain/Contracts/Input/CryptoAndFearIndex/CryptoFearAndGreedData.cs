@@ -23,19 +23,19 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex
                 {
                     if (long.TryParse(_timestamp, out long unixTimestamp))
                     {
-                        // Converts the Unix timestamp to UTC DateTime
-                        TimestampAsDateTime = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime;
+                        // Converts the Unix timestamp to UTC DateTime and then gets only the Date part
+                        TimestampAsDateTime = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime.Date;
                     }
                     else
                     {
                         // Handle invalid timestamp, could also throw an exception or log an error
-                        TimestampAsDateTime = DateTime.MinValue;
+                        TimestampAsDateTime = DateTime.MinValue.Date;
                     }
                 }
                 catch (Exception)
                 {
                     // Log the exception, throw it, or set a default value
-                    TimestampAsDateTime = DateTime.MinValue;
+                    TimestampAsDateTime = DateTime.MinValue.Date;
                 }
             }
         }
