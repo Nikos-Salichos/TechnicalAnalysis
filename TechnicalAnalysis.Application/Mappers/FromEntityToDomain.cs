@@ -7,8 +7,7 @@ namespace TechnicalAnalysis.Application.Mappers
     public static class FromEntityToDomain
     {
         private static PairExtended ToDomain(this Domain.Entities.Pair pair)
-        {
-            return new PairExtended
+            => new()
             {
                 PrimaryId = pair.PrimaryId,
                 Symbol = pair.Symbol,
@@ -20,17 +19,12 @@ namespace TechnicalAnalysis.Application.Mappers
                 CreatedAt = pair.CreatedAt,
                 Candlesticks = new List<CandlestickExtended>()
             };
-        }
 
         public static IEnumerable<PairExtended> ToDomain(this IEnumerable<Domain.Entities.Pair> pairs)
-        {
-            return pairs.Select(c => c.ToDomain()).ToList();
-        }
+            => pairs.Select(c => c.ToDomain()).ToList();
 
         private static CandlestickExtended ToDomain(this Domain.Entities.Candlestick candlestick)
-        {
-            var builder = new CandlestickBuilder();
-            return builder.WithId(candlestick.PrimaryId)
+            => new CandlestickBuilder().WithId(candlestick.PrimaryId)
                           .WithPoolOrPairId(candlestick.PairId)
                           .WithOpenPrice(candlestick.OpenPrice)
                           .WithHighPrice(candlestick.HighPrice)
@@ -41,18 +35,12 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithOpenDate(candlestick.OpenDate)
                           .WithCloseDate(candlestick.CloseDate)
                           .Build();
-        }
 
         public static IEnumerable<CandlestickExtended> ToDomain(this IEnumerable<Domain.Entities.Candlestick> assets)
-        {
-            return assets.Select(c => c.ToDomain()).ToList();
-        }
+            => assets.Select(c => c.ToDomain()).ToList();
 
         private static CandlestickExtended ToDomain(this Domain.Entities.DexCandlestick dexCandlestick)
-        {
-            var builder = new CandlestickBuilder();
-
-            return builder.WithId(dexCandlestick.PrimaryId)
+            => new CandlestickBuilder().WithId(dexCandlestick.PrimaryId)
                           .WithPoolOrPairId(dexCandlestick.PoolId)
                           .WithPoolOrPairName(dexCandlestick.PoolContract)
                           .WithOpenDate(dexCandlestick.OpenDate)
@@ -68,16 +56,12 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithVolume(dexCandlestick.Volume)
                           .WithNumberOfTrades(dexCandlestick.NumberOfTrades)
                           .Build();
-        }
 
         public static IEnumerable<CandlestickExtended> DexCandlestickToDomain(this IEnumerable<Domain.Entities.DexCandlestick> assets)
-        {
-            return assets.Select(c => c.ToDomain()).ToList();
-        }
+            => assets.Select(c => c.ToDomain()).ToList();
 
         private static PairExtended PoolToDomain(this Domain.Entities.Pool pool)
-        {
-            return new PairExtended
+            => new()
             {
                 PrimaryId = pool.PrimaryId,
                 Provider = pool.Provider,
@@ -95,11 +79,8 @@ namespace TechnicalAnalysis.Application.Mappers
                 IsActive = pool.IsActive,
                 Candlesticks = new List<CandlestickExtended>()
             };
-        }
 
         public static IEnumerable<PairExtended> PoolToDomain(this IEnumerable<Domain.Entities.Pool> pairs)
-        {
-            return pairs.Select(c => c.PoolToDomain()).ToList();
-        }
+            => pairs.Select(c => c.PoolToDomain()).ToList();
     }
 }
