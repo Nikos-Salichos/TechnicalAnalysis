@@ -20,14 +20,10 @@ namespace TechnicalAnalysis.Application.Mappers
                 CreatedAt = pair.CreatedAt
             };
 
-        public static IEnumerable<Pair> ToEntity(this IEnumerable<PairExtended> pairs)
-        {
-            return pairs.Select(c => c.ToEntity());
-        }
+        public static IEnumerable<Pair> ToEntity(this IEnumerable<PairExtended> pairs) => pairs.Select(c => c.ToEntity()).ToList();
 
         private static Candlestick ToEntity(this CandlestickExtended candlestick)
-        {
-            return new Candlestick
+            => new()
             {
                 PairId = candlestick.PoolOrPairId,
                 OpenPrice = candlestick.OpenPrice,
@@ -40,16 +36,12 @@ namespace TechnicalAnalysis.Application.Mappers
                 CloseDate = candlestick.CloseDate,
                 NumberOfTrades = candlestick.NumberOfTrades
             };
-        }
 
         public static IEnumerable<Candlestick> ToEntity(this IEnumerable<CandlestickExtended> candlesticks)
-        {
-            return candlesticks.Select(c => c.ToEntity());
-        }
+            => candlesticks.Select(c => c.ToEntity()).ToList();
 
         private static DexCandlestick DexToEntityCandlestick(this CandlestickExtended candlestick)
-        {
-            return new DexCandlestick
+            => new()
             {
                 PoolId = candlestick.PoolOrPairId,
                 PoolContract = candlestick.PoolOrPairName,
@@ -65,16 +57,12 @@ namespace TechnicalAnalysis.Application.Mappers
                 Volume = candlestick.Volume,
                 NumberOfTrades = candlestick.NumberOfTrades
             };
-        }
 
         public static IEnumerable<DexCandlestick> DexToEntityCandlestick(this IEnumerable<CandlestickExtended> candlesticks)
-        {
-            return candlesticks.Select(c => c.DexToEntityCandlestick());
-        }
+            => candlesticks.Select(c => c.DexToEntityCandlestick());
 
         private static Pool DexToEntityToken(this PairExtended pair)
-        {
-            return new Pool
+            => new()
             {
                 PrimaryId = pair.PrimaryId,
                 PoolContract = pair.ContractAddress,
@@ -91,11 +79,8 @@ namespace TechnicalAnalysis.Application.Mappers
                 Provider = pair.Provider,
                 IsActive = pair.IsActive
             };
-        }
 
         public static IEnumerable<Pool> DexToEntityPool(this IEnumerable<PairExtended> pairs)
-        {
-            return pairs.Select(c => c.DexToEntityToken());
-        }
+            => pairs.Select(c => c.DexToEntityToken()).ToList();
     }
 }
