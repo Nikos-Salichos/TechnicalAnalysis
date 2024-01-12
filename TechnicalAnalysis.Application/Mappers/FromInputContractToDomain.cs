@@ -10,13 +10,10 @@ namespace TechnicalAnalysis.Application.Mappers
     public static class FromInputContractToDomain
     {
         public static IEnumerable<PairExtended> ToDomain(this IEnumerable<BinancePair> binancePairs)
-        {
-            return binancePairs.Select(c => c.ToDomain()).ToList();
-        }
+            => binancePairs.Select(c => c.ToDomain()).ToList();
 
         public static PairExtended ToDomain(this BinancePair binancePair)
-        {
-            return new PairExtended
+            => new()
             {
                 PrimaryId = binancePair.Id,
                 Symbol = binancePair.Pair,
@@ -28,26 +25,19 @@ namespace TechnicalAnalysis.Application.Mappers
                 CreatedAt = binancePair.CreatedAt,
                 Candlesticks = binancePair.BinanceCandlesticks.ConvertAll(c => c.ToDomain())
             };
-        }
 
         public static IEnumerable<CandlestickExtended> ToDomain(this IEnumerable<BinanceCandlestick> binanceCandlesticks)
-        {
-            return binanceCandlesticks.Select(c => c.ToDomain()).ToList();
-        }
+            => binanceCandlesticks.Select(c => c.ToDomain()).ToList();
 
         public static Asset ToDomain(this BinanceAsset binanceAsset)
-        {
-            return new Asset
+            => new()
             {
                 PrimaryId = binanceAsset.Id,
                 Symbol = binanceAsset.Asset
             };
-        }
 
         public static IEnumerable<Asset> ToDomain(this IEnumerable<BinanceAsset> binanceAssets)
-        {
-            return binanceAssets.Select(c => c.ToDomain()).ToList();
-        }
+            => binanceAssets.Select(c => c.ToDomain()).ToList();
 
         public static CandlestickExtended ToDomain(this BinanceCandlestick binanceCandlestick)
         {
@@ -81,18 +71,13 @@ namespace TechnicalAnalysis.Application.Mappers
         }
 
         public static IEnumerable<CandlestickExtended> FromDexCandlesticksV3ToDomain(this IEnumerable<Data> dexCandlesticks)
-        {
-            return dexCandlesticks.Select(c => c.FromDexCandlesticksV3ToDomain()).ToList();
-        }
+            => dexCandlesticks.Select(c => c.FromDexCandlesticksV3ToDomain()).ToList();
 
         public static IEnumerable<PairExtended> ToDomain(this IEnumerable<Pool> pools)
-        {
-            return pools.Select(c => c.ToDomain()).ToList();
-        }
+            => pools.Select(c => c.ToDomain()).ToList();
 
         public static PairExtended ToDomain(this Pool pool)
-        {
-            return new PairExtended
+            => new PairExtended
             {
                 Symbol = pool.PoolId,
                 FeeTier = pool.FeeTier,
@@ -108,6 +93,5 @@ namespace TechnicalAnalysis.Application.Mappers
                 NumberOfTrades = pool.NumberOfTrades.ReduceDigitsToFitLongLength(),
                 Candlesticks = pool.PoolDayData.FromDexCandlesticksV3ToDomain().ToList()
             };
-        }
     }
 }
