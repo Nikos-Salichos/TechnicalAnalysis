@@ -8,8 +8,7 @@ namespace TechnicalAnalysis.Application.Mappers
     public static class FromDomainToEntity
     {
         private static Pair ToEntity(this PairExtended pair)
-        {
-            return new Pair
+            => new()
             {
                 PrimaryId = pair.PrimaryId,
                 Symbol = pair.Symbol,
@@ -20,7 +19,6 @@ namespace TechnicalAnalysis.Application.Mappers
                 AllCandles = pair.AllCandles,
                 CreatedAt = pair.CreatedAt
             };
-        }
 
         public static IEnumerable<Pair> ToEntity(this IEnumerable<PairExtended> pairs)
         {
