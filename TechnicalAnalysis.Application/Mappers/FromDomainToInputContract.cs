@@ -6,8 +6,7 @@ namespace TechnicalAnalysis.Application.Mappers
     public static class FromDomainToInputContract
     {
         private static BinanceCandlestick ToContract(this CandlestickExtended candlestick)
-        {
-            return new BinanceCandlestick
+            => new()
             {
                 OpenPrice = candlestick.OpenPrice,
                 ClosePrice = candlestick.ClosePrice,
@@ -18,16 +17,12 @@ namespace TechnicalAnalysis.Application.Mappers
                 Volume = candlestick.Volume,
                 NumberOfTrades = candlestick.NumberOfTrades
             };
-        }
 
         public static IEnumerable<BinancePair> ToContract(this IEnumerable<PairExtended> pairs)
-        {
-            return pairs.Select(p => p.ToContract());
-        }
+            => pairs.Select(p => p.ToContract());
 
         private static BinancePair ToContract(this PairExtended pair)
-        {
-            return new BinancePair
+            => new()
             {
                 Id = pair.PrimaryId,
                 Pair = pair.Symbol,
@@ -38,20 +33,15 @@ namespace TechnicalAnalysis.Application.Mappers
                 AllCandles = pair.AllCandles,
                 BinanceCandlesticks = pair.Candlesticks.ConvertAll(c => c.ToContract())
             };
-        }
 
         private static BinanceAsset ToContract(this Asset asset)
-        {
-            return new BinanceAsset
+            => new()
             {
                 Id = asset.PrimaryId,
                 Asset = asset.Symbol
             };
-        }
 
         public static IEnumerable<BinanceAsset> ToContract(this IEnumerable<Asset> assets)
-        {
-            return assets.Select(p => p.ToContract());
-        }
+            => assets.Select(p => p.ToContract());
     }
 }
