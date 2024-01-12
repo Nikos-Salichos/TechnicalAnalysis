@@ -77,7 +77,7 @@ namespace TechnicalAnalysis.Application.Mappers
             => pools.Select(c => c.ToDomain()).ToList();
 
         public static PairExtended ToDomain(this Pool pool)
-            => new PairExtended
+            => new()
             {
                 Symbol = pool.PoolId,
                 FeeTier = pool.FeeTier,
