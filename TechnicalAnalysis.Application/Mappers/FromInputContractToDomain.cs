@@ -55,9 +55,7 @@ namespace TechnicalAnalysis.Application.Mappers
         }
 
         public static CandlestickExtended FromDexCandlesticksV3ToDomain(this Data dexCandlestick)
-        {
-            var builder = new CandlestickBuilder();
-            return builder.WithOpenPrice(dexCandlestick.Open?.ReduceDigitsToFitDecimalLength())
+            => new CandlestickBuilder().WithOpenPrice(dexCandlestick.Open?.ReduceDigitsToFitDecimalLength())
                           .WithHighPrice(dexCandlestick.High?.ReduceDigitsToFitDecimalLength())
                           .WithLowPrice(dexCandlestick.Low?.ReduceDigitsToFitDecimalLength())
                           .WithClosePrice(dexCandlestick.Close?.ReduceDigitsToFitDecimalLength())
@@ -68,7 +66,6 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithNumberOfTrades(dexCandlestick.NumberOfTrades.ReduceDigitsToFitLongLength())
                           .WithTotalValueLockedUsd(dexCandlestick.TotalValueLockedRawData?.ReduceDigitsToFitDecimalLength())
                           .Build();
-        }
 
         public static IEnumerable<CandlestickExtended> FromDexCandlesticksV3ToDomain(this IEnumerable<Data> dexCandlesticks)
             => dexCandlesticks.Select(c => c.FromDexCandlesticksV3ToDomain()).ToList();
