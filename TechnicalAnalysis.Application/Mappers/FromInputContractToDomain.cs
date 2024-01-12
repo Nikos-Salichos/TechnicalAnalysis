@@ -40,9 +40,7 @@ namespace TechnicalAnalysis.Application.Mappers
             => binanceAssets.Select(c => c.ToDomain()).ToList();
 
         public static CandlestickExtended ToDomain(this BinanceCandlestick binanceCandlestick)
-        {
-            var builder = new CandlestickBuilder();
-            return builder.WithPoolOrPairId(binanceCandlestick.PairId)
+            => new CandlestickBuilder().WithPoolOrPairId(binanceCandlestick.PairId)
               .WithOpenPrice(binanceCandlestick.OpenPrice)
               .WithHighPrice(binanceCandlestick.HighPrice)
               .WithLowPrice(binanceCandlestick.LowPrice)
@@ -52,7 +50,6 @@ namespace TechnicalAnalysis.Application.Mappers
               .WithOpenDate(binanceCandlestick.OpenTime)
               .WithCloseDate(binanceCandlestick.CloseTime)
               .Build();
-        }
 
         public static CandlestickExtended FromDexCandlesticksV3ToDomain(this Data dexCandlestick)
             => new CandlestickBuilder().WithOpenPrice(dexCandlestick.Open?.ReduceDigitsToFitDecimalLength())
