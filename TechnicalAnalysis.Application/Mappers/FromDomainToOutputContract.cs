@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
         }
 
-        public static IEnumerable<Candle> ToOutputContract(this IEnumerable<CandlestickExtended> domainCandlesticks)
+        private static IEnumerable<Candle> ToOutputContract(this IEnumerable<CandlestickExtended> domainCandlesticks)
         {
             return domainCandlesticks is null
                 ? Enumerable.Empty<Candle>()
@@ -32,13 +32,6 @@ namespace TechnicalAnalysis.Application.Mappers
                 Symbol = domain.Symbol,
                 Candles = domain.Candlesticks.ToOutputContract()
             };
-        }
-
-        public static IEnumerable<PartialPair> ToOutputContract(this IEnumerable<PairExtended> pairExtendeds)
-        {
-            return pairExtendeds is null
-                ? Enumerable.Empty<PartialPair>()
-                : pairExtendeds.Select(c => c.ToOutputContract());
         }
     }
 }
