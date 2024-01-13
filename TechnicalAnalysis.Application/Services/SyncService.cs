@@ -58,8 +58,8 @@ namespace TechnicalAnalysis.Application.Services
         private async Task GetAndSyncAdapter(DataProvider provider, Timeframe timeframe)
         {
             var adapter = adapterFactory(provider);
-
             await adapter.Sync(provider, timeframe);
+            logger.LogInformation("Synchronization completed for {Provider}", provider);
         }
     }
 }
