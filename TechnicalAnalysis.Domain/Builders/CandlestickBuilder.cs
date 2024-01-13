@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Domain.Builders
 {
     public class CandlestickBuilder : ICandlestickBuilder
     {
-        private readonly CandlestickExtended _candlestick = new CandlestickExtended();
+        private readonly CandlestickExtended _candlestick = new();
 
         public CandlestickExtended Build()
         {

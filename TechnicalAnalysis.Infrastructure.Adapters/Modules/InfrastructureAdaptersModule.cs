@@ -37,10 +37,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             });
 
             services.AddHttpClient("default")
-                .ConfigureHttpClient(client =>
-                {
-                    client.DefaultRequestHeaders.Add("User-Agent", "Tracking prices application");
-                });
+                .ConfigureHttpClient(client => client.DefaultRequestHeaders.Add("User-Agent", "Tracking prices application"));
 
             services.AddSingleton<IBinanceHttpClient, BinanceHttpClient>();
             services.AddSingleton<IDexV3HttpClient, DexV3HttpClient>();
