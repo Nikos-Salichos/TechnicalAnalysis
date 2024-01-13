@@ -10,57 +10,67 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
 
-            List<Position> positions = new List<Position>();
+            List<Position> positions = [];
 
             foreach (var candlestick in pair.Candlesticks)
             {
                 if (candlestick.DragonFlyDojis.Count > 0 && candlestick.DragonFlyDojis[0].IsDragonFlyDoji)
                 {
-                    Position position = new Position();
-                    position.OpenPositionDate = candlestick.OpenDate;
-                    position.EntryPositionPrice = candlestick.ClosePrice;
-                    position.OpenPosition = true;
-                    position.SignalType = nameof(DragonFlyDoji);
+                    Position position = new()
+                    {
+                        OpenPositionDate = candlestick.OpenDate,
+                        EntryPositionPrice = candlestick.ClosePrice,
+                        OpenPosition = true,
+                        SignalType = nameof(DragonFlyDoji)
+                    };
                     positions.Add(position);
                 }
 
                 if (candlestick.InvertedHammers.Count > 0 && candlestick.InvertedHammers[0].IsInvertedHammer)
                 {
-                    Position position = new Position();
-                    position.OpenPositionDate = candlestick.OpenDate;
-                    position.EntryPositionPrice = candlestick.ClosePrice;
-                    position.OpenPosition = true;
-                    position.SignalType = nameof(InvertedHammer);
+                    Position position = new()
+                    {
+                        OpenPositionDate = candlestick.OpenDate,
+                        EntryPositionPrice = candlestick.ClosePrice,
+                        OpenPosition = true,
+                        SignalType = nameof(InvertedHammer)
+                    };
                     positions.Add(position);
                 }
 
                 if (candlestick.Hammers.Count > 0 && candlestick.Hammers[0].IsHammer)
                 {
-                    Position position = new Position();
-                    position.OpenPositionDate = candlestick.OpenDate;
-                    position.EntryPositionPrice = candlestick.ClosePrice;
-                    position.OpenPosition = true;
-                    position.SignalType = nameof(Hammer);
+                    Position position = new()
+                    {
+                        OpenPositionDate = candlestick.OpenDate,
+                        EntryPositionPrice = candlestick.ClosePrice,
+                        OpenPosition = true,
+                        SignalType = nameof(Hammer)
+                    };
                     positions.Add(position);
                 }
 
                 if (candlestick.SpinningTops.Count > 0 && candlestick.SpinningTops[0].IsSpinningTop)
                 {
-                    Position position = new Position();
-                    position.OpenPositionDate = candlestick.OpenDate;
-                    position.EntryPositionPrice = candlestick.ClosePrice;
-                    position.OpenPosition = true;
-                    position.SignalType = nameof(SpinningTop);
+                    Position position = new()
+                    {
+                        OpenPositionDate = candlestick.OpenDate,
+                        EntryPositionPrice = candlestick.ClosePrice,
+                        OpenPosition = true,
+                        SignalType = nameof(SpinningTop)
+                    };
                     positions.Add(position);
                 }
 
                 if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans[0].EnhancedScanIsBuy)
                 {
-                    Position position = new Position();
-                    position.OpenPositionDate = candlestick.OpenDate;
-                    position.EntryPositionPrice = candlestick.ClosePrice;
-                    position.OpenPosition = true;
-                    position.SignalType = nameof(EnhancedScan);
+                    Position position = new()
+                    {
+                        OpenPositionDate = candlestick.OpenDate,
+                        EntryPositionPrice = candlestick.ClosePrice,
+                        OpenPosition = true,
+                        SignalType = nameof(EnhancedScan)
+                    };
                     positions.Add(position);
                 }
 
