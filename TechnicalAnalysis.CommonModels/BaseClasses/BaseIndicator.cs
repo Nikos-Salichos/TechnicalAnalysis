@@ -5,8 +5,6 @@
         public long CandlestickId { get; init; }
 
         protected BaseIndicator(long candlestickId)
-        {
-            CandlestickId = candlestickId;
-        }
+            => CandlestickId = candlestickId;
     }
 }
