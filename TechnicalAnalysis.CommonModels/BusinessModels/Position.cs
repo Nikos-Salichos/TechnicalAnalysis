@@ -14,20 +14,10 @@
         public string SignalType { get; set; }
 
         public TimeSpan DaysInPosition
-        {
-            get
-            {
-                return ClosePositionDate - OpenPositionDate;
-            }
-        }
+            => ClosePositionDate - OpenPositionDate;
 
         public decimal? ClosedProfitOrLoss
-        {
-            get
-            {
-                return ClosePositionPrice - EntryPositionPrice;
-            }
-        }
+            => ClosePositionPrice - EntryPositionPrice;
 
         public Position()
         {
