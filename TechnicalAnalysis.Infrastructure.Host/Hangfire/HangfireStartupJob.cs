@@ -14,11 +14,24 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
             if (syncService != null)
             {
                 RecurringJob.AddOrUpdate(
-                    "SynchronizeProvidersJob", // Unique identifier for the job
+                    "synchronize_providers_job_binance", // Unique identifier for the job
                     () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                        CommonModels.Enums.DataProvider.All,
+                        CommonModels.Enums.DataProvider.Binance,
                         CommonModels.Enums.Timeframe.Daily)),
-                    Cron.Daily);
+                   "*/30 * * * *"); // Run at the current minute and then every 30 minutes
+
+                RecurringJob.AddOrUpdate(
+                    "synchronize_providers_job_alpaca", // Unique identifier for the job
+                    () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.Alpaca,
+                        CommonModels.Enums.Timeframe.Daily)),
+                   "*/30 * * * *"); // Run at the current minute and then every 30 minutes
+
+                RecurringJob.AddOrUpdate("synchronize_providers_job_alternative_me_crypto_and_fear_index",
+                    () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.AlternativeMeCryptoAndFearIndex,
+                        CommonModels.Enums.Timeframe.Daily)),
+                     "*/30 * * * *"); // Run at the current minute and then every 30 minutes
             }
         }
     }
