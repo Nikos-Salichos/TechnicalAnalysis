@@ -20,7 +20,8 @@ namespace TechnicalAnalysis.Application.Mappers
                 CreatedAt = pair.CreatedAt
             };
 
-        public static IEnumerable<Pair> ToEntity(this IEnumerable<PairExtended> pairs) => pairs.Select(c => c.ToEntity()).ToList();
+        public static IEnumerable<Pair> ToEntity(this IEnumerable<PairExtended> pairs)
+            => pairs.Select(c => c.ToEntity()).ToList();
 
         private static Candlestick ToEntity(this CandlestickExtended candlestick)
             => new()
@@ -59,7 +60,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static IEnumerable<DexCandlestick> DexToEntityCandlestick(this IEnumerable<CandlestickExtended> candlesticks)
-            => candlesticks.Select(c => c.DexToEntityCandlestick());
+            => candlesticks.Select(c => c.DexToEntityCandlestick()).ToList();
 
         private static Pool DexToEntityToken(this PairExtended pair)
             => new()
