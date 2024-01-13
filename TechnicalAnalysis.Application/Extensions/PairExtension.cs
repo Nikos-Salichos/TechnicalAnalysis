@@ -51,7 +51,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     pair.Symbol = pair.BaseAssetName;
                 }
             }
-            return pairs;
+            return pairs.ToList();
         }
 
         public static IEnumerable<PairExtended> MapPairsToCandlesticks(this IEnumerable<PairExtended> pairs, IEnumerable<CandlestickExtended> candlesticks)
