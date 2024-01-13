@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Application.Mappers
         private static IEnumerable<Candle> ToOutputContract(this IEnumerable<CandlestickExtended> domainCandlesticks)
             => domainCandlesticks is null
                 ? Enumerable.Empty<Candle>()
-                : domainCandlesticks.Select(c => c.ToOutputContract());
+                : domainCandlesticks.Select(c => c.ToOutputContract()).ToList();
 
         public static PartialPair ToOutputContract(this PairExtended domain)
             => new()
