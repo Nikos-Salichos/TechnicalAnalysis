@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static IEnumerable<BinancePair> ToContract(this IEnumerable<PairExtended> pairs)
-            => pairs.Select(p => p.ToContract());
+            => pairs.Select(p => p.ToContract()).ToList();
 
         private static BinancePair ToContract(this PairExtended pair)
             => new()
@@ -42,6 +42,6 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static IEnumerable<BinanceAsset> ToContract(this IEnumerable<Asset> assets)
-            => assets.Select(p => p.ToContract());
+            => assets.Select(p => p.ToContract()).ToList();
     }
 }
