@@ -67,102 +67,54 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public decimal? TotalValueLockedUsd { get; set; }
 
         public decimal? InternalBarStrength
-        {
-            get
-            {
-                if (HighPrice - LowPrice == 0)
-                {
-                    return null;
-                }
-
-                return (ClosePrice - LowPrice) / (HighPrice - LowPrice);
-            }
-        }
+            => HighPrice - LowPrice == 0
+                    ? null
+                    : (ClosePrice - LowPrice) / (HighPrice - LowPrice);
 
         public decimal? PriceReturn
-        {
-            get
-            {
-                return OpenPrice == 0
+            => OpenPrice == 0
                     ? null
                     : (ClosePrice - OpenPrice) / OpenPrice;
-            }
-        }
 
-        public decimal? Range
-        {
-            get { return HighPrice - LowPrice; }
-        }
+        public decimal? Range => HighPrice - LowPrice;
 
         public decimal? Body
-        {
-            get
-            {
-                return OpenPrice.HasValue && ClosePrice.HasValue
+            => OpenPrice.HasValue && ClosePrice.HasValue
                     ? Math.Abs(OpenPrice.Value - ClosePrice.Value)
                     : null;
-            }
-        }
 
         public decimal? TypicalPrice
-        {
-            get { return (HighPrice + LowPrice + ClosePrice) / 3; }
-        }
+            => (HighPrice + LowPrice + ClosePrice) / 3;
 
         public decimal? BodyToRangeRatio
-        {
-            get
-            {
-                return Range == 0
+            => Range == 0
                     ? null
                     : Body / Range;
-            }
-        }
 
         public decimal? TopTwentyPercentOfRangeInPriceUnit
-        {
-            get { return HighPrice - (Range / 5); }
-        }
+            => HighPrice - (Range / 5);
 
         public decimal? BottomTwentyPercentOfRangeInPriceUnit
-        {
-            get { return LowPrice + (Range / 5); }
-        }
+            => LowPrice + (Range / 5);
 
         public decimal? MidRangeInPriceUnit
-        {
-            get { return (HighPrice + LowPrice) / 2; }
-        }
+            => (HighPrice + LowPrice) / 2;
 
         public decimal? TenPercentHigherThanMidRangeInPriceUnit
-        {
-            get { return MidRangeInPriceUnit + MidRangeInPriceUnit * 0.1m; }
-        }
+            => MidRangeInPriceUnit + MidRangeInPriceUnit * 0.1m;
 
         public decimal? TenPercentLowerThanMidRangeInPriceUnit
-        {
-            get { return MidRangeInPriceUnit - MidRangeInPriceUnit * 0.1m; }
-        }
+            => MidRangeInPriceUnit - MidRangeInPriceUnit * 0.1m;
 
         public decimal? VolumeToTVLRatio
-        {
-            get
-            {
-                return TotalValueLockedUsd == 0
+            => TotalValueLockedUsd == 0
                   ? null
                   : Volume / TotalValueLockedUsd;
-            }
-        }
 
         public decimal? LiquidityToTVLRatio
-        {
-            get
-            {
-                return TotalValueLockedUsd == 0
+            => TotalValueLockedUsd == 0
                   ? null
                   : Liquidity / TotalValueLockedUsd;
-            }
-        }
     }
 
 }
