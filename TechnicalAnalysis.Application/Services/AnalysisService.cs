@@ -523,15 +523,16 @@ namespace TechnicalAnalysis.Application.Services
             return flagNestedCandlesticksBody;
         }
 
-        private static void CalculateMarketStatistics(MarketStatistic marketStatistic, IEnumerable<PairExtended> selectedPairs)
+        private static void CalculateMarketStatistics(MarketStatistic marketStatistic,
+            IEnumerable<PairExtended> selectedPairs,
+            Func<PairExtended, bool> filterPredicate)
         {
             var dailyStatisticsDict = marketStatistic.DailyStatistics
                 .GroupBy(ds => ds.Key.Date)
                 .ToDictionary(g => g.Key, g => g.Select(ds => ds.Value).ToList());
 
-            Parallel.ForEach(selectedPairs.Where(p => p.Provider is DataProvider.Binance
-                        or DataProvider.Uniswap
-                        or DataProvider.Pancakeswap), ParallelConfig.GetOptions(), pair =>
+            Parallel.ForEach(selectedPairs.Where(filterPredicate),
+                ParallelConfig.GetOptions(), pair =>
             {
                 foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0))
                 {
@@ -541,7 +542,7 @@ namespace TechnicalAnalysis.Application.Services
                         continue;
                     }
 
-                    var isPairInStatistic = dailyStatistics.Exists(ds => !ds.PairsWithEnhancedScan.Contains(pair.Symbol));
+                    var isPairInStatistic = dailyStatistics.Exists(ds => ds.PairsWithEnhancedScan.Any(s => string.Equals(s, pair.Symbol, StringComparison.InvariantCultureIgnoreCase)));
                     if (!isPairInStatistic)
                     {
                         candlestick.EnhancedScans.Clear();
@@ -564,8 +565,14 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime));
 
-            var marketStatistic = await CountPairsWithEnhancedScanIsBuy(pairs);
-            CalculateMarketStatistics(marketStatistic, pairs);
+            var cryptoMarketStatistic = await CountCryptoPairsWithEnhancedScanIsBuy(pairs);
+            var etfStockMarketStatistic = await CountEtfStockPairWithEnhancedScanIsBuy(pairs);
+
+            CalculateMarketStatistics(cryptoMarketStatistic, pairs, p => p.Provider == DataProvider.Binance
+            || p.Provider == DataProvider.Uniswap
+            || p.Provider == DataProvider.Pancakeswap);
+
+            CalculateMarketStatistics(etfStockMarketStatistic, pairs, p => p.Provider == DataProvider.Alpaca);
 
             // pairs.CalculatePairStatistics();
         }
@@ -596,11 +603,13 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
-        private async Task<MarketStatistic> CountPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> CountCryptoPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
         {
-            var marketStatistic = new MarketStatistic();
+            var cryptoMarketStatistic = new MarketStatistic();
 
-            foreach (var pair in pairs)
+            foreach (var pair in pairs.Where(p => p.Provider is DataProvider.Binance
+                        or DataProvider.Uniswap
+                        or DataProvider.Pancakeswap))
             {
                 // Dictionary to keep track of dates where the pair has a candlestick record
                 var datesWithCandlestick = new HashSet<DateTime>();
@@ -613,10 +622,10 @@ namespace TechnicalAnalysis.Application.Services
                     // Check for enhanced scan and if it's a buy
                     if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
                     {
-                        if (!marketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStatistic))
+                        if (!cryptoMarketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStatistic))
                         {
                             dailyStatistic ??= new DailyStatistic();
-                            marketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStatistic;
+                            cryptoMarketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStatistic;
                         }
 
                         dailyStatistic.PairsWithEnhancedScan.Add(pair.Symbol);
@@ -626,23 +635,72 @@ namespace TechnicalAnalysis.Application.Services
                 // Update the NumberOfPairs for each date where this pair has a candlestick record
                 foreach (var date in datesWithCandlestick)
                 {
-                    if (!marketStatistic.DailyStatistics.TryGetValue(date, out var dailyStat))
+                    if (!cryptoMarketStatistic.DailyStatistics.TryGetValue(date, out var dailyStat))
                     {
                         dailyStat ??= new DailyStatistic();
-                        marketStatistic.DailyStatistics[date] = dailyStat;
+                        cryptoMarketStatistic.DailyStatistics[date] = dailyStat;
                     }
 
                     dailyStat.NumberOfPairs++;
                 }
             }
 
-            marketStatistic.CalculateAndFilterPercentages(25);
+            cryptoMarketStatistic.CalculateAndFilterPercentages(25);
 
             var baseDirectory = GetBaseDirectory();
             string jsonFileName = Path.Combine(baseDirectory, $"{nameof(MarketStatistic)}.json");
-            await JsonHelper.SerializeToJson(marketStatistic, jsonFileName);
+            await JsonHelper.SerializeToJson(cryptoMarketStatistic, jsonFileName);
 
-            return marketStatistic;
+            return cryptoMarketStatistic;
+        }
+
+        private async Task<MarketStatistic> CountEtfStockPairWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        {
+            var etfStockMarketStatistic = new MarketStatistic();
+
+            foreach (var pair in pairs.Where(p => p.Provider is DataProvider.Alpaca))
+            {
+                // Dictionary to keep track of dates where the pair has a candlestick record
+                var datesWithCandlestick = new HashSet<DateTime>();
+
+                foreach (var candlestick in pair.Candlesticks)
+                {
+                    // Add the date of the candlestick to the set
+                    datesWithCandlestick.Add(candlestick.CloseDate);
+
+                    // Check for enhanced scan and if it's a buy
+                    if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
+                    {
+                        if (!etfStockMarketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStatistic))
+                        {
+                            dailyStatistic ??= new DailyStatistic();
+                            etfStockMarketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStatistic;
+                        }
+
+                        dailyStatistic.PairsWithEnhancedScan.Add(pair.Symbol);
+                    }
+                }
+
+                // Update the NumberOfPairs for each date where this pair has a candlestick record
+                foreach (var date in datesWithCandlestick)
+                {
+                    if (!etfStockMarketStatistic.DailyStatistics.TryGetValue(date, out var dailyStat))
+                    {
+                        dailyStat ??= new DailyStatistic();
+                        etfStockMarketStatistic.DailyStatistics[date] = dailyStat;
+                    }
+
+                    dailyStat.NumberOfPairs++;
+                }
+            }
+
+            etfStockMarketStatistic.CalculateAndFilterPercentages(25);
+
+            var baseDirectory = GetBaseDirectory();
+            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(MarketStatistic)}.json");
+            await JsonHelper.SerializeToJson(etfStockMarketStatistic, jsonFileName);
+
+            return etfStockMarketStatistic;
         }
     }
 }
