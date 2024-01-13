@@ -166,7 +166,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         HighestPriceOfFunnel = candlestick.HighPrice
                     });
                 }
-                else if (count > 0)
+                else
                 {
                     count = 0;
                 }
@@ -399,7 +399,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 foreach (var flagNestedCandlestickBody in candlestick1.FlagsNestedCandlesticksBody.Where(f => f.NumberOfNestedCandlestickBodies > 3))
                 {
-                    var candlestickFlagPole = pair?.Candlesticks.Find(c => c.PrimaryId == flagNestedCandlestickBody.FlagPoleCandlestickId);
+                    var candlestickFlagPole = pair.Candlesticks.Find(c => c.PrimaryId == flagNestedCandlestickBody.FlagPoleCandlestickId);
 
                     if (candlestick.ClosePrice > candlestickFlagPole?.HighPrice)
                     {
@@ -407,7 +407,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         {
                             OrderOfSignal = 1,
                             IsBuy = true,
-                            FlagPoleCandlestickId = candlestickFlagPole?.PrimaryId,
+                            FlagPoleCandlestickId = candlestickFlagPole.PrimaryId,
                             PurchaseAmount = initialInvestment / candlestick.ClosePrice
                         });
                     }
@@ -468,8 +468,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2024, 01, 07).Date
-                    && string.Equals(pair.Symbol, "FLM-USDT", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2022, 11, 10).Date
+                    && string.Equals(pair.Symbol, "BTC-USDT", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
@@ -501,17 +501,24 @@ namespace TechnicalAnalysis.Application.Extensions
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
                 ];
 
-                bool? greedAndFearCondition = null;
+
                 if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
                     && cryptoFearAndGreedIndex is not null && pair.Provider
                         is DataProvider.Binance
                         or DataProvider.Uniswap
                         or DataProvider.Pancakeswap)
                 {
-                    greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassification == "ExtremeFear" || cryptoFearAndGreedIndex.ValueClassification == "Fear"
-                        || cryptoFearAndGreedIndex.ValueClassification == "Neutral"
-;
-                    conditions = [.. conditions, greedAndFearCondition.Value];
+                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassification == "Extreme Fear"
+                          || cryptoFearAndGreedIndex.ValueClassification == "Fear"
+                          || cryptoFearAndGreedIndex.ValueClassification == "Neutral";
+
+                    conditions = [.. conditions, greedAndFearCondition];
+                }
+
+                var consesutiveCandlesticksBelowSma = GetConsecutiveCandlesticksBelowSmaCondition(pair, i);
+                if (consesutiveCandlesticksBelowSma)
+                {
+                    conditions = [.. conditions, consesutiveCandlesticksBelowSma];
                 }
 
                 int trueConditionsCount = conditions.Count(condition => condition);
@@ -565,6 +572,18 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
             }
+        }
+
+        private static bool GetConsecutiveCandlesticksBelowSmaCondition(PairExtended pair, int index)
+        {
+            if (index <= 0 || index - 1 <= 0 || index - 2 <= 0)
+            {
+                return false;
+            }
+
+            return pair.Candlesticks[index]?.ConsecutiveCandlesticksBelowSma >= 5
+                || pair.Candlesticks[index - 1]?.ConsecutiveCandlesticksBelowSma >= 5
+                || pair.Candlesticks[index - 2]?.ConsecutiveCandlesticksBelowSma >= 5;
         }
 
         private static void CalculateVerticalHorizontalFilterRange(PairExtended pair)
