@@ -529,7 +529,9 @@ namespace TechnicalAnalysis.Application.Services
                 .GroupBy(ds => ds.Key.Date)
                 .ToDictionary(g => g.Key, g => g.Select(ds => ds.Value).ToList());
 
-            Parallel.ForEach(selectedPairs, ParallelConfig.GetOptions(), pair =>
+            Parallel.ForEach(selectedPairs.Where(p => p.Provider is DataProvider.Binance
+                        or DataProvider.Uniswap
+                        or DataProvider.Pancakeswap), ParallelConfig.GetOptions(), pair =>
             {
                 foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0))
                 {
