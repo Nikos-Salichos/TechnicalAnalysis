@@ -37,16 +37,16 @@ builder.Services.AddAntiforgery(options =>
 builder.Services.ConfigureRateLimit();
 #endregion Api Rate Limit
 
-if (builder.Environment.IsProduction())
+builder.Services.AddHangfire(configuration =>
 {
-    builder.Services.AddHangfire(configuration =>
-    {
-        var connectionString = builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose");
-        configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString));
-    });
+    var connectionString = builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose");
+    configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)
+    //TODO Need to test it
+    // new PostgreSqlStorageOptions { InvisibilityTimeout = TimeSpan.FromMinutes(720)}
+     );
+});
 
-    builder.Services.AddHangfireServer();
-}
+builder.Services.AddHangfireServer();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -79,14 +79,11 @@ app.UseRateLimiter();
 
 app.UseMiddleware<SecureHeadersMiddleware>();
 
-if (app.Environment.IsProduction())
+app.UseHangfireDashboard("/hangfire", new DashboardOptions()
 {
-    app.UseHangfireDashboard("/hangfire", new DashboardOptions()
-    {
-        Authorization = new[] { new DashboardNoAuthorizationFilter() }
-    });
-    HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
-}
+    Authorization = new[] { new DashboardNoAuthorizationFilter() }
+});
+HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
 
 app.UseAuthentication(); //first line should be
 
