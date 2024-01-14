@@ -60,7 +60,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await SyncCandlesticks(pairs.ToContract().ToList(), timeframe);
 
-            binanceProvider.UpdateProviderInfo();
+            binanceProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = binanceProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(binanceProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
