@@ -30,13 +30,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var stockSymbols = new List<string> {
                 "vt","vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
                 "tsla", "aapl", "googl", "abnb", "JNJ", "XOM","xom", "WMT", "META", "JPM","V", "KO", "PEP",
-                "MCD", "AVGO", "ACN", "NFLX",
-                "MA","BAC","MS","WCF","SCHW","RY","MSFT","NVDA","CRM","ABDE","VZ","IBM","EWH","MCHI","EWS",
+                "MCD", "AVGO", "ACN", "NFLX","WCF","ABDE",
+                "MA","BAC","MS","SCHW","RY","MSFT","NVDA","CRM","VZ","IBM","EWH","MCHI","EWS",
                 "FEZ","IWM","SPY","DIA","DAX","VGK","QQQ",
                 "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
                 "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA",
-                "BRK.A",
-                "AMZN"
+                "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG", "PEP", "JNJ", "NSRGY"
             };
 
             stockSymbols = stockSymbols.Select(symbol => symbol.ToUpper())
@@ -68,7 +67,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await SyncPairs(stockSymbols);
             await SyncCandlesticks(timeframe);
 
-            alpacaProvider.UpdateProviderInfo();
+            alpacaProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = alpacaProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(alpacaProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
