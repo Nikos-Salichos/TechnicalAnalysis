@@ -297,17 +297,30 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateSma(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var indicatorResult in quotes.GetSma(200))
+            int? counter = null;
+
+            foreach (var indicatorResult in quotes.GetSma(Constants.SimpleMovingAveragePeriod))
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
                     var sma = MovingAverage.Create(
                         candlestickId: candlestick.PrimaryId,
-                        period: 200,
+                        period: Constants.SimpleMovingAveragePeriod,
                         value: indicatorResult.Sma,
                         movingAverageType: MovingAverageType.Simple
                     );
                     candlestick.MovingAverages.Add(sma);
+
+                    // Compare ClosePrice with SMA and update the counter
+                    if (candlestick.ClosePrice < (decimal?)indicatorResult.Sma)
+                    {
+                        counter++;
+                        candlestick.ConsecutiveCandlesticksBelowSma = counter;
+                    }
+                    else
+                    {
+                        counter = 0;
+                    }
                 }
             }
         }
