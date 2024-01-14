@@ -36,16 +36,6 @@ namespace TechnicalAnalysis.Application.Extensions
                     && timeframe == Timeframe.Weekly);
         }
 
-        public static void UpdateProviderInfo(this ProviderSynchronization provider)
-        {
-            if (provider is null)
-            {
-                return;
-            }
-            provider.ProviderPairAssetSyncInfo.LastAssetSync = DateTime.UtcNow;
-            provider.ProviderPairAssetSyncInfo.LastPairSync = DateTime.UtcNow;
-        }
-
         public static ProviderCandlestickSyncInfo GetOrCreateProviderCandlestickSyncInfo(this ProviderSynchronization providerSynchronization, DataProvider provider, Timeframe timeframe)
         {
             var providerCandlestickSyncInfoProviderFound = providerSynchronization.CandlestickSyncInfos
@@ -53,7 +43,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             if (providerCandlestickSyncInfoProviderFound is null)
             {
-                var newProviderCandlestickSyncInfo = new ProviderCandlestickSyncInfo
+                var newProviderCandlestickSyncInfo = new ProviderCandlestickSyncInfo()
                 {
                     DataProvider = providerSynchronization.ProviderPairAssetSyncInfo.DataProvider,
                     Timeframe = timeframe,
@@ -68,6 +58,5 @@ namespace TechnicalAnalysis.Application.Extensions
                 return providerCandlestickSyncInfoProviderFound;
             }
         }
-
     }
 }
