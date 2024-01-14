@@ -41,7 +41,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await mediator.Send(new InsertCryptoFearAndGreedIndexCommand(response.SuccessValue));
 
-            alternativeMeCryptoAndFearProvider.UpdateProviderInfo();
+            alternativeMeCryptoAndFearProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = alternativeMeCryptoAndFearProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(alternativeMeCryptoAndFearProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
