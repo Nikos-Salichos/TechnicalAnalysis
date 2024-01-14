@@ -54,7 +54,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await SavePools(poolsWithStables, provider);
             await SaveCandlesticks(apiResponse.SuccessValue.PoolResponse, provider);
 
-            dexV3Provider.UpdateProviderInfo();
+            dexV3Provider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = dexV3Provider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(dexV3Provider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
         }
