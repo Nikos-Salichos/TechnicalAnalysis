@@ -7,7 +7,7 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static IEnumerable<Position> AverageDownStrategyCloseOneByOne(this PairExtended pair)
         {
-            List<Position> positions = new List<Position>();
+            List<Position> positions = new();
 
             _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
             bool openPosition = false;
@@ -82,7 +82,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static IEnumerable<Position> AverageDownStrategyCloseOneByOnBasedInFractalBreak(this PairExtended pair)
         {
-            List<Position> positions = new List<Position>();
+            List<Position> positions = new();
 
             _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
             bool openPosition = false;
@@ -169,7 +169,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static IEnumerable<Position> AverageDownStrategyCloseAllBasedInFractalBreak(this PairExtended pair)
         {
-            List<Position> positions = new List<Position>();
+            List<Position> positions = new();
 
             _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
             bool openPosition = false;
@@ -177,10 +177,6 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 CandlestickExtended? candlestick = pair.Candlesticks[i];
-
-                if (candlestick.CloseDate.Date == new DateTime(2023, 10, 27).Date)
-                {
-                }
 
                 if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy != null && !openPosition)
                 {
@@ -201,8 +197,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (positionFound?.OpenPosition == true)
                 {
                     var percentage = candlestick.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
-                    var thresholdValue = positionFound?.EntryPositionPrice * percentage;
-                    var pricePercentageBelowEntry = positionFound?.EntryPositionPrice - thresholdValue;
+                    var thresholdValue = positionFound.EntryPositionPrice * percentage;
+                    var pricePercentageBelowEntry = positionFound.EntryPositionPrice - thresholdValue;
                     if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy != null
                         && openPosition
                         && candlestick.ClosePrice <= pricePercentageBelowEntry)
