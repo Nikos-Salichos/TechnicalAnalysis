@@ -772,16 +772,16 @@ namespace TechnicalAnalysis.Application.Extensions
             const int period = 5;
             foreach (var candlestickWithIndex in pair.Candlesticks.Select((candlestick, index) => new { candlestick, index }))
             {
-                int startIndex = Math.Max(candlestickWithIndex.index - period + 1, 0);
-
-                int risingPeriodsCount = pair.Candlesticks
-                                            .Skip(startIndex)
-                                            .Take(candlestickWithIndex.index - startIndex + 1)
-                                            .Where((cs, i) => i + startIndex > 0 && cs.ClosePrice > pair.Candlesticks[i + startIndex - 1].ClosePrice)
-                                            .Count();
-
                 if (candlestickWithIndex.index >= period - 1)
                 {
+                    int startIndex = Math.Max(candlestickWithIndex.index - period + 1, 0);
+
+                    int risingPeriodsCount = pair.Candlesticks
+                            .Skip(startIndex)
+                            .Take(candlestickWithIndex.index - startIndex + 1)
+                            .Where((cs, i) => i + startIndex > 0 && cs.ClosePrice > pair.Candlesticks[i + startIndex - 1].ClosePrice)
+                            .Count();
+
                     var psyValue = (decimal)risingPeriodsCount / period * 100;
                     candlestickWithIndex.candlestick.PsychologicalLines.Add(new PsychologicalLine(candlestickWithIndex.candlestick.PrimaryId, period, (double)psyValue));
                 }
