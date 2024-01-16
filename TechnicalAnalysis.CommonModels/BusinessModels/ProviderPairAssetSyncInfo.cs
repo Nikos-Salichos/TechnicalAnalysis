@@ -14,6 +14,5 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
             LastAssetSync = DateTime.UtcNow;
             LastPairSync = DateTime.UtcNow;
         }
-
     }
 }
