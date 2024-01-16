@@ -260,6 +260,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
             }
 
+            var totalProfitAndLoss = positions.Select(p => p.ClosedProfitOrLoss).Sum();
+
             return positions;
         }
 
