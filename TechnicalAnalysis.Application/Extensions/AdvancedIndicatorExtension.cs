@@ -468,8 +468,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2022, 11, 10).Date
-                    && string.Equals(pair.Symbol, "BTC-USDT", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2023, 01, 03).Date
+                    && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
@@ -536,17 +536,18 @@ namespace TechnicalAnalysis.Application.Extensions
                      threshold = 90;
                  }*/
 
-                if (percentageTrueConditions >= threshold // TODO test it with candlesticks patterns
-                /*                &&
-                                (
-                                    candlestick?.DragonFlyDojis.FirstOrDefault()?.IsDragonFlyDoji == true
-                                    || candlestick?.Hammers.FirstOrDefault()?.IsHammer == true
-                                    || candlestick?.InvertedHammers.FirstOrDefault()?.IsInvertedHammer == true
-                                    || candlestick?.SpinningTops.FirstOrDefault()?.IsSpinningTop == true
-                                    || candlestick?.Marubozus.FirstOrDefault()?.IsMarubozu == true
-                                    || candlestick?.PriceFunnels.FirstOrDefault()?.IsFunnel == true
-                                    || candlestick?.TypicalPriceReversals.FirstOrDefault()?.TypicalPriceReversalIsBuy == true
-                                )*/
+                if (percentageTrueConditions >= threshold
+                // TODO test it with candlesticks patterns
+                /*                                &&
+                                                (
+                                                    candlestick?.DragonFlyDojis.FirstOrDefault()?.IsDragonFlyDoji == true
+                                                    || candlestick?.Hammers.FirstOrDefault()?.IsHammer == true
+                                                    || candlestick?.InvertedHammers.FirstOrDefault()?.IsInvertedHammer == true
+                                                    || candlestick?.SpinningTops.FirstOrDefault()?.IsSpinningTop == true
+                                                    || candlestick?.Marubozus.FirstOrDefault()?.IsMarubozu == true
+                                                    || candlestick?.PriceFunnels.FirstOrDefault()?.IsFunnel == true
+                                                    || candlestick?.TypicalPriceReversals.FirstOrDefault()?.TypicalPriceReversalIsBuy == true
+                                                )*/
                 )
                 {
                     var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
