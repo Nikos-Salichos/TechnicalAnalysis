@@ -38,9 +38,7 @@ namespace TechnicalAnalysis.Application.Services
 
             await CalculateTechnicalIndicators(pairs);
 
-            var filteredPairs = FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
-
-            return filteredPairs;
+            return FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
         }
 
         private static IEnumerable<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
@@ -86,10 +84,11 @@ namespace TechnicalAnalysis.Application.Services
                     CalculateEnhancedScanSignal(positionsCloseAll, "EnhancedScan_CloseAll", selectedPair.Symbol),
                     CalculateEnhancedScanAllSignals(selectedPair),
                     PrintFractalTrend(selectedPair),
-                    PrintLowestHighSignals(selectedPair),
+                    PrintLowestHighFractalSignals(selectedPair),
                     PrintFlagNestedBodySignals(selectedPair),
                     PrintFlagNestedRangeSignals(selectedPair),
                     PrintFunnelSignals(selectedPair),
+                    PrintAllKindOfRanges(selectedPair),
                     PrintResistanceBreakoutSignals(selectedPair),
                     CalculateCandlestickCloseBelowPivotPrice(selectedPair)
                 };
@@ -232,7 +231,7 @@ namespace TechnicalAnalysis.Application.Services
             return fractalTrend;
         }
 
-        private static Indicator PrintLowestHighSignals(PairExtended pair)
+        private static Indicator PrintLowestHighFractalSignals(PairExtended pair)
         {
             var lowestHighLowestLowFractal = new Indicator { Name = "lowestHighLowestLowFractal", PairName = pair.Symbol };
 
@@ -247,7 +246,7 @@ namespace TechnicalAnalysis.Application.Services
                     continue;
                 }
 
-                if (candlestick1.FractalTrend == Trend.Up && candlestick.ClosePrice > candlestick1.HighPrice
+                if (candlestick1.FractalTrend == Trend.Up
                     && (string.IsNullOrWhiteSpace(lastSignal) || string.Equals(lastSignal, "sell", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     lastSignal = "buy";
@@ -259,7 +258,7 @@ namespace TechnicalAnalysis.Application.Services
                     lowestHighLowestLowFractal.Signals.Add(signalIndicator);
                 }
 
-                if (candlestick1.FractalTrend == Trend.Down && candlestick.ClosePrice < candlestick1.LowPrice
+                if (candlestick1.FractalTrend == Trend.Down
                     && (string.IsNullOrWhiteSpace(lastSignal) || string.Equals(lastSignal, "buy", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     lastSignal = "sell";
@@ -286,85 +285,25 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var candlestick in pair.Candlesticks)
             {
-                foreach (var signal in candlestick.FlagsNestedCandlesticksBody)
+                foreach (var signal in candlestick.FlagsNestedCandlesticksBody.Where(s => s.NumberOfNestedCandlestickBodies >= 3))
                 {
-                    if (signal.NumberOfNestedCandlestickBodies >= 3 &&
-                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
+                    var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                    if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
                     {
-                        var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
-                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                        if (signalFound is not null)
                         {
-                            var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
-
-                            if (signalFound is not null)
-                            {
-                                continue;
-                            }
-
-                            var signalIndicator = new Signal
-                            {
-                                OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                                Buy = 1,
-                                EntryPrice = candlestick.ClosePrice
-                            };
-
-                            indicator.Signals.Add(signalIndicator);
+                            continue;
                         }
-                    }
-                }
 
-                foreach (var signal in candlestick.FlagsNestedCandlesticksRange)
-                {
-                    if (signal.NumberOfNestedCandlestickRanges > 3 &&
-                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
-                    {
-                        var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
-                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        var signalIndicator = new Signal
                         {
-                            var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                            OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                            Buy = 1,
+                            EntryPrice = candlestick.ClosePrice
+                        };
 
-                            if (signalFound is not null)
-                            {
-                                continue;
-                            }
-
-                            var signalIndicator = new Signal
-                            {
-                                OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                                Buy = 1,
-                                EntryPrice = candlestick.ClosePrice
-                            };
-
-                            indicator.Signals.Add(signalIndicator);
-                        }
-                    }
-                }
-
-                foreach (var signal in candlestick.PriceFunnels)
-                {
-                    if (signal.NumberOfFunnelCandlesticks > 3 &&
-                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
-                    {
-                        var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
-
-                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
-                        {
-                            var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
-
-                            if (signalFound is not null)
-                            {
-                                continue;
-                            }
-
-                            var signalIndicator = new Signal
-                            {
-                                OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                                Buy = 1,
-                                EntryPrice = candlestick.ClosePrice
-                            };
-
-                            indicator.Signals.Add(signalIndicator);
-                        }
+                        indicator.Signals.Add(signalIndicator);
                     }
                 }
             }
@@ -382,41 +321,50 @@ namespace TechnicalAnalysis.Application.Services
 
             foreach (var candlestick in pair.Candlesticks)
             {
-                foreach (var signal in candlestick.FlagsNestedCandlesticksRange)
+                foreach (var signal in candlestick.FlagsNestedCandlesticksRange.Where(s => s.NumberOfNestedCandlestickRanges >= 3))
                 {
-                    if (signal.NumberOfNestedCandlestickRanges > 3 &&
-                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
+                    var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                    if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
                     {
-                        var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
-                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                        if (signalFound is not null)
                         {
-                            var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
-
-                            if (signalFound is not null)
-                            {
-                                continue;
-                            }
-
-                            var signalIndicator = new Signal
-                            {
-                                OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                                Buy = 1,
-                                EntryPrice = candlestick.ClosePrice
-                            };
-
-                            indicator.Signals.Add(signalIndicator);
+                            continue;
                         }
+
+                        var signalIndicator = new Signal
+                        {
+                            OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                            Buy = 1,
+                            EntryPrice = candlestick.ClosePrice
+                        };
+
+                        indicator.Signals.Add(signalIndicator);
                     }
                 }
+            }
 
+            return indicator;
+        }
+
+        private static Indicator PrintFunnelSignals(PairExtended pair)
+        {
+            var indicator = new Indicator { Name = "FunnelSignals", PairName = pair.Symbol };
+
+            if (pair.Candlesticks.Count == 0)
+            {
+                return indicator;
+            }
+
+            foreach (var candlestick in pair.Candlesticks)
+            {
                 foreach (var signal in candlestick.PriceFunnels)
                 {
-                    if (signal.NumberOfFunnelCandlesticks > 3 &&
-                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
+                    if (signal.NumberOfFunnelCandlesticks >= 3)
                     {
                         var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
 
-                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
                         {
                             var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
@@ -440,9 +388,9 @@ namespace TechnicalAnalysis.Application.Services
             return indicator;
         }
 
-        private static Indicator PrintFunnelSignals(PairExtended pair)
+        private static Indicator PrintAllKindOfRanges(PairExtended pair)
         {
-            var indicator = new Indicator { Name = "FunnelSignals", PairName = pair.Symbol };
+            var indicator = new Indicator { Name = "PrintAllKindOfRanges", PairName = pair.Symbol };
 
             if (pair.Candlesticks.Count == 0)
             {
@@ -453,12 +401,11 @@ namespace TechnicalAnalysis.Application.Services
             {
                 foreach (var signal in candlestick.PriceFunnels)
                 {
-                    if (signal.NumberOfFunnelCandlesticks > 3 &&
-                        (candlestick.FractalTrend is Trend.Down || candlestick.PriceTrend is Trend.Down))
+                    if (signal.NumberOfFunnelCandlesticks >= 3)
                     {
                         var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
 
-                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue)
+                        if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
                         {
                             var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
@@ -479,6 +426,57 @@ namespace TechnicalAnalysis.Application.Services
                     }
                 }
             }
+
+            foreach (var candlestick in pair.Candlesticks)
+            {
+                foreach (var signal in candlestick.FlagsNestedCandlesticksBody.Where(s => s.NumberOfNestedCandlestickBodies >= 3))
+                {
+                    var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                    if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
+                    {
+                        var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                        if (signalFound is not null)
+                        {
+                            continue;
+                        }
+
+                        var signalIndicator = new Signal
+                        {
+                            OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                            Buy = 1,
+                            EntryPrice = candlestick.ClosePrice
+                        };
+
+                        indicator.Signals.Add(signalIndicator);
+                    }
+                }
+            }
+
+            foreach (var candlestick in pair.Candlesticks)
+            {
+                foreach (var signal in candlestick.FlagsNestedCandlesticksRange.Where(s => s.NumberOfNestedCandlestickRanges >= 3))
+                {
+                    var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                    if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
+                    {
+                        var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                        if (signalFound is not null)
+                        {
+                            continue;
+                        }
+
+                        var signalIndicator = new Signal
+                        {
+                            OpenedAt = candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                            Buy = 1,
+                            EntryPrice = candlestick.ClosePrice
+                        };
+
+                        indicator.Signals.Add(signalIndicator);
+                    }
+                }
+            }
+
             return indicator;
         }
 
@@ -536,6 +534,12 @@ namespace TechnicalAnalysis.Application.Services
             {
                 foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0))
                 {
+
+                    if (candlestick.CloseDate.Date == new DateTime(2023, 01, 03).Date
+                        && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                    }
+
                     if (!dailyStatisticsDict.TryGetValue(candlestick.CloseDate.Date, out var dailyStatistics))
                     {
                         candlestick.EnhancedScans.Clear();
@@ -565,8 +569,8 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime));
 
-            var cryptoMarketStatistic = await CountCryptoPairsWithEnhancedScanIsBuy(pairs);
-            var etfStockMarketStatistic = await CountEtfStockPairWithEnhancedScanIsBuy(pairs);
+            var cryptoMarketStatistic = await GetCryptoPairsWithEnhancedScanIsBuy(pairs);
+            var etfStockMarketStatistic = await GetEtfStockPairWithEnhancedScanIsBuy(pairs);
 
             CalculateMarketStatistics(cryptoMarketStatistic, pairs, p => p.Provider == DataProvider.Binance
             || p.Provider == DataProvider.Uniswap
@@ -603,7 +607,7 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
-        private async Task<MarketStatistic> CountCryptoPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> GetCryptoPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
         {
             var cryptoMarketStatistic = new MarketStatistic();
 
@@ -645,16 +649,16 @@ namespace TechnicalAnalysis.Application.Services
                 }
             }
 
-            cryptoMarketStatistic.CalculateAndFilterPercentages(25);
+            cryptoMarketStatistic.CalculateAndFilterPercentages(Constants.ThresholdPercentage);
 
             var baseDirectory = GetBaseDirectory();
-            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(MarketStatistic)}.json");
+            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetCryptoPairsWithEnhancedScanIsBuy)}-{nameof(MarketStatistic)}.json");
             await JsonHelper.SerializeToJson(cryptoMarketStatistic, jsonFileName);
 
             return cryptoMarketStatistic;
         }
 
-        private async Task<MarketStatistic> CountEtfStockPairWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> GetEtfStockPairWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
         {
             var etfStockMarketStatistic = new MarketStatistic();
 
@@ -694,10 +698,10 @@ namespace TechnicalAnalysis.Application.Services
                 }
             }
 
-            etfStockMarketStatistic.CalculateAndFilterPercentages(25);
+            etfStockMarketStatistic.CalculateAndFilterPercentages(Constants.ThresholdPercentage);
 
             var baseDirectory = GetBaseDirectory();
-            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(MarketStatistic)}.json");
+            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetEtfStockPairWithEnhancedScanIsBuy)}-{nameof(MarketStatistic)}.json");
             await JsonHelper.SerializeToJson(etfStockMarketStatistic, jsonFileName);
 
             return etfStockMarketStatistic;
