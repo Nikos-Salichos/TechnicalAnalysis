@@ -65,6 +65,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public long? Liquidity { get; set; }
         public decimal? Fees { get; set; }
         public decimal? TotalValueLockedUsd { get; set; }
+        public int? ConsecutiveCandlesticksBelowSma { get; set; }
 
         public decimal? InternalBarStrength
             => HighPrice - LowPrice == 0
