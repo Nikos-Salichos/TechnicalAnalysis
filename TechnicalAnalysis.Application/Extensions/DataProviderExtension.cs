@@ -47,14 +47,14 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                     DataProvider = providerSynchronization.ProviderPairAssetSyncInfo.DataProvider,
                     Timeframe = timeframe,
-                    LastCandlestickSync = DateTime.UtcNow
                 };
+                newProviderCandlestickSyncInfo.UpdateCandlestickInfo();
                 providerSynchronization.CandlestickSyncInfos.Add(newProviderCandlestickSyncInfo);
                 return newProviderCandlestickSyncInfo;
             }
             else
             {
-                providerCandlestickSyncInfoProviderFound.LastCandlestickSync = DateTime.UtcNow;
+                providerCandlestickSyncInfoProviderFound.UpdateCandlestickInfo();
                 return providerCandlestickSyncInfoProviderFound;
             }
         }
