@@ -83,7 +83,7 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions()
 {
     Authorization = new[] { new DashboardNoAuthorizationFilter() }
 });
-HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
+await HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
 
 app.UseAuthentication(); //first line should be
 
