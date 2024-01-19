@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Application.Services
                 var cachedPair = await redisRepository.GetRecordAsync<PairExtended>(pairName);
                 if (cachedPair != null)
                 {
-                    //pairsFromCache.Add(cachedPair);
+                    pairsFromCache.Add(cachedPair);
                 }
             }
 
