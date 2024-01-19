@@ -66,7 +66,6 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
                     options.UseSqlServer(configuration.GetConnectionString()));
                 */
             });
-
         }
 
         public async Task InitializeAsync()
@@ -77,14 +76,14 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
 
         public async Task InitializeDatabaseScriptAsync()
         {
-            using var dbConnection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
+            await using var dbConnection = new NpgsqlConnection(PostgreSqlContainer.GetConnectionString());
             await dbConnection.OpenAsync();
 
             var scriptPath = Path.Combine(AppContext.BaseDirectory, "createTables.sql");
             var script = await File.ReadAllTextAsync(scriptPath);
 
             // Combine all the SQL queries into one transaction
-            using var transaction = await dbConnection.BeginTransactionAsync();
+            await using var transaction = await dbConnection.BeginTransactionAsync();
             await dbConnection.ExecuteAsync(script, transaction: transaction);
 
             // Commit the transaction to execute all queries
