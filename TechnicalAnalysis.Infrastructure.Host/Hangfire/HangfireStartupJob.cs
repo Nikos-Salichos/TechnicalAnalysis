@@ -50,12 +50,6 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
                         CommonModels.Enums.Timeframe.Daily)),
                      "*/30 * * * *");
             }
-
-            var analysisService = serviceProvider.GetService<IAnalysisService>();
-            if (analysisService != null)
-            {
-                await analysisService.GetPairsIndicatorsAsync(CommonModels.Enums.DataProvider.All);
-            }
         }
     }
 }
