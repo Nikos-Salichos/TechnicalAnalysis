@@ -5,18 +5,18 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
 {
     public abstract class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>, IDisposable
     {
-        private readonly IServiceScope _scope;
+        private readonly IServiceScope _serviceScope;
         protected readonly IPostgreSqlRepository PostgreSqlRepository;
 
         protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
         {
-            _scope = factory.Services.CreateScope();
-            PostgreSqlRepository = _scope.ServiceProvider.GetRequiredService<IPostgreSqlRepository>();
+            _serviceScope = factory.Services.CreateScope();
+            PostgreSqlRepository = _serviceScope.ServiceProvider.GetRequiredService<IPostgreSqlRepository>();
         }
 
         public void Dispose()
         {
-            _scope?.Dispose();
+            _serviceScope?.Dispose();
         }
     }
 }
