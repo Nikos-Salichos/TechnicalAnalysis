@@ -11,9 +11,9 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
         [Fact]
         public async Task ExecuteAssetsCommand_Successful()
         {
-            List<Asset> assets = new List<Asset>
+            List<Asset> assets = new()
             {
-                new Asset { Symbol = "TestContainersAsset" },
+                new() { Symbol = "TestContainersAsset" },
             };
 
             await PostgreSqlRepository.InsertAssetsAsync(assets);
@@ -27,10 +27,10 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
         [Fact]
         public async Task InsertDuplicateAssets_Fail()
         {
-            List<Asset> assets = new List<Asset>
+            List<Asset> assets = new()
             {
-                new Asset { Symbol = "BTC"},
-                new Asset { Symbol = "BTC"},
+                new() { Symbol = "BTC"},
+                new() { Symbol = "BTC"},
             };
 
             var insertedAssets = await PostgreSqlRepository.InsertAssetsAsync(assets);
