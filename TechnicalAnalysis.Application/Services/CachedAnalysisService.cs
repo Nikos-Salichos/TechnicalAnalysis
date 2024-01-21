@@ -115,6 +115,7 @@ namespace TechnicalAnalysis.Application.Services
 
                         var sortedPairsByRange = vhfPairs.OrderByDescending(result => result.VerticalHorizontalFilterRanges.FirstOrDefault()?.CandlestickCloseDate).ToList();*/
 
+            //TODO Instead of anonymous object create a class
             await redisRepository.SetRecordAsync(provider.ToString(), sortedPairsByEnhanced, null, null);
             await communication.CreateAttachmentSendMessage(sortedPairsByEnhanced);
             rabbitMqService.PublishMessage(pairs);
