@@ -3,10 +3,16 @@ version: '3.4'
 services:
   infrastructurehost:
     image: ${DOCKER_REGISTRY-}infrastructurehost
+    depends_on:
+      - "postgresql"
     build:
       context: .
       dockerfile: TechnicalAnalysis.Infrastructure.Host/Dockerfile
     user: root
+    environment:
+     DB_CONNECTION_STRING: "Host=postgresql;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
+    networks:
+       - postgres-db-network
 
   redis:
     image: redis
@@ -35,11 +41,29 @@ services:
      - "5432:5432"
     environment:
       POSTGRES_DB: "TechnicalAnalysis"
+      POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "admin"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes: 
        - ./postgres-data:/var/lib/postgresql/data
        # copy the sql script to create tables
        - ../TechnicalAnalysis/createTables.sql:/docker-entrypoint-initdb.d/createTables.sql
+    networks:
+       - postgres-db-network
+
+  pgadmin:
+        image: dpage/pgadmin4
+        container_name: technical-analysis-pgadmin
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+            PGADMIN_DEFAULT_PASSWORD: 'admin'
+        ports:
+            - 16543:80
+        volumes:
+            - ./servers.json:/pgadmin4/servers.json
+        networks:
+            - postgres-db-network
 
   seq:
     container_name: technical-analysis-seq
@@ -51,3 +75,7 @@ services:
 
 volumes:
   app-data:  # Define the shared volume
+
+networks:
+    postgres-db-network:
+        driver: bridge
