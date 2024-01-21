@@ -1,6 +1,15 @@
 version: '3.4'
 
+
+volumes:
+  app-data:  # Define the shared volume
+
+networks:
+    postgres-db-network:
+        driver: bridge
+
 services:
+
   infrastructurehost:
     image: ${DOCKER_REGISTRY-}infrastructurehost
     depends_on:
@@ -12,7 +21,7 @@ services:
     environment:
      DB_CONNECTION_STRING: "Host=postgresql;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
     networks:
-       - postgres-db-network
+      - postgres-db-network
 
   redis:
     image: redis
@@ -22,6 +31,8 @@ services:
      - "6379:6379"
     environment:
      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - postgres-db-network
 
   rabbitmq:
     image: rabbitmq:management
@@ -32,6 +43,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - postgres-db-network
 
   postgresql:
     image: postgres:latest
@@ -72,10 +85,3 @@ services:
       - 5341:80
     environment:
       - ACCEPT_EULA=Y 
-
-volumes:
-  app-data:  # Define the shared volume
-
-networks:
-    postgres-db-network:
-        driver: bridge
