@@ -84,7 +84,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.RabbitMQ
             channel.BasicConsume(queue: _queue, autoAck: true, consumer: consumer);
 
             // Wait for some time or an event indicating that enough messages have been received.
-            await Task.Delay(TimeSpan.FromSeconds(10));
+            await Task.Delay(TimeSpan.FromSeconds(5));
 
             return receivedMessages;
         }
