@@ -81,6 +81,8 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions()
 {
     Authorization = new[] { new DashboardNoAuthorizationFilter() }
 });
+
+//Note: Swagger will not run before jobs finish
 await HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
 
 app.UseAuthentication(); //first line should be
