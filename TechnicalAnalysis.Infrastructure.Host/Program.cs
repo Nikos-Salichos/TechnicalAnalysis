@@ -39,10 +39,8 @@ builder.Services.ConfigureRateLimit();
 
 builder.Services.AddHangfire(configuration =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose");
+    var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
     configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)
-    //TODO Need to test it
-    // new PostgreSqlStorageOptions { InvisibilityTimeout = TimeSpan.FromMinutes(720)}
      );
 });
 
