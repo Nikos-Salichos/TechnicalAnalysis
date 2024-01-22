@@ -65,17 +65,17 @@ services:
        - postgres-db-network
 
   pgadmin:
-        image: dpage/pgadmin4
-        container_name: technical-analysis-pgadmin
-        restart: always
-        environment:
-            PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
-            PGADMIN_DEFAULT_PASSWORD: 'admin'
-        ports:
-            - 16543:80
-        volumes:
-            - ./servers.json:/pgadmin4/servers.json
-        networks:
+    image: dpage/pgadmin4
+    container_name: technical-analysis-pgadmin
+    restart: always
+    environment:
+        PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+        PGADMIN_DEFAULT_PASSWORD: 'admin'
+    ports:
+        - 16543:80
+    volumes:
+        - ./servers.json:/pgadmin4/servers.json
+    networks:
             - postgres-db-network
 
   seq:
@@ -85,3 +85,5 @@ services:
       - 5341:80
     environment:
       - ACCEPT_EULA=Y 
+    networks:
+      - postgres-db-network
