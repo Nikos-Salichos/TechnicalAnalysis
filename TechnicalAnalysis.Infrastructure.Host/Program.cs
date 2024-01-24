@@ -14,7 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 #region Read Configuration
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
-    .AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true);
+    .AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
 #endregion Read Configuration
 
 #region Serilog
