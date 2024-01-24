@@ -13,13 +13,13 @@ services:
   infrastructurehost:
     image: ${DOCKER_REGISTRY-}infrastructurehost
     depends_on:
-      - "postgresql"
+      - "postgresql.api"
     build:
       context: .
       dockerfile: TechnicalAnalysis.Infrastructure.Host/Dockerfile
     user: root
     environment:
-     DB_CONNECTION_STRING: "Host=postgresql;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
+     DB_CONNECTION_STRING: "Host=postgresql.api;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
     networks:
       - postgres-db-network
 
@@ -46,7 +46,7 @@ services:
     networks:
       - postgres-db-network
 
-  postgresql:
+  postgresql.api:
     image: postgres:latest
     container_name: technical-analysis-postgresql
     restart: always
