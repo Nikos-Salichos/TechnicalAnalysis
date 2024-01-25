@@ -49,8 +49,8 @@ namespace TechnicalAnalysis.Application.Services
                     await communication.CreateAttachmentSendMessage(cachedPairs);
                     rabbitMqService.PublishMessage(cachedPairs);
 
-                    //Example how to consume message
-                    var message = await rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
+                    // Example how to consume message
+                    // var message = await rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
 
                     return cachedPairs;
                 }
