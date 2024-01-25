@@ -22,8 +22,11 @@ services:
      DB_CONNECTION_STRING: "Host=postgresql.api;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
     networks:
       - postgres-db-network
+    ports:
+      - "5000:5000"
+      - "5001:5001"
 
-  redis:
+  redis.api:
     image: redis
     container_name: technical-analysis-redis
     restart: always
