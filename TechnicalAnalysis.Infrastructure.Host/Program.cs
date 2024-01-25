@@ -1,5 +1,6 @@
 using Hangfire;
 using Hangfire.PostgreSql;
+using Serilog;
 using TechnicalAnalysis.Application.Modules;
 using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host.Hangfire;
@@ -47,6 +48,8 @@ builder.Services.AddHangfire(configuration =>
 
 builder.Services.AddHangfireServer();
 
+builder.Services.AddHttpsRedirection(options => options.HttpsPort = 5001);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -59,11 +62,12 @@ app.UseSwaggerUI();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.UseSerilogRequestLogging();
+
 if (builder.Environment.IsProduction())
 {
     app.UseMiddleware<ApiKeyMiddleware>();
 }
-
 app.UseHsts();
 
 app.UseHttpsRedirection();
