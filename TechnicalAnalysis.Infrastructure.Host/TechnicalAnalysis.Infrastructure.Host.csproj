@@ -10,10 +10,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<_ContentIncludedByDefault Remove="appsettings.prod.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Hangfire" Version="1.8.7" />
 		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.5" />
 		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
@@ -31,9 +27,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="appsettings.prod.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 </Project>
