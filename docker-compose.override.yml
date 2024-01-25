@@ -4,10 +4,10 @@ services:
   infrastructurehost:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=https://+:5000;http://+:5001
     ports:
-      - "3200:80"
-      - "3201:443"
+      - "5000:5000"
+      - "5001:5001"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
