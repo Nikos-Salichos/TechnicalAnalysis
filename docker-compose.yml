@@ -73,10 +73,8 @@ services:
         PGADMIN_DEFAULT_PASSWORD: 'admin'
     ports:
         - 16543:80
-    volumes:
-        - ./servers.json:/pgadmin4/servers.json
     networks:
-            - postgres-db-network
+        - postgres-db-network
 
   seq:
     container_name: technical-analysis-seq
