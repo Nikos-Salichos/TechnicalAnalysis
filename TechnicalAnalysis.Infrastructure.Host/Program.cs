@@ -10,14 +10,12 @@ using TechnicalAnalysis.Infrastructure.Host.Serilog;
 using TechnicalAnalysis.Infrastructure.Host.Services;
 using TechnicalAnalysis.Infrastructure.Persistence.Modules;
 
+
+await Task.Delay(10000);
 var builder = WebApplication.CreateBuilder(args);
 
 #region Read Configuration
-builder.Configuration
-    .SetBasePath(builder.Environment.ContentRootPath)
-    .AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables()
-    .Build();
+builder.Configuration.AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true);
 #endregion Read Configuration
 
 #region Serilog
@@ -42,9 +40,9 @@ builder.Services.ConfigureRateLimit();
 
 builder.Services.AddHangfire(configuration =>
 {
-    var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-    configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)
-     );
+    var hangfireConnectionString = builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose");
+    //var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+    configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(hangfireConnectionString));
 });
 
 builder.Services.AddHangfireServer();
