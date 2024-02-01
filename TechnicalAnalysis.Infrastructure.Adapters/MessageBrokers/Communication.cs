@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             await SendMessage(mailInformation);
         }
 
-        public async Task SendMessage(List<MimePart> message)
+        private async Task SendMessage(List<MimePart> message)
         {
             var receivers = configuration.GetValue<string>("MailData:To") ?? string.Empty;
             List<string> receiversList = receivers.Split(',').Select(r => r.Trim()).ToList();
@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             await mailService.SendAsync(mailData, new CancellationToken());
         }
 
-        public void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments, IEnumerable<T> data)
+        private static void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments, IEnumerable<T> data)
         {
             string json = JsonSerializer.Serialize(data, JsonHelper.JsonSerializerOptions);
 
