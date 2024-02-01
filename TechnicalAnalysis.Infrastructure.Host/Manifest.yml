@@ -1,0 +1,17 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: technicalanalysis-infrastructure-host-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: TechnicalAnalysis.Infrastructure.Host
+  template:
+    metadata:
+      labels:
+        app: TechnicalAnalysis.Infrastructure.Host
+    spec:
+      containers:
+        - name: technicalanalysis-infrastructure-host
+          image: nikos/TechnicalAnalysis.Infrastructure.Host_docker:v1.0.0

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>1950bd76-2da9-4a60-a634-3409e1577845</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Hangfire" Version="1.8.7" />
+		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.5" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+		<PackageReference Include="Serilog.Enrichers.Context" Version="4.6.5" />
+		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
+		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+		<PackageReference Include="Serilog.Sinks.Seq" Version="6.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TechnicalAnalysis.Application\TechnicalAnalysis.Application.csproj" />
+		<ProjectReference Include="..\TechnicalAnalysis.Infrastructure.Adapters\TechnicalAnalysis.Infrastructure.Adapters.csproj" />
+		<ProjectReference Include="..\TechnicalAnalysis.Infrastructure.Persistence\TechnicalAnalysis.Infrastructure.Persistence.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="appsettings.prod.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+</Project>
