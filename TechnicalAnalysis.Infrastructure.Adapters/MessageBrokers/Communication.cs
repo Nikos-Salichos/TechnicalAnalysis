@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             await SendMessage(mailInformation);
         }
 
-        private async Task SendMessage(List<MimePart> message)
+        private Task SendMessage(List<MimePart> messages)
         {
             var receivers = configuration.GetValue<string>("MailData:To") ?? string.Empty;
             List<string> receiversList = receivers.Split(',').Select(r => r.Trim()).ToList();
@@ -25,8 +25,18 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             var bccReceivers = configuration.GetValue<string>("MailData:Bcc") ?? string.Empty;
             List<string> bccReceiversList = bccReceivers.Split(',').Select(r => r.Trim()).ToList();
 
-            MailData mailData = new MailData(receiversList, "Coins", null, message, null, null, null, null, bccReceiversList, null);
-            await mailService.SendAsync(mailData, new CancellationToken());
+            if (receiversList.Count is 0 && bccReceiversList.Count is 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            return NewMethod(mailService, messages, receiversList, bccReceiversList);
+
+            static async Task NewMethod(IMailer mailService, List<MimePart> messages, List<string> receiversList, List<string> bccReceiversList)
+            {
+                var mailData = new MailData(receiversList, "Coins", null, messages, null, null, null, null, bccReceiversList, null);
+                await mailService.SendAsync(mailData, new CancellationToken());
+            }
         }
 
         private static void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments, IEnumerable<T> data)
