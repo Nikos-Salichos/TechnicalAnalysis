@@ -16,7 +16,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             {
                 var mail = new MimeMessage();
 
-                #region Sender / Receiver
                 // Sender
                 mail.From.Add(new MailboxAddress(settings.CurrentValue.DisplayName, mailData.From ?? settings.CurrentValue.From));
                 mail.Sender = new MailboxAddress(mailData.DisplayName ?? settings.CurrentValue.DisplayName, mailData.From ?? settings.CurrentValue.From);
@@ -62,9 +61,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
                         }
                     }
                 }
-                #endregion
-
-                #region Content
 
                 // Add Content to Mime Message
                 var body = new BodyBuilder();
@@ -81,9 +77,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 
                 mail.Body = body.ToMessageBody();
 
-                #endregion
-
-                #region Send Mail
 
                 using var smtp = new SmtpClient();
 
@@ -99,7 +92,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
                 await smtp.SendAsync(mail, cancellationToken);
                 await smtp.DisconnectAsync(true, cancellationToken);
 
-                #endregion
             }
             catch (Exception exception)
             {
