@@ -10,7 +10,7 @@ networks:
 
 services:
 
-  infrastructurehost:
+  ta.api:
     image: ${DOCKER_REGISTRY-}infrastructurehost
     container_name: ta-api
     depends_on:
@@ -26,9 +26,10 @@ services:
      DB_CONNECTION_STRING: "Host=postgresql.api;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
     networks:
       - postgres-db-network
-# Not working I must test the volume below
+# Be careful and use same path in other pc
     volumes:
       - ../TechnicalAnalysis/TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json
+    restart: on-failure
 
   redis.api:
     image: redis
