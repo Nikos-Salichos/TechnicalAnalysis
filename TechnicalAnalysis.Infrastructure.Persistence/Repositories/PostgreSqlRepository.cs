@@ -31,7 +31,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
                     var assets = await dbConnection.QueryAsync<CryptoFearAndGreedData>(query);
                     return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(assets);
-                }, logger, nameof(GetCryptoFearAndGreedIndexAsync));
+                }, logger);
             }
             catch (Exception exception)
             {
@@ -50,7 +50,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol FROM \"Assets\"";
                     var assets = await dbConnection.QueryAsync<Asset>(query);
                     return Result<IEnumerable<Asset>, string>.Success(assets);
-                }, logger, nameof(GetAssetsAsync));
+                }, logger);
             }
             catch (Exception exception)
             {
