@@ -38,8 +38,7 @@ builder.Services.ConfigureRateLimit();
 
 builder.Services.AddHangfire(configuration =>
 {
-    var hangfireConnectionString = builder.Configuration.GetConnectionString("PostgreSqlTechnicalAnalysisDockerCompose");
-    //var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+    var hangfireConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
     configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(hangfireConnectionString));
 });
 
