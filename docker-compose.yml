@@ -12,6 +12,7 @@ services:
 
   infrastructurehost:
     image: ${DOCKER_REGISTRY-}infrastructurehost
+    container_name: ta-api
     depends_on:
       - "postgresql.api"
     build:
@@ -31,7 +32,7 @@ services:
 
   redis.api:
     image: redis
-    container_name: technical-analysis-redis
+    container_name: ta-redis
     restart: always
     ports:
      - "6379:6379"
@@ -42,7 +43,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:management
-    container_name: technical-analysis-rabbitmq
+    container_name: ta-rmq
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
@@ -54,7 +55,7 @@ services:
 
   postgresql.api:
     image: postgres:latest
-    container_name: technical-analysis-postgresql
+    container_name: ta-postgresql
     restart: always
     ports:
      - "5432:5432"
@@ -72,7 +73,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: technical-analysis-pgadmin
+    container_name: ta-pgadmin
     restart: always
     environment:
         PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
@@ -83,7 +84,7 @@ services:
         - postgres-db-network
 
   seq:
-    container_name: technical-analysis-seq
+    container_name: ta-seq
     image: datalust/seq:latest
     ports:
       - 5341:80

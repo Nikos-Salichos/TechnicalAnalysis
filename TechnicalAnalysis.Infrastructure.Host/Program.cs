@@ -10,8 +10,6 @@ using TechnicalAnalysis.Infrastructure.Host.Serilog;
 using TechnicalAnalysis.Infrastructure.Host.Services;
 using TechnicalAnalysis.Infrastructure.Persistence.Modules;
 
-
-await Task.Delay(10000);
 var builder = WebApplication.CreateBuilder(args);
 
 #region Read Configuration
@@ -61,12 +59,15 @@ app.UseSwaggerUI();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.UseMiddleware<LogHeadersMiddleware>();
+
 app.UseSerilogRequestLogging();
 
 if (builder.Environment.IsProduction())
 {
     app.UseMiddleware<ApiKeyMiddleware>();
 }
+
 app.UseHsts();
 
 app.UseHttpsRedirection();
