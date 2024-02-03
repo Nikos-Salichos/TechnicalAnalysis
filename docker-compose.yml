@@ -14,7 +14,8 @@ services:
     image: ${DOCKER_REGISTRY-}infrastructurehost
     container_name: ta-api
     depends_on:
-      - "postgresql.api"
+     postgresql.api:
+        condition: service_healthy
     build:
       context: .
       dockerfile: TechnicalAnalysis.Infrastructure.Host/Dockerfile
@@ -69,6 +70,11 @@ services:
        - ./postgres-data:/var/lib/postgresql/data
        # copy the sql script to create tables
        - ../TechnicalAnalysis/createTables.sql:/docker-entrypoint-initdb.d/createTables.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
        - postgres-db-network
 
