@@ -29,8 +29,13 @@ services:
       - postgres-db-network
 # Be careful and use same path in other pc
     volumes:
-      - ../TechnicalAnalysis/TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json
+      - ./:/TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/health && curl -f https://localhost:5001/health || exit 1"] #
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   redis.api:
     image: redis
