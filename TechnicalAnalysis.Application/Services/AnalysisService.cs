@@ -50,7 +50,7 @@ namespace TechnicalAnalysis.Application.Services
                                                 .Where(predicate)
                                                 .OrderByDescending(c => c.CloseDate)
                                                 .GroupBy(c => c.PoolOrPairId)
-                                                .Select(group => group.First()) // Take the first item of each group
+                                                .Select(group => group.First())
                                                 .ToList();
                             return pair;
                         })
