@@ -97,9 +97,12 @@ namespace TechnicalAnalysis.Application.Services
             }
 
             // Now indicatorReportsPerPair contains the generated indicators for each selected pair.
-
-
             var baseDirectory = GetBaseDirectory();
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+            {
+                return Enumerable.Empty<PairExtended>();
+            }
+
             foreach (var indicatorReportPerPair in indicatorReportsPerPair)
             {
                 foreach (var indicatorReport in indicatorReportPerPair.Value)
@@ -118,9 +121,17 @@ namespace TechnicalAnalysis.Application.Services
         {
             var baseDirectory = configuration.GetSection("OutputFolder:Path").Value;
 
-            return string.IsNullOrWhiteSpace(baseDirectory)
-                ? string.Empty
-                : baseDirectory;
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+            {
+                return string.Empty;
+            }
+
+            if (!Directory.Exists(baseDirectory))
+            {
+                Directory.CreateDirectory(baseDirectory);
+            }
+
+            return baseDirectory;
         }
 
         private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsStrategy, string indicatorName, string pairSymbol)
@@ -652,6 +663,11 @@ namespace TechnicalAnalysis.Application.Services
             cryptoMarketStatistic.CalculateAndFilterPercentages(Constants.ThresholdPercentage);
 
             var baseDirectory = GetBaseDirectory();
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+            {
+                return cryptoMarketStatistic;
+            }
+
             string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetCryptoPairsWithEnhancedScanIsBuy)}-{nameof(MarketStatistic)}.json");
             await JsonHelper.SerializeToJson(cryptoMarketStatistic, jsonFileName);
 
@@ -701,6 +717,11 @@ namespace TechnicalAnalysis.Application.Services
             etfStockMarketStatistic.CalculateAndFilterPercentages(Constants.ThresholdPercentage);
 
             var baseDirectory = GetBaseDirectory();
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+            {
+                return etfStockMarketStatistic;
+            }
+
             string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetEtfStockPairWithEnhancedScanIsBuy)}-{nameof(MarketStatistic)}.json");
             await JsonHelper.SerializeToJson(etfStockMarketStatistic, jsonFileName);
 
