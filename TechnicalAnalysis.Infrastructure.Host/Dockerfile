@@ -4,6 +4,10 @@ WORKDIR /app
 EXPOSE 5000
 EXPOSE 5001
 
+# Create the directory and give appropriate permissions
+RUN mkdir -p /app/BacktestData
+RUN chmod -R 777 /app/BacktestData
+
 # Build image
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
