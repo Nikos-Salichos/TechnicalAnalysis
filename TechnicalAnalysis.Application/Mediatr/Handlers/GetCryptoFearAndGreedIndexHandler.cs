@@ -10,7 +10,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
         public async Task<IEnumerable<CryptoFearAndGreedData>> Handle(GetCryptoFearAndGreedIndexQuery getCryptoFearAndGreedIndexQuery, CancellationToken cancellationToken)
         {
             var result = await repository.GetCryptoFearAndGreedIndexAsync();
-            if (result.IsError)
+            if (result.HasError)
             {
                 return Enumerable.Empty<CryptoFearAndGreedData>();
             }
