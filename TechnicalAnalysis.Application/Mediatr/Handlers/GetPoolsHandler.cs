@@ -10,7 +10,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers
         public async Task<IEnumerable<Pool>> Handle(GetPoolsQuery getPoolsQuery, CancellationToken cancellationToken)
         {
             var result = await repository.GetPoolsAsync();
-            if (result.IsError)
+            if (result.HasError)
             {
                 return Enumerable.Empty<Pool>();
             }
