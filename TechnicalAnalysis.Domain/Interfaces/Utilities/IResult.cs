@@ -1,6 +1,6 @@
 ﻿namespace TechnicalAnalysis.Domain.Interfaces.Utilities
 {
-    public interface IResult<TSuccess, TFail>
+    public interface IResult<out TSuccess, out TFail>
     {
         TSuccess SuccessValue { get; }
         TFail FailValue { get; }
