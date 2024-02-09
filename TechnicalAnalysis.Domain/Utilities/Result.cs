@@ -8,17 +8,17 @@ namespace TechnicalAnalysis.Domain.Utilities
 
         public TFail FailValue { get; }
 
-        public bool IsError { get; }
+        public bool HasError { get; }
 
         private Result(TSuccess successValue)
         {
-            IsError = false;
+            HasError = false;
             SuccessValue = successValue;
         }
 
         private Result(TFail failValue)
         {
-            IsError = true;
+            HasError = true;
             FailValue = failValue;
         }
 
