@@ -10,7 +10,7 @@ public class GetAssetsHandler(IPostgreSqlRepository repository) : IRequestHandle
     public async Task<IEnumerable<Asset>> Handle(GetAssetsQuery getAssetsQuery, CancellationToken cancellationToken)
     {
         var result = await repository.GetAssetsAsync();
-        if (result.IsError)
+        if (result.HasError)
         {
             return Enumerable.Empty<Asset>();
         }
