@@ -62,14 +62,11 @@ app.UseMiddleware<LogHeadersMiddleware>();
 
 app.UseSerilogRequestLogging();
 
-if (builder.Environment.IsProduction())
-{
-    app.UseMiddleware<ApiKeyMiddleware>();
-}
+app.UseMiddleware<ApiKeyMiddleware>();
 
-app.UseHsts();
+//Remove comment to enable https app.UseHsts();
 
-app.UseHttpsRedirection();
+//Remove comment to enable https app.UseHttpsRedirection();
 
 app.UseCors();
 
