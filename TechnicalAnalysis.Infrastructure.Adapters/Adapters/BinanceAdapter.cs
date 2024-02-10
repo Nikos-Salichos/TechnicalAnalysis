@@ -36,7 +36,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             var response = await binanceHttpClient.GetBinanceAssetsAndPairs();
 
-            if (response.IsError)
+            if (response.HasError)
             {
                 return;
             }
@@ -193,9 +193,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                         var response = await binanceHttpClient.GetBinanceCandlesticks(queryParams);
 
-                        if (response.IsError)
+                        if (response.HasError)
                         {
-                            logger.LogWarning("{apiResponse.IsError}", response.IsError);
+                            logger.LogWarning("{apiResponse.IsError}", response.HasError);
                             break;
                         }
 
