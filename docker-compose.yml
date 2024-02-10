@@ -22,7 +22,7 @@ services:
     user: root
     ports:
       - 5000:5000
-      - 5001:5001
+      #Remove comment to enable https - 5001:5001
     environment:
      DB_CONNECTION_STRING: "Host=postgresql.api;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
     networks:
