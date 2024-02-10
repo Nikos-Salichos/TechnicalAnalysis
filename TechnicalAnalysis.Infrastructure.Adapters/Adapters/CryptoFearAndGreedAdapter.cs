@@ -34,7 +34,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var calculatedDates = CalculateNumberOfDates(cryptoFearAndGreedIndexData);
             var response = await cryptoFearAndGreedHttpClient.GetCryptoFearAndGreedIndex(calculatedDates);
 
-            if (response.IsError)
+            if (response.HasError)
             {
                 return;
             }
