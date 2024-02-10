@@ -42,9 +42,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             var apiResponse = await dexV3HttpClient.GetMostActivePoolsAsync(10, 10, provider);
 
-            if (apiResponse.IsError)
+            if (apiResponse.HasError)
             {
-                logger.LogWarning("{apiResponse.IsError}", apiResponse.IsError);
+                logger.LogWarning("{apiResponse.IsError}", apiResponse.HasError);
                 return;
             }
 
