@@ -9,6 +9,8 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Builders;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
+using TechnicalAnalysis.Domain.Interfaces.Utilities;
+using TechnicalAnalysis.Domain.Utilities;
 using Asset = TechnicalAnalysis.CommonModels.BusinessModels.Asset;
 using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 using PairExtended = TechnicalAnalysis.CommonModels.BusinessModels.PairExtended;
@@ -65,7 +67,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await SyncAssets(fetchedAssets, stockSymbols);
             await SyncPairs(stockSymbols);
-            await SyncCandlesticks(timeframe);
+            var candlesticksUpdated = await SyncCandlesticks(timeframe);
+
+            if (candlesticksUpdated.HasError)
+            {
+                return;
+            }
 
             alpacaProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = alpacaProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
@@ -134,7 +141,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        public async Task SyncCandlesticks(Timeframe period = Timeframe.Daily)
+        private async Task<IResult<bool, string>> SyncCandlesticks(Timeframe period = Timeframe.Daily)
         {
             var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
@@ -189,10 +196,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 foreach (var dateRange in DatetimeExtension.GetDailyDateRanges(fromDatetime, toDatetime))
                 {
                     var stockData = await alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
-                    if (stockData.IsError)
+                    if (stockData.HasError)
                     {
-                        logger.LogWarning("{ResponseError}", stockData.IsError);
-                        continue;
+                        return Result<bool, string>.Fail(stockData.FailValue);
                     }
 
                     foreach (var kvp in stockData.SuccessValue.Items)
@@ -222,6 +228,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             {
                 await mediator.Send(new InsertCandlesticksCommand(newCandlesticks));
             }
+
+            return Result<bool, string>.Success(true);
         }
     }
 }
