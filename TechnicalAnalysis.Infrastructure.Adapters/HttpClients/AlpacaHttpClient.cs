@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             {
                 logger.LogInformation("Method {Method}, pairName {pairName}, toDateTime {toDateTime}, barTimeFrame {barTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
                 var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(alpacaSettings.CurrentValue.ApiKey, alpacaSettings.CurrentValue.ApiSecret));
-                HistoricalBarsRequest historicalBarsRequest = new HistoricalBarsRequest(pairName, fromDateTime, toDateTime, barTimeFrame)
+                HistoricalBarsRequest historicalBarsRequest = new(pairName, fromDateTime, toDateTime, barTimeFrame)
                 {
                     Adjustment = Adjustment.SplitsAndDividends
                 };
