@@ -12,6 +12,7 @@
 	<ItemGroup>
 		<PackageReference Include="Hangfire" Version="1.8.7" />
 		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.5" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
 		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
 		<PackageReference Include="Serilog.Enrichers.Context" Version="4.6.5" />
 		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
@@ -27,12 +28,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="appsettings.prod.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="appsettings.prod.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 </Project>
