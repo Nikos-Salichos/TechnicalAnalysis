@@ -10,6 +10,16 @@ networks:
 
 services:
 
+  technicalanalysis.infrastructure.gateway:
+    image: ${DOCKER_REGISTRY-}technicalanalysisinfrastructuregateway
+    build:
+      context: .
+      dockerfile: TechnicalAnalysis.Infrastructure.Gateway/Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - postgres-db-network
+
   ta.api:
     image: ${DOCKER_REGISTRY-}infrastructurehost
     container_name: ta-api
