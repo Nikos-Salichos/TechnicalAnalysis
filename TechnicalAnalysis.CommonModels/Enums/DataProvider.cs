@@ -9,6 +9,7 @@
         Alpaca = 4,
         WallStreetZen = 5,
         All = 6,
-        AlternativeMeCryptoAndFearIndex = 7
+        AlternativeMeCryptoAndFearIndex = 7,
+        CoinPaprika = 8
     }
 }
