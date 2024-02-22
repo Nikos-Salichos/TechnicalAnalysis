@@ -4,6 +4,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface IAdapter
     {
-        Task Sync(DataProvider provider, Timeframe timeframe);
+        Task<bool> Sync(DataProvider provider, Timeframe timeframe);
     }
 }
