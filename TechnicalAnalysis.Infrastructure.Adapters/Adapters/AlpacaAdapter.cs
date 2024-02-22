@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
     public class AlpacaAdapter(ILogger<AlpacaAdapter> logger, IMediator mediator, IAlpacaHttpClient alpacaHttpClient) : IAdapter
     {
-        public async Task Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
         {
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var alpacaProvider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
@@ -62,7 +62,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             if (alpacaProvider.IsProviderSyncedToday(timeframe) && allStockSymbolsExist)
             {
                 logger.LogInformation("{Provider} synchronized for today", provider);
-                return;
+                return true;
             }
 
             await SyncAssets(fetchedAssets, stockSymbols);
@@ -71,12 +71,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (candlesticksUpdated.HasError)
             {
-                return;
+                return false;
             }
 
             alpacaProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = alpacaProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(alpacaProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
+            return true;
         }
 
         private async Task SyncAssets(IEnumerable<Asset> fetchedAssets, IEnumerable<string> stockSymbols)
