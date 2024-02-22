@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
     public class BinanceAdapter(IBinanceHttpClient binanceHttpClient, IMediator mediator, ILogger<BinanceAdapter> logger) : IAdapter
     {
-        public async Task Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
         {
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var binanceProvider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
@@ -31,14 +31,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             if (binanceProvider.IsProviderSyncedToday(timeframe))
             {
                 logger.LogInformation("{Provider} synchronized for today", provider);
-                return;
+                return true;
             }
 
             var response = await binanceHttpClient.GetBinanceAssetsAndPairs();
 
             if (response.HasError)
             {
-                return;
+                return false;
             }
 
             const string activeStatus = "TRADING";
@@ -63,6 +63,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             binanceProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = binanceProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(binanceProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
+            return true;
         }
 
         private async Task SyncAssets(IEnumerable<BinanceSymbol> tradeablePairs)
