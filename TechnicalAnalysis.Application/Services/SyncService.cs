@@ -48,6 +48,11 @@ namespace TechnicalAnalysis.Application.Services
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.AlternativeMeCryptoAndFearIndex, timeframe));
                 }
 
+                if (provider == DataProvider.CoinPaprika || provider == DataProvider.All)
+                {
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CoinPaprika, timeframe));
+                }
+
                 if (adaptersToSync.Count > 0)
                 {
                     await Task.WhenAll(adaptersToSync);
