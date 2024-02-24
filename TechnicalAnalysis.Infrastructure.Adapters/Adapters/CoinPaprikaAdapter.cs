@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Commands;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.Enums;
@@ -11,7 +12,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
         {
-            var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var response = await coinPaprikaClient.SyncAssets();
 
             if (response.HasError)
@@ -22,13 +22,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             //Fetch old assets
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
 
-            //Find differential
-            var newAssets = response.SuccessValue.Except(fetchedAssets.ToContract()).Distinct();
+            //Find differential;
+            var newAssets = response.SuccessValue.ToDomain().Except(fetchedAssets).Distinct().ToList();
 
             //Insert differential
-            if (newAssets.Any())
+            if (newAssets.Count > 0)
             {
-                await mediator.Send(new InsertAssetsCommand(newAssets.ToDomain()));
+                await mediator.Send(new InsertAssetsCommand(newAssets));
             }
 
             return true;
