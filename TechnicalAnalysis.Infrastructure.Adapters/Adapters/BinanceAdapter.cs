@@ -78,11 +78,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
 
-            var missingAssets = newAssets.Except(fetchedAssets.ToContract()).Distinct();
+            var missingAssets = newAssets.ToDomain().Except(fetchedAssets).Distinct().ToList();
 
-            if (missingAssets.Any())
+            if (missingAssets.Count > 0)
             {
-                await mediator.Send(new InsertAssetsCommand(missingAssets.ToDomain()));
+                await mediator.Send(new InsertAssetsCommand(missingAssets));
             }
         }
 
