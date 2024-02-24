@@ -33,7 +33,7 @@ namespace TechnicalAnalysis.Application.Services
 
             if (pairs.Count is 0)
             {
-                return Enumerable.Empty<PairExtended>();
+                return [];
             }
 
             await CalculateTechnicalIndicators(pairs);
