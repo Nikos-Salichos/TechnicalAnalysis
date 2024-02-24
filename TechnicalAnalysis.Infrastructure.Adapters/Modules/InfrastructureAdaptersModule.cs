@@ -22,6 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<DexV3Adapter>();
             services.AddSingleton<WallStreetZenAdapter>();
             services.AddSingleton<CryptoFearAndGreedAdapter>();
+            services.AddSingleton<CoinPaprikaAdapter>();
 
             services.AddSingleton<Func<DataProvider, IAdapter>>(serviceProvider => provider =>
             {
@@ -32,6 +33,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
                     DataProvider.Uniswap or DataProvider.Pancakeswap => serviceProvider.GetRequiredService<DexV3Adapter>(),
                     DataProvider.WallStreetZen => serviceProvider.GetRequiredService<WallStreetZenAdapter>(),
                     DataProvider.AlternativeMeCryptoAndFearIndex => serviceProvider.GetRequiredService<CryptoFearAndGreedAdapter>(),
+                    DataProvider.CoinPaprika => serviceProvider.GetRequiredService<CoinPaprikaAdapter>(),
                     _ => throw new ArgumentOutOfRangeException(nameof(provider), $"Exchange {provider} not found")
                 };
             });
@@ -39,12 +41,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddHttpClient("default")
                 .ConfigureHttpClient(client => client.DefaultRequestHeaders.Add("User-Agent", "Tracking prices application"));
 
+            services.AddSingleton<IPollyPolicy, PollyPolicy>();
             services.AddSingleton<IBinanceHttpClient, BinanceHttpClient>();
             services.AddSingleton<IDexV3HttpClient, DexV3HttpClient>();
             services.AddSingleton<IAlpacaHttpClient, AlpacaHttpClient>();
             services.AddSingleton<IWallStreetZenClient, WallStreetZenClient>();
             services.AddSingleton<ICryptoFearAndGreedHttpClient, CryptoFearAndGreedHttpClient>();
-            services.AddSingleton<IPollyPolicy, PollyPolicy>();
+            services.AddSingleton<ICoinPaprikaClient, CoinPaprikaClient>();
 
             services.AddOptions<MailSettings>().Bind(configuration.GetSection(nameof(MailSettings)));
             services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMq"));
