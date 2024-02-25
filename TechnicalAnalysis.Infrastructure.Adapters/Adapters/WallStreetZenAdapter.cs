@@ -6,10 +6,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
     public class WallStreetZenAdapter(ILogger<WallStreetZenAdapter> logger, IWallStreetZenClient wallStreetZenClient) : IAdapter
     {
-        public Task Sync(DataProvider provider, Timeframe timeframe)
+        public Task<bool> Sync(DataProvider provider, Timeframe timeframe)
         {
             var stocks = wallStreetZenClient.Sync();
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
     }
 }
