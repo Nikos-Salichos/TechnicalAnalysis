@@ -9,8 +9,6 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Builders;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
-using TechnicalAnalysis.Domain.Interfaces.Utilities;
-using TechnicalAnalysis.Domain.Utilities;
 using Asset = TechnicalAnalysis.CommonModels.BusinessModels.Asset;
 using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 using PairExtended = TechnicalAnalysis.CommonModels.BusinessModels.PairExtended;
@@ -45,7 +43,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                        .ToList();
 
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
-
             var fetchedAssetNames = fetchedAssets.Select(f => f.Symbol).ToList();
 
             bool allStockSymbolsExist = true;
@@ -69,7 +66,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await SyncPairs(stockSymbols);
             var candlesticksUpdated = await SyncCandlesticks(timeframe);
 
-            if (candlesticksUpdated.HasError)
+            if (!candlesticksUpdated)
             {
                 return false;
             }
@@ -104,7 +101,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         {
             var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
-            await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask);
 
             var assets = (await fetchedAssetsTask).ToList();
             var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == DataProvider.Alpaca).ToList();
@@ -142,13 +138,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        private async Task<IResult<bool, string>> SyncCandlesticks(Timeframe period = Timeframe.Daily)
+        private async Task<bool> SyncCandlesticks(Timeframe period = Timeframe.Daily)
         {
             var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
             var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
-
-            await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask);
 
             var fetchedAssets = await fetchedAssetsTask;
             var fetchedPairs = await fetchedPairsTask;
@@ -199,7 +193,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     var stockData = await alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
                     if (stockData.HasError)
                     {
-                        return Result<bool, string>.Fail(stockData.FailValue);
+                        return false;
                     }
 
                     foreach (var kvp in stockData.SuccessValue.Items)
@@ -230,7 +224,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 await mediator.Send(new InsertCandlesticksCommand(newCandlesticks));
             }
 
-            return Result<bool, string>.Success(true);
+            return true;
         }
     }
 }
