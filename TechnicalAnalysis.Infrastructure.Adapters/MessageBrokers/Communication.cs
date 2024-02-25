@@ -10,10 +10,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
     public class Communication(IMailer mailService, IConfiguration configuration) : ICommunication
     {
-        public async Task CreateAttachmentSendMessage<T>(IEnumerable<T> data)
+        public async Task CreateAttachmentSendMessage<T>(IEnumerable<T> data, string fileName)
         {
             List<MimePart> mailInformation = [];
-            CreateAttachment(nameof(data), ".json", mailInformation, data.ToList());
+            CreateAttachment(fileName, ".json", mailInformation, data.ToList());
             await SendMessage(mailInformation);
         }
 
