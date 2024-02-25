@@ -58,9 +58,9 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
                 HttpRequestMessage request = new()
                 {
                     RequestUri = new Uri(_httpClient.BaseAddress + urlWithParams),
-                    Method = httpMethod
+                    Method = httpMethod,
+                    Content = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json")
                 };
-                request.Content = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
                 response = await _httpClient.SendAsync(request);
             }
             else
