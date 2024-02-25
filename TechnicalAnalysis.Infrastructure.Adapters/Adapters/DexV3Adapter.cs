@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
     public class DexV3Adapter(IDexV3HttpClient dexV3HttpClient, ILogger<DexV3Adapter> logger,
          IMediator mediator) : IAdapter
     {
-        public async Task Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
         {
             var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
             var dexV3Provider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
@@ -30,7 +30,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             if (dexV3Provider.IsProviderSyncedToday(timeframe))
             {
                 logger.LogInformation("{Provider} synchronized for today", provider);
-                return;
+                return true;
             }
 
             var pairs = await FormatDexAssetsPoolsCandlesticks(provider);
@@ -45,7 +45,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             if (apiResponse.HasError)
             {
                 logger.LogWarning("{apiResponse.IsError}", apiResponse.HasError);
-                return;
+                return false;
             }
 
             var poolsWithStables = FilterPoolsBasedOnStable(apiResponse.SuccessValue.PoolResponse);
@@ -57,6 +57,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             dexV3Provider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = dexV3Provider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
             await mediator.Send(new UpdateExchangeCommand(dexV3Provider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
+            return true;
         }
 
         private async Task<IEnumerable<PairExtended>> FormatDexAssetsPoolsCandlesticks(DataProvider provider)
