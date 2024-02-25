@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Collections.Immutable;
 using System.Reflection;
 using System.Text.Json;
 using TechnicalAnalysis.Application.Extensions;
@@ -42,16 +41,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
 
             const string activeStatus = "TRADING";
-            var tradeablePairs = response.SuccessValue.Symbols.Where(s => string.Equals(s.Status, activeStatus, StringComparison.InvariantCultureIgnoreCase));
+            var tradeableBinancePairs = response.SuccessValue.Symbols.Where(s => string.Equals(s.Status, activeStatus, StringComparison.InvariantCultureIgnoreCase));
 
-            await SyncAssets(tradeablePairs);
-            await SyncPairs(tradeablePairs);
+            await SyncAssets(tradeableBinancePairs);
+            await SyncPairs(tradeableBinancePairs);
 
-            var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
             var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
-
-            await Task.WhenAll(fetchedAssetsTask, fetchedPairsTask, fetchedCandlesticksTask);
 
             var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == provider).ToList();
             var candlesticks = await fetchedCandlesticksTask;
@@ -86,31 +82,33 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        private async Task SyncPairs(IEnumerable<BinanceSymbol> tradeablePairs)
+        private async Task SyncPairs(IEnumerable<BinanceSymbol> tradeableBinancePairs)
         {
+            var fetchedPairsTask = mediator.Send(new GetPairsQuery());
             var fetchedAssets = (await mediator.Send(new GetAssetsQuery())).ToList();
-            var assetDictionary = fetchedAssets.ToContract().ToDictionary(asset => asset.Asset, asset => asset.Id);
+            var assetDictionary = fetchedAssets.ToDictionary(asset => asset.Symbol, asset => asset.PrimaryId);
 
-            var binancePairs = tradeablePairs.Select(tradeablePair => new BinancePair
+            var binancePairs = tradeableBinancePairs.Select(tradeablePair => new PairExtended
             {
-                Pair = $"{tradeablePair.BaseAsset}-{tradeablePair.QuoteAsset}",
+                Symbol = $"{tradeablePair.BaseAsset}-{tradeablePair.QuoteAsset}",
                 BaseAssetId = assetDictionary.TryGetValue(tradeablePair.BaseAsset, out long baseAssetId) ? baseAssetId : 0,
                 QuoteAssetId = assetDictionary.TryGetValue(tradeablePair.QuoteAsset, out long quoteAssetId) ? quoteAssetId : 0,
                 Provider = DataProvider.Binance,
                 AllCandles = false,
                 IsActive = true,
-            });
+            }).ToList();
 
-            binancePairs = PairExtension.GetUniqueDollarPairs(fetchedAssets.ToContract(), binancePairs.ToList());
-            var fetchedPairs = await mediator.Send(new GetPairsQuery());
-            var newPairs = binancePairs.ToDomain().Where(pair => !fetchedPairs.Contains(pair));
+            var newDollarPairs = PairExtension.GetUniqueDollarPairs(fetchedAssets, binancePairs);
+
+            var fetchedPairs = (await fetchedPairsTask).ToList();
+            var newPairs = newDollarPairs.Where(pair => !fetchedPairs.Contains(pair)).ToList();
 
             foreach (var dollarPair in newPairs)
             {
                 dollarPair.IsActive = true;
             }
 
-            if (newPairs.Any())
+            if (newPairs.Count > 0)
             {
                 await mediator.Send(new InsertPairsCommand(newPairs));
             }
@@ -190,7 +188,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                     { "startTime", new DateTimeOffset(dateRange.Item1).ToUnixTimeMilliseconds().ToString() },
                                     { "endTime", new DateTimeOffset(dateRange.Item2).ToUnixTimeMilliseconds().ToString() },
                                     { "limit", candlesPerCall },
-                            }.ToImmutableDictionary();
+                            }.ToDictionary();
 
                         var response = await binanceHttpClient.GetBinanceCandlesticks(queryParams);
 
