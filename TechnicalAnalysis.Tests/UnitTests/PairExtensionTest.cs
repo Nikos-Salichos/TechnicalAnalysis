@@ -1,5 +1,5 @@
 ﻿using TechnicalAnalysis.Application.Extensions;
-using TechnicalAnalysis.Domain.Contracts.Input.Binance;
+using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Tests.UnitTests
 {
@@ -16,31 +16,31 @@ namespace TechnicalAnalysis.Tests.UnitTests
         public void GetDollarPairs_ReturnsUniqueDollarPairs(string pair, bool expectedResult)
         {
             // Arrange
-            var binanceAssets = new List<BinanceAsset> {
-            new() { Id = 1, Asset = "USDT" } ,
-            new() { Id = 2, Asset = "USDC" },
-            new() { Id = 3, Asset = "DAI" },
-            new() { Id = 4, Asset = "BUSD" },
-            new() { Id = 100, Asset = "ETH" },
-            new() { Id = 30, Asset = "ADA" },
+            var binanceAssets = new List<Asset> {
+            new() { PrimaryId = 1, Symbol = "USDT" } ,
+            new() { PrimaryId = 2, Symbol = "USDC" },
+            new() { PrimaryId = 3, Symbol = "DAI" },
+            new() { PrimaryId = 4, Symbol = "BUSD" },
+            new() { PrimaryId = 100, Symbol = "ETH" },
+            new() { PrimaryId = 30, Symbol = "ADA" },
             };
 
-            var binancePair = new List<BinancePair> {
-            new() { BaseAssetId = 10, QuoteAssetId = 1, Pair = "BTC-USDT"} ,
-            new() { BaseAssetId = 10, QuoteAssetId = 2, Pair = "BTC-USDC"} ,
-            new() { BaseAssetId = 20, QuoteAssetId = 2, Pair = "ETH-USDC"} ,
-            new() { BaseAssetId = 30, QuoteAssetId = 3, Pair = "ADA-DAI"} ,
-            new() { BaseAssetId = 10, QuoteAssetId = 4, Pair = "BTC-BUSD"} ,
-            new() { BaseAssetId = 50, QuoteAssetId = 4, Pair = "DOT-BUSD"} ,
-            new() { BaseAssetId = 10, QuoteAssetId = 100, Pair = "BTC-ETH"} ,
-            new() { BaseAssetId = 10, QuoteAssetId = 30, Pair = "BTC-ADA"} ,
+            var binancePair = new List<PairExtended> {
+            new() { BaseAssetId = 10, QuoteAssetId = 1, Symbol = "BTC-USDT"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 2, Symbol = "BTC-USDC"} ,
+            new() { BaseAssetId = 20, QuoteAssetId = 2, Symbol = "ETH-USDC"} ,
+            new() { BaseAssetId = 30, QuoteAssetId = 3, Symbol = "ADA-DAI"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 4, Symbol = "BTC-BUSD"} ,
+            new() { BaseAssetId = 50, QuoteAssetId = 4, Symbol = "DOT-BUSD"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 100, Symbol = "BTC-ETH"} ,
+            new() { BaseAssetId = 10, QuoteAssetId = 30, Symbol = "BTC-ADA"} ,
             };
 
             // Act
             var dollarPairs = PairExtension.GetUniqueDollarPairs(binanceAssets, binancePair);
 
             // Assert
-            Assert.Equal(expectedResult, dollarPairs.Any(p => p.Pair == pair));
+            Assert.Equal(expectedResult, dollarPairs.Any(p => p.Symbol == pair));
         }
     }
 
