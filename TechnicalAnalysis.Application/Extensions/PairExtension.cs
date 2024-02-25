@@ -6,15 +6,15 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class PairExtension
     {
-        public static IEnumerable<BinancePair> GetUniqueDollarPairs(IEnumerable<BinanceAsset> assets, IEnumerable<BinancePair> fetchedPairs)
+        public static IEnumerable<PairExtended> GetUniqueDollarPairs(IEnumerable<Asset> assets, IEnumerable<PairExtended> fetchedPairs)
         {
             // Retrieve the IDs for USDT, USDC, DAI, and BUSD from the assets
             var assetIds = assets
-                .Where(a => string.Equals(a.Asset, Constants.Usdt, StringComparison.InvariantCultureIgnoreCase) ||
-                            string.Equals(a.Asset, Constants.Usdc, StringComparison.InvariantCultureIgnoreCase) ||
-                            string.Equals(a.Asset, Constants.Dai, StringComparison.InvariantCultureIgnoreCase) ||
-                            string.Equals(a.Asset, Constants.Busd, StringComparison.InvariantCultureIgnoreCase))
-                .Select(a => a.Id)
+                .Where(a => string.Equals(a.Symbol, Constants.Usdt, StringComparison.InvariantCultureIgnoreCase) ||
+                            string.Equals(a.Symbol, Constants.Usdc, StringComparison.InvariantCultureIgnoreCase) ||
+                            string.Equals(a.Symbol, Constants.Dai, StringComparison.InvariantCultureIgnoreCase) ||
+                            string.Equals(a.Symbol, Constants.Busd, StringComparison.InvariantCultureIgnoreCase))
+                .Select(a => a.PrimaryId)
                 .ToHashSet();
 
             // Use a HashSet to keep track of unique BaseAssetIds
