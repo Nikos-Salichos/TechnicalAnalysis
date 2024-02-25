@@ -54,7 +54,7 @@ namespace TechnicalAnalysis.Application.Services
                                                 .ToList();
                             return pair;
                         })
-                        .Where(pair => pair.Candlesticks.Count > 0);
+                        .Where(pair => pair.Candlesticks.Count > 0).ToList();
         }
 
         public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe)
