@@ -64,7 +64,7 @@ namespace TechnicalAnalysis.Application.Services
 
             if (!selectedPairs.Any())
             {
-                return Enumerable.Empty<PairExtended>();
+                return [];
             }
 
             await CalculateTechnicalIndicators(fetchedPairs);
