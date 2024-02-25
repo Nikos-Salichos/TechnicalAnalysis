@@ -9,27 +9,10 @@ namespace TechnicalAnalysis.Application.Mappers
 {
     public static class FromInputContractToDomain
     {
-        public static IEnumerable<PairExtended> ToDomain(this IEnumerable<BinancePair> binancePairs)
-            => binancePairs.Select(c => c.ToDomain()).ToList();
-
-        public static PairExtended ToDomain(this BinancePair binancePair)
-            => new()
-            {
-                PrimaryId = binancePair.Id,
-                Symbol = binancePair.Pair,
-                BaseAssetId = binancePair.BaseAssetId,
-                QuoteAssetId = binancePair.QuoteAssetId,
-                Provider = binancePair.Provider,
-                IsActive = binancePair.IsActive,
-                AllCandles = binancePair.AllCandles,
-                CreatedAt = binancePair.CreatedAt,
-                Candlesticks = binancePair.BinanceCandlesticks.ConvertAll(c => c.ToDomain())
-            };
-
         public static IEnumerable<CandlestickExtended> ToDomain(this IEnumerable<BinanceCandlestick> binanceCandlesticks)
             => binanceCandlesticks.Select(c => c.ToDomain()).ToList();
 
-        public static Asset ToDomain(this BinanceAsset binanceAsset)
+        private static Asset ToDomain(this BinanceAsset binanceAsset)
             => new()
             {
                 PrimaryId = binanceAsset.Id,
@@ -51,7 +34,7 @@ namespace TechnicalAnalysis.Application.Mappers
               .WithCloseDate(binanceCandlestick.CloseTime)
               .Build();
 
-        public static CandlestickExtended FromDexCandlesticksV3ToDomain(this Data dexCandlestick)
+        private static CandlestickExtended FromDexCandlesticksV3ToDomain(this Data dexCandlestick)
             => new CandlestickBuilder().WithOpenPrice(dexCandlestick.Open?.ReduceDigitsToFitDecimalLength())
                           .WithHighPrice(dexCandlestick.High?.ReduceDigitsToFitDecimalLength())
                           .WithLowPrice(dexCandlestick.Low?.ReduceDigitsToFitDecimalLength())
@@ -70,7 +53,7 @@ namespace TechnicalAnalysis.Application.Mappers
         public static IEnumerable<PairExtended> ToDomain(this IEnumerable<Pool> pools)
             => pools.Select(c => c.ToDomain()).ToList();
 
-        public static PairExtended ToDomain(this Pool pool)
+        private static PairExtended ToDomain(this Pool pool)
             => new()
             {
                 Symbol = pool.PoolId,
