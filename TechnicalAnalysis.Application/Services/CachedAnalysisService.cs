@@ -41,12 +41,14 @@ namespace TechnicalAnalysis.Application.Services
 
         public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
         {
+            var fileName = $"All-Pairs-Indicators-{DateTime.UtcNow}";
+
             if (httpContext?.Request.Headers.ContainsKey("C-Invalid") == false)
             {
                 var cachedPairs = await redisRepository.GetRecordAsync<IEnumerable<PairExtended>>(provider.ToString());
                 if (cachedPairs?.Any() == true)
                 {
-                    await communication.CreateAttachmentSendMessage(cachedPairs);
+                    await communication.CreateAttachmentSendMessage(cachedPairs, fileName);
                     rabbitMqService.PublishMessage(cachedPairs);
 
                     // Example how to consume message
@@ -117,7 +119,7 @@ namespace TechnicalAnalysis.Application.Services
 
             //TODO Instead of anonymous object create a class
             await redisRepository.SetRecordAsync(provider.ToString(), sortedPairsByEnhanced, null, null);
-            await communication.CreateAttachmentSendMessage(sortedPairsByEnhanced);
+            await communication.CreateAttachmentSendMessage(sortedPairsByEnhanced, fileName);
             rabbitMqService.PublishMessage(pairs);
 
             return pairs;
