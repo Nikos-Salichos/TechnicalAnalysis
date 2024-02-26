@@ -501,7 +501,6 @@ namespace TechnicalAnalysis.Application.Extensions
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
                 ];
 
-
                 if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
                     && cryptoFearAndGreedIndex is not null && pair.Provider
                         is DataProvider.Binance
@@ -518,7 +517,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var consesutiveCandlesticksBelowSma = GetConsecutiveCandlesticksBelowSmaCondition(pair, i);
                 if (consesutiveCandlesticksBelowSma)
                 {
-                    conditions = [.. conditions, consesutiveCandlesticksBelowSma];
+                    //  conditions = [.. conditions, consesutiveCandlesticksBelowSma];
                 }
 
                 int trueConditionsCount = conditions.Count(condition => condition);
