@@ -1,6 +1,6 @@
 ﻿using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
-using TechnicalAnalysis.Domain.Contracts.Output.CoinPaprika;
+using TechnicalAnalysis.Domain.Contracts.Input.CoinPaprika;
 
 namespace TechnicalAnalysis.Application.Mappers
 {
