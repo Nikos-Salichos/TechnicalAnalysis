@@ -41,7 +41,7 @@ namespace TechnicalAnalysis.Application.Services
             return FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
         }
 
-        private static IEnumerable<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
+        private static List<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
         {
             return pairs.OrderByDescending(pair => pair.CreatedAt)
                         .Select(pair =>
@@ -57,7 +57,7 @@ namespace TechnicalAnalysis.Application.Services
                         .Where(pair => pair.Candlesticks.Count > 0).ToList();
         }
 
-        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe)
+        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null)
         {
             var fetchedPairs = await FormatAssetsPairsCandlesticks();
             var selectedPairs = fetchedPairs.Where(p => pairNames.Contains(p.Symbol, StringComparer.InvariantCultureIgnoreCase));
