@@ -30,18 +30,19 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
                 return Task.CompletedTask;
             }
 
-            return NewMethod(mailService, messages, receiversList, bccReceiversList);
+            return SendMailAsync(mailService, messages, receiversList, bccReceiversList);
 
-            static async Task NewMethod(IMailer mailService, List<MimePart> messages, List<string> receiversList, List<string> bccReceiversList)
+            static async Task SendMailAsync(IMailer mailService, List<MimePart> messages, List<string> receiversList, List<string> bccReceiversList)
             {
                 var mailData = new MailData(receiversList, "Coins", null, messages, null, null, null, null, bccReceiversList, null);
                 await mailService.SendAsync(mailData, new CancellationToken());
             }
         }
 
-        private static void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments, IEnumerable<T> data)
+        private static void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments,
+            IEnumerable<T> data, JsonSerializerOptions jsonSerializerOptions = null)
         {
-            string json = JsonSerializer.Serialize(data, JsonHelper.JsonSerializerOptions);
+            string json = JsonSerializer.Serialize(data, jsonSerializerOptions ?? JsonHelper.JsonSerializerOptions);
 
             var byteArray = Encoding.UTF8.GetBytes(json);
 
