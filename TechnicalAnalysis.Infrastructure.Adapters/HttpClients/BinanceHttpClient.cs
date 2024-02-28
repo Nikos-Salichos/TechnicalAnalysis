@@ -89,11 +89,5 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<object[][], string>.Fail(exception.ToString());
             }
         }
-
-        //TODO I do not need it
-        /*        public void Dispose()
-                {
-                    _httpClient.Dispose();
-                }*/
     }
 }
