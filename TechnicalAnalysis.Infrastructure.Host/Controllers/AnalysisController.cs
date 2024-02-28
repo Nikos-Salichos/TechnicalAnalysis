@@ -64,8 +64,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [EnableRateLimiting("fixed-by-ip")]
         public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] IEnumerable<string> pairNames, [FromQuery] Timeframe timeframe)
         {
-            logger.LogInformation("request {request}", pairNames);
-            await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe);
+            logger.LogInformation("request {pairNames} {timeframe}", pairNames, timeframe);
+            await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
             return Ok();
         }
     }
