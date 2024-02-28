@@ -1,4 +1,4 @@
-﻿using TechnicalAnalysis.Domain.Contracts.Output.CoinPaprika;
+﻿using TechnicalAnalysis.Domain.Contracts.Input.CoinPaprika;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 
 namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
