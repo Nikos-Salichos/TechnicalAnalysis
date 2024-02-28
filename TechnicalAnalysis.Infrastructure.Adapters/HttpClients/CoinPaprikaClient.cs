@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Polly;
 using System.Text.Json;
-using TechnicalAnalysis.Domain.Contracts.Output.CoinPaprika;
+using TechnicalAnalysis.Domain.Contracts.Input.CoinPaprika;
 using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
