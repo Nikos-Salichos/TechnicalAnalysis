@@ -244,13 +244,14 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             {
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\") FROM STDIN BINARY");
+                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\", \"AssetType\") FROM STDIN BINARY");
 
                 foreach (var asset in assets)
                 {
                     await writer.StartRowAsync();
                     await WriteParameter(writer, asset.Symbol);
                     await WriteParameter(writer, asset.CreatedDate);
+                    await WriteParameter(writer, asset.AssetType);
                 }
 
                 await writer.CompleteAsync();
