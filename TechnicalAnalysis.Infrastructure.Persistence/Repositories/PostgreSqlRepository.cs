@@ -47,7 +47,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 return await ExecutionTimeLogger.LogExecutionTime(async () =>
                 {
                     await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                    const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol FROM \"Assets\"";
+                    const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol, \"AssetType\" AS AssetType FROM \"Assets\"";
                     var assets = await dbConnection.QueryAsync<Asset>(query);
                     return Result<IEnumerable<Asset>, string>.Success(assets);
                 }, logger);
