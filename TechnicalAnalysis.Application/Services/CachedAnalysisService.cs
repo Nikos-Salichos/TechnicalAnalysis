@@ -43,8 +43,7 @@ namespace TechnicalAnalysis.Application.Services
             return pairsFromCache;
         }
 
-        //TODO fix it to return proper type
-        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
+        public async Task<List<EnhancedPairResult>> GetEnhancedPairResultsAsync(DataProvider provider, HttpContext? httpContext = null)
         {
             var fileName = $"All-Pairs-Indicators-{DateTime.UtcNow}";
 
@@ -59,49 +58,17 @@ namespace TechnicalAnalysis.Application.Services
                     // Example how to consume message
                     // var message = await rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
 
-                    return [];
+                    return cachedPairs;
                 }
             }
 
-            var pairs = await inner.GetPairsIndicatorsAsync(provider, httpContext);
+            var pairs = await inner.GetEnhancedPairResultsAsync(provider, httpContext);
 
-            var filteredPairs = pairs
-               .OrderByDescending(pair => pair.CreatedAt)
-                 .Select(pair =>
-                 {
-                     var enhancedScans = pair.Candlesticks
-                         .Where(c => c.EnhancedScans.Count > 0)
-                         .OrderByDescending(c => c.CloseDate)
-                         .ThenBy(c => c.EnhancedScans.OrderBy(es => es.OrderOfSignal))
-                         .GroupBy(c => c.PoolOrPairId)
-                         .Select(group => new EnhancedScanGroup
-                         {
-                             CandlestickCloseDate = group.First().CloseDate,
-                             EnhancedScans = group.First().EnhancedScans.ToList()
-                         })
-                         .ToList();
+            await redisRepository.SetRecordAsync(provider.ToString(), pairs, null, null);
+            await communication.CreateAttachmentSendMessage(pairs, fileName);
+            rabbitMqService.PublishMessage(pairs);
 
-                     return new EnhancedPairResult
-                     {
-                         Symbol = pair.Symbol,
-                         EnhancedScans = enhancedScans,
-                         OrderOfSignal = enhancedScans[0].EnhancedScans[0].OrderOfSignal
-                     };
-                 })
-                 .Where(result => result.EnhancedScans.Count > 0)
-                 .ToList();
-
-            var sortedPairsByEnhanced = filteredPairs
-                .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate)
-                .ThenBy(result => result.OrderOfSignal)
-                .ToList();
-
-            //TODO Instead of anonymous object create a class
-            await redisRepository.SetRecordAsync(provider.ToString(), sortedPairsByEnhanced, null, null);
-            await communication.CreateAttachmentSendMessage(sortedPairsByEnhanced, fileName);
-            rabbitMqService.PublishMessage(sortedPairsByEnhanced);
-
-            return [];
+            return pairs;
         }
     }
 }
