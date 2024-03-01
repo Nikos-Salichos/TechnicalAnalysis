@@ -49,7 +49,8 @@ SET default_table_access_method = heap;
 CREATE TABLE public."Assets" (
     "Id" bigint NOT NULL,
     "Symbol" text,
-    "CreatedDate" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    "CreatedDate" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    "AssetType" bigint
 );
 
 
