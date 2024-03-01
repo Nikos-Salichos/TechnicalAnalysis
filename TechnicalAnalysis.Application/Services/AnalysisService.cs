@@ -8,6 +8,7 @@ using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.JsonOutput;
+using TechnicalAnalysis.Domain.Contracts.Output;
 using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Utilities;
@@ -18,7 +19,7 @@ namespace TechnicalAnalysis.Application.Services
     public class AnalysisService(ILogger<AnalysisService> logger, IMediator mediator, IConfiguration configuration)
         : IAnalysisService
     {
-        public async Task<IEnumerable<PairExtended>> GetPairsIndicatorsAsync(DataProvider provider, HttpContext? httpContext = null)
+        public async Task<List<EnhancedPairResult>> GetEnhancedPairResultsAsync(DataProvider provider, HttpContext? httpContext = null)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
 
@@ -38,7 +39,35 @@ namespace TechnicalAnalysis.Application.Services
 
             await CalculateTechnicalIndicators(pairs);
 
-            return FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
+            var filteredPairs = FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
+
+            var enhancedPairResults = filteredPairs.OrderByDescending(pair => pair.CreatedAt)
+                .Select(pair =>
+                {
+                    var enhancedScans = pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0)
+                                                                        .OrderByDescending(c => c.CloseDate)
+                                                                        .ThenBy(c => c.EnhancedScans
+                                                                        .OrderBy(es => es.OrderOfSignal))
+                                                                        .GroupBy(c => c.PoolOrPairId)
+                                                                        .Select(group => new EnhancedScanGroup
+                                                                        {
+                                                                            CandlestickCloseDate = group.First().CloseDate,
+                                                                            EnhancedScans = group.First().EnhancedScans.ToList()
+                                                                        }).ToList();
+                    return new EnhancedPairResult
+                    {
+                        Symbol = pair.Symbol,
+                        EnhancedScans = enhancedScans,
+                        OrderOfSignal = enhancedScans[0].EnhancedScans[0].OrderOfSignal
+                    };
+                })
+                .Where(result => result.EnhancedScans.Count > 0)
+                .ToList();
+
+            return enhancedPairResults
+                .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate)
+                .ThenBy(result => result.OrderOfSignal)
+                .ToList();
         }
 
         private static List<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
