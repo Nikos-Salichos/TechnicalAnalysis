@@ -53,8 +53,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] DataProvider provider = DataProvider.All)
         {
             logger.LogInformation("request {request}", provider);
-            await analysisService.GetPairsIndicatorsAsync(provider, HttpContext);
-            return Ok();
+            var result = await analysisService.GetEnhancedPairResultsAsync(provider, HttpContext);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -65,8 +65,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] IEnumerable<string> pairNames, [FromQuery] Timeframe timeframe)
         {
             logger.LogInformation("request {pairNames} {timeframe}", pairNames, timeframe);
-            await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
-            return Ok();
+            var result = await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
+            return Ok(result);
         }
     }
 }
