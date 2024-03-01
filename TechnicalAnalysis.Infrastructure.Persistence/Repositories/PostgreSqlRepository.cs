@@ -251,7 +251,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     await writer.StartRowAsync();
                     await WriteParameter(writer, asset.Symbol);
                     await WriteParameter(writer, asset.CreatedDate);
-                    await WriteParameter(writer, asset.AssetType);
+                    await WriteParameter(writer, (int)asset.AssetType);
                 }
 
                 await writer.CompleteAsync();
