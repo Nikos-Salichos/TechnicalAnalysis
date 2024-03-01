@@ -16,6 +16,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (response.HasError)
             {
+                logger.LogError("CoinPaprika response error {FailValue}", response.FailValue);
                 return false;
             }
 
