@@ -12,7 +12,7 @@ public class GetAssetsHandler(IPostgreSqlRepository repository) : IRequestHandle
         var result = await repository.GetAssetsAsync();
         if (result.HasError)
         {
-            return Enumerable.Empty<Asset>();
+            return [];
         }
         return result.SuccessValue;
     }
