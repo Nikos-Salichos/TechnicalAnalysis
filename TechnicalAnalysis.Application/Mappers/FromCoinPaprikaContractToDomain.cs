@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Application.Mappers
 {
     public static class FromCoinPaprikaContractToDomain
     {
-        private static Asset ToDomain(this CoinPaprikaAsset asset)
+        private static CoinPaprikaAsset ToDomain(this CoinPaprikaAssetContract asset)
         {
             AssetType assetType = AssetType.Unknown;
 
@@ -23,11 +23,14 @@ namespace TechnicalAnalysis.Application.Mappers
             return new()
             {
                 Symbol = asset.Symbol,
-                AssetType = assetType
+                Name = asset.Name,
+                AssetType = assetType,
+                DataProvider = DataProvider.CoinPaprika,
+                CreatedDate = (asset.CreatedAt == DateTime.MinValue) ? DateTime.UtcNow : asset.CreatedAt,
             };
         }
 
-        public static IEnumerable<Asset> ToDomain(this IEnumerable<CoinPaprikaAsset> assets)
+        public static IEnumerable<CoinPaprikaAsset> ToDomain(this IEnumerable<CoinPaprikaAssetContract> assets)
             => assets.Select(p => p.ToDomain()).ToList();
     }
 }
