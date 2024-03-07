@@ -3,8 +3,8 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands.Insert
 {
-    public class InsertAssetsRankingCommand(IEnumerable<CoinPaprikaAsset> assets) : IRequest
+    public class InsertAssetsRankingCommand(IEnumerable<AssetRanking> assets) : IRequest
     {
-        public IEnumerable<CoinPaprikaAsset> Assets { get; } = assets;
+        public IEnumerable<AssetRanking> Assets { get; } = assets;
     }
 }
