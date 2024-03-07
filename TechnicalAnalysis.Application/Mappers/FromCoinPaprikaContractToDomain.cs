@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Application.Mappers
 {
     public static class FromCoinPaprikaContractToDomain
     {
-        private static CoinPaprikaAsset ToDomain(this CoinPaprikaAssetContract asset)
+        private static AssetRanking ToDomain(this CoinPaprikaAssetContract asset)
         {
             AssetType assetType = AssetType.Unknown;
 
@@ -30,7 +30,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
         }
 
-        public static IEnumerable<CoinPaprikaAsset> ToDomain(this IEnumerable<CoinPaprikaAssetContract> assets)
+        public static IEnumerable<AssetRanking> ToDomain(this IEnumerable<CoinPaprikaAssetContract> assets)
             => assets.Select(p => p.ToDomain()).ToList();
     }
 }
