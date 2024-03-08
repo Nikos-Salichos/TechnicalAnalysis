@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Mappers;
-using TechnicalAnalysis.Application.Mediatr.Handlers.Get;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
