@@ -70,5 +70,7 @@ namespace TechnicalAnalysis.Application.Services
 
             return pairs;
         }
+
+        public Task<List<AssetRanking>> GetLayerOneAssets() => inner.GetLayerOneAssets();
     }
 }
