@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
-    public class Asset : BaseEntity
+    public sealed class Asset : BaseEntity, IEquatable<Asset>
     {
         public string Symbol { get; init; } = string.Empty;
         public DateTime CreatedDate { get; } = DateTime.UtcNow;
