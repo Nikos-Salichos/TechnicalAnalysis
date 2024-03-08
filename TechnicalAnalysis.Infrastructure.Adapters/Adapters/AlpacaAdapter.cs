@@ -3,7 +3,8 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
 using TechnicalAnalysis.Application.Extensions;
-using TechnicalAnalysis.Application.Mediatr.Commands;
+using TechnicalAnalysis.Application.Mediatr.Commands.Insert;
+using TechnicalAnalysis.Application.Mediatr.Commands.Update;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
@@ -27,6 +28,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
             };
 
+            var tenStocksToOwnForever = new List<string> {
+                "ZTS","ODFL", "SYK", "LVMH", "CSU", "GAW", "MKL", "WSO", "BRO", "BRK"
+            };
+
             var stockSymbols = new List<string> {
                 "vt","vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
                 "tsla", "aapl", "googl", "abnb", "JNJ", "XOM","xom", "WMT", "META", "JPM","V", "KO", "PEP",
@@ -37,6 +42,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA",
                 "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG", "PEP", "JNJ", "NSRGY"
             };
+
+            stockSymbols.AddRange(tenStocksToOwnForever);
 
             stockSymbols = stockSymbols.Select(symbol => symbol.ToUpper())
                                        .Distinct(StringComparer.InvariantCultureIgnoreCase)
