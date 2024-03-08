@@ -10,6 +10,7 @@
         WallStreetZen = 5,
         All = 6,
         AlternativeMeCryptoAndFearIndex = 7,
-        CoinPaprika = 8
+        CoinPaprika = 8,
+        CoinMarketCap = 9
     }
 }
