@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Mappers;
+using TechnicalAnalysis.Application.Mediatr.Handlers.Get;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
@@ -755,6 +756,12 @@ namespace TechnicalAnalysis.Application.Services
             await JsonHelper.SerializeToJson(etfStockMarketStatistic, jsonFileName);
 
             return etfStockMarketStatistic;
+        }
+
+        public async Task<List<AssetRanking>> GetLayerOneAssets()
+        {
+            var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
+            return fetchedAssets.Where(a => a.AssetType is AssetType.Layer1 && a.CreatedDate != default).OrderByDescending(a => a.CreatedDate).ToList();
         }
     }
 }
