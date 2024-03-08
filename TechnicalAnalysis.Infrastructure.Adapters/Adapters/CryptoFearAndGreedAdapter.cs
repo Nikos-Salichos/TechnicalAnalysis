@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using TechnicalAnalysis.Application.Extensions;
-using TechnicalAnalysis.Application.Mediatr.Commands;
+using TechnicalAnalysis.Application.Mediatr.Commands.Insert;
+using TechnicalAnalysis.Application.Mediatr.Commands.Update;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
