@@ -12,12 +12,14 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
         Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticksAsync();
         Task<IResult<IEnumerable<Pair>, string>> GetPairsAsync();
         Task<IResult<IEnumerable<Asset>, string>> GetAssetsAsync();
+        Task<IResult<IEnumerable<AssetRanking>, string>> GetCoinPaprikaAssetsAsync();
         Task<IResult<IEnumerable<Pool>, string>> GetPoolsAsync();
         Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlesticksAsync();
         Task InsertCryptoFearAndGreedIndex(IEnumerable<CryptoFearAndGreedData> indexes);
         Task InsertPairsAsync(IEnumerable<Pair> pairs);
         Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks);
         Task<IResult<string, string>> InsertAssetsAsync(IEnumerable<Asset> assets);
+        Task<IResult<string, string>> InsertCoinPaprikaAssetsAsync(IEnumerable<AssetRanking> assets);
         Task UpdateProviderPairAssetSyncInfoAsync(ProviderPairAssetSyncInfo providerPairAssetSyncInfo);
         Task UpdateProviderCandlestickSyncInfoAsync(ProviderCandlestickSyncInfo providerCandlestickSyncInfo);
         Task InsertPoolsAsync(IEnumerable<Pool> pools);
