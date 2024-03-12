@@ -12,7 +12,7 @@ namespace TechnicalAnalysis.Domain.Utilities
 
         public IAsyncPolicy<T> CreatePolicies<T>(int retries, TimeSpan timeSpan)
         {
-            var retryDelays = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromMilliseconds(30), retryCount: retries).ToArray();
+            var retryDelays = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(30), retryCount: retries).ToArray();
 
             return Policy.WrapAsync(
                 Policy.TimeoutAsync<T>(timeSpan, TimeoutStrategy.Optimistic, onTimeoutAsync: (context, timespan, task) =>
