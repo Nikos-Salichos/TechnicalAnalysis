@@ -23,6 +23,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<WallStreetZenAdapter>();
             services.AddSingleton<CryptoFearAndGreedAdapter>();
             services.AddSingleton<CoinPaprikaAdapter>();
+            services.AddSingleton<CoinMarketCapAdapter>();
 
             services.AddSingleton<Func<DataProvider, IAdapter>>(serviceProvider => provider =>
             {
@@ -34,6 +35,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
                     DataProvider.WallStreetZen => serviceProvider.GetRequiredService<WallStreetZenAdapter>(),
                     DataProvider.AlternativeMeCryptoAndFearIndex => serviceProvider.GetRequiredService<CryptoFearAndGreedAdapter>(),
                     DataProvider.CoinPaprika => serviceProvider.GetRequiredService<CoinPaprikaAdapter>(),
+                    DataProvider.CoinMarketCap => serviceProvider.GetRequiredService<CoinMarketCapAdapter>(),
                     _ => throw new ArgumentOutOfRangeException(nameof(provider), $"Exchange {provider} not found")
                 };
             });
@@ -47,7 +49,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<IAlpacaHttpClient, AlpacaHttpClient>();
             services.AddSingleton<IWallStreetZenClient, WallStreetZenClient>();
             services.AddSingleton<ICryptoFearAndGreedHttpClient, CryptoFearAndGreedHttpClient>();
-            services.AddSingleton<ICoinPaprikaClient, CoinPaprikaClient>();
+            services.AddSingleton<ICoinPaprikaHttpClient, CoinPaprikaHttpClient>();
+            services.AddSingleton<ICoinMarketCapHttpClient, CoinMarketCapHttpClient>();
 
             services.AddOptions<MailSettings>().Bind(configuration.GetSection(nameof(MailSettings)));
             services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMq"));
