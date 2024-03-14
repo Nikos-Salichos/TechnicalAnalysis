@@ -56,11 +56,6 @@ CREATE TABLE public."Assets" (
 
 ALTER TABLE public."Assets" OWNER TO postgres;
 
---
--- TOC entry 216 (class 1259 OID 48685)
--- Name: Assets_Id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
 ALTER TABLE public."Assets" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Assets_Id_seq"
     START WITH 1
@@ -69,6 +64,26 @@ ALTER TABLE public."Assets" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDENTITY (
     NO MAXVALUE
     CACHE 1
 );
+
+
+CREATE TABLE public."CoinPaprikaAssets" (
+    "Id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
+    "Name" text,
+    "Symbol" text,
+    "CreatedDate" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    "AssetType" bigint,
+    "Provider" bigint NOT NULL
+);
+
+
+ALTER TABLE public."CoinPaprikaAssets" OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 48685)
+-- Name: Assets_Id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+
 
 
 --
