@@ -125,11 +125,10 @@ namespace TechnicalAnalysis.Application.Services
                 indicatorReportsPerPair.Add(selectedPair, indicatorReports);
             }
 
-            // Now indicatorReportsPerPair contains the generated indicators for each selected pair.
             var baseDirectory = GetBaseDirectory();
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
-                return Enumerable.Empty<PairExtended>();
+                return [];
             }
 
             foreach (var indicatorReportPerPair in indicatorReportsPerPair)
