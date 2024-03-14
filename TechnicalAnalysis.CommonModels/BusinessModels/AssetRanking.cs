@@ -17,14 +17,11 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
                 return true;
             }
 
-            return other != null
-                && Symbol == other.Symbol
-                && Name == other.Name
-                && AssetType == other.AssetType;
+            return other != null && Name == other.Name;
         }
 
         public override bool Equals(object? obj) => obj is not null && Equals(obj as AssetRanking);
 
-        public override int GetHashCode() => HashCode.Combine(Symbol);
+        public override int GetHashCode() => HashCode.Combine(Name);
     }
 }
