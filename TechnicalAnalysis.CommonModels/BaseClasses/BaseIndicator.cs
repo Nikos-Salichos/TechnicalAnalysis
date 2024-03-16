@@ -1,10 +1,7 @@
 ﻿namespace TechnicalAnalysis.CommonModels.BaseClasses
 {
-    public abstract class BaseIndicator
+    public abstract class BaseIndicator(long candlestickId)
     {
-        public long CandlestickId { get; init; }
-
-        protected BaseIndicator(long candlestickId)
-            => CandlestickId = candlestickId;
+        public long CandlestickId { get; init; } = candlestickId;
     }
 }
