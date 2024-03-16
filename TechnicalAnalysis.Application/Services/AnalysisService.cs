@@ -7,12 +7,12 @@ using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
-using TechnicalAnalysis.CommonModels.JsonOutput;
+using TechnicalAnalysis.CommonModels.OutputContract;
 using TechnicalAnalysis.Domain.Contracts.Output;
 using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Utilities;
-using Indicator = TechnicalAnalysis.CommonModels.JsonOutput.Indicator;
+using Indicator = TechnicalAnalysis.CommonModels.OutputContract.Indicator;
 
 namespace TechnicalAnalysis.Application.Services
 {
