@@ -52,13 +52,14 @@ namespace TechnicalAnalysis.Application.Services
                                                                         .Select(group => new EnhancedScanGroup
                                                                         {
                                                                             CandlestickCloseDate = group.First().CloseDate,
-                                                                            EnhancedScans = group.First().EnhancedScans.ToList()
+                                                                            EnhancedScans = group.First().EnhancedScans.ToList(),
+                                                                            CandlestickClosePrice = group.First().ClosePrice
                                                                         }).ToList();
                     return new EnhancedPairResult
                     {
                         Symbol = pair.Symbol,
                         EnhancedScans = enhancedScans,
-                        OrderOfSignal = enhancedScans[0].EnhancedScans[0].OrderOfSignal
+                        OrderOfSignal = enhancedScans[0].EnhancedScans[0].OrderOfSignal,
                     };
                 })
                 .Where(result => result.EnhancedScans.Count > 0)
