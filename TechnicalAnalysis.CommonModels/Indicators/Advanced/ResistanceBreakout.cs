@@ -2,7 +2,7 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
 {
-    public class ResistanceBreakout : BaseIndicator
+    public class ResistanceBreakout(long candlestickId) : BaseIndicator(candlestickId)
     {
         public bool IsBuy { get; set; }
         public bool ClosePosition { get; set; }
@@ -16,10 +16,5 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
         public decimal? ValueAtExit { get; set; }
         public decimal? ProfitInMoney { get; set; }
         public decimal? LossInMoney { get; set; }
-
-        public ResistanceBreakout(long candlestickId)
-            : base(candlestickId)
-        {
-        }
     }
 }
