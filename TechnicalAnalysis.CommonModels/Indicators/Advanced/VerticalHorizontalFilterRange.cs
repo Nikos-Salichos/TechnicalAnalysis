@@ -15,4 +15,3 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
         }
     }
 }
-
