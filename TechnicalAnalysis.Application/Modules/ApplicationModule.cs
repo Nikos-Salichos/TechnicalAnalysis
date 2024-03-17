@@ -36,6 +36,7 @@ namespace TechnicalAnalysis.Application.Modules
             services.AddOptions<BinanceSetting>().Bind(configuration.GetSection("BinanceSettings"));
             services.AddOptions<DexSetting>().Bind(configuration.GetSection("DexSettings"));
             services.AddOptions<CoinMarketCapSetting>().Bind(configuration.GetSection("CoinMarketCap"));
+            services.AddOptions<CoinRankingSetting>().Bind(configuration.GetSection("CoinRanking"));
 
             services.AddSingleton<IValidator<DataProviderTimeframeRequest>, DataProviderTimeframeValidator>();
         }
