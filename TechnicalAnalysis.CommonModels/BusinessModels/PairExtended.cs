@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public DataProvider Provider { get; set; }
         public bool IsActive { get; set; } = true;
         public bool AllCandles { get; init; }
-        public DateTime CreatedAt { get; init; }
+        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
         public string FeeTier { get; init; } = string.Empty;
         public decimal? Fees { get; init; }
         public long? Liquidity { get; init; }
