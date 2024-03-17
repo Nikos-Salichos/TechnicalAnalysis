@@ -4,7 +4,8 @@ namespace TechnicalAnalysis.Domain.Contracts.Output
 {
     public class EnhancedScanGroup
     {
-        public DateTime CandlestickCloseDate { get; set; }
-        public List<EnhancedScan> EnhancedScans { get; set; } = [];
+        public DateTime CandlestickCloseDate { get; init; }
+        public List<EnhancedScan> EnhancedScans { get; init; } = [];
+        public decimal? CandlestickClosePrice { get; init; }
     }
 }
