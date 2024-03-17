@@ -71,6 +71,14 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
-        public Task<List<AssetRanking>> GetLayerOneAssets() => inner.GetLayerOneAssets();
+        public async Task<List<AssetRanking>> GetLayerOneAssetsAsync()
+        {
+            var layerOneAssets = await inner.GetLayerOneAssetsAsync();
+
+            var fileName = $"New-Layer-One-{DateTime.UtcNow}";
+            await communication.CreateAttachmentSendMessage(layerOneAssets, fileName);
+
+            return layerOneAssets;
+        }
     }
 }
