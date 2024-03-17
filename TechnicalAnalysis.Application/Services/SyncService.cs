@@ -58,6 +58,11 @@ namespace TechnicalAnalysis.Application.Services
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CoinMarketCap, timeframe));
                 }
 
+                if (provider == DataProvider.CoinRanking || provider == DataProvider.All)
+                {
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CoinRanking, timeframe));
+                }
+
                 if (adaptersToSync.Count > 0)
                 {
                     await Task.WhenAll(adaptersToSync);
