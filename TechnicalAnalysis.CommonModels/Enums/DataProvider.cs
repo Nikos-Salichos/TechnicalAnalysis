@@ -11,6 +11,7 @@
         All = 6,
         AlternativeMeCryptoAndFearIndex = 7,
         CoinPaprika = 8,
-        CoinMarketCap = 9
+        CoinMarketCap = 9,
+        CoinRanking = 10
     }
 }
