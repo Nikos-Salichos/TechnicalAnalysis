@@ -757,10 +757,10 @@ namespace TechnicalAnalysis.Application.Services
             return etfStockMarketStatistic;
         }
 
-        public async Task<List<AssetRanking>> GetLayerOneAssets()
+        public async Task<List<AssetRanking>> GetLayerOneAssetsAsync()
         {
             var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
-            return fetchedAssets.Where(a => a.AssetType is AssetType.Layer1 && a.CreatedDate != default).OrderByDescending(a => a.CreatedDate).ToList();
+            return fetchedAssets.Where(a => a.AssetType is AssetType.Layer1).OrderByDescending(a => a.CreatedDate).ToList();
         }
     }
 }
