@@ -41,7 +41,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             async Task<IActionResult> SynchronizeInternalAsync(DataProviderTimeframeRequest request)
             {
                 await syncService.SynchronizeProvidersAsync(request);
-                return Ok();
+                return NoContent();
             }
         }
 
@@ -65,7 +65,18 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] IEnumerable<string> pairNames, [FromQuery] Timeframe timeframe)
         {
             logger.LogInformation("request {pairNames} {timeframe}", pairNames, timeframe);
-            var result = await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
+            await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
+            return NoContent();
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+        [HttpGet("LayerOneAssets")]
+        [EnableRateLimiting("fixed-by-ip")]
+        public async Task<IActionResult> GetLayerOneAssetsAsync()
+        {
+            var result = await analysisService.GetLayerOneAssetsAsync();
             return Ok(result);
         }
     }
