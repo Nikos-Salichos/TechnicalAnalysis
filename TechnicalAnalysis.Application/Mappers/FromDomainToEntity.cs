@@ -20,7 +20,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 CreatedAt = pair.CreatedAt
             };
 
-        public static IEnumerable<Pair> ToEntity(this IEnumerable<PairExtended> pairs)
+        public static List<Pair> ToEntity(this IEnumerable<PairExtended> pairs)
             => pairs.Select(c => c.ToEntity()).ToList();
 
         private static Candlestick ToEntity(this CandlestickExtended candlestick)
@@ -38,7 +38,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 NumberOfTrades = candlestick.NumberOfTrades
             };
 
-        public static IEnumerable<Candlestick> ToEntity(this IEnumerable<CandlestickExtended> candlesticks)
+        public static List<Candlestick> ToEntity(this IEnumerable<CandlestickExtended> candlesticks)
             => candlesticks.Select(c => c.ToEntity()).ToList();
 
         private static DexCandlestick DexToEntityCandlestick(this CandlestickExtended candlestick)
@@ -59,7 +59,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 NumberOfTrades = candlestick.NumberOfTrades
             };
 
-        public static IEnumerable<DexCandlestick> DexToEntityCandlestick(this IEnumerable<CandlestickExtended> candlesticks)
+        public static List<DexCandlestick> DexToEntityCandlestick(this IEnumerable<CandlestickExtended> candlesticks)
             => candlesticks.Select(c => c.DexToEntityCandlestick()).ToList();
 
         private static Pool DexToEntityToken(this PairExtended pair)
@@ -81,7 +81,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 IsActive = pair.IsActive
             };
 
-        public static IEnumerable<Pool> DexToEntityPool(this IEnumerable<PairExtended> pairs)
+        public static List<Pool> DexToEntityPool(this IEnumerable<PairExtended> pairs)
             => pairs.Select(c => c.DexToEntityToken()).ToList();
     }
 }
