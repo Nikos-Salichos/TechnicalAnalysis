@@ -9,7 +9,7 @@ namespace TechnicalAnalysis.Application.Mappers
 {
     public static class FromInputContractToDomain
     {
-        public static IEnumerable<CandlestickExtended> ToDomain(this IEnumerable<BinanceCandlestick> binanceCandlesticks)
+        public static List<CandlestickExtended> ToDomain(this IEnumerable<BinanceCandlestick> binanceCandlesticks)
             => binanceCandlesticks.Select(c => c.ToDomain()).ToList();
 
         private static Asset ToDomain(this BinanceAsset binanceAsset)
@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 Symbol = binanceAsset.Asset
             };
 
-        public static IEnumerable<Asset> ToDomain(this IEnumerable<BinanceAsset> binanceAssets)
+        public static List<Asset> ToDomain(this IEnumerable<BinanceAsset> binanceAssets)
             => binanceAssets.Select(c => c.ToDomain()).ToList();
 
         public static CandlestickExtended ToDomain(this BinanceCandlestick binanceCandlestick)
@@ -47,10 +47,10 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithTotalValueLockedUsd(dexCandlestick.TotalValueLockedRawData?.ReduceDigitsToFitDecimalLength())
                           .Build();
 
-        public static IEnumerable<CandlestickExtended> FromDexCandlesticksV3ToDomain(this IEnumerable<Data> dexCandlesticks)
+        public static List<CandlestickExtended> FromDexCandlesticksV3ToDomain(this IEnumerable<Data> dexCandlesticks)
             => dexCandlesticks.Select(c => c.FromDexCandlesticksV3ToDomain()).ToList();
 
-        public static IEnumerable<PairExtended> ToDomain(this IEnumerable<Pool> pools)
+        public static List<PairExtended> ToDomain(this IEnumerable<Pool> pools)
             => pools.Select(c => c.ToDomain()).ToList();
 
         private static PairExtended ToDomain(this Pool pool)
