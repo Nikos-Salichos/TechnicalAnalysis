@@ -1,9 +1,10 @@
-﻿using TechnicalAnalysis.CommonModels.Enums;
+﻿using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface IAdapter
     {
-        Task<bool> Sync(DataProvider provider, Timeframe timeframe);
+        Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges);
     }
 }
