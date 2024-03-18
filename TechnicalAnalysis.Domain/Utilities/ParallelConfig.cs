@@ -3,9 +3,9 @@
     public static class ParallelConfig
     {
         public static ParallelOptions GetOptions()
-            => new ParallelOptions
+            => new()
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount / 4
+                MaxDegreeOfParallelism = Environment.ProcessorCount * 3
             };
     }
 }
