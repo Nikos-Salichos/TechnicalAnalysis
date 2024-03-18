@@ -9,6 +9,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Application
     {
         Task<List<EnhancedPairResult>> GetEnhancedPairResultsAsync(DataProvider provider, HttpContext? httpContext = null);
         Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null);
-        Task<List<AssetRanking>> GetLayerOneAssets();
+        Task<List<AssetRanking>> GetLayerOneAssetsAsync();
     }
 }
