@@ -16,9 +16,9 @@ namespace TechnicalAnalysis.Application.Mappers
                 EnhancedScans = domainCandlestick.EnhancedScans
             };
 
-        private static IEnumerable<Candle> ToOutputContract(this IEnumerable<CandlestickExtended> domainCandlesticks)
+        private static List<Candle> ToOutputContract(this IEnumerable<CandlestickExtended> domainCandlesticks)
             => domainCandlesticks is null
-                ? Enumerable.Empty<Candle>()
+                ? []
                 : domainCandlesticks.Select(c => c.ToOutputContract()).ToList();
 
         public static PartialPair ToOutputContract(this PairExtended domain)
