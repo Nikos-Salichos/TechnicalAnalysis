@@ -20,7 +20,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 Candlesticks = new List<CandlestickExtended>()
             };
 
-        public static IEnumerable<PairExtended> ToDomain(this IEnumerable<Domain.Entities.Pair> pairs)
+        public static List<PairExtended> ToDomain(this IEnumerable<Domain.Entities.Pair> pairs)
             => pairs.Select(c => c.ToDomain()).ToList();
 
         private static CandlestickExtended ToDomain(this Domain.Entities.Candlestick candlestick)
@@ -36,7 +36,7 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithCloseDate(candlestick.CloseDate)
                           .Build();
 
-        public static IEnumerable<CandlestickExtended> ToDomain(this IEnumerable<Domain.Entities.Candlestick> assets)
+        public static List<CandlestickExtended> ToDomain(this IEnumerable<Domain.Entities.Candlestick> assets)
             => assets.Select(c => c.ToDomain()).ToList();
 
         private static CandlestickExtended ToDomain(this Domain.Entities.DexCandlestick dexCandlestick)
@@ -57,7 +57,7 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithNumberOfTrades(dexCandlestick.NumberOfTrades)
                           .Build();
 
-        public static IEnumerable<CandlestickExtended> DexCandlestickToDomain(this IEnumerable<Domain.Entities.DexCandlestick> assets)
+        public static List<CandlestickExtended> DexCandlestickToDomain(this IEnumerable<Domain.Entities.DexCandlestick> assets)
             => assets.Select(c => c.ToDomain()).ToList();
 
         private static PairExtended PoolToDomain(this Domain.Entities.Pool pool)
@@ -80,7 +80,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 Candlesticks = new List<CandlestickExtended>()
             };
 
-        public static IEnumerable<PairExtended> PoolToDomain(this IEnumerable<Domain.Entities.Pool> pairs)
+        public static List<PairExtended> PoolToDomain(this IEnumerable<Domain.Entities.Pool> pairs)
             => pairs.Select(c => c.PoolToDomain()).ToList();
     }
 }
