@@ -8,8 +8,15 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers.Update
     {
         public async Task Handle(UpdateExchangeCommand request, CancellationToken cancellationToken)
         {
-            await repository.UpdateProviderPairAssetSyncInfoAsync(request.ProviderPairAssetSyncInfo);
-            await repository.UpdateProviderCandlestickSyncInfoAsync(request.ProviderCandlestickSyncInfo);
+            if (request.ProviderPairAssetSyncInfo is not null)
+            {
+                await repository.UpdateProviderPairAssetSyncInfoAsync(request.ProviderPairAssetSyncInfo);
+            }
+
+            if (request.ProviderCandlestickSyncInfo is not null)
+            {
+                await repository.UpdateProviderCandlestickSyncInfoAsync(request.ProviderCandlestickSyncInfo);
+            }
         }
     }
 }
