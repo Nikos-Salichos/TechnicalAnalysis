@@ -51,9 +51,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 using var content = httpResponseMessage.Content;
                 await using var jsonStream = await content.ReadAsStreamAsync();
 
-                // 
-                //sort by layer 1 and pass api key
-
                 var deserializedData = await JsonSerializer.DeserializeAsync<CoinMarketCapAssetContract>(jsonStream, JsonHelper.JsonSerializerOptions);
                 if (deserializedData is not null)
                 {
