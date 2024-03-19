@@ -8,7 +8,7 @@ namespace TechnicalAnalysis.Domain.Interfaces.Application
     public interface IAnalysisService
     {
         Task<List<EnhancedPairResult>> GetEnhancedPairResultsAsync(DataProvider provider, HttpContext? httpContext = null);
-        Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null);
+        Task<List<PairExtended>> GetIndicatorsByPairNamesAsync(List<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null);
         Task<List<AssetRanking>> GetLayerOneAssetsAsync();
     }
 }
