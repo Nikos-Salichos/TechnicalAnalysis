@@ -11,7 +11,7 @@ namespace TechnicalAnalysis.Application.Services
     public class CachedAnalysisService(IAnalysisService inner, IRedisRepository redisRepository,
         ICommunication communication, IRabbitMqService rabbitMqService) : IAnalysisService
     {
-        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null)
+        public async Task<List<PairExtended>> GetIndicatorsByPairNamesAsync(List<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null)
         {
             var pairsFromCache = new List<PairExtended>();
 
@@ -27,7 +27,7 @@ namespace TechnicalAnalysis.Application.Services
                 }
             }
 
-            if (pairNames.Count() == pairsFromCache.Count)
+            if (pairNames.Count == pairsFromCache.Count && pairNames.Count > 0)
             {
                 return pairsFromCache;
             }
@@ -47,7 +47,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var fileName = $"All-Pairs-Indicators-{DateTime.UtcNow}";
 
-            if (httpContext?.Request.Headers.ContainsKey("C-Invalid") == false)
+            if (httpContext?.Request.Headers.ContainsKey("Cache-Invalid") == false)
             {
                 var cachedPairs = await redisRepository.GetRecordAsync<List<EnhancedPairResult>>(provider.ToString());
                 if (cachedPairs?.Count > 0)
