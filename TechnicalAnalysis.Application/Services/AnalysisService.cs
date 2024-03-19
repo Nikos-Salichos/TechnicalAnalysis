@@ -87,12 +87,12 @@ namespace TechnicalAnalysis.Application.Services
                         .Where(pair => pair.Candlesticks.Count > 0).ToList();
         }
 
-        public async Task<IEnumerable<PairExtended>> GetIndicatorsByPairNamesAsync(IEnumerable<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null)
+        public async Task<List<PairExtended>> GetIndicatorsByPairNamesAsync(List<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null)
         {
             var fetchedPairs = await FormatAssetsPairsCandlesticks();
-            var selectedPairs = fetchedPairs.Where(p => pairNames.Contains(p.Symbol, StringComparer.InvariantCultureIgnoreCase));
+            var selectedPairs = fetchedPairs.Where(p => pairNames.Contains(p.Symbol, StringComparer.InvariantCultureIgnoreCase)).ToList();
 
-            if (!selectedPairs.Any())
+            if (selectedPairs.Count == 0)
             {
                 return [];
             }
