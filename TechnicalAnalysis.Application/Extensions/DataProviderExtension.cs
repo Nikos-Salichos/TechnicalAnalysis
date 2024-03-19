@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class DataProviderExtension
     {
-        public static bool IsProviderSyncedToday(this ProviderSynchronization provider, Timeframe timeframe)
+        public static bool IsProviderAssetPairsSyncedToday(this ProviderSynchronization provider)
         {
             if (provider is null)
             {
@@ -13,8 +13,23 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             if (provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
-                && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date
-                && provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
+                && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date)
+            {
+                return true;
+            }
+
+            return provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
+            && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date;
+        }
+
+        public static bool IsProviderCandlesticksSyncedToday(this ProviderSynchronization provider, Timeframe timeframe)
+        {
+            if (provider is null)
+            {
+                return false;
+            }
+
+            if (provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
                     && candlestickSyncInfo.Timeframe == timeframe
                     && timeframe == Timeframe.Daily))
@@ -27,9 +42,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             int dayDifference = (currentDayOfWeek - DayOfWeek.Monday + 7) % 7;
 
-            return provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
-            && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date
-            && provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
+            return provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
                     && dayDifference > 0
                     && candlestickSyncInfo.Timeframe == timeframe
