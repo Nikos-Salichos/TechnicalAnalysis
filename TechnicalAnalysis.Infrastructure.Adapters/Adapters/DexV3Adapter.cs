@@ -19,17 +19,16 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
     public class DexV3Adapter(IDexV3HttpClient dexV3HttpClient, ILogger<DexV3Adapter> logger,
          IMediator mediator) : IAdapter
     {
-        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
-            var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
-            var dexV3Provider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
+            var dexV3Provider = exchanges.Find(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
 
             dexV3Provider ??= new ProviderSynchronization
             {
                 ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
             };
 
-            if (dexV3Provider.IsProviderSyncedToday(timeframe))
+            if (dexV3Provider.IsProviderCandlesticksSyncedToday(timeframe))
             {
                 logger.LogInformation("{Provider} synchronized for today", provider);
                 return true;
@@ -42,7 +41,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await Task.WhenAll(mediator.Send(new DeleteDexCandlesticksCommand(candlestickIds)),
               mediator.Send(new DeletePoolsCommand(poolIds)));
 
-            var apiResponse = await dexV3HttpClient.GetMostActivePoolsAsync(10, 10, provider);
+            const int numberOfPools = 10;
+            const int numberOfData = 10;
+            var apiResponse = await dexV3HttpClient.GetMostActivePoolsAsync(numberOfPools, numberOfData, provider);
 
             if (apiResponse.HasError)
             {
