@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Mediatr.Commands.Insert;
+using TechnicalAnalysis.Application.Mediatr.Commands.Update;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
@@ -8,15 +10,27 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    internal class CoinMarketCapAdapter(ICoinMarketCapHttpClient coinMarketCapHttpClient, IMediator mediator, ILogger<CoinMarketCapAdapter> logger)
+    internal sealed class CoinMarketCapAdapter(ICoinMarketCapHttpClient coinMarketCapHttpClient, IMediator mediator, ILogger<CoinMarketCapAdapter> logger)
         : IAdapter
     {
-        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
+            var coinMarketCapProvider = exchanges.Find(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
+            coinMarketCapProvider ??= new ProviderSynchronization
+            {
+                ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
+            };
+
+            if (coinMarketCapProvider.IsProviderAssetPairsSyncedToday())
+            {
+                logger.LogInformation("{Provider} synchronized for today", provider);
+                return true;
+            }
+
             var response = await coinMarketCapHttpClient.SyncAssets();
             if (response.HasError)
             {
-                logger.LogError("CoinPaprika response error {FailValue}", response.FailValue);
+                logger.LogError("{DataProvider} response error {FailValue}", nameof(provider), response.FailValue);
                 return false;
             }
 
@@ -43,6 +57,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             {
                 await mediator.Send(new InsertAssetsRankingCommand(newAssets));
             }
+
+            coinMarketCapProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
+            await mediator.Send(new UpdateExchangeCommand(coinMarketCapProvider.ProviderPairAssetSyncInfo));
 
             return true;
         }
