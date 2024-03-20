@@ -14,23 +14,22 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
     public class CryptoFearAndGreedAdapter(ICryptoFearAndGreedHttpClient cryptoFearAndGreedHttpClient, IMediator mediator,
         ILogger<CryptoFearAndGreedAdapter> logger) : IAdapter
     {
-        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
-            var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
-            var alternativeMeCryptoAndFearProvider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
+            var alternativeMeCryptoAndFearProvider = exchanges.Find(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
 
             alternativeMeCryptoAndFearProvider ??= new ProviderSynchronization
             {
                 ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
             };
 
-            if (alternativeMeCryptoAndFearProvider.IsProviderSyncedToday(timeframe))
+            if (alternativeMeCryptoAndFearProvider.IsProviderAssetPairsSyncedToday())
             {
                 logger.LogInformation("{Provider} synchronized for today", provider);
                 return true;
             }
 
-            var cryptoFearAndGreedIndexData = await mediator.Send(new GetCryptoFearAndGreedIndexQuery());
+            var cryptoFearAndGreedIndexData = (await mediator.Send(new GetCryptoFearAndGreedIndexQuery())).ToList();
 
             var calculatedDates = CalculateNumberOfDates(cryptoFearAndGreedIndexData);
             var response = await cryptoFearAndGreedHttpClient.GetCryptoFearAndGreedIndex(calculatedDates);
@@ -43,16 +42,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             await mediator.Send(new InsertCryptoFearAndGreedIndexCommand(response.SuccessValue));
 
             alternativeMeCryptoAndFearProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
-            var providerCandlestickSyncInfo = alternativeMeCryptoAndFearProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
-            await mediator.Send(new UpdateExchangeCommand(alternativeMeCryptoAndFearProvider.ProviderPairAssetSyncInfo, providerCandlestickSyncInfo));
+            await mediator.Send(new UpdateExchangeCommand(alternativeMeCryptoAndFearProvider.ProviderPairAssetSyncInfo));
             return true;
         }
 
-        private static int CalculateNumberOfDates(IEnumerable<CryptoFearAndGreedData> cryptoFearAndGreedData)
+        private static int CalculateNumberOfDates(List<CryptoFearAndGreedData> cryptoFearAndGreedData)
         {
             const int providerAllDaysParam = 1000;
 
-            if (!cryptoFearAndGreedData.Any())
+            if (cryptoFearAndGreedData.Count == 0)
             {
                 return providerAllDaysParam;
             }
