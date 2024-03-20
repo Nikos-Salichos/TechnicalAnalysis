@@ -470,8 +470,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2023, 01, 03).Date
-                    && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2024, 03, 15).Date
+                    && string.Equals(pair.Symbol, "TSLA", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
