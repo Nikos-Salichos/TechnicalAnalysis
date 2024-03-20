@@ -18,17 +18,16 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
     public class BinanceAdapter(IBinanceHttpClient binanceHttpClient, IMediator mediator, ILogger<BinanceAdapter> logger) : IAdapter
     {
-        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
-            var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
-            var binanceProvider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
+            var binanceProvider = exchanges.Find(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
 
             binanceProvider ??= new ProviderSynchronization
             {
                 ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
             };
 
-            if (binanceProvider.IsProviderSyncedToday(timeframe))
+            if (binanceProvider.IsProviderAssetPairsSyncedToday() && binanceProvider.IsProviderCandlesticksSyncedToday(timeframe))
             {
                 logger.LogInformation("{Provider} synchronized for today", provider);
                 return true;
@@ -74,7 +73,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             newAssets = newAssets.Distinct().ToList();
 
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
-
             var missingAssets = newAssets.ToDomain().Except(fetchedAssets).Distinct().ToList();
 
             if (missingAssets.Count > 0)
@@ -100,18 +98,17 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }).ToList();
 
             var newDollarPairs = PairExtension.GetUniqueDollarPairs(fetchedAssets, binancePairs);
-
             var fetchedPairs = (await fetchedPairsTask).ToList();
-            var newPairs = newDollarPairs.Where(pair => !fetchedPairs.Contains(pair)).ToList();
 
-            foreach (var dollarPair in newPairs)
+            var missingDollarPairs = newDollarPairs.Except(fetchedPairs).Distinct().ToList();
+            foreach (var dollarPair in missingDollarPairs)
             {
                 dollarPair.IsActive = true;
             }
 
-            if (newPairs.Count > 0)
+            if (missingDollarPairs.Count > 0)
             {
-                await mediator.Send(new InsertPairsCommand(newPairs));
+                await mediator.Send(new InsertPairsCommand(missingDollarPairs));
             }
         }
 
@@ -249,8 +246,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binancePairs.Any(pair => pair.BinanceCandlesticks.Count > 0))
             {
-                var pairsWithCandlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0);
-                var candlesticks = pairsWithCandlesticks.SelectMany(c => c.BinanceCandlesticks);
+                var pairsWithCandlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0).ToList();
+                var candlesticks = pairsWithCandlesticks.SelectMany(c => c.BinanceCandlesticks).ToList();
                 await mediator.Send(new InsertCandlesticksCommand(candlesticks.ToDomain()));
             }
         }
