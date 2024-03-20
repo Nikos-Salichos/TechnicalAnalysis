@@ -18,10 +18,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
     public class AlpacaAdapter(ILogger<AlpacaAdapter> logger, IMediator mediator, IAlpacaHttpClient alpacaHttpClient) : IAdapter
     {
-        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe)
+        public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
-            var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
-            var alpacaProvider = exchanges.FirstOrDefault(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
+            var alpacaProvider = exchanges.Find(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
 
             alpacaProvider ??= new ProviderSynchronization
             {
@@ -32,6 +31,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 "ZTS","ODFL", "SYK", "LVMH", "CSU", "GAW", "MKL", "WSO", "BRO", "BRK"
             };
 
+            //Add more stocks from here: https://www.wallstreetzen.com/stock-screener?p=1&s=mc&sd=desc&t=1
+            //Check top owned stocks: https://www.dataroma.com/m/home.php
             var stockSymbols = new List<string> {
                 "vt","vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
                 "tsla", "aapl", "googl", "abnb", "JNJ", "XOM","xom", "WMT", "META", "JPM","V", "KO", "PEP",
@@ -40,12 +41,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 "FEZ","IWM","SPY","DIA","DAX","VGK","QQQ",
                 "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
                 "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA",
-                "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG", "PEP", "JNJ", "NSRGY"
+                "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG", "PEP", "JNJ", "NSRGY","NVDA","TSM","LLY","NVO",
+                "AVGO", "BRK.B", "V", "JPM", "WMT", "MA", "UNH", "XOM", "PG", "ASML","HD","ORCL","COST","ABBV","AMD",
+                "TM", "MRK", "CRM", "GOOG"
             };
 
             stockSymbols.AddRange(tenStocksToOwnForever);
 
-            stockSymbols = stockSymbols.Select(symbol => symbol.ToUpper())
+            stockSymbols = stockSymbols.Select(symbol => symbol.ToUpperInvariant())
                                        .Distinct(StringComparer.InvariantCultureIgnoreCase)
                                        .ToList();
 
@@ -63,7 +66,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 }
             }
 
-            if (alpacaProvider.IsProviderSyncedToday(timeframe) && allStockSymbolsExist)
+            if (alpacaProvider.IsProviderAssetPairsSyncedToday() && alpacaProvider.IsProviderCandlesticksSyncedToday(timeframe) && allStockSymbolsExist)
             {
                 logger.LogInformation("{Provider} synchronized for today", provider);
                 return true;
@@ -88,7 +91,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         {
             var existingAssetNames = fetchedAssets.Select(a => a.Symbol).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
 
-            List<Asset> newAssets = new List<Asset>();
+            List<Asset> newAssets = new();
             foreach (var stockSymbol in stockSymbols)
             {
                 if (!existingAssetNames.Contains(stockSymbol, StringComparer.InvariantCultureIgnoreCase))
