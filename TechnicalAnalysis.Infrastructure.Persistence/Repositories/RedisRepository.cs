@@ -55,7 +55,5 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 SlidingExpiration = slidingExpireTime ?? timeUntilMidnightUtc
             };
         }
-
-
     }
 }
