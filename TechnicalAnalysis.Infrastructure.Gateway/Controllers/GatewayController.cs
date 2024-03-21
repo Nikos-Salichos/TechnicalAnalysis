@@ -18,13 +18,12 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
         };
 
         [HttpGet]
-        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] string pairName, [FromQuery] Timeframe timeframe)
+        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
         {
             const string apiUrl = "IndicatorsByPairName";
-            var requestData = new { pairName, timeframe };
+            var requestData = new { pairNames, timeframe };
 
             var result = await SendHttpRequestAsync<IEnumerable<PairExtended>>(apiUrl, HttpMethod.Get, requestData);
-
             return Ok(result);
         }
 
