@@ -10,8 +10,9 @@ networks:
 
 services:
 
-  technicalanalysis.infrastructure.gateway:
+  ta.gateway:
     image: ${DOCKER_REGISTRY-}technicalanalysisinfrastructuregateway
+    container_name: ta-gateway
     build:
       context: .
       dockerfile: TechnicalAnalysis.Infrastructure.Gateway/Dockerfile
