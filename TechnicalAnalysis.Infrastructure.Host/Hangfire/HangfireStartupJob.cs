@@ -16,8 +16,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
                 List<Task> tasks =
                 [
                     syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                            CommonModels.Enums.DataProvider.Alpaca,
-                            CommonModels.Enums.Timeframe.Daily)),
+                        CommonModels.Enums.DataProvider.Alpaca,
+                        CommonModels.Enums.Timeframe.Daily)),
 
                     syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
                         CommonModels.Enums.DataProvider.Binance,
@@ -25,7 +25,19 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
 
                     syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
                         CommonModels.Enums.DataProvider.AlternativeMeCryptoAndFearIndex,
-                        CommonModels.Enums.Timeframe.Daily))
+                        CommonModels.Enums.Timeframe.Daily)),
+
+                   syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.CoinPaprika,
+                        CommonModels.Enums.Timeframe.Daily)),
+
+                   syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.CoinMarketCap,
+                        CommonModels.Enums.Timeframe.Daily)),
+
+                   syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.CoinRanking,
+                        CommonModels.Enums.Timeframe.Daily)),
                 ];
 
                 await Task.WhenAll(tasks);
@@ -49,6 +61,27 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
                         CommonModels.Enums.DataProvider.AlternativeMeCryptoAndFearIndex,
                         CommonModels.Enums.Timeframe.Daily)),
                      "*/30 * * * *");
+
+                RecurringJob.AddOrUpdate(
+                     "synchronize_providers_job_coinpaprika", // Unique identifier for the job
+                     () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                         CommonModels.Enums.DataProvider.CoinPaprika,
+                         CommonModels.Enums.Timeframe.Daily)),
+                     "0 0 * * *"); // Runs at midnight (00:00) every day
+
+                RecurringJob.AddOrUpdate(
+                     "synchronize_providers_job_coinmarketcap", // Unique identifier for the job
+                     () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                         CommonModels.Enums.DataProvider.CoinMarketCap,
+                         CommonModels.Enums.Timeframe.Daily)),
+                     "0 0 * * *"); // Runs at midnight (00:00) every day
+
+                RecurringJob.AddOrUpdate(
+                    "synchronize_providers_job_coinranking", // Unique identifier for the job
+                    () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.CoinRanking,
+                        CommonModels.Enums.Timeframe.Daily)),
+                    "0 0 * * *"); // Runs at midnight (00:00) every day
             }
         }
     }
