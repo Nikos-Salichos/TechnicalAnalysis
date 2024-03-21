@@ -15,12 +15,11 @@ namespace TechnicalAnalysis.Infrastructure.Host.Filters
                 Name = "ApiKey",
                 In = ParameterLocation.Header,
                 Required = true,
-                Example = new OpenApiString("123") // Example value
+                Example = new OpenApiString("123")
             };
 
             operation.Parameters.Add(apiKeyParameter);
         }
-
     }
 
 }
