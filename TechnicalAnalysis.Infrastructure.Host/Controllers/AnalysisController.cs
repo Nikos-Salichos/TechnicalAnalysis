@@ -62,9 +62,16 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("IndicatorsByPairName")]
         [EnableRateLimiting("fixed-by-ip")]
-        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] IEnumerable<string> pairNames, [FromQuery] Timeframe timeframe)
+        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
         {
             logger.LogInformation("request {pairNames} {timeframe}", pairNames, timeframe);
+
+            if (pairNames.Count is 0)
+            {
+                logger.LogWarning("No pair names provided by the user {@pairNames}", pairNames);
+                return BadRequest($"No pair names provided by the user {pairNames}");
+            }
+
             await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
             return NoContent();
         }
