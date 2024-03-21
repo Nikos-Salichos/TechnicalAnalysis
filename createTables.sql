@@ -396,7 +396,10 @@ INSERT INTO public."Providers" ("Id", "Name") VALUES
   (4, 'Alpaca'),
   (5, 'WallStreetZen'),
   (6, 'All'),
-  (7, 'AlternativeMeCryptoAndFearIndex');
+  (7, 'AlternativeMeCryptoAndFearIndex'),
+  (8, 'CoinPaprika'),
+  (9, 'CoinMarketCap'),
+  (10, 'CoinRanking');
 
 
 --
