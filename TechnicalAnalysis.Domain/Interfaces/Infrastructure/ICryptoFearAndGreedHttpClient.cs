@@ -1,4 +1,4 @@
-﻿using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
+﻿using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 
 namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
