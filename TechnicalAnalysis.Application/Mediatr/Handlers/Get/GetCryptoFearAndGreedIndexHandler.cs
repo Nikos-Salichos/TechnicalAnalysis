@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using TechnicalAnalysis.Application.Mediatr.Queries;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
