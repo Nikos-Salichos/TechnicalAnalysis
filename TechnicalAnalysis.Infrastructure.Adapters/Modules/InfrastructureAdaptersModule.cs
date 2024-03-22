@@ -25,6 +25,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<CoinPaprikaAdapter>();
             services.AddSingleton<CoinMarketCapAdapter>();
             services.AddSingleton<CoinRankingAdapter>();
+            services.AddSingleton<StockFearAndGreedAdapter>();
 
             services.AddSingleton<Func<DataProvider, IAdapter>>(serviceProvider => provider =>
             {
@@ -38,6 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
                     DataProvider.CoinPaprika => serviceProvider.GetRequiredService<CoinPaprikaAdapter>(),
                     DataProvider.CoinMarketCap => serviceProvider.GetRequiredService<CoinMarketCapAdapter>(),
                     DataProvider.CoinRanking => serviceProvider.GetRequiredService<CoinRankingAdapter>(),
+                    DataProvider.StockFearAndGreedProvider => serviceProvider.GetRequiredService<StockFearAndGreedAdapter>(),
                     _ => throw new ArgumentOutOfRangeException(nameof(provider), $"Exchange {provider} not found")
                 };
             });
@@ -54,6 +56,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<ICoinPaprikaHttpClient, CoinPaprikaHttpClient>();
             services.AddSingleton<ICoinMarketCapHttpClient, CoinMarketCapHttpClient>();
             services.AddSingleton<ICoinRankingHttpClient, CoinRankingHttpClient>();
+            services.AddSingleton<IStockFearAndGreedHttpClient, StockFearAndGreedHttpClient>();
 
             services.AddOptions<MailSettings>().Bind(configuration.GetSection(nameof(MailSettings)));
             services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMq"));
