@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using TechnicalAnalysis.CommonModels.BusinessModels;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Entities;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
