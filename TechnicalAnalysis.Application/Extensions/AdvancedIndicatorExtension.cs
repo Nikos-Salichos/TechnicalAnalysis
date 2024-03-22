@@ -4,7 +4,7 @@ using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 using TechnicalAnalysis.CommonModels.Indicators.Basic;
 using TechnicalAnalysis.CommonModels.Indicators.CandlestickFormations;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 
 namespace TechnicalAnalysis.Application.Extensions
 {
