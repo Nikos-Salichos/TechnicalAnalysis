@@ -9,8 +9,8 @@ using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
-    public class CoinPaprikaHttpClient(IHttpClientFactory httpClientFactory,
-        ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy) : ICoinPaprikaHttpClient
+    public class CoinPaprikaHttpClient(IHttpClientFactory httpClientFactory, ILogger<CoinPaprikaHttpClient> logger, IPollyPolicy pollyPolicy)
+        : ICoinPaprikaHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
