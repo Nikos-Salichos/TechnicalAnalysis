@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
 using System.Text.Json;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
@@ -9,7 +9,7 @@ using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
-    public class CryptoFearAndGreedHttpClient(IHttpClientFactory httpClientFactory, ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy)
+    public class CryptoFearAndGreedHttpClient(IHttpClientFactory httpClientFactory, ILogger<CryptoFearAndGreedHttpClient> logger, IPollyPolicy pollyPolicy)
         : ICryptoFearAndGreedHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
