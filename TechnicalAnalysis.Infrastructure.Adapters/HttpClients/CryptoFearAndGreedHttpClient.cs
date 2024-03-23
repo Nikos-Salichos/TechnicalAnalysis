@@ -31,7 +31,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 using var content = httpResponseMessage.Content;
                 await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<CryptoFearAndGreedIndex>(jsonStream, JsonHelper.JsonSerializerOptions);
+                var deserializedData = await JsonSerializer.DeserializeAsync<CryptoFearAndGreedRoot>(jsonStream, JsonHelper.JsonSerializerOptions);
                 if (deserializedData is not null)
                 {
                     logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
