@@ -1,4 +1,5 @@
 ﻿using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.Domain.Contracts.Input.StockFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Entities;
 using Candlestick = TechnicalAnalysis.Domain.Entities.Candlestick;
 using Pair = TechnicalAnalysis.Domain.Entities.Pair;
@@ -62,7 +63,7 @@ namespace TechnicalAnalysis.Application.Mappers
         public static List<DexCandlestick> DexToEntityCandlestick(this IEnumerable<CandlestickExtended> candlesticks)
             => candlesticks.Select(c => c.DexToEntityCandlestick()).ToList();
 
-        private static Pool DexToEntityToken(this PairExtended pair)
+        private static PoolEntity DexToEntityToken(this PairExtended pair)
             => new()
             {
                 PrimaryId = pair.PrimaryId,
@@ -81,7 +82,17 @@ namespace TechnicalAnalysis.Application.Mappers
                 IsActive = pair.IsActive
             };
 
-        public static List<Pool> DexToEntityPool(this IEnumerable<PairExtended> pairs)
+        public static List<PoolEntity> DexToEntityPool(this IEnumerable<PairExtended> pairs)
             => pairs.Select(c => c.DexToEntityToken()).ToList();
+
+        public static StockFearAndGreedDomain? ToDomain(this StockFearAndGreedRoot stockFearAndGreedRoot)
+            => stockFearAndGreedRoot is null
+                ? null
+                : new()
+                {
+                    DateTime = DateTimeOffset.FromUnixTimeSeconds(stockFearAndGreedRoot.StockFearAndGreedLastUpdated.EpochUnixSeconds).UtcDateTime.Date,
+                    Value = stockFearAndGreedRoot.StockFearAndGreedData.Now.Value.ToString(),
+                    ValueClassification = stockFearAndGreedRoot.StockFearAndGreedData.Now.ValueText
+                };
     }
 }
