@@ -60,7 +60,7 @@ namespace TechnicalAnalysis.Application.Mappers
         public static List<CandlestickExtended> DexCandlestickToDomain(this IEnumerable<Domain.Entities.DexCandlestick> assets)
             => assets.Select(c => c.ToDomain()).ToList();
 
-        private static PairExtended PoolToDomain(this Domain.Entities.Pool pool)
+        private static PairExtended PoolToDomain(this Domain.Entities.PoolEntity pool)
             => new()
             {
                 PrimaryId = pool.PrimaryId,
@@ -80,7 +80,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 Candlesticks = new List<CandlestickExtended>()
             };
 
-        public static List<PairExtended> PoolToDomain(this IEnumerable<Domain.Entities.Pool> pairs)
+        public static List<PairExtended> PoolToDomain(this IEnumerable<Domain.Entities.PoolEntity> pairs)
             => pairs.Select(c => c.PoolToDomain()).ToList();
     }
 }
