@@ -3,6 +3,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.Domain.Builders;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 using TechnicalAnalysis.Domain.Contracts.Input.DexV3;
+using TechnicalAnalysis.Domain.Contracts.Input.StockFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Extensions;
 
 namespace TechnicalAnalysis.Application.Mappers
@@ -69,6 +70,16 @@ namespace TechnicalAnalysis.Application.Mappers
                 Volume = pool.VolumeRawData.ReduceDigitsToFitDecimalLength(),
                 NumberOfTrades = pool.NumberOfTrades.ReduceDigitsToFitLongLength(),
                 Candlesticks = pool.PoolDayData.FromDexCandlesticksV3ToDomain().ToList()
+            };
+
+        public static StockFearAndGreedDomain? ToDomain(this StockFearAndGreedRoot stockFearAndGreedRoot)
+            => stockFearAndGreedRoot is null
+            ? null
+            : new()
+            {
+                DateTime = DateTimeOffset.FromUnixTimeSeconds(stockFearAndGreedRoot.StockFearAndGreedLastUpdated.EpochUnixSeconds).UtcDateTime.Date,
+                Value = stockFearAndGreedRoot.StockFearAndGreedData.Now.Value.ToString(),
+                ValueClassification = stockFearAndGreedRoot.StockFearAndGreedData.Now.ValueText
             };
     }
 }
