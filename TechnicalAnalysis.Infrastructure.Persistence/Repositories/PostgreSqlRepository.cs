@@ -11,7 +11,7 @@ using TechnicalAnalysis.Domain.Settings;
 using TechnicalAnalysis.Domain.Utilities;
 using Candlestick = TechnicalAnalysis.Domain.Entities.Candlestick;
 using Pair = TechnicalAnalysis.Domain.Entities.Pair;
-using Pool = TechnicalAnalysis.Domain.Entities.Pool;
+using PoolEntity = TechnicalAnalysis.Domain.Entities.PoolEntity;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 {
@@ -22,21 +22,33 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndexAsync()
         {
+            return await ExecutionTimeLogger.LogExecutionTime(async () =>
+            {
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"TimestampAsDateTime\" FROM \"CryptoFearAndGreedIndex\"";
+
+                var assets = await dbConnection.QueryAsync<CryptoFearAndGreedData>(query);
+                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(assets);
+            }, logger);
+        }
+
+        public async Task<IResult<IEnumerable<StockFearAndGreedDomain>, string>> GetStockFearAndGreedIndexAsync()
+        {
             try
             {
                 return await ExecutionTimeLogger.LogExecutionTime(async () =>
                 {
                     await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                    const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"TimestampAsDateTime\" FROM \"CryptoFearAndGreedIndex\"";
+                    const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
 
-                    var assets = await dbConnection.QueryAsync<CryptoFearAndGreedData>(query);
-                    return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(assets);
+                    var assets = await dbConnection.QueryAsync<StockFearAndGreedDomain>(query);
+                    return Result<IEnumerable<StockFearAndGreedDomain>, string>.Success(assets);
                 }, logger);
             }
             catch (Exception exception)
             {
                 logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(exception.ToString());
+                return Result<IEnumerable<StockFearAndGreedDomain>, string>.Fail(exception.ToString());
             }
         }
 
@@ -83,7 +95,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 return Result<IEnumerable<AssetRanking>, string>.Fail(exception.ToString());
             }
         }
-
 
         public async Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticksAsync()
         {
@@ -174,7 +185,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task<IResult<IEnumerable<Pool>, string>> GetPoolsAsync()
+        public async Task<IResult<IEnumerable<PoolEntity>, string>> GetPoolsAsync()
         {
             try
             {
@@ -182,13 +193,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 const string query = "SELECT \"Id\" AS PrimaryId, \"DexId\" AS Provider, \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", " +
                                      "\"FeeTier\" AS FeeTier, \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\" " +
                                      "FROM \"Pools\"";
-                var pools = await dbConnection.QueryAsync<Pool>(query);
-                return Result<IEnumerable<Pool>, string>.Success(pools);
+                var pools = await dbConnection.QueryAsync<PoolEntity>(query);
+                return Result<IEnumerable<PoolEntity>, string>.Success(pools);
             }
             catch (Exception exception)
             {
                 logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<Pool>, string>.Fail(exception.ToString());
+                return Result<IEnumerable<PoolEntity>, string>.Fail(exception.ToString());
             }
         }
 
@@ -226,6 +237,28 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                     await WriteParameter(writer, index.ValueClassification);
                     await WriteParameter(writer, index.TimestampAsDateTime);
                 }
+
+                await writer.CompleteAsync();
+            }
+            catch (Exception exception)
+            {
+                logger.LogError("Exception:{@exception}", exception);
+            }
+        }
+
+        public async Task InsertStockFearAndGreedIndex(StockFearAndGreedDomain stockFearAndGreedEntity)
+        {
+            try
+            {
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
+
+                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"StockFearAndGreedIndex\" (\"Value\", \"ValueClassification\", \"DateTime\") FROM STDIN BINARY");
+
+                await writer.StartRowAsync();
+                await WriteParameter(writer, stockFearAndGreedEntity.Value);
+                await WriteParameter(writer, stockFearAndGreedEntity.ValueClassification);
+                await WriteParameter(writer, stockFearAndGreedEntity.DateTime);
 
                 await writer.CompleteAsync();
             }
@@ -384,7 +417,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertPoolsAsync(IEnumerable<Pool> pools)
+        public async Task InsertPoolsAsync(IEnumerable<PoolEntity> pools)
         {
             try
             {
