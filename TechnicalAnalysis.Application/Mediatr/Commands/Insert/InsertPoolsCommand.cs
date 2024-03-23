@@ -3,8 +3,8 @@ using TechnicalAnalysis.Domain.Entities;
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands.Insert
 {
-    public class InsertPoolsCommand(IEnumerable<Pool> pools) : IRequest
+    public class InsertPoolsCommand(IEnumerable<PoolEntity> pools) : IRequest
     {
-        public IEnumerable<Pool> Pools { get; } = pools;
+        public IEnumerable<PoolEntity> Pools { get; } = pools;
     }
 }
