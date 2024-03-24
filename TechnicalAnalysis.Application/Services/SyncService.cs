@@ -48,9 +48,9 @@ namespace TechnicalAnalysis.Application.Services
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.WallStreetZen, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.AlternativeMeCryptoAndFearIndex || provider == DataProvider.All)
+                if (provider == DataProvider.AlternativeMeCryptoFearAndGreedProvider || provider == DataProvider.All)
                 {
-                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.AlternativeMeCryptoAndFearIndex, timeframe, exchanges));
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.AlternativeMeCryptoFearAndGreedProvider, timeframe, exchanges));
                 }
 
                 if (provider == DataProvider.CoinPaprika || provider == DataProvider.All)
@@ -66,6 +66,11 @@ namespace TechnicalAnalysis.Application.Services
                 if (provider == DataProvider.CoinRanking || provider == DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CoinRanking, timeframe, exchanges));
+                }
+
+                if (provider == DataProvider.RapidApiStockFearAndGreedProvider || provider == DataProvider.All)
+                {
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.RapidApiStockFearAndGreedProvider, timeframe, exchanges));
                 }
 
                 if (adaptersToSync.Count > 0)
