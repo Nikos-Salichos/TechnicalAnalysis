@@ -24,7 +24,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
                         CommonModels.Enums.Timeframe.Daily)),
 
                     syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                        CommonModels.Enums.DataProvider.AlternativeMeCryptoAndFearIndex,
+                        CommonModels.Enums.DataProvider.AlternativeMeCryptoFearAndGreedProvider,
                         CommonModels.Enums.Timeframe.Daily)),
 
                    syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
@@ -58,7 +58,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
 
                 RecurringJob.AddOrUpdate("synchronize_providers_job_alternative_me_crypto_and_fear_index",
                     () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                        CommonModels.Enums.DataProvider.AlternativeMeCryptoAndFearIndex,
+                        CommonModels.Enums.DataProvider.AlternativeMeCryptoFearAndGreedProvider,
                         CommonModels.Enums.Timeframe.Daily)),
                      "*/30 * * * *");
 
