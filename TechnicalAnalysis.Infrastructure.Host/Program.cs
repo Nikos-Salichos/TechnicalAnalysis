@@ -2,6 +2,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Serilog;
 using TechnicalAnalysis.Application.Modules;
+using TechnicalAnalysis.Domain.Modules;
 using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host.Hangfire;
 using TechnicalAnalysis.Infrastructure.Host.Middleware;
@@ -21,16 +22,14 @@ builder.SerilogConfiguration();
 #endregion Serilog
 
 #region Layer Modules
+builder.Services.AddDomainModule(builder.Configuration);
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
 builder.Services.AddApplicationModule(builder.Configuration);
 builder.Services.AddInfrastructureHostModule();
 #endregion Layer Modules
 
-builder.Services.AddAntiforgery(options =>
-{
-    options.SuppressXFrameOptionsHeader = true;
-});
+builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
 
 #region Api Rate Limit
 builder.Services.ConfigureRateLimit();
