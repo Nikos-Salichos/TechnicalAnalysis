@@ -7,7 +7,6 @@ using TechnicalAnalysis.Application.Validations;
 using TechnicalAnalysis.CommonModels.ApiRequests;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
-using TechnicalAnalysis.Domain.Settings;
 
 namespace TechnicalAnalysis.Application.Modules
 {
@@ -31,12 +30,6 @@ namespace TechnicalAnalysis.Application.Modules
             services.AddSingleton<ISyncService, SyncService>();
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
-            services.AddOptions<AlpacaSetting>().Bind(configuration.GetSection("AlpacaSettings"));
-            services.AddOptions<BinanceSetting>().Bind(configuration.GetSection("BinanceSettings"));
-            services.AddOptions<DexSetting>().Bind(configuration.GetSection("DexSettings"));
-            services.AddOptions<CoinMarketCapSetting>().Bind(configuration.GetSection("CoinMarketCap"));
-            services.AddOptions<CoinRankingSetting>().Bind(configuration.GetSection("CoinRanking"));
 
             services.AddSingleton<IValidator<DataProviderTimeframeRequest>, DataProviderTimeframeValidator>();
         }
