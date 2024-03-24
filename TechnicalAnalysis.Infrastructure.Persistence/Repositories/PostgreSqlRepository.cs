@@ -250,17 +250,26 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             try
             {
+                //Add unique constraint in DB like 
+                /*ALTER TABLE "StockFearAndGreedIndex"
+                ADD CONSTRAINT "DateTime_unique"
+                UNIQUE ("DateTime");*/
+
+                const string query =
+                    """
+                        INSERT INTO "StockFearAndGreedIndex" ("Value", "ValueClassification", "DateTime")
+                        VALUES (@Value, @ValueClassification, @DateTime)
+                        ON CONFLICT ("DateTime") DO UPDATE
+                        SET "Value" = EXCLUDED."Value",
+                            "ValueClassification" = EXCLUDED."ValueClassification"
+                    """;
+
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"StockFearAndGreedIndex\" (\"Value\", \"ValueClassification\", \"DateTime\") FROM STDIN BINARY");
-
-                await writer.StartRowAsync();
-                await WriteParameter(writer, stockFearAndGreedEntity.Value);
-                await WriteParameter(writer, stockFearAndGreedEntity.ValueClassification);
-                await WriteParameter(writer, stockFearAndGreedEntity.DateTime);
-
-                await writer.CompleteAsync();
+                await using var transaction = await dbConnection.BeginTransactionAsync();
+                await dbConnection.ExecuteAsync(query, stockFearAndGreedEntity, transaction: transaction);
+                await transaction.CommitAsync();
             }
             catch (Exception exception)
             {
@@ -459,7 +468,6 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                                  "ON CONFLICT (\"ProviderId\") DO UPDATE SET " +
                                  "\"LastAssetSync\" = EXCLUDED.\"LastAssetSync\", " +
                                  "\"LastPairSync\" = EXCLUDED.\"LastPairSync\"";
-
             try
             {
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
