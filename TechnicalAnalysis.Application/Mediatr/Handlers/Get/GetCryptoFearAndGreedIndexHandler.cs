@@ -12,7 +12,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
             var result = await repository.GetCryptoFearAndGreedIndexAsync();
             if (result.HasError)
             {
-                return Enumerable.Empty<CryptoFearAndGreedData>();
+                return [];
             }
             return result.SuccessValue;
         }
