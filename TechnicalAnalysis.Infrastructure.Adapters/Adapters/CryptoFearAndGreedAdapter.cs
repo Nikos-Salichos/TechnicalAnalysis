@@ -6,7 +6,7 @@ using TechnicalAnalysis.Application.Mediatr.Commands.Update;
 using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoAndFearIndex;
+using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
@@ -31,7 +31,17 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             var cryptoFearAndGreedIndexData = (await mediator.Send(new GetCryptoFearAndGreedIndexQuery())).ToList();
 
-            var calculatedDates = CalculateNumberOfDates(cryptoFearAndGreedIndexData);
+            int calculatedDates = 0;
+            if (cryptoFearAndGreedIndexData.Count > 0)
+            {
+                calculatedDates = CalculateNumberOfDates(cryptoFearAndGreedIndexData);
+                if (calculatedDates == 0)
+                {
+                    return true; // If calculated dates are 0 when there are elements, return true
+                }
+            }
+
+            // If there are no elements in cryptoFearAndGreedIndexData we use 0 to fetch data from all providers
             var response = await cryptoFearAndGreedHttpClient.GetCryptoFearAndGreedIndex(calculatedDates);
 
             if (response.HasError)
@@ -48,19 +58,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
         private static int CalculateNumberOfDates(List<CryptoFearAndGreedData> cryptoFearAndGreedData)
         {
-            const int providerAllDaysParam = 1000;
-
-            if (cryptoFearAndGreedData.Count == 0)
-            {
-                return providerAllDaysParam;
-            }
-
             var latestDataBasedOnDatetime = cryptoFearAndGreedData.Max(e => e.TimestampAsDateTime);
-            int numberOfDates = (DateTime.Today - latestDataBasedOnDatetime).Days;
-
-            return numberOfDates is not 0
-                ? numberOfDates
-                : providerAllDaysParam;
+            return (DateTime.Today - latestDataBasedOnDatetime).Days;
         }
     }
 }
