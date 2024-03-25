@@ -2,6 +2,7 @@
 
 ## Project Purpose
 My project's primary objective is to download financial data from various providers and apply technical indicators to analyze this data comprehensively.
+In addition I have expand my project to be able to gather all new layer 1 blockchains based on 3 different providers.
 
 ### Design Highlights
 I have designed a versatile system that seamlessly connects with multiple financial providers to obtain essential financial data. I have integrated with the following providers:
@@ -9,8 +10,12 @@ I have designed a versatile system that seamlessly connects with multiple financ
 - **Binance**: Utilizing the REST API for data retrieval.
 - **Alpaca**: Employing the C# SDK for Alpaca for streamlined integration.
 - **UniswapV3 and PancakeswapV3**: Utilizing GraphQL for efficient data access.
-- **Crypto Fear And Greed Index**: Utilizing the REST API for data retrieval from Alternative.me
+- **Crypto Fear And Greed Index**: Utilizing the REST API for data retrieval from [Alternative.me](https://alternative.me/crypto/fear-and-greed-index/)
 - **CNN Stock Fear And Greed Index**:  Utilizing the REST API for data retrieval from RapidApi
+- **CoinPaprika**: Utilizing the REST API for data retrieval and filter for layer 1 blockchains
+- **CoinMarketCap**: Utilizing the REST API for data retrieval and filter for layer 1 blockchains
+- **CoinRanking**: Utilizing the REST API for data retrieval and filter for layer 1 blockchains
+
 - **WallStreetZen**: Preparing for integration (coming soon).
 
 ### Design Components
