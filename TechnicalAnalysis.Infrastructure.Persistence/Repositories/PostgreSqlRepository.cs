@@ -240,15 +240,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task InsertStockFearAndGreedIndex(StockFearAndGreedDomain stockFearAndGreedEntity)
         {
-            try
-            {
-                //Add unique constraint in DB like 
-                /*ALTER TABLE "StockFearAndGreedIndex"
-                ADD CONSTRAINT "DateTime_unique"
-                UNIQUE ("DateTime");*/
-
-                const string query =
-                    """
+            const string query =
+                """
                         INSERT INTO "StockFearAndGreedIndex" ("Value", "ValueClassification", "DateTime")
                         VALUES (@Value, @ValueClassification, @DateTime)
                         ON CONFLICT ("DateTime") DO UPDATE
@@ -256,17 +249,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                             "ValueClassification" = EXCLUDED."ValueClassification"
                     """;
 
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
 
-                await using var transaction = await dbConnection.BeginTransactionAsync();
-                await dbConnection.ExecuteAsync(query, stockFearAndGreedEntity, transaction: transaction);
-                await transaction.CommitAsync();
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception:{@exception}", exception);
-            }
+            await using var transaction = await dbConnection.BeginTransactionAsync();
+            await dbConnection.ExecuteAsync(query, stockFearAndGreedEntity, transaction: transaction);
+            await transaction.CommitAsync();
         }
 
         public async Task InsertPairsAsync(IEnumerable<Pair> pairs)
