@@ -26,26 +26,18 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
-            try
-            {
-                using var content = httpResponseMessage.Content;
-                await using var jsonStream = await content.ReadAsStreamAsync();
+            using var content = httpResponseMessage.Content;
+            await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<CryptoFearAndGreedRoot>(jsonStream, JsonHelper.JsonSerializerOptions);
-                if (deserializedData is not null)
-                {
-                    logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
-                    return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(deserializedData.CryptoFearAndGreedDatas);
-                }
-
-                logger.LogWarning("Deserialization Failed");
-                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail($"{nameof(GetCryptoFearAndGreedIndex)} Deserialization Failed");
-            }
-            catch (Exception exception)
+            var deserializedData = await JsonSerializer.DeserializeAsync<CryptoFearAndGreedRoot>(jsonStream, JsonHelper.JsonSerializerOptions);
+            if (deserializedData is not null)
             {
-                logger.LogError("{exception}", exception);
-                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(exception.ToString());
+                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
+                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(deserializedData.CryptoFearAndGreedDatas);
             }
+
+            logger.LogWarning("Deserialization Failed");
+            return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail($"{nameof(GetCryptoFearAndGreedIndex)} Deserialization Failed");
         }
     }
 }
