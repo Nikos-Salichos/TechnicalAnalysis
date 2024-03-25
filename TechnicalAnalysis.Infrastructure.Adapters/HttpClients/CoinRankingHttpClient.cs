@@ -43,26 +43,18 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<CoinRankingAssetContract, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
-            try
-            {
-                using var content = httpResponseMessage.Content;
-                await using var jsonStream = await content.ReadAsStreamAsync();
+            using var content = httpResponseMessage.Content;
+            await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<CoinRankingAssetContract>(jsonStream, JsonHelper.JsonSerializerOptions);
-                if (deserializedData is not null)
-                {
-                    logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
-                    return Result<CoinRankingAssetContract, string>.Success(deserializedData);
-                }
-
-                logger.LogWarning("Deserialization Failed");
-                return Result<CoinRankingAssetContract, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
-            }
-            catch (Exception exception)
+            var deserializedData = await JsonSerializer.DeserializeAsync<CoinRankingAssetContract>(jsonStream, JsonHelper.JsonSerializerOptions);
+            if (deserializedData is not null)
             {
-                logger.LogError("{exception}", exception);
-                return Result<CoinRankingAssetContract, string>.Fail(exception.ToString());
+                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
+                return Result<CoinRankingAssetContract, string>.Success(deserializedData);
             }
+
+            logger.LogWarning("Deserialization Failed");
+            return Result<CoinRankingAssetContract, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
 }
