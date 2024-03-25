@@ -31,26 +31,19 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<BinanceExchangeInfoResponse, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
-            try
-            {
-                using var content = httpResponseMessage.Content;
-                await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
-                if (deserializedData is not null)
-                {
-                    logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
-                    return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
-                }
+            using var content = httpResponseMessage.Content;
+            await using var jsonStream = await content.ReadAsStreamAsync();
 
-                logger.LogWarning("Deserialization Failed");
-                return Result<BinanceExchangeInfoResponse, string>.Fail($"{nameof(GetBinanceAssetsAndPairs)} Deserialization Failed");
-            }
-            catch (Exception exception)
+            var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
+            if (deserializedData is not null)
             {
-                logger.LogError("{exception}", exception);
-                return Result<BinanceExchangeInfoResponse, string>.Fail(exception.ToString());
+                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
+                return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
             }
+
+            logger.LogWarning("Deserialization Failed");
+            return Result<BinanceExchangeInfoResponse, string>.Fail($"{nameof(GetBinanceAssetsAndPairs)} Deserialization Failed");
         }
 
         public async Task<IResult<object[][], string>> GetBinanceCandlesticks(IDictionary<string, string>? queryParams = null)
