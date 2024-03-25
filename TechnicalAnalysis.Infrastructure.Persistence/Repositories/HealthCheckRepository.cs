@@ -13,15 +13,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             await using var connection = new NpgsqlConnection(_connectionStringKey);
-            try
-            {
-                await connection.OpenAsync(cancellationToken);
-                return HealthCheckResult.Healthy();
-            }
-            catch (Exception)
-            {
-                return HealthCheckResult.Unhealthy();
-            }
+            await connection.OpenAsync(cancellationToken);
+            return HealthCheckResult.Healthy();
         }
     }
 }
