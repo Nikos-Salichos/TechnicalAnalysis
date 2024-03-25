@@ -46,26 +46,19 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<CoinMarketCapAssetContract, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
-            try
-            {
-                using var content = httpResponseMessage.Content;
-                await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<CoinMarketCapAssetContract>(jsonStream, JsonHelper.JsonSerializerOptions);
-                if (deserializedData is not null)
-                {
-                    logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
-                    return Result<CoinMarketCapAssetContract, string>.Success(deserializedData);
-                }
+            using var content = httpResponseMessage.Content;
+            await using var jsonStream = await content.ReadAsStreamAsync();
 
-                logger.LogWarning("Deserialization Failed");
-                return Result<CoinMarketCapAssetContract, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
-            }
-            catch (Exception exception)
+            var deserializedData = await JsonSerializer.DeserializeAsync<CoinMarketCapAssetContract>(jsonStream, JsonHelper.JsonSerializerOptions);
+            if (deserializedData is not null)
             {
-                logger.LogError("{exception}", exception);
-                return Result<CoinMarketCapAssetContract, string>.Fail(exception.ToString());
+                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
+                return Result<CoinMarketCapAssetContract, string>.Success(deserializedData);
             }
+
+            logger.LogWarning("Deserialization Failed");
+            return Result<CoinMarketCapAssetContract, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
 }
