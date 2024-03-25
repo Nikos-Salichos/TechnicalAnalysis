@@ -34,22 +34,14 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<StockFearAndGreedDomain>, string>> GetStockFearAndGreedIndexAsync()
         {
-            try
+            return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
-                return await ExecutionTimeLogger.LogExecutionTime(async () =>
-                {
-                    await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                    const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
 
-                    var assets = await dbConnection.QueryAsync<StockFearAndGreedDomain>(query);
-                    return Result<IEnumerable<StockFearAndGreedDomain>, string>.Success(assets);
-                }, logger);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<StockFearAndGreedDomain>, string>.Fail(exception.ToString());
-            }
+                var assets = await dbConnection.QueryAsync<StockFearAndGreedDomain>(query);
+                return Result<IEnumerable<StockFearAndGreedDomain>, string>.Success(assets);
+            }, logger);
         }
 
         public async Task<IResult<IEnumerable<Asset>, string>> GetAssetsAsync()
