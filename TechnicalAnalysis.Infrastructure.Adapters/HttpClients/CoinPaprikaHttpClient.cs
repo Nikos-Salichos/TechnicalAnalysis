@@ -29,27 +29,18 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
-            try
-            {
-                using var content = httpResponseMessage.Content;
-                await using var jsonStream = await content.ReadAsStreamAsync();
+            using var content = httpResponseMessage.Content;
+            await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<IEnumerable<CoinPaprikaAssetContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
-                if (deserializedData is not null)
-                {
-                    logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
-                    return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Success(deserializedData);
-                }
-
-                logger.LogWarning("Deserialization Failed");
-                return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
-            }
-            catch (Exception exception)
+            var deserializedData = await JsonSerializer.DeserializeAsync<IEnumerable<CoinPaprikaAssetContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
+            if (deserializedData is not null)
             {
-                logger.LogError("{exception}", exception);
-                return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Fail(exception.ToString());
+                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
+                return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Success(deserializedData);
             }
 
+            logger.LogWarning("Deserialization Failed");
+            return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
 }
