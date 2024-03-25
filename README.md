@@ -54,5 +54,5 @@ Technologies & Tools used:
 - Develop client endpoints
 - Endpoint that consumer can pass the candlestick data and we will produce indicators on this data
 - Implement WallStreetZen
-- Add tests using Wiremock: https://wiremock.org/
+- Add integration tests using testcontainers
 - Export to Nuget (Client + Common models only)
