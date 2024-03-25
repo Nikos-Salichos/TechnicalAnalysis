@@ -32,7 +32,7 @@ To set up the project, you'll need to populate the `appsettings.json` file with 
 
 ### Architecture, technologies & tools
 I have follow the principals of Clean Architecture with some personal changes.
-Architecture Diagram: https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723
+Architecture Diagram: https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723 (pending to update with latest providers)
 
 Technologies & Tools used:
 - .C# (.NET 8)
