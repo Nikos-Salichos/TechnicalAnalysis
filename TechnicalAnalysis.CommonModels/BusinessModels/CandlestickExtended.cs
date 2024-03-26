@@ -65,6 +65,8 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public decimal? Fees { get; set; }
         public decimal? TotalValueLockedUsd { get; set; }
         public int? ConsecutiveCandlesticksBelowSma { get; set; }
+        public decimal? PercentageFromAllTimeHigh { get; set; }
+        public decimal? DaysFromAllTimeHigh { get; set; }
 
         public decimal? InternalBarStrength
             => HighPrice - LowPrice == 0
