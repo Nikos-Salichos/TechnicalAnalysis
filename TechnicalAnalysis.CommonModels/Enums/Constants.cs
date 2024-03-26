@@ -24,6 +24,7 @@
         public const int SimpleMovingAveragePeriod = 7;
 
         public const int DecimalPlacesRound = 20;
-        public const double ThresholdPercentage = 10;
+        public const double EtfThresholdPercentage = 5;
+        public const double CryptoThresholdPercentage = 5;
     }
 }
