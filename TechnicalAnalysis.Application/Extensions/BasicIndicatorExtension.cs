@@ -73,6 +73,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateFractalLowestHigh(pair);
             CalculateHighestHigh(pair);
             CalculateLowestLow(pair);
+            CalculateStatisticsFromAllTimeHigh(pair);
 
             CalculateHighestClose(pair);
 
@@ -536,6 +537,31 @@ namespace TechnicalAnalysis.Application.Extensions
                     Value = lowestLow,
                     PriceType = PriceType.Low
                 });
+            }
+        }
+
+        private static void CalculateStatisticsFromAllTimeHigh(PairExtended pair)
+        {
+            if (pair.Candlesticks.Count == 0)
+            {
+                return;
+            }
+
+            decimal? maxHighPriceSoFar = 0;
+            int lastAllTimeHighIndex = -1;
+
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            {
+                var currentCandlestick = pair.Candlesticks[i];
+
+                if (currentCandlestick.HighPrice > maxHighPriceSoFar)
+                {
+                    maxHighPriceSoFar = currentCandlestick.HighPrice;
+                    lastAllTimeHighIndex = i;
+                }
+
+                currentCandlestick.PercentageFromAllTimeHigh = ((currentCandlestick.ClosePrice / maxHighPriceSoFar) - 1) * 100;
+                currentCandlestick.DaysFromAllTimeHigh = i - lastAllTimeHighIndex;
             }
         }
 
