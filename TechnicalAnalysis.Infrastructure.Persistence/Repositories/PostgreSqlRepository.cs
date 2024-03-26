@@ -46,21 +46,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<Asset>, string>> GetAssetsAsync()
         {
-            try
+            return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
-                return await ExecutionTimeLogger.LogExecutionTime(async () =>
-                {
-                    await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                    const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol, \"AssetType\" AS AssetType FROM \"Assets\"";
-                    var assets = await dbConnection.QueryAsync<Asset>(query);
-                    return Result<IEnumerable<Asset>, string>.Success(assets);
-                }, logger);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<Asset>, string>.Fail(exception.ToString());
-            }
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol, \"AssetType\" AS AssetType FROM \"Assets\"";
+                var assets = await dbConnection.QueryAsync<Asset>(query);
+                return Result<IEnumerable<Asset>, string>.Success(assets);
+            }, logger);
         }
 
         public async Task<IResult<IEnumerable<AssetRanking>, string>> GetCoinPaprikaAssetsAsync()
