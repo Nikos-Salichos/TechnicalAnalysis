@@ -53,7 +53,9 @@ namespace TechnicalAnalysis.Application.Services
                                                                         {
                                                                             CandlestickCloseDate = group.First().CloseDate,
                                                                             EnhancedScans = group.First().EnhancedScans.ToList(),
-                                                                            CandlestickClosePrice = group.First().ClosePrice
+                                                                            CandlestickClosePrice = group.First().ClosePrice,
+                                                                            DaysFromAllTimeHigh = group.First().DaysFromAllTimeHigh,
+                                                                            PercentageFromAllTimeHigh = group.First().PercentageFromAllTimeHigh
                                                                         }).ToList();
                     return new EnhancedPairResult
                     {
@@ -689,7 +691,7 @@ namespace TechnicalAnalysis.Application.Services
                 }
             }
 
-            cryptoMarketStatistic.CalculateAndFilterPercentages(Constants.ThresholdPercentage);
+            cryptoMarketStatistic.CalculateAndFilterPercentages(Constants.CryptoThresholdPercentage);
 
             var baseDirectory = GetBaseDirectory();
             if (string.IsNullOrWhiteSpace(baseDirectory))
@@ -743,7 +745,7 @@ namespace TechnicalAnalysis.Application.Services
                 }
             }
 
-            etfStockMarketStatistic.CalculateAndFilterPercentages(Constants.ThresholdPercentage);
+            etfStockMarketStatistic.CalculateAndFilterPercentages(Constants.EtfThresholdPercentage);
 
             var baseDirectory = GetBaseDirectory();
             if (string.IsNullOrWhiteSpace(baseDirectory))
