@@ -3,13 +3,10 @@ version: '3.4'
 services:
   ta.api:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000
-    #Not working - ASPNETCORE_ENVIRONMENT=Production
-    #ASPNETCORE_URLS=https://+:5001;http://+:5000
-    # ports:
-    #   - "5000:5000"
-    #   - "5001:5001"
+       - ASPNETCORE_ENVIRONMENT=Development
+       - ASPNETCORE_URLS=http://+:5000 # Application listens on port 8081 within the container
+    ports:
+       - "5000:5000"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -17,7 +14,12 @@ services:
   ta.gateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:3000
-      - ASPNETCORE_HTTPS_PORTS=3001
+      - ASPNETCORE_HTTP_PORTS=8080 # Application listens on port 8080 within the container
+      - ASPNETCORE_HTTPS_PORTS=8081 # Application listens on port 8081 within the container
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456789
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
+    ports:
+       - "3000:8080"
+       - "3001:8081"
     volumes:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
