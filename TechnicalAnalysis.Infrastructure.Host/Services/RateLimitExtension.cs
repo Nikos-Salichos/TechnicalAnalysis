@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Services
                                                partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
                                                factory: _ => new FixedWindowRateLimiterOptions
                                                {
-                                                   PermitLimit = 3,
+                                                   PermitLimit = 5,
                                                    Window = TimeSpan.FromMinutes(1)
                                                }));
                                    });
