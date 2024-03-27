@@ -183,6 +183,32 @@ ALTER TABLE public."CryptoFearAndGreedIndex" ALTER COLUMN "PrimaryId" ADD GENERA
 );
 
 
+
+CREATE TABLE public."StockFearAndGreedIndex" (
+    "PrimaryId" bigint NOT NULL,
+    "Value" text NOT NULL,
+    "ValueClassification" text NOT NULL,
+    "DateTime" timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public."StockFearAndGreedIndex" OWNER TO postgres;
+
+ALTER TABLE public."StockFearAndGreedIndex" ALTER COLUMN "PrimaryId" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."StockFearAndGreedIndex_PrimaryId_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+ALTER TABLE ONLY public."StockFearAndGreedIndex"
+    ADD CONSTRAINT "unique_stockfearandgreedindex_datetime" UNIQUE ("DateTime");
+
+
 --
 -- TOC entry 221 (class 1259 OID 48696)
 -- Name: DexCandlesticks; Type: TABLE; Schema: public; Owner: postgres
@@ -396,10 +422,11 @@ INSERT INTO public."Providers" ("Id", "Name") VALUES
   (4, 'Alpaca'),
   (5, 'WallStreetZen'),
   (6, 'All'),
-  (7, 'AlternativeMeCryptoAndFearIndex'),
+  (7, 'AlternativeMeCryptoFearAndGreedIndex'),
   (8, 'CoinPaprika'),
   (9, 'CoinMarketCap'),
-  (10, 'CoinRanking');
+  (10, 'CoinRanking'),
+  (11, 'RapidApiCryptoFearAndGreedIndex');
 
 
 --
