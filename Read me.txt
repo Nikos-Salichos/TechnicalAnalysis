@@ -23,10 +23,8 @@ and copy paste this line in the end:
 host    TechnicalAnalysis    postgres    192.168.1.11/32    md5
 
 
-
 How to connect to docker container postgresql from pgadmin running in docker:
 https://www.youtube.com/watch?v=3nIc5GNmh98&ab_channel=CodewithSalman
-
 
 
 Proxy details:
@@ -34,8 +32,10 @@ In order to reach proxy
 Right click solution --> properties --> set composer & TechnicalAnalysis.Infrastructure.GatewayApi to start together
 When both load:
 Pick an endpoint that load from composer like:
-https://localhost:3201/api/v1/analysis/IndicatorsByPairName?pairName=aaaa&timeframe=Daily
+http://localhost:5000/api/v1/analysis/IndicatorsByPairName?pairName=aaaa&timeframe=Daily
 and replace it to use port of gateway like:
-https://localhost:32774/api/v1/analysis/IndicatorsByPairName?pairName=aaaa&timeframe=Daily
+https://localhost:3001/api/v1/analysis/IndicatorsByPairName?pairName=aaaa&timeframe=Daily
 It should return 2xx code
 
+Hosting ASP.NET Core images with Docker over HTTPS
+https://learn.microsoft.com/en-us/aspnet/core/security/docker-https?view=aspnetcore-8.0
