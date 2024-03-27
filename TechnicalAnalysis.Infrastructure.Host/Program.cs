@@ -43,29 +43,21 @@ builder.Services.AddHangfire(configuration =>
 
 builder.Services.AddHangfireServer();
 
-builder.Services.AddHttpsRedirection(options => options.HttpsPort = 5001);
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
 app.UseSwagger();
+
 app.UseSwaggerUI();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-app.UseMiddleware<LogHeadersMiddleware>();
-
-app.UseSerilogRequestLogging();
+app.UseSerilogRequestLogging(options
+  => options.EnrichDiagnosticContext = LogRequestEnricher.LogAdditionalInfo);
 
 app.UseMiddleware<ApiKeyMiddleware>();
-
-//Remove comment to enable https app.UseHsts();
-
-//Remove comment to enable https app.UseHttpsRedirection();
 
 app.UseCors();
 
@@ -94,6 +86,6 @@ app.MapControllers();
 app.Run();
 
 /// <summary>
-/// I need to declare Program for test containers nuget (integration testing)
+/// I must declare Program partial class for testcontainers nuget (integration tests)
 /// </summary>
 public partial class Program { }
