@@ -16,8 +16,6 @@ services:
     build:
       context: .
       dockerfile: TechnicalAnalysis.Infrastructure.Gateway/Dockerfile
-    ports:
-      - 3000:3000
     networks:
       - postgres-db-network
 
@@ -33,7 +31,6 @@ services:
     user: root
     ports:
       - 5000:5000
-      #Remove comment to enable https - 5001:5001
     environment:
      DB_CONNECTION_STRING: "Host=postgresql.api;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
     networks:
