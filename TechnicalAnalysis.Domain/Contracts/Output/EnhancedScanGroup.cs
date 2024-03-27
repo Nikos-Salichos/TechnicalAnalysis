@@ -7,5 +7,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Output
         public DateTime CandlestickCloseDate { get; init; }
         public List<EnhancedScan> EnhancedScans { get; init; } = [];
         public decimal? CandlestickClosePrice { get; init; }
+        public decimal? PercentageFromAllTimeHigh { get; set; }
+        public decimal? DaysFromAllTimeHigh { get; set; }
     }
 }
