@@ -74,28 +74,20 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticksAsync()
         {
-            try
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"Id\" AS PrimaryId, " +
-                    "\"open_date\" AS OpenDate, " +
-                    "\"open_price\" AS OpenPrice, " +
-                    "\"high_price\" AS HighPrice, " +
-                    "\"low_price\" AS LowPrice, " +
-                    "\"close_price\" AS ClosePrice," +
-                    " \"volume\" AS Volume, " +
-                    "\"close_date\" AS CloseDate, " +
-                    "\"number_of_trades\" AS NumberOfTrades," +
-                    " \"timeframe\" AS Timeframe, " +
-                    "\"pair_id\" AS PairId FROM \"Candlesticks\"";
-                var candlesticks = await dbConnection.QueryAsync<Candlestick>(query);
-                return Result<IEnumerable<Candlestick>, string>.Success(candlesticks);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<Candlestick>, string>.Fail(exception.ToString());
-            }
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            const string query = "SELECT \"Id\" AS PrimaryId, " +
+                "\"open_date\" AS OpenDate, " +
+                "\"open_price\" AS OpenPrice, " +
+                "\"high_price\" AS HighPrice, " +
+                "\"low_price\" AS LowPrice, " +
+                "\"close_price\" AS ClosePrice," +
+                " \"volume\" AS Volume, " +
+                "\"close_date\" AS CloseDate, " +
+                "\"number_of_trades\" AS NumberOfTrades," +
+                " \"timeframe\" AS Timeframe, " +
+                "\"pair_id\" AS PairId FROM \"Candlesticks\"";
+            var candlesticks = await dbConnection.QueryAsync<Candlestick>(query);
+            return Result<IEnumerable<Candlestick>, string>.Success(candlesticks);
         }
 
         public async Task<IResult<IEnumerable<Pair>, string>> GetPairsAsync()
