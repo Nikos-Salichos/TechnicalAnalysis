@@ -100,11 +100,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<ProviderSynchronization>, string>> GetProvidersAsync()
         {
-            try
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
 
-                const string providerPairAssetSyncInfoQuery = @"
+            const string providerPairAssetSyncInfoQuery = @"
                                         SELECT
                                             p.""Id"" AS PrimaryId,
                                             p.""ProviderId"" AS DataProvider,
@@ -113,7 +111,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                                         FROM
                                             public.""ProviderPairAssetSyncInfos"" p";
 
-                const string providerCandlestickSyncInfoQuery = @"
+            const string providerCandlestickSyncInfoQuery = @"
                                             SELECT
                                                 p.""Id"" AS PrimaryId,
                                                 p.""ProviderId"" AS DataProvider,
@@ -122,27 +120,21 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                                             FROM
                                                 public.""ProviderCandlestickSyncInfos"" p";
 
-                var syncInfos = await dbConnection.QueryMultipleAsync(providerPairAssetSyncInfoQuery + ";" + providerCandlestickSyncInfoQuery);
+            var syncInfos = await dbConnection.QueryMultipleAsync(providerPairAssetSyncInfoQuery + ";" + providerCandlestickSyncInfoQuery);
 
-                var providerPairAssetSyncInfos = await syncInfos.ReadAsync<ProviderPairAssetSyncInfo>();
-                var providerCandlestickSyncInfos = await syncInfos.ReadAsync<ProviderCandlestickSyncInfo>();
+            var providerPairAssetSyncInfos = await syncInfos.ReadAsync<ProviderPairAssetSyncInfo>();
+            var providerCandlestickSyncInfos = await syncInfos.ReadAsync<ProviderCandlestickSyncInfo>();
 
-                var providerSynchronizations = providerPairAssetSyncInfos
-                            .GroupJoin(providerCandlestickSyncInfos, pair => pair.DataProvider, candlestick => candlestick.DataProvider,
-                                (pair, candlesticks) => new ProviderSynchronization()
-                                {
-                                    ProviderPairAssetSyncInfo = pair,
-                                    CandlestickSyncInfos = candlesticks.ToList()
-                                })
-                            .ToList();
+            var providerSynchronizations = providerPairAssetSyncInfos
+                        .GroupJoin(providerCandlestickSyncInfos, pair => pair.DataProvider, candlestick => candlestick.DataProvider,
+                            (pair, candlesticks) => new ProviderSynchronization()
+                            {
+                                ProviderPairAssetSyncInfo = pair,
+                                CandlestickSyncInfos = candlesticks.ToList()
+                            })
+                        .ToList();
 
-                return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<ProviderSynchronization>, string>.Fail(exception.ToString());
-            }
+            return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
         }
 
         public async Task<IResult<IEnumerable<PoolEntity>, string>> GetPoolsAsync()
