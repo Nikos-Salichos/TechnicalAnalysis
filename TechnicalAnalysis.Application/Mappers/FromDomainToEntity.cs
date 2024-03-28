@@ -81,7 +81,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 IsActive = pair.IsActive
             };
 
-        public static List<PoolEntity> DexToEntityPool(this IEnumerable<PairExtended> pairs)
+        public static List<PoolEntity> DexPoolToEntityPool(this IEnumerable<PairExtended> pairs)
             => pairs.Select(c => c.DexToEntityToken()).ToList();
     }
 }
