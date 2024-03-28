@@ -14,44 +14,29 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
-            var stockFearAndGreedIndexData = (await mediator.Send(new GetStockFearAndGreedIndexQuery())).ToList();
+            var stockFearAndGreedIndexData = await mediator.Send(new GetStockFearAndGreedIndexQuery());
 
-            var missingDays = CalculateDaysSinceLatestData(stockFearAndGreedIndexData);
-            if (missingDays <= 0)
+            var latestDatetime = stockFearAndGreedIndexData.FirstOrDefault()?.DateTime ?? DateTime.MinValue;
+
+            if (latestDatetime <= DateTime.UtcNow.Date)
             {
-                logger.LogInformation("{Provider} synchronized for today", provider);
-                return false;
+                var response = await stockFearAndGreedHttpClient.GetStockFearAndGreedIndex();
+                if (response.HasError)
+                {
+                    return false;
+                }
+
+                var stockFearAndGreedDomain = response.SuccessValue.ToDomain();
+                if (stockFearAndGreedDomain is null)
+                {
+                    logger.LogInformation("{stockFearAndGreedDomain} domain model is null", stockFearAndGreedDomain);
+                    return false;
+                }
+
+                await mediator.Send(new InsertStockFearAndGreedIndexCommand(stockFearAndGreedDomain));
             }
-
-            var response = await stockFearAndGreedHttpClient.GetStockFearAndGreedIndex();
-
-            if (response.HasError)
-            {
-                return false;
-            }
-
-            var stockFearAndGreedDomain = response.SuccessValue.ToDomain();
-
-            if (stockFearAndGreedDomain is null)
-            {
-                logger.LogInformation("{stockFearAndGreedDomain} domain model is null", stockFearAndGreedDomain);
-                return false;
-            }
-
-            await mediator.Send(new InsertStockFearAndGreedIndexCommand(stockFearAndGreedDomain));
 
             return true;
-        }
-
-        private static int CalculateDaysSinceLatestData(List<StockFearAndGreedDomain> stockFearAndGreedEntities)
-        {
-            if (stockFearAndGreedEntities.Count == 0)
-            {
-                return 1;
-            }
-
-            var latestDataBasedOnDatetime = stockFearAndGreedEntities.Max(e => e.DateTime);
-            return (DateTime.Today - latestDataBasedOnDatetime).Days;
         }
     }
 }
