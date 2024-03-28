@@ -33,22 +33,31 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             //Add more stocks from here: https://www.wallstreetzen.com/stock-screener?p=1&s=mc&sd=desc&t=1
             //Check top owned stocks: https://www.dataroma.com/m/home.php
-            var stockSymbols = new List<string> {
-                "vt","vti", "VTV", "PFF", "SPHD", "XLRE", "nke", "ba",
-                "tsla", "aapl", "googl", "abnb", "JNJ", "XOM","xom", "WMT", "META", "JPM","V", "KO", "PEP",
-                "MCD", "AVGO", "ACN", "NFLX","WCF","ABDE",
-                "MA","BAC","MS","SCHW","RY","MSFT","NVDA","CRM","VZ","IBM","EWH","MCHI","EWS",
-                "FEZ","IWM","SPY","DIA","DAX","VGK","QQQ",
-                "IVV","VUG","VB","VNQ","XLE","XLF","BND","VUG","vea", "VWO", "GLD", "VXUS", "VO", "IWM",
-                "XLV", "PYPL","IWD","IJH","ITOT","JEPI","SPYV", "VOT","VDE", "voo", "WBA",
-                "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG", "PEP", "JNJ", "NSRGY","NVDA","TSM","LLY","NVO",
-                "AVGO", "BRK.B", "V", "JPM", "WMT", "MA", "UNH", "XOM", "PG", "ASML","HD","ORCL","COST","ABBV","AMD",
-                "TM", "MRK", "CRM", "GOOG"
-            };
+            List<string> stockTickers = new()
+                {
+                    "nke", "ba", "tsla", "aapl", "googl", "abnb", "JNJ", "XOM", "WMT", "META",
+                    "JPM", "V", "KO", "PEP", "MCD", "AVGO", "ACN", "NFLX", "WCF", "ABDE",
+                    "MA", "BAC", "MS", "SCHW", "RY", "MSFT", "NVDA", "CRM", "VZ", "IBM",
+                    "PYPL", "IWD", "IJH", "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG",
+                    "NSRGY", "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG"
+                };
 
-            stockSymbols.AddRange(tenStocksToOwnForever);
+            List<string> etfTickers = new()
+                {
+                    "vt", "vti", "VTV", "PFF", "SPHD", "XLRE", "EWH", "MCHI", "EWS", "FEZ",
+                    "IWM", "SPY", "DIA", "DAX", "VGK", "QQQ", "IVV", "VUG", "VB", "VNQ",
+                    "XLE", "XLF", "BND", "vea", "VWO", "GLD", "VXUS", "VO", "JEPI", "SPYV",
+                    "VOT", "VDE", "voo", "ITOT"
+                };
 
-            stockSymbols = stockSymbols.Select(symbol => symbol.ToUpperInvariant())
+            var allSymbols = new List<string>();
+            allSymbols.AddRange(tenStocksToOwnForever);
+            allSymbols.AddRange(stockTickers);
+            allSymbols.AddRange(etfTickers);
+
+            allSymbols.AddRange(tenStocksToOwnForever);
+
+            allSymbols = allSymbols.Select(symbol => symbol.ToUpperInvariant())
                                        .Distinct(StringComparer.InvariantCultureIgnoreCase)
                                        .ToList();
 
@@ -56,7 +65,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var fetchedAssetNames = fetchedAssets.Select(f => f.Symbol).ToList();
 
             bool allStockSymbolsExist = true;
-            foreach (var symbol in stockSymbols)
+            foreach (var symbol in allSymbols)
             {
                 var assetFound = fetchedAssetNames.Find(name => string.Equals(name, symbol, StringComparison.InvariantCultureIgnoreCase));
                 if (assetFound is null)
@@ -72,8 +81,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return true;
             }
 
-            await SyncAssets(fetchedAssets, stockSymbols);
-            await SyncPairs(stockSymbols);
+            await SyncAssets(fetchedAssets, allSymbols);
+            await SyncPairs(allSymbols);
             var candlesticksUpdated = await SyncCandlesticks(timeframe);
 
             if (!candlesticksUpdated)
