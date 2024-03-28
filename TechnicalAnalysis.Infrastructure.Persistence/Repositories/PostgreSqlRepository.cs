@@ -149,20 +149,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlesticksAsync()
         {
-            try
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"Id\" AS PrimaryId, \"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\" AS OpenPrice, \"High\" AS HighPrice, \"Low\" AS LowPrice, " +
-                                     "\"Close\" AS ClosePrice, \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\" " +
-                                     "FROM \"DexCandlesticks\"";
-                var dexCandlesticks = await dbConnection.QueryAsync<DexCandlestick>(query);
-                return Result<IEnumerable<DexCandlestick>, string>.Success(dexCandlesticks);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<DexCandlestick>, string>.Fail(exception.ToString());
-            }
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            const string query = "SELECT \"Id\" AS PrimaryId, \"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\" AS OpenPrice, \"High\" AS HighPrice, \"Low\" AS LowPrice, " +
+                                 "\"Close\" AS ClosePrice, \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\" " +
+                                 "FROM \"DexCandlesticks\"";
+            var dexCandlesticks = await dbConnection.QueryAsync<DexCandlestick>(query);
+            return Result<IEnumerable<DexCandlestick>, string>.Success(dexCandlesticks);
         }
 
         public async Task InsertCryptoFearAndGreedIndex(IEnumerable<CryptoFearAndGreedData> indexes)
