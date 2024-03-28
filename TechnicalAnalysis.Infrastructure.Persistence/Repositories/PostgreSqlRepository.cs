@@ -92,18 +92,10 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<Pair>, string>> GetPairsAsync()
         {
-            try
-            {
-                await using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"id\" AS PrimaryId, \"symbol\" AS Symbol, \"asset0_id\" AS BaseAssetId, \"asset1_id\" AS QuoteAssetId, \"provider_id\" AS Provider, \"is_active\" AS IsActive, \"all_candles\" AS AllCandles, \"created_at\" AS CreatedAt FROM \"Pairs\"";
-                var pairs = await dbConnection.QueryAsync<Pair>(query);
-                return Result<IEnumerable<Pair>, string>.Success(pairs);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<Pair>, string>.Fail(exception.ToString());
-            }
+            await using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
+            const string query = "SELECT \"id\" AS PrimaryId, \"symbol\" AS Symbol, \"asset0_id\" AS BaseAssetId, \"asset1_id\" AS QuoteAssetId, \"provider_id\" AS Provider, \"is_active\" AS IsActive, \"all_candles\" AS AllCandles, \"created_at\" AS CreatedAt FROM \"Pairs\"";
+            var pairs = await dbConnection.QueryAsync<Pair>(query);
+            return Result<IEnumerable<Pair>, string>.Success(pairs);
         }
 
         public async Task<IResult<IEnumerable<ProviderSynchronization>, string>> GetProvidersAsync()
