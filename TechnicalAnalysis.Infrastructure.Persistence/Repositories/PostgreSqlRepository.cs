@@ -57,27 +57,19 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<AssetRanking>, string>> GetCoinPaprikaAssetsAsync()
         {
-            try
+            return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
-                return await ExecutionTimeLogger.LogExecutionTime(async () =>
-                {
-                    await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                    const string query = "SELECT \"Id\" AS Id," +
-                    "\"Name\" AS Name, " +
-                    "\"Symbol\" AS Symbol, " +
-                    "\"CreatedDate\" AS CreatedDate, " +
-                    "\"AssetType\" AS AssetType, " +
-                    "\"Provider\" AS DataProvider " +
-                    "FROM \"CoinPaprikaAssets\"";
-                    var assets = await dbConnection.QueryAsync<AssetRanking>(query);
-                    return Result<IEnumerable<AssetRanking>, string>.Success(assets);
-                }, logger);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<AssetRanking>, string>.Fail(exception.ToString());
-            }
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                const string query = "SELECT \"Id\" AS Id," +
+                "\"Name\" AS Name, " +
+                "\"Symbol\" AS Symbol, " +
+                "\"CreatedDate\" AS CreatedDate, " +
+                "\"AssetType\" AS AssetType, " +
+                "\"Provider\" AS DataProvider " +
+                "FROM \"CoinPaprikaAssets\"";
+                var assets = await dbConnection.QueryAsync<AssetRanking>(query);
+                return Result<IEnumerable<AssetRanking>, string>.Success(assets);
+            }, logger);
         }
 
         public async Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticksAsync()
