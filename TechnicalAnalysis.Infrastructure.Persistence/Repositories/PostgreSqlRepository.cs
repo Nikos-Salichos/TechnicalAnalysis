@@ -139,20 +139,12 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<IEnumerable<PoolEntity>, string>> GetPoolsAsync()
         {
-            try
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"Id\" AS PrimaryId, \"DexId\" AS Provider, \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", " +
-                                     "\"FeeTier\" AS FeeTier, \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\" " +
-                                     "FROM \"Pools\"";
-                var pools = await dbConnection.QueryAsync<PoolEntity>(query);
-                return Result<IEnumerable<PoolEntity>, string>.Success(pools);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<IEnumerable<PoolEntity>, string>.Fail(exception.ToString());
-            }
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            const string query = "SELECT \"Id\" AS PrimaryId, \"DexId\" AS Provider, \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", " +
+                                 "\"FeeTier\" AS FeeTier, \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\" " +
+                                 "FROM \"Pools\"";
+            var pools = await dbConnection.QueryAsync<PoolEntity>(query);
+            return Result<IEnumerable<PoolEntity>, string>.Success(pools);
         }
 
         public async Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlesticksAsync()
