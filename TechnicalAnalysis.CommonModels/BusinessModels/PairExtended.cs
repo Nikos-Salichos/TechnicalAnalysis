@@ -23,6 +23,8 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public decimal? TotalValueLocked { get; init; }
         public decimal? Volume { get; init; }
         public long? NumberOfTrades { get; init; }
+        public decimal? AllTimeHighPrice { get; set; }
+        public decimal? AllTimeLowPrice { get; set; }
         public List<CandlestickExtended> Candlesticks { get; set; } = [];
 
         public bool Equals(PairExtended? other)
@@ -42,6 +44,4 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
 
         public override int GetHashCode() => HashCode.Combine(BaseAssetId, QuoteAssetId, Provider);
     }
-
-
 }
