@@ -262,34 +262,27 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
         {
-            try
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
+
+            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") FROM STDIN BINARY");
+            foreach (var candlestick in candlesticks)
             {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
+                await writer.StartRowAsync();
 
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Candlesticks\" (\"pair_id\", \"timeframe\", \"open_date\", \"close_date\", \"open_price\", \"high_price\", \"low_price\", \"close_price\", \"volume\", \"number_of_trades\") FROM STDIN BINARY");
-                foreach (var candlestick in candlesticks)
-                {
-                    await writer.StartRowAsync();
-
-                    await WriteParameter(writer, candlestick.PairId);
-                    await WriteParameter(writer, (int)candlestick.Timeframe);
-                    await WriteParameter(writer, candlestick.OpenDate);
-                    await WriteParameter(writer, candlestick.CloseDate);
-                    await WriteParameter(writer, candlestick.OpenPrice);
-                    await WriteParameter(writer, candlestick.HighPrice);
-                    await WriteParameter(writer, candlestick.LowPrice);
-                    await WriteParameter(writer, candlestick.ClosePrice);
-                    await WriteParameter(writer, candlestick.Volume);
-                    await WriteParameter(writer, candlestick.NumberOfTrades);
-                }
-
-                await writer.CompleteAsync();
+                await WriteParameter(writer, candlestick.PairId);
+                await WriteParameter(writer, (int)candlestick.Timeframe);
+                await WriteParameter(writer, candlestick.OpenDate);
+                await WriteParameter(writer, candlestick.CloseDate);
+                await WriteParameter(writer, candlestick.OpenPrice);
+                await WriteParameter(writer, candlestick.HighPrice);
+                await WriteParameter(writer, candlestick.LowPrice);
+                await WriteParameter(writer, candlestick.ClosePrice);
+                await WriteParameter(writer, candlestick.Volume);
+                await WriteParameter(writer, candlestick.NumberOfTrades);
             }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-            }
+
+            await writer.CompleteAsync();
         }
 
         public async Task InsertDexCandlesticksAsync(IEnumerable<DexCandlestick> candlesticks)
