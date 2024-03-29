@@ -55,8 +55,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             allSymbols.AddRange(stockTickers);
             allSymbols.AddRange(etfTickers);
 
-            allSymbols.AddRange(tenStocksToOwnForever);
-
             allSymbols = allSymbols.Select(symbol => symbol.ToUpperInvariant())
                                        .Distinct(StringComparer.InvariantCultureIgnoreCase)
                                        .ToList();
