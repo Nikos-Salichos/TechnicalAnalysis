@@ -45,7 +45,8 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateWilliamsVixFix(pair);
             CalculateHighestWilliamsVixFixValue(pair);
 
-            CalculateEnchanced(pair, cryptoFearAndGreedDataPerDatetime);
+            CalculateEnchancedLong(pair, cryptoFearAndGreedDataPerDatetime);
+            CalculateEnchancedShort(pair, cryptoFearAndGreedDataPerDatetime);
             CalculateResistanceBreakout(pair);
             CalculateVerticalHorizontalFilterRange(pair);
         }
@@ -462,8 +463,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        //TODO Enchanced sell , all time high condition
-        private static void CalculateEnchanced(PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
+        private static void CalculateEnchancedLong(PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
         {
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
@@ -505,9 +505,9 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetOversoldBollingerConditions(pair.Candlesticks, i),
                     GetOversoldKeltnerConditions(pair.Candlesticks, i),
                     GetOversoldAroonConditions(pair.Candlesticks, i),
+                    GetOversoldDonchianConditions(pair.Candlesticks, i),
                     GetLowestLowCondition(pair.Candlesticks, i),
                     GetFractalBullCondition(pair.Candlesticks, i),
-                    GetOversoldDonchianConditions(pair.Candlesticks, i),
                     GetPivotSupportOversoldCondition(pair.Candlesticks, i),
                     GetFractalTrend(pair.Candlesticks, i),
                     GetPriceTrend(pair.Candlesticks, i),
@@ -557,22 +557,97 @@ namespace TechnicalAnalysis.Application.Extensions
                     var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
                     var firstEnhancedScan = candlestick1?.EnhancedScans.FirstOrDefault();
 
-                    if (firstEnhancedScan?.EnhancedScanIsBuy == true)
+                    if (firstEnhancedScan?.EnhancedScanIsLong == true)
                     {
                         candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId)
                         {
-                            EnhancedScanIsBuy = true,
-                            EnhancedScanIsSell = false,
-                            OrderOfSignal = firstEnhancedScan.OrderOfSignal + 1
+                            EnhancedScanIsLong = true,
+                            OrderOfLongSignal = firstEnhancedScan.OrderOfLongSignal + 1
                         });
                     }
                     else
                     {
                         candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId)
                         {
-                            EnhancedScanIsBuy = true,
-                            EnhancedScanIsSell = false,
-                            OrderOfSignal = 1
+                            EnhancedScanIsLong = true,
+                            OrderOfLongSignal = 1
+                        });
+                    }
+                }
+            }
+        }
+
+        private static void CalculateEnchancedShort(PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
+        {
+            decimal? candlestickHighestPrice = -1;
+
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            {
+                var candlestick = pair.Candlesticks[i];
+
+                if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
+                    && cryptoFearAndGreedIndex is not null && pair.Provider
+                    is DataProvider.Binance
+                    or DataProvider.Uniswap
+                    or DataProvider.Pancakeswap)
+                {
+                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassification == "Extreme Greed"
+                          || cryptoFearAndGreedIndex.ValueClassification == "Greed";
+
+                    if (!greedAndFearCondition)
+                    {
+                        continue;
+                    }
+                }
+
+                if (candlestick.HighPrice > candlestickHighestPrice)
+                {
+                    candlestickHighestPrice = candlestick.HighPrice;
+                }
+
+                if (!GetHighestHighCandlestickConditions(pair.Candlesticks, i, candlestickHighestPrice))
+                {
+                    continue;
+                }
+
+                bool[] conditions =
+                [
+                    GetOverboughtRsiConditions(pair.Candlesticks, i),
+                    GetOverboughtStochasticConditions(pair.Candlesticks, i),
+                    GetOverboughtAdxConditions(pair.Candlesticks, i),
+                    GetOverboughtCciConditions(pair.Candlesticks, i),
+                    GetOverboughtBollingerConditions(pair.Candlesticks, i),
+                    GetOverboughtKeltnerConditions(pair.Candlesticks, i),
+                    GetOverboughtAroonConditions(pair.Candlesticks, i),
+                    GetOverboughtDonchianConditions(pair.Candlesticks, i),
+                    GetPivotSupportOverboughtConditions(pair.Candlesticks, i),
+                    GetFractalBearCondition(pair.Candlesticks, i),
+                ];
+
+                int trueConditionsCount = conditions.Count(condition => condition);
+                double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
+
+                const int threshold = 100;
+
+                if (percentageTrueConditions >= threshold)
+                {
+                    var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
+                    var firstEnhancedScan = candlestick1?.EnhancedScans.FirstOrDefault();
+
+                    if (firstEnhancedScan?.EnhancedScanIsShort == true)
+                    {
+                        candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId)
+                        {
+                            EnhancedScanIsShort = true,
+                            OrderOfShortSignal = firstEnhancedScan.OrderOfLongSignal + 1
+                        });
+                    }
+                    else
+                    {
+                        candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId)
+                        {
+                            EnhancedScanIsShort = true,
+                            OrderOfShortSignal = 1
                         });
                     }
                 }
@@ -1095,11 +1170,11 @@ namespace TechnicalAnalysis.Application.Extensions
             var aroon3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Aroons.FirstOrDefault() : null;
             var aroon4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Aroons.FirstOrDefault() : null;
 
-            return aroon?.AroonDown >= 80 || aroon1?.AroonUp <= 20
-                || aroon1?.AroonDown >= 80 || aroon2?.AroonUp >= 20
-                || aroon2?.AroonDown >= 80 || aroon3?.AroonUp >= 20
-                || aroon3?.AroonDown >= 80 || aroon4?.AroonUp >= 20
-                || aroon4?.AroonDown >= 80;
+            return aroon?.AroonDown >= 80 || aroon?.AroonUp <= 20
+                || aroon1?.AroonDown >= 80 || aroon1?.AroonUp >= 20
+                || aroon2?.AroonDown >= 80 || aroon2?.AroonUp >= 20
+                || aroon3?.AroonDown >= 80 || aroon3?.AroonUp >= 20
+                || aroon4?.AroonDown >= 80 || aroon4?.AroonUp >= 20;
         }
 
         private static bool GetOversoldCciConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -1300,5 +1375,293 @@ namespace TechnicalAnalysis.Application.Extensions
 
             return rateOfChange?.Value >= rateOfChange1?.Value;
         }
+
+
+
+
+
+
+
+        private static bool GetOverboughtRsiConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var rsi = candlesticks[currentIndex].Rsis.FirstOrDefault();
+            var rsi1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Rsis?.FirstOrDefault() : null;
+            var rsi2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Rsis?.FirstOrDefault() : null;
+            var rsi3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Rsis?.FirstOrDefault() : null;
+            var rsi4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Rsis?.FirstOrDefault() : null;
+
+            return rsi?.Value >= Constants.RsiOverbought ||
+                rsi1?.Value >= Constants.RsiOverbought ||
+                rsi2?.Value >= Constants.RsiOverbought ||
+                rsi3?.Value >= Constants.RsiOverbought ||
+                rsi4?.Value >= Constants.RsiOverbought;
+        }
+
+        private static bool GetOverboughtStochasticConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var stochastic = candlesticks[currentIndex].Stochastics.FirstOrDefault();
+            var stochastic1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Stochastics?.FirstOrDefault() : null;
+            var stochastic2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Stochastics?.FirstOrDefault() : null;
+            var stochastic3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Stochastics?.FirstOrDefault() : null;
+            var stochastic4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Stochastics?.FirstOrDefault() : null;
+
+            return stochastic?.OscillatorK >= Constants.StochasticOverbought ||
+                stochastic1?.OscillatorK >= Constants.StochasticOverbought ||
+                stochastic2?.OscillatorK >= Constants.StochasticOverbought ||
+                stochastic3?.OscillatorK >= Constants.StochasticOverbought ||
+                stochastic4?.OscillatorK >= Constants.StochasticOverbought ||
+                stochastic?.SignalD >= Constants.StochasticOverbought ||
+                stochastic1?.SignalD >= Constants.StochasticOverbought ||
+                stochastic2?.SignalD >= Constants.StochasticOverbought ||
+                stochastic3?.SignalD >= Constants.StochasticOverbought ||
+                stochastic4?.SignalD >= Constants.StochasticOverbought;
+        }
+
+        private static bool GetOverboughtAdxConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var adx = candlesticks[currentIndex].Adxs.FirstOrDefault();
+            var adx1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Adxs?.FirstOrDefault() : null;
+            var adx2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Adxs?.FirstOrDefault() : null;
+            var adx3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Adxs?.FirstOrDefault() : null;
+            var adx4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Adxs?.FirstOrDefault() : null;
+
+            return adx?.PlusDi >= Constants.AdxOverbought ||
+                adx1?.PlusDi >= Constants.AdxOverbought ||
+                adx2?.PlusDi >= Constants.AdxOverbought ||
+                adx3?.PlusDi >= Constants.AdxOverbought ||
+                adx4?.PlusDi >= Constants.AdxOverbought;
+        }
+
+        private static bool GetOverboughtBollingerConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var bollingerBand = candlesticks[currentIndex].BollingerBands.FirstOrDefault();
+            var bollingerBand1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].BollingerBands.FirstOrDefault() : null;
+            var bollingerBand2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].BollingerBands.FirstOrDefault() : null;
+            var bollingerBand3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].BollingerBands.FirstOrDefault() : null;
+            var bollingerBand4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].BollingerBands.FirstOrDefault() : null;
+
+            if (bollingerBand == null
+                || bollingerBand1 == null
+                || bollingerBand2 == null
+                || bollingerBand3 == null
+                || bollingerBand4 == null)
+            {
+                return false;
+            }
+
+            if (!decimal.TryParse(bollingerBand.UpperBand.ToString(), out decimal _)
+                || !decimal.TryParse(bollingerBand1.UpperBand.ToString(), out decimal _)
+                || !decimal.TryParse(bollingerBand2.UpperBand.ToString(), out decimal _)
+                || !decimal.TryParse(bollingerBand3.UpperBand.ToString(), out decimal _)
+                || !decimal.TryParse(bollingerBand4.UpperBand.ToString(), out decimal _))
+            {
+                return false;
+            }
+
+            return candlesticks[currentIndex].HighPrice >= bollingerBand?.UpperBand
+                || candlesticks[currentIndex - 1].HighPrice >= bollingerBand1?.UpperBand
+                || candlesticks[currentIndex - 2].HighPrice >= bollingerBand2?.UpperBand
+                || candlesticks[currentIndex - 3].HighPrice >= bollingerBand3?.UpperBand
+                || candlesticks[currentIndex - 4].HighPrice >= bollingerBand4?.UpperBand;
+        }
+
+        private static bool GetOverboughtKeltnerConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var keltnerChannel = candlesticks[currentIndex].KeltnerChannels.FirstOrDefault();
+            var keltnerChannel1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].KeltnerChannels.FirstOrDefault() : null;
+            var keltnerChannel2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].KeltnerChannels.FirstOrDefault() : null;
+            var keltnerChannel3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].KeltnerChannels.FirstOrDefault() : null;
+            var keltnerChannel4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].KeltnerChannels.FirstOrDefault() : null;
+
+            if (keltnerChannel == null || keltnerChannel1 == null || keltnerChannel2 == null || keltnerChannel3 == null || keltnerChannel4 == null)
+            {
+                return false;
+            }
+
+            if (!decimal.TryParse(keltnerChannel.UpperBand.ToString(), out decimal _)
+             || !decimal.TryParse(keltnerChannel1.UpperBand.ToString(), out decimal _)
+             || !decimal.TryParse(keltnerChannel2.UpperBand.ToString(), out decimal _)
+             || !decimal.TryParse(keltnerChannel3.UpperBand.ToString(), out decimal _)
+             || !decimal.TryParse(keltnerChannel4.UpperBand.ToString(), out decimal _))
+            {
+                return false;
+            }
+
+            return candlesticks[currentIndex].HighPrice >= (decimal)keltnerChannel?.UpperBand
+                || candlesticks[currentIndex - 1].HighPrice >= (decimal)keltnerChannel1?.UpperBand
+                || candlesticks[currentIndex - 2].HighPrice >= (decimal)keltnerChannel2?.UpperBand
+                || candlesticks[currentIndex - 3].HighPrice >= (decimal)keltnerChannel3?.UpperBand
+                || candlesticks[currentIndex - 4].HighPrice >= (decimal)keltnerChannel4?.UpperBand;
+        }
+
+        private static bool GetOverboughtDonchianConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var donchianChannel = candlesticks[currentIndex].DonchianChannels.FirstOrDefault();
+            var donchianChannel1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].DonchianChannels.FirstOrDefault() : null;
+            var donchianChannel2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].DonchianChannels.FirstOrDefault() : null;
+            var donchianChannel3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].DonchianChannels.FirstOrDefault() : null;
+            var donchianChannel4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].DonchianChannels.FirstOrDefault() : null;
+
+            if (donchianChannel == null || donchianChannel1 == null || donchianChannel2 == null || donchianChannel3 == null || donchianChannel4 == null)
+            {
+                return false;
+            }
+
+            return (candlesticks[currentIndex]?.HighPrice != null && donchianChannel?.UpperBand is not null && candlesticks[currentIndex].HighPrice >= (decimal)donchianChannel.UpperBand)
+                || (candlesticks[currentIndex - 1]?.HighPrice is not null && donchianChannel1?.UpperBand != null && candlesticks[currentIndex - 1].HighPrice <= (decimal)donchianChannel1.UpperBand)
+                || (candlesticks[currentIndex - 2]?.HighPrice is not null && donchianChannel2?.UpperBand != null && candlesticks[currentIndex - 2].HighPrice <= (decimal)donchianChannel2.UpperBand)
+                || (candlesticks[currentIndex - 3]?.HighPrice != null && donchianChannel3?.UpperBand is not null && candlesticks[currentIndex - 3].HighPrice <= (decimal)donchianChannel3.UpperBand)
+                || (candlesticks[currentIndex - 4]?.HighPrice != null && donchianChannel4?.UpperBand is not null && candlesticks[currentIndex - 4].HighPrice <= (decimal)donchianChannel4.UpperBand);
+        }
+
+        private static bool GetOverboughtAroonConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var aroon = candlesticks[currentIndex].Aroons.FirstOrDefault();
+            var aroon1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Aroons.FirstOrDefault() : null;
+            var aroon2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Aroons.FirstOrDefault() : null;
+            var aroon3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Aroons.FirstOrDefault() : null;
+            var aroon4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Aroons.FirstOrDefault() : null;
+
+            return aroon?.AroonUp >= 80 || aroon?.AroonDown <= 20
+                || aroon1?.AroonUp >= 80 || aroon1?.AroonDown >= 20
+                || aroon2?.AroonUp >= 80 || aroon2?.AroonDown >= 20
+                || aroon3?.AroonUp >= 80 || aroon3?.AroonDown >= 20
+                || aroon4?.AroonUp >= 80 || aroon4?.AroonDown >= 20;
+        }
+
+        private static bool GetOverboughtCciConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var cci = candlesticks[currentIndex].Ccis.FirstOrDefault();
+            var cci1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Ccis.FirstOrDefault() : null;
+            var cci2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Ccis.FirstOrDefault() : null;
+            var cci3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Ccis.FirstOrDefault() : null;
+            var cci4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Ccis.FirstOrDefault() : null;
+
+            if (cci == null || cci1 == null || cci2 == null || cci3 == null || cci4 == null)
+            {
+                return false;
+            }
+
+            return cci.Value >= Constants.CciOverBought ||
+               cci1.Value >= Constants.CciOverBought ||
+                cci2.Value >= Constants.CciOverBought ||
+                cci3.Value >= Constants.CciOverBought ||
+                cci4.Value >= Constants.CciOverBought;
+        }
+
+        private static bool GetPivotSupportOverboughtConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var pivot = candlesticks[currentIndex].StandardPivotPoints.FirstOrDefault();
+            var pivot1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].StandardPivotPoints.FirstOrDefault() : null;
+            var pivot2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].StandardPivotPoints.FirstOrDefault() : null;
+            var pivot3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].StandardPivotPoints.FirstOrDefault() : null;
+            var pivot4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].StandardPivotPoints.FirstOrDefault() : null;
+
+            if (pivot == null || pivot1 == null || pivot2 == null || pivot3 == null || pivot4 == null)
+            {
+                return false;
+            }
+
+            return
+                candlesticks[currentIndex].ClosePrice >= pivot.PivotPoint ||
+                candlesticks[currentIndex - 1].ClosePrice >= pivot1.PivotPoint ||
+                candlesticks[currentIndex - 2].ClosePrice >= pivot2.PivotPoint ||
+                candlesticks[currentIndex - 3].ClosePrice >= pivot3.PivotPoint ||
+                candlesticks[currentIndex - 4].ClosePrice >= pivot4.PivotPoint;
+        }
+
+        private static bool GetHighestHighCandlestickConditions(IList<CandlestickExtended> candlesticks, int currentIndex, decimal? candlestickHighestPrice)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var highprice = candlesticks[currentIndex].HighPrice;
+            var highprice1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].HighPrice : null;
+            var highprice2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].HighPrice : null;
+            var highprice3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].HighPrice : null;
+            var highprice4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].HighPrice : null;
+
+            if (highprice == null || highprice1 == null || highprice2 == null || highprice3 == null || highprice4 == null)
+            {
+                return false;
+            }
+
+            return candlestickHighestPrice == highprice
+                || candlestickHighestPrice == highprice1
+                || candlestickHighestPrice == highprice2
+                || candlestickHighestPrice == highprice3
+                || candlestickHighestPrice == highprice4;
+        }
+
+        private static bool GetFractalBearCondition(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var candlestick2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2] : null;
+            var candlestick3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3] : null;
+            var candlestick4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4] : null;
+
+            if (candlestick2 is null ||
+                candlestick3 is null ||
+                candlestick4 is null)
+            {
+                return false;
+            }
+
+            return candlestick2.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
+                   candlestick3.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
+                   candlestick4.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
+        }
+
     }
 }
