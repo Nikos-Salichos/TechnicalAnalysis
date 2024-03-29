@@ -287,37 +287,30 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task InsertDexCandlesticksAsync(IEnumerable<DexCandlestick> candlesticks)
         {
-            try
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
+
+            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\") FROM STDIN BINARY");
+
+            foreach (var candlestick in candlesticks)
             {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
-
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"DexCandlesticks\" (\"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\", \"High\", \"Low\", \"Close\", \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\") FROM STDIN BINARY");
-
-                foreach (var candlestick in candlesticks)
-                {
-                    await writer.StartRowAsync();
-                    await WriteParameter(writer, candlestick.PoolContract);
-                    await WriteParameter(writer, candlestick.PoolId);
-                    await WriteParameter(writer, candlestick.OpenDate);
-                    await WriteParameter(writer, candlestick.OpenPrice);
-                    await WriteParameter(writer, candlestick.HighPrice);
-                    await WriteParameter(writer, candlestick.LowPrice);
-                    await WriteParameter(writer, candlestick.ClosePrice);
-                    await WriteParameter(writer, (int)candlestick.Timeframe);
-                    await WriteParameter(writer, candlestick.Fees);
-                    await WriteParameter(writer, candlestick.Liquidity);
-                    await WriteParameter(writer, candlestick.TotalValueLocked);
-                    await WriteParameter(writer, candlestick.Volume);
-                    await WriteParameter(writer, candlestick.NumberOfTrades);
-                }
-
-                await writer.CompleteAsync();
+                await writer.StartRowAsync();
+                await WriteParameter(writer, candlestick.PoolContract);
+                await WriteParameter(writer, candlestick.PoolId);
+                await WriteParameter(writer, candlestick.OpenDate);
+                await WriteParameter(writer, candlestick.OpenPrice);
+                await WriteParameter(writer, candlestick.HighPrice);
+                await WriteParameter(writer, candlestick.LowPrice);
+                await WriteParameter(writer, candlestick.ClosePrice);
+                await WriteParameter(writer, (int)candlestick.Timeframe);
+                await WriteParameter(writer, candlestick.Fees);
+                await WriteParameter(writer, candlestick.Liquidity);
+                await WriteParameter(writer, candlestick.TotalValueLocked);
+                await WriteParameter(writer, candlestick.Volume);
+                await WriteParameter(writer, candlestick.NumberOfTrades);
             }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-            }
+
+            await writer.CompleteAsync();
         }
 
         public async Task InsertPoolsAsync(IEnumerable<PoolEntity> pools)
