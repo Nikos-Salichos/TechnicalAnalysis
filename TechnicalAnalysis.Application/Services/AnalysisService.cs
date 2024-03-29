@@ -47,7 +47,7 @@ namespace TechnicalAnalysis.Application.Services
                     var enhancedScans = pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0)
                                                                         .OrderByDescending(c => c.CloseDate)
                                                                         .ThenBy(c => c.EnhancedScans
-                                                                        .OrderBy(es => es.OrderOfSignal))
+                                                                        .OrderBy(es => es.OrderOfLongSignal))
                                                                         .GroupBy(c => c.PoolOrPairId)
                                                                         .Select(group => new EnhancedScanGroup
                                                                         {
@@ -61,16 +61,13 @@ namespace TechnicalAnalysis.Application.Services
                     {
                         Symbol = pair.Symbol,
                         EnhancedScans = enhancedScans,
-                        OrderOfSignal = enhancedScans[0].EnhancedScans[0].OrderOfSignal,
                     };
                 })
                 .Where(result => result.EnhancedScans.Count > 0)
                 .ToList();
 
             return enhancedPairResults
-                .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate)
-                .ThenBy(result => result.OrderOfSignal)
-                .ToList();
+                .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate).ToList();
         }
 
         private static List<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
@@ -112,8 +109,8 @@ namespace TechnicalAnalysis.Application.Services
 
                 var indicatorReports = new List<Indicator>
                 {
-                    CalculateEnhancedScanSignal(positionsCloseOneByOne, "EnhancedScan_CloseOneByOne", selectedPair.Symbol),
-                    CalculateEnhancedScanSignal(positionsCloseAll, "EnhancedScan_CloseAll", selectedPair.Symbol),
+                    CalculateEnhancedScanLongSignal(positionsCloseOneByOne, "EnhancedScan_CloseOneByOne", selectedPair.Symbol),
+                    CalculateEnhancedScanLongSignal(positionsCloseAll, "EnhancedScan_CloseAll", selectedPair.Symbol),
                     CalculateEnhancedScanAllSignals(selectedPair),
                     PrintFractalTrend(selectedPair),
                     PrintLowestHighFractalSignals(selectedPair),
@@ -122,7 +119,8 @@ namespace TechnicalAnalysis.Application.Services
                     PrintFunnelSignals(selectedPair),
                     PrintAllKindOfRanges(selectedPair),
                     PrintResistanceBreakoutSignals(selectedPair),
-                    CalculateCandlestickCloseBelowPivotPrice(selectedPair)
+                    CalculateCandlestickCloseBelowPivotPrice(selectedPair),
+                    CalculateEnhancedScanShortSignal(selectedPair)
                 };
 
                 indicatorReportsPerPair.Add(selectedPair, indicatorReports);
@@ -165,7 +163,7 @@ namespace TechnicalAnalysis.Application.Services
             return baseDirectory;
         }
 
-        private static Indicator CalculateEnhancedScanSignal(IEnumerable<Position> positionsStrategy, string indicatorName, string pairSymbol)
+        private static Indicator CalculateEnhancedScanLongSignal(IEnumerable<Position> positionsStrategy, string indicatorName, string pairSymbol)
         {
             var enhancedScan = new Indicator { Name = indicatorName, PairName = pairSymbol };
             foreach (var position in positionsStrategy)
@@ -191,6 +189,23 @@ namespace TechnicalAnalysis.Application.Services
             return enhancedScan;
         }
 
+        private static Indicator CalculateEnhancedScanShortSignal(PairExtended pair)
+        {
+            var indicator = new Indicator { Name = "EnhancedShortSignal" };
+
+            foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.FirstOrDefault()?.EnhancedScanIsShort is true))
+            {
+                var signalIndicator = new Signal
+                {
+                    OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                    Sell = 1,
+                };
+                indicator.Signals.Add(signalIndicator);
+            }
+
+            return indicator;
+        }
+
         private static Indicator CalculateCandlestickCloseBelowPivotPrice(PairExtended pair)
         {
             var closeBelowPivotPrice = new Indicator { Name = "closeBelowPivotPrice" };
@@ -213,7 +228,7 @@ namespace TechnicalAnalysis.Application.Services
             var enhancedScan = new Indicator { Name = "EnhancedScanAllSignals", PairName = pair.Symbol };
 
             foreach (var candlestick in pair.Candlesticks
-                .Where(c => c.EnhancedScans?.FirstOrDefault()?.OrderOfSignal >= 0))
+                .Where(c => c.EnhancedScans?.FirstOrDefault()?.OrderOfLongSignal >= 0))
             {
                 var signalIndicator = new Signal
                 {
@@ -563,7 +578,7 @@ namespace TechnicalAnalysis.Application.Services
             return flagNestedCandlesticksBody;
         }
 
-        private static void CalculateMarketStatistics(MarketStatistic marketStatistic,
+        private static void CalculateEnhancedIsLongBasedOnStatistics(MarketStatistic marketStatistic,
             IEnumerable<PairExtended> selectedPairs,
             Func<PairExtended, bool> filterPredicate)
         {
@@ -574,9 +589,8 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(selectedPairs.Where(filterPredicate),
                 ParallelConfig.GetOptions(), pair =>
             {
-                foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0))
+                foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Any(e => e.EnhancedScanIsLong)))
                 {
-
                     if (candlestick.CloseDate.Date == new DateTime(2023, 01, 03).Date
                         && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -584,17 +598,27 @@ namespace TechnicalAnalysis.Application.Services
 
                     if (!dailyStatisticsDict.TryGetValue(candlestick.CloseDate.Date, out var dailyStatistics))
                     {
-                        candlestick.EnhancedScans.Clear();
+                        var enchancedScanLong = candlestick.EnhancedScans.FirstOrDefault();
+                        if (enchancedScanLong is not null)
+                        {
+                            enchancedScanLong.EnhancedScanIsLong = false;
+                        }
+
                         continue;
                     }
 
                     var isPairInStatistic = dailyStatistics.Exists(ds => ds.PairsWithEnhancedScan.Any(s => string.Equals(s, pair.Symbol, StringComparison.InvariantCultureIgnoreCase)));
                     if (!isPairInStatistic)
                     {
-                        candlestick.EnhancedScans.Clear();
+                        var enchancedScanLong = candlestick.EnhancedScans.FirstOrDefault();
+                        if (enchancedScanLong is not null)
+                        {
+                            enchancedScanLong.EnhancedScanIsLong = false;
+                        }
                     }
                 }
             });
+
         }
 
         private async Task CalculateTechnicalIndicators(IEnumerable<PairExtended> pairs)
@@ -611,14 +635,14 @@ namespace TechnicalAnalysis.Application.Services
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime));
 
-            var cryptoMarketStatistic = await GetCryptoPairsWithEnhancedScanIsBuy(pairs);
-            var etfStockMarketStatistic = await GetEtfStockPairWithEnhancedScanIsBuy(pairs);
+            var cryptoMarketStatistic = await GetCryptoPairsWithEnhancedScanIsLong(pairs);
+            var etfStockMarketStatistic = await GetEtfStockPairWithEnhancedScanIsLong(pairs);
 
-            CalculateMarketStatistics(cryptoMarketStatistic, pairs, p => p.Provider == DataProvider.Binance
+            CalculateEnhancedIsLongBasedOnStatistics(cryptoMarketStatistic, pairs, p => p.Provider == DataProvider.Binance
             || p.Provider == DataProvider.Uniswap
             || p.Provider == DataProvider.Pancakeswap);
 
-            CalculateMarketStatistics(etfStockMarketStatistic, pairs, p => p.Provider == DataProvider.Alpaca);
+            CalculateEnhancedIsLongBasedOnStatistics(etfStockMarketStatistic, pairs, p => p.Provider == DataProvider.Alpaca);
 
             // pairs.CalculatePairStatistics();
         }
@@ -649,7 +673,7 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
-        private async Task<MarketStatistic> GetCryptoPairsWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> GetCryptoPairsWithEnhancedScanIsLong(IEnumerable<PairExtended> pairs)
         {
             var cryptoMarketStatistic = new MarketStatistic();
 
@@ -666,7 +690,7 @@ namespace TechnicalAnalysis.Application.Services
                     datesWithCandlestick.Add(candlestick.CloseDate);
 
                     // Check for enhanced scan and if it's a buy
-                    if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
+                    if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong == true)
                     {
                         if (!cryptoMarketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStatistic))
                         {
@@ -699,13 +723,13 @@ namespace TechnicalAnalysis.Application.Services
                 return cryptoMarketStatistic;
             }
 
-            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetCryptoPairsWithEnhancedScanIsBuy)}-{nameof(MarketStatistic)}.json");
+            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetCryptoPairsWithEnhancedScanIsLong)}-{nameof(MarketStatistic)}.json");
             await JsonHelper.SerializeToJson(cryptoMarketStatistic, jsonFileName);
 
             return cryptoMarketStatistic;
         }
 
-        private async Task<MarketStatistic> GetEtfStockPairWithEnhancedScanIsBuy(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> GetEtfStockPairWithEnhancedScanIsLong(IEnumerable<PairExtended> pairs)
         {
             var etfStockMarketStatistic = new MarketStatistic();
 
@@ -720,7 +744,7 @@ namespace TechnicalAnalysis.Application.Services
                     datesWithCandlestick.Add(candlestick.CloseDate);
 
                     // Check for enhanced scan and if it's a buy
-                    if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsBuy == true)
+                    if (candlestick.EnhancedScans.Count > 0 && candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong == true)
                     {
                         if (!etfStockMarketStatistic.DailyStatistics.TryGetValue(candlestick.CloseDate, out var dailyStatistic))
                         {
@@ -753,7 +777,7 @@ namespace TechnicalAnalysis.Application.Services
                 return etfStockMarketStatistic;
             }
 
-            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetEtfStockPairWithEnhancedScanIsBuy)}-{nameof(MarketStatistic)}.json");
+            string jsonFileName = Path.Combine(baseDirectory, $"{nameof(GetEtfStockPairWithEnhancedScanIsLong)}-{nameof(MarketStatistic)}.json");
             await JsonHelper.SerializeToJson(etfStockMarketStatistic, jsonFileName);
 
             return etfStockMarketStatistic;
