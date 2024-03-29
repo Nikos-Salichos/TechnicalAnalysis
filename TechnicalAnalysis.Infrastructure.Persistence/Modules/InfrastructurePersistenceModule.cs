@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Modules
             services.AddSingleton<IRedisRepository, RedisRepository>();
 
             // Register ConnectionMultiplexer as a singleton
-            services.AddSingleton(c =>
+            services.AddSingleton(_ =>
             {
                 var options = new ConfigurationOptions
                 {
