@@ -225,28 +225,20 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<string, string>> InsertAssetsAsync(IEnumerable<Asset> assets)
         {
-            try
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\", \"AssetType\") FROM STDIN BINARY");
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
+            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\", \"AssetType\") FROM STDIN BINARY");
 
-                foreach (var asset in assets)
-                {
-                    await writer.StartRowAsync();
-                    await WriteParameter(writer, asset.Symbol);
-                    await WriteParameter(writer, asset.CreatedDate);
-                    await WriteParameter(writer, (long)asset.AssetType);
-                }
-
-                await writer.CompleteAsync();
-                return Result<string, string>.Success(string.Empty);
-            }
-            catch (Exception exception)
+            foreach (var asset in assets)
             {
-                logger.LogError("Exception{@exception}", exception);
-                return Result<string, string>.Fail(exception.ToString());
+                await writer.StartRowAsync();
+                await WriteParameter(writer, asset.Symbol);
+                await WriteParameter(writer, asset.CreatedDate);
+                await WriteParameter(writer, (long)asset.AssetType);
             }
+
+            await writer.CompleteAsync();
+            return Result<string, string>.Success(string.Empty);
         }
 
         public async Task<IResult<string, string>> InsertCoinPaprikaAssetsAsync(IEnumerable<AssetRanking> assets)
