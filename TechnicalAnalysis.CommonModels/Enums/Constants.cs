@@ -14,7 +14,9 @@
         public const double StochasticOverbought = 80;
         public const double StochasticOversold = 20;
         public const double CciOversold = -100;
+        public const double CciOverBought = 100;
         public const double AdxOversold = 15;
+        public const double AdxOverbought = 30;
         public const double AdxTrendLevel = 0;
         public const decimal BodyOneToTenOfRangeRatio = 0.1m;
         public const double MacdOversold = 0;
