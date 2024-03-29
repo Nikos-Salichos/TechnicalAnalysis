@@ -348,19 +348,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                                  "ON CONFLICT (\"ProviderId\") DO UPDATE SET " +
                                  "\"LastAssetSync\" = EXCLUDED.\"LastAssetSync\", " +
                                  "\"LastPairSync\" = EXCLUDED.\"LastPairSync\"";
-            try
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
 
-                await using var transaction = await dbConnection.BeginTransactionAsync();
-                await dbConnection.ExecuteAsync(query, providerPairAssetSyncInfo, transaction: transaction);
-                await transaction.CommitAsync();
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-            }
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
+
+            await using var transaction = await dbConnection.BeginTransactionAsync();
+            await dbConnection.ExecuteAsync(query, providerPairAssetSyncInfo, transaction: transaction);
+            await transaction.CommitAsync();
         }
 
         public async Task UpdateProviderCandlestickSyncInfoAsync(ProviderCandlestickSyncInfo providerCandlestickSyncInfo)
