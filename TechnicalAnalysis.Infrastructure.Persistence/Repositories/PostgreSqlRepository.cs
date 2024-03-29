@@ -315,37 +315,30 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task InsertPoolsAsync(IEnumerable<PoolEntity> pools)
         {
-            try
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
+
+            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pools\" (\"DexId\", \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", \"FeeTier\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\") FROM STDIN BINARY");
+
+            foreach (var pool in pools)
             {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
-
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pools\" (\"DexId\", \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", \"FeeTier\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\") FROM STDIN BINARY");
-
-                foreach (var pool in pools)
-                {
-                    await writer.StartRowAsync();
-                    await WriteParameter(writer, (long)pool.Provider);
-                    await WriteParameter(writer, pool.PoolContract);
-                    await WriteParameter(writer, pool.Token0Id);
-                    await WriteParameter(writer, pool.Token0Contract);
-                    await WriteParameter(writer, pool.Token1Id);
-                    await WriteParameter(writer, pool.Token1Contract);
-                    await WriteParameter(writer, pool.FeeTier);
-                    await WriteParameter(writer, pool.Fees);
-                    await WriteParameter(writer, pool.Liquidity);
-                    await WriteParameter(writer, pool.TotalValueLocked);
-                    await WriteParameter(writer, pool.Volume);
-                    await WriteParameter(writer, pool.NumberOfTrades);
-                    await WriteParameter(writer, pool.IsActive);
-                }
-
-                await writer.CompleteAsync();
+                await writer.StartRowAsync();
+                await WriteParameter(writer, (long)pool.Provider);
+                await WriteParameter(writer, pool.PoolContract);
+                await WriteParameter(writer, pool.Token0Id);
+                await WriteParameter(writer, pool.Token0Contract);
+                await WriteParameter(writer, pool.Token1Id);
+                await WriteParameter(writer, pool.Token1Contract);
+                await WriteParameter(writer, pool.FeeTier);
+                await WriteParameter(writer, pool.Fees);
+                await WriteParameter(writer, pool.Liquidity);
+                await WriteParameter(writer, pool.TotalValueLocked);
+                await WriteParameter(writer, pool.Volume);
+                await WriteParameter(writer, pool.NumberOfTrades);
+                await WriteParameter(writer, pool.IsActive);
             }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception{@exception}", exception);
-            }
+
+            await writer.CompleteAsync();
         }
 
         public async Task UpdateProviderPairAssetSyncInfoAsync(ProviderPairAssetSyncInfo providerPairAssetSyncInfo)
