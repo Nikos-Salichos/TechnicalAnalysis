@@ -380,21 +380,14 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 throw new ArgumentException("Invalid table");
             }
 
-            try
-            {
-                string query = $"DELETE FROM \"{tableName}\" WHERE \"Id\" = ANY(@Ids)";
+            string query = $"DELETE FROM \"{tableName}\" WHERE \"Id\" = ANY(@Ids)";
 
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
 
-                await using var transaction = await dbConnection.BeginTransactionAsync();
-                await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
-                await transaction.CommitAsync();
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("Method:{Method}, Exception{@exception}", $"Delete{typeof(T).Name}ByIdsAsync", exception);
-            }
+            await using var transaction = await dbConnection.BeginTransactionAsync();
+            await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
+            await transaction.CommitAsync();
         }
 
         private static async Task WriteParameter(NpgsqlBinaryImporter writer, object value)
