@@ -203,31 +203,24 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task InsertPairsAsync(IEnumerable<Pair> pairs)
         {
-            try
+            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await dbConnection.OpenAsync();
+
+            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") FROM STDIN BINARY");
+
+            foreach (var pair in pairs)
             {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                await dbConnection.OpenAsync();
-
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Pairs\" (\"asset0_id\", \"asset1_id\", \"provider_id\", \"symbol\", \"is_active\", \"all_candles\", \"created_at\") FROM STDIN BINARY");
-
-                foreach (var pair in pairs)
-                {
-                    await writer.StartRowAsync();
-                    await WriteParameter(writer, pair.BaseAssetId);
-                    await WriteParameter(writer, pair.QuoteAssetId);
-                    await WriteParameter(writer, (int)pair.Provider);
-                    await WriteParameter(writer, pair.Symbol);
-                    await WriteParameter(writer, pair.IsActive);
-                    await WriteParameter(writer, pair.AllCandles);
-                    await WriteParameter(writer, pair.CreatedAt);
-                }
-
-                await writer.CompleteAsync();
+                await writer.StartRowAsync();
+                await WriteParameter(writer, pair.BaseAssetId);
+                await WriteParameter(writer, pair.QuoteAssetId);
+                await WriteParameter(writer, (int)pair.Provider);
+                await WriteParameter(writer, pair.Symbol);
+                await WriteParameter(writer, pair.IsActive);
+                await WriteParameter(writer, pair.AllCandles);
+                await WriteParameter(writer, pair.CreatedAt);
             }
-            catch (Exception exception)
-            {
-                logger.LogError("Exception:{@exception}", exception);
-            }
+
+            await writer.CompleteAsync();
         }
 
         public async Task<IResult<string, string>> InsertAssetsAsync(IEnumerable<Asset> assets)
