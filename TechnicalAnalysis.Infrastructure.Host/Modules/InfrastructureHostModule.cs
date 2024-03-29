@@ -12,7 +12,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
         public static IServiceCollection AddInfrastructureHostModule(this IServiceCollection services)
         {
             //Cors
-            services.AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+            services.AddCors(options =>
+            options.AddDefaultPolicy(builder =>
+            builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
             //Set Json options for controllers
             services.AddControllers().AddJsonOptions(options =>
@@ -25,7 +27,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
             services.AddSwaggerGen(options =>
             {
                 options.UseInlineDefinitionsForEnums();
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Investment API", Version = "v1" });
                 options.OperationFilter<ApiKeyHeaderFilter>();
             });
 
@@ -35,12 +37,6 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
                 options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
                 options.CombineLogs = true;
             });
-
-            //Configure Cors
-            services.AddCors(options => options.AddDefaultPolicy(builder => builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()));
 
             //Brotli Compression
             services.AddResponseCompression(options =>
