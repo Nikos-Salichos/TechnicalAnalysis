@@ -372,7 +372,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await transaction.CommitAsync();
         }
 
-        public async Task DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName)
+        public async Task<IResult<string, string>> DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName)
         {
             var validTableNames = new HashSet<string> { "DexCandlesticks", "Pools" };
             if (!validTableNames.Contains(tableName))
@@ -388,6 +388,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await using var transaction = await dbConnection.BeginTransactionAsync();
             await dbConnection.ExecuteAsync(query, new { Ids = ids }, transaction: transaction);
             await transaction.CommitAsync();
+
+            return Result<string, string>.Success(string.Empty);
         }
 
         private static async Task WriteParameter(NpgsqlBinaryImporter writer, object value)
