@@ -509,8 +509,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetLowestLowCondition(pair.Candlesticks, i),
                     GetFractalBullCondition(pair.Candlesticks, i),
                     GetPivotSupportOversoldCondition(pair.Candlesticks, i),
-                    GetFractalTrend(pair.Candlesticks, i),
-                    GetPriceTrend(pair.Candlesticks, i),
+                    GetFractalEnhancedLongTrend(pair.Candlesticks, i),
+                    GetPriceEnhancedLongTrend(pair.Candlesticks, i),
                     GetHighestHighVixFix(pair.Candlesticks, i),
                     GetOnBalanceVolumeCondition(pair.Candlesticks, i),
                     GetPsychologicalLineCondition(pair.Candlesticks, i),
@@ -622,12 +622,14 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetOverboughtDonchianConditions(pair.Candlesticks, i),
                     GetPivotSupportOverboughtConditions(pair.Candlesticks, i),
                     GetFractalBearCondition(pair.Candlesticks, i),
+                    GetFractalEnhancedShortTrend(pair.Candlesticks, i),
+                    GetPriceEnhancedShortTrend(pair.Candlesticks, i),
                 ];
 
                 int trueConditionsCount = conditions.Count(condition => condition);
                 double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
-                const int threshold = 100;
+                const int threshold = 90;
 
                 if (percentageTrueConditions >= threshold)
                 {
@@ -909,7 +911,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 || (highestHighVixFix4 is not null && candlesticks[currentIndex - 4].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix4.Value);
         }
 
-        private static bool GetFractalTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
+        private static bool GetFractalEnhancedLongTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
         {
             if (currentIndex < 0 || currentIndex >= candlesticks.Count)
             {
@@ -943,7 +945,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 candlestick4.FractalTrend is Trend.Sideways;
         }
 
-        private static bool GetPriceTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
+        private static bool GetPriceEnhancedLongTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
         {
             if (currentIndex < 0 || currentIndex >= candlesticks.Count)
             {
@@ -1663,5 +1665,67 @@ namespace TechnicalAnalysis.Application.Extensions
                    candlestick4.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
         }
 
+        private static bool GetFractalEnhancedShortTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var candlestick = candlesticks[currentIndex];
+            var candlestick1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1] : null;
+            var candlestick2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2] : null;
+            var candlestick3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3] : null;
+            var candlestick4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4] : null;
+
+            if (candlestick is null ||
+                candlestick1 is null ||
+                candlestick2 is null ||
+                candlestick3 is null ||
+                candlestick4 is null)
+            {
+                return false;
+            }
+
+            return candlestick.FractalTrend is Trend.Up ||
+                candlestick1.FractalTrend is Trend.Up ||
+                candlestick2.FractalTrend is Trend.Up ||
+                candlestick3.FractalTrend is Trend.Up ||
+                candlestick4.FractalTrend is Trend.Up ||
+                candlestick.FractalTrend is Trend.Sideways ||
+                candlestick1.FractalTrend is Trend.Sideways ||
+                candlestick2.FractalTrend is Trend.Sideways ||
+                candlestick3.FractalTrend is Trend.Sideways ||
+                candlestick4.FractalTrend is Trend.Sideways;
+        }
+
+        private static bool GetPriceEnhancedShortTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
+        {
+            if (currentIndex < 0 || currentIndex >= candlesticks.Count)
+            {
+                return false;
+            }
+
+            var candlestick = candlesticks[currentIndex];
+            var candlestick1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1] : null;
+            var candlestick2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2] : null;
+            var candlestick3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3] : null;
+            var candlestick4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4] : null;
+
+            if (candlestick is null ||
+                candlestick1 is null ||
+                candlestick2 is null ||
+                candlestick3 is null ||
+                candlestick4 is null)
+            {
+                return false;
+            }
+
+            return candlestick.PriceTrend is Trend.Down ||
+                candlestick1.PriceTrend is Trend.Down ||
+                candlestick2.PriceTrend is Trend.Down ||
+                candlestick3.PriceTrend is Trend.Down ||
+                candlestick4.PriceTrend is Trend.Down;
+        }
     }
 }
