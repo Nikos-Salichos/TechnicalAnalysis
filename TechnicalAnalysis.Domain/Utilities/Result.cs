@@ -10,14 +10,18 @@ namespace TechnicalAnalysis.Domain.Utilities
 
         public bool HasError { get; }
 
+        public bool IsSuccess { get; }
+
         private Result(TSuccess successValue)
         {
+            IsSuccess = true;
             HasError = false;
             SuccessValue = successValue;
         }
 
         private Result(TFail failValue)
         {
+            IsSuccess = false;
             HasError = true;
             FailValue = failValue;
         }
