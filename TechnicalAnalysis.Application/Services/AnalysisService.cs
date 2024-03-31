@@ -41,33 +41,30 @@ namespace TechnicalAnalysis.Application.Services
 
             var filteredPairs = FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
 
-            var enhancedPairResults = filteredPairs.OrderByDescending(pair => pair.CreatedAt)
-                .Select(pair =>
-                {
-                    var enhancedScans = pair.Candlesticks.Where(c => c.EnhancedScans.Count > 0)
-                                                                        .OrderByDescending(c => c.CloseDate)
-                                                                        .ThenBy(c => c.EnhancedScans
-                                                                        .OrderBy(es => es.OrderOfLongSignal))
-                                                                        .GroupBy(c => c.PoolOrPairId)
-                                                                        .Select(group => new EnhancedScanGroup
-                                                                        {
-                                                                            CandlestickCloseDate = group.First().CloseDate,
-                                                                            EnhancedScans = group.First().EnhancedScans.ToList(),
-                                                                            CandlestickClosePrice = group.First().ClosePrice,
-                                                                            DaysFromAllTimeHigh = group.First().DaysFromAllTimeHigh,
-                                                                            PercentageFromAllTimeHigh = group.First().PercentageFromAllTimeHigh
-                                                                        }).ToList();
-                    return new EnhancedPairResult
-                    {
-                        Symbol = pair.Symbol,
-                        EnhancedScans = enhancedScans,
-                    };
-                })
-                .Where(result => result.EnhancedScans.Count > 0)
-                .ToList();
 
-            return enhancedPairResults
-                .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate).ToList();
+            var pairsWithEnhancedScans = filteredPairs.Where(pair => pair.Candlesticks.Exists(c => c.EnhancedScans.Count > 0))
+                                                      .OrderByDescending(pair => pair.CreatedAt);
+
+            return pairsWithEnhancedScans
+                .Select(pair => new EnhancedPairResult
+                {
+                    Symbol = pair.Symbol,
+                    EnhancedScans = pair.Candlesticks
+                        .Where(c => c.EnhancedScans.Count > 0)
+                        .SelectMany(c => c.EnhancedScans, (candlestick, enhancedScan) => new EnhancedScanGroup
+                        {
+                            CandlestickCloseDate = candlestick.CloseDate,
+                            OrderOfLongSignal = enhancedScan?.OrderOfLongSignal,
+                            OrderOfShortSignal = enhancedScan?.OrderOfShortSignal,
+                            CandlestickClosePrice = candlestick.ClosePrice,
+                            DaysFromAllTimeHigh = candlestick.DaysFromAllTimeHigh,
+                            PercentageFromAllTimeHigh = candlestick.PercentageFromAllTimeHigh
+                        })
+                        .OrderByDescending(es => es.CandlestickCloseDate)
+                        .ToList()
+                })
+                .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate)
+                .ToList();
         }
 
         private static List<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
@@ -193,7 +190,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var indicator = new Indicator { Name = "EnhancedShortSignal" };
 
-            foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.FirstOrDefault()?.EnhancedScanIsShort is true))
+            foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.FirstOrDefault()?.OrderOfShortSignal == 1))
             {
                 var signalIndicator = new Signal
                 {
