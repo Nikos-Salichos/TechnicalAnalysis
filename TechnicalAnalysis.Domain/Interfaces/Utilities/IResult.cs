@@ -4,6 +4,8 @@
     {
         TSuccess SuccessValue { get; }
         TFail FailValue { get; }
+
+        bool IsSuccess { get; }
         bool HasError { get; }
     }
 }
