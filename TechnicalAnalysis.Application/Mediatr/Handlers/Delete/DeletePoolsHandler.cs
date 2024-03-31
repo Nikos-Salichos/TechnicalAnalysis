@@ -5,10 +5,11 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers.Delete;
 
-public class DeletePoolsHandler(IPostgreSqlRepository repository) : IRequestHandler<DeletePoolsCommand>
+public class DeletePoolsHandler(IPostgreSqlRepository repository) : IRequestHandler<DeletePoolsCommand, bool>
 {
-    public async Task Handle(DeletePoolsCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeletePoolsCommand request, CancellationToken cancellationToken)
     {
-        await repository.DeleteEntitiesByIdsAsync<Pool>(request.Ids, "Pools");
+        var result = await repository.DeleteEntitiesByIdsAsync<Pool>(request.Ids, tableName: "Pools");
+        return result.IsSuccess;
     }
 }
