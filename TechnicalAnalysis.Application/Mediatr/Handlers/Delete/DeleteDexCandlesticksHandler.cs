@@ -3,13 +3,13 @@ using TechnicalAnalysis.Application.Mediatr.Commands.Delete;
 using TechnicalAnalysis.Domain.Entities;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
-namespace TechnicalAnalysis.Application.Mediatr.Handlers.Delete
+namespace TechnicalAnalysis.Application.Mediatr.Handlers.Delete;
+
+public class DeleteDexCandlesticksHandler(IPostgreSqlRepository repository) : IRequestHandler<DeleteDexCandlesticksCommand, bool>
 {
-    public class DeleteDexCandlesticksHandler(IPostgreSqlRepository repository) : IRequestHandler<DeleteDexCandlesticksCommand>
+    public async Task<bool> Handle(DeleteDexCandlesticksCommand request, CancellationToken cancellationToken)
     {
-        public async Task Handle(DeleteDexCandlesticksCommand request, CancellationToken cancellationToken)
-        {
-            await repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, "DexCandlesticks");
-        }
+        var result = await repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, tableName: "DexCandlesticks");
+        return result.IsSuccess;
     }
 }
