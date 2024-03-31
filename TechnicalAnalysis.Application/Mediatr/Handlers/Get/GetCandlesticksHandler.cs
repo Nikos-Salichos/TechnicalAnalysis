@@ -14,7 +14,7 @@ namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
             var result = await repository.GetCandlesticksAsync();
             if (result.HasError)
             {
-                return Enumerable.Empty<CandlestickExtended>();
+                return [];
             }
             return result.SuccessValue.ToDomain();
         }
