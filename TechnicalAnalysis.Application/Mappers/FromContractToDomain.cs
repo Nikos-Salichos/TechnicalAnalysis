@@ -72,10 +72,8 @@ namespace TechnicalAnalysis.Application.Mappers
                 Candlesticks = pool.PoolDayData.FromDexCandlesticksV3ToDomain().ToList()
             };
 
-        public static StockFearAndGreedDomain? ToDomain(this StockFearAndGreedRoot stockFearAndGreedRoot)
-            => stockFearAndGreedRoot is null
-            ? null
-            : new()
+        public static StockFearAndGreedDomain ToDomain(this StockFearAndGreedRoot stockFearAndGreedRoot)
+            => new()
             {
                 DateTime = DateTimeOffset.FromUnixTimeSeconds(stockFearAndGreedRoot.StockFearAndGreedLastUpdated.EpochUnixSeconds).UtcDateTime.Date,
                 Value = stockFearAndGreedRoot.StockFearAndGreedData.Now.Value.ToString(),
