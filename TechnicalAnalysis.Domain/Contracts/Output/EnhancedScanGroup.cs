@@ -1,13 +1,21 @@
-﻿using TechnicalAnalysis.CommonModels.Indicators.Advanced;
+﻿using System.Text.Json.Serialization;
 
 namespace TechnicalAnalysis.Domain.Contracts.Output
 {
     public class EnhancedScanGroup
     {
         public DateTime CandlestickCloseDate { get; init; }
-        public List<EnhancedScan> EnhancedScans { get; init; } = [];
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? OrderOfLongSignal { get; init; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? OrderOfShortSignal { get; init; }
+
         public decimal? CandlestickClosePrice { get; init; }
-        public decimal? PercentageFromAllTimeHigh { get; set; }
-        public decimal? DaysFromAllTimeHigh { get; set; }
+
+        public decimal? PercentageFromAllTimeHigh { get; init; }
+
+        public decimal? DaysFromAllTimeHigh { get; init; }
     }
 }
