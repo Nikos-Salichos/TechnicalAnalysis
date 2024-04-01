@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks.Dataflow;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Contracts.Output;
@@ -34,11 +35,23 @@ namespace TechnicalAnalysis.Application.Services
 
             var fetchedPairs = await inner.GetIndicatorsByPairNamesAsync(pairNames, timeframe);
 
+            var block = new ActionBlock<PairExtended>(async pair =>
+            {
+                await redisRepository.SetRecordAsync(pair.Symbol, pair);
+                pairsFromCache.Add(pair);
+
+            }, new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 3 * Environment.ProcessorCount
+            });
+
             foreach (var pair in fetchedPairs)
             {
-                await redisRepository.SetRecordAsync(pair.Symbol, pair, null, null);
-                pairsFromCache.Add(pair);
+                block.Post(pair);
             }
+
+            block.Complete();
+            await block.Completion;
 
             return pairsFromCache;
         }
