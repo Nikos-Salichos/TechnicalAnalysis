@@ -48,9 +48,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-        [HttpGet("PairsIndicators")]
+        [HttpGet("EnhancedIndicatorPairResults")]
         [EnableRateLimiting("fixed-by-ip")]
-        public async Task<IActionResult> GetPairsIndicatorsAsync([FromQuery] DataProvider provider = DataProvider.All)
+        public async Task<IActionResult> GetEnhancedPairResultsAsync([FromQuery] DataProvider provider = DataProvider.All)
         {
             logger.LogInformation("request {request}", provider);
             var result = await analysisService.GetEnhancedPairResultsAsync(provider, HttpContext);
@@ -62,18 +62,23 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("IndicatorsByPairName")]
         [EnableRateLimiting("fixed-by-ip")]
-        public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
+        public Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
         {
             logger.LogInformation("request {pairNames} {timeframe}", pairNames, timeframe);
 
             if (pairNames.Count is 0)
             {
                 logger.LogWarning("No pair names provided by the user {@pairNames}", pairNames);
-                return BadRequest($"No pair names provided by the user {pairNames}");
+                return Task.FromResult<IActionResult>(BadRequest($"No pair names provided by the user {pairNames}"));
             }
 
-            await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
-            return NoContent();
+            return GetIndicatorsByPairNameAsync(analysisService, pairNames, timeframe);
+
+            async Task<IActionResult> GetIndicatorsByPairNameAsync(IAnalysisService analysisService, List<string> pairNames, Timeframe timeframe)
+            {
+                await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
+                return NoContent();
+            }
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
