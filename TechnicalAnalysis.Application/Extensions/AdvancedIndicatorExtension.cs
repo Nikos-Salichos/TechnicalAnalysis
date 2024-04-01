@@ -335,7 +335,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BullFractal
+                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BullFractal
                                                               && f.WindowPeriod == 2))
                 {
                     if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
@@ -344,7 +344,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BearFractal
+                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BearFractal
                                                               && f.WindowPeriod == 2))
                 {
                     if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick?.PrimaryId)
@@ -471,7 +471,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 //TODO Enable it debug specific candlestick
                 if (candlestick.CloseDate.Date == new DateTime(2024, 03, 15).Date
-                    && string.Equals(pair.Symbol, "TSLA", StringComparison.InvariantCultureIgnoreCase))
+                    && string.Equals(pair.Symbol, "CREAM", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
@@ -610,6 +610,11 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
+                if (pair.Symbol == "CREAM-USDT" && candlestick.CloseDate.Date == new DateTime(2024, 03, 29))
+                {
+
+                }
+
                 bool[] conditions =
                 [
                     GetOverboughtRsiConditions(pair.Candlesticks, i),
@@ -641,7 +646,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         candlestick.EnhancedScans.Add(new EnhancedScan(candlestick.PrimaryId)
                         {
                             EnhancedScanIsShort = true,
-                            OrderOfShortSignal = firstEnhancedScan.OrderOfLongSignal + 1
+                            OrderOfShortSignal = firstEnhancedScan.OrderOfShortSignal + 1
                         });
                     }
                     else
