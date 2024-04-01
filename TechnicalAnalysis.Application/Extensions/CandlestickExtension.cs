@@ -38,7 +38,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        public static (IEnumerable<DateTime> MissingCandles, IEnumerable<BinancePair> MissingSymbols) FindMissingCandles(this IEnumerable<BinancePair> pairs)
+        public static (List<DateTime> MissingCandles, List<BinancePair> MissingSymbols) FindMissingCandles(this IEnumerable<BinancePair> pairs)
         {
             var missingDates = new List<DateTime>();
             var missingSymbols = new List<BinancePair>();
