@@ -39,18 +39,14 @@ namespace TechnicalAnalysis.Application.Services
 
             await CalculateTechnicalIndicators(pairs);
 
-            var filteredPairs = FilterPairs(pairs, c => c.EnhancedScans.Count > 0);
+            var pairsWithEnhancedScanCandlesticks = FilterPairs(pairs, c => c.EnhancedScans.Exists(e => e.EnhancedScanIsLong || e.EnhancedScanIsShort));
 
-
-            var pairsWithEnhancedScans = filteredPairs.Where(pair => pair.Candlesticks.Exists(c => c.EnhancedScans.Count > 0))
-                                                      .OrderByDescending(pair => pair.CreatedAt);
-
-            return pairsWithEnhancedScans
+            var filteredEnhancedScanPairs = pairsWithEnhancedScanCandlesticks
                 .Select(pair => new EnhancedPairResult
                 {
                     Symbol = pair.Symbol,
                     EnhancedScans = pair.Candlesticks
-                        .Where(c => c.EnhancedScans.Count > 0)
+                        //  .Where(f => f.EnhancedScans.Exists(e => e.EnhancedScanIsLong || e.EnhancedScanIsShort))
                         .SelectMany(c => c.EnhancedScans, (candlestick, enhancedScan) => new EnhancedScanGroup
                         {
                             CandlestickCloseDate = candlestick.CloseDate,
@@ -65,6 +61,8 @@ namespace TechnicalAnalysis.Application.Services
                 })
                 .OrderByDescending(result => result.EnhancedScans.FirstOrDefault()?.CandlestickCloseDate)
                 .ToList();
+
+            return filteredEnhancedScanPairs;
         }
 
         private static List<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
