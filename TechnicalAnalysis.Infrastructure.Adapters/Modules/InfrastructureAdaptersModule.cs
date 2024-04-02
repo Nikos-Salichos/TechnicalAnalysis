@@ -35,11 +35,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
                     DataProvider.Alpaca => serviceProvider.GetRequiredService<AlpacaAdapter>(),
                     DataProvider.Uniswap or DataProvider.Pancakeswap => serviceProvider.GetRequiredService<DexV3Adapter>(),
                     DataProvider.WallStreetZen => serviceProvider.GetRequiredService<WallStreetZenAdapter>(),
-                    DataProvider.AlternativeMeCryptoAndFearIndex => serviceProvider.GetRequiredService<CryptoFearAndGreedAdapter>(),
+                    DataProvider.AlternativeMeCryptoFearAndGreedProvider => serviceProvider.GetRequiredService<CryptoFearAndGreedAdapter>(),
                     DataProvider.CoinPaprika => serviceProvider.GetRequiredService<CoinPaprikaAdapter>(),
                     DataProvider.CoinMarketCap => serviceProvider.GetRequiredService<CoinMarketCapAdapter>(),
                     DataProvider.CoinRanking => serviceProvider.GetRequiredService<CoinRankingAdapter>(),
-                    DataProvider.StockFearAndGreedProvider => serviceProvider.GetRequiredService<StockFearAndGreedAdapter>(),
+                    DataProvider.RapidApiStockFearAndGreedProvider => serviceProvider.GetRequiredService<StockFearAndGreedAdapter>(),
                     _ => throw new ArgumentOutOfRangeException(nameof(provider), $"Exchange {provider} not found")
                 };
             });
