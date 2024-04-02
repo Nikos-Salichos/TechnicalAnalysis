@@ -2,14 +2,16 @@
 {
     public static class InfrastructureHostModule
     {
-        public static void AddInfrastructureHostModule(this WebApplicationBuilder webApplicationBuilder)
+        public static void AddInfrastructureHostModule(this WebApplicationBuilder webApplicationBuilder, IConfiguration configuration)
         {
+            var apiKeyOptions = configuration.GetSection("ApiKey");
+
             // Configure HttpClient for all environments
             webApplicationBuilder.Services.AddHttpClient("taapi", client =>
             {
                 client.BaseAddress = new Uri("http://host.docker.internal:5000/api/v1/analysis/");
                 client.DefaultRequestHeaders.Add("User-Agent", "Tracking prices application");
-                client.DefaultRequestHeaders.Add("ApiKey", "tokalyteroapi");
+                client.DefaultRequestHeaders.Add("ApiKey", apiKeyOptions.Value);
             })
             // Add a delegating handler in the development environment which bypasses SSL validation
             .ConfigurePrimaryHttpMessageHandler(() =>

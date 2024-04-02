@@ -2,6 +2,8 @@ using TechnicalAnalysis.Infrastructure.Gateway;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true);
+
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -9,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.AddInfrastructureHostModule();
+builder.AddInfrastructureHostModule(builder.Configuration);
 
 var proxyBuilder = builder.Services.AddReverseProxy();
 // Initialize the reverse proxy from the "ReverseProxy" section of configuration
