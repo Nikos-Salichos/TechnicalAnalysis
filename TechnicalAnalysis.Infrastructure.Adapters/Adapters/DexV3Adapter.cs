@@ -38,8 +38,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var candlestickIds = pairs.SelectMany(p => p.Candlesticks.Select(c => c.PrimaryId)).ToList();
             var poolIds = pairs.Select(p => p.PrimaryId).ToList();
 
-            await Task.WhenAll(mediator.Send(new DeleteDexCandlesticksCommand(candlestickIds)),
-              mediator.Send(new DeletePoolsCommand(poolIds)));
+            var deleteCandlesticksResult = await mediator.Send(new DeleteDexCandlesticksCommand(candlestickIds));
+            var poolsResult = await mediator.Send(new DeletePoolsCommand(poolIds));
+
+            if (!deleteCandlesticksResult || !poolsResult)
+            {
+                return false;
+            }
 
             const int numberOfPools = 10;
             const int numberOfData = 10;
