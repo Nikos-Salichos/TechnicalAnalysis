@@ -40,7 +40,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
         }
 
         private static void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments,
-            IEnumerable<T> data, JsonSerializerOptions jsonSerializerOptions = null)
+            IEnumerable<T> data, JsonSerializerOptions? jsonSerializerOptions = null)
         {
             string json = JsonSerializer.Serialize(data, jsonSerializerOptions ?? JsonHelper.JsonSerializerOptions);
 
