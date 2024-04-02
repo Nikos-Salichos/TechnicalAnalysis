@@ -27,12 +27,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 }
 
                 var stockFearAndGreedDomain = response.SuccessValue.ToDomain();
-                if (stockFearAndGreedDomain is null)
-                {
-                    logger.LogInformation("{stockFearAndGreedDomain} domain model is null", stockFearAndGreedDomain);
-                    return false;
-                }
-
                 await mediator.Send(new InsertStockFearAndGreedIndexCommand(stockFearAndGreedDomain));
             }
 
