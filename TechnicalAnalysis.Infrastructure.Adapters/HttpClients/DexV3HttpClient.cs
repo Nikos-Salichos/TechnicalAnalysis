@@ -106,7 +106,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 var deserializedData = await JsonSerializer.DeserializeAsync<DexV3ApiResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
                 if (deserializedData is not null)
                 {
-                    logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
                     return Result<DexV3ApiResponse, string>.Success(deserializedData);
                 }
                 logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
