@@ -1545,10 +1545,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             return (candlesticks[currentIndex]?.HighPrice != null && donchianChannel?.UpperBand is not null && candlesticks[currentIndex].HighPrice >= (decimal)donchianChannel.UpperBand)
-                || (candlesticks[currentIndex - 1]?.HighPrice is not null && donchianChannel1?.UpperBand != null && candlesticks[currentIndex - 1].HighPrice <= (decimal)donchianChannel1.UpperBand)
-                || (candlesticks[currentIndex - 2]?.HighPrice is not null && donchianChannel2?.UpperBand != null && candlesticks[currentIndex - 2].HighPrice <= (decimal)donchianChannel2.UpperBand)
-                || (candlesticks[currentIndex - 3]?.HighPrice != null && donchianChannel3?.UpperBand is not null && candlesticks[currentIndex - 3].HighPrice <= (decimal)donchianChannel3.UpperBand)
-                || (candlesticks[currentIndex - 4]?.HighPrice != null && donchianChannel4?.UpperBand is not null && candlesticks[currentIndex - 4].HighPrice <= (decimal)donchianChannel4.UpperBand);
+                || (candlesticks[currentIndex - 1]?.HighPrice is not null && donchianChannel1?.UpperBand != null && candlesticks[currentIndex - 1].HighPrice >= (decimal)donchianChannel1.UpperBand)
+                || (candlesticks[currentIndex - 2]?.HighPrice is not null && donchianChannel2?.UpperBand != null && candlesticks[currentIndex - 2].HighPrice >= (decimal)donchianChannel2.UpperBand)
+                || (candlesticks[currentIndex - 3]?.HighPrice != null && donchianChannel3?.UpperBand is not null && candlesticks[currentIndex - 3].HighPrice >= (decimal)donchianChannel3.UpperBand)
+                || (candlesticks[currentIndex - 4]?.HighPrice != null && donchianChannel4?.UpperBand is not null && candlesticks[currentIndex - 4].HighPrice >= (decimal)donchianChannel4.UpperBand);
         }
 
         private static bool GetOverboughtAroonConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -1565,10 +1565,10 @@ namespace TechnicalAnalysis.Application.Extensions
             var aroon4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Aroons.FirstOrDefault() : null;
 
             return aroon?.AroonUp >= 80 || aroon?.AroonDown <= 20
-                || aroon1?.AroonUp >= 80 || aroon1?.AroonDown >= 20
-                || aroon2?.AroonUp >= 80 || aroon2?.AroonDown >= 20
-                || aroon3?.AroonUp >= 80 || aroon3?.AroonDown >= 20
-                || aroon4?.AroonUp >= 80 || aroon4?.AroonDown >= 20;
+                || aroon1?.AroonUp >= 80 || aroon1?.AroonDown <= 20
+                || aroon2?.AroonUp >= 80 || aroon2?.AroonDown <= 20
+                || aroon3?.AroonUp >= 80 || aroon3?.AroonDown <= 20
+                || aroon4?.AroonUp >= 80 || aroon4?.AroonDown <= 20;
         }
 
         private static bool GetOverboughtCciConditions(IList<CandlestickExtended> candlesticks, int currentIndex)
@@ -1726,11 +1726,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlestick.PriceTrend is Trend.Down ||
-                candlestick1.PriceTrend is Trend.Down ||
-                candlestick2.PriceTrend is Trend.Down ||
-                candlestick3.PriceTrend is Trend.Down ||
-                candlestick4.PriceTrend is Trend.Down;
+            return candlestick.PriceTrend is Trend.Up ||
+                candlestick1.PriceTrend is Trend.Up ||
+                candlestick2.PriceTrend is Trend.Up ||
+                candlestick3.PriceTrend is Trend.Up ||
+                candlestick4.PriceTrend is Trend.Up;
         }
     }
 }
