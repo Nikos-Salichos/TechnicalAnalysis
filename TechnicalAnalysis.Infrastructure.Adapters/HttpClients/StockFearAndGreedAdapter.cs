@@ -36,7 +36,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var deserializedData = await JsonSerializer.DeserializeAsync<StockFearAndGreedRoot>(jsonStream, JsonHelper.JsonSerializerOptions);
             if (deserializedData is not null)
             {
-                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
                 return Result<StockFearAndGreedRoot, string>.Success(deserializedData);
             }
 
