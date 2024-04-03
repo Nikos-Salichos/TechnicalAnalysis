@@ -1,15 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Polly;
 using System.Text.Json;
 using TechnicalAnalysis.Domain.Contracts.Input.CoinPaprika;
 using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
+using TechnicalAnalysis.Domain.Settings;
 using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
-    public class CoinPaprikaHttpClient(IHttpClientFactory httpClientFactory, ILogger<CoinPaprikaHttpClient> logger, IPollyPolicy pollyPolicy)
+    public class CoinPaprikaHttpClient(IOptionsMonitor<CoinPaprikaSetting> coinPaprikaSetting, IHttpClientFactory httpClientFactory,
+        ILogger<CoinPaprikaHttpClient> logger, IPollyPolicy pollyPolicy)
         : ICoinPaprikaHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
@@ -17,11 +20,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         public async Task<IResult<IEnumerable<CoinPaprikaAssetContract>, string>> SyncAssets()
         {
-            const string baseUrl = "https://api.coinpaprika.com/v1/coins";
-            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(baseUrl, HttpCompletionOption.ResponseHeadersRead));
+            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead));
 
             logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
-                baseUrl, httpResponseMessage);
+                coinPaprikaSetting.CurrentValue.Endpoint, httpResponseMessage);
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -35,7 +37,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var deserializedData = await JsonSerializer.DeserializeAsync<IEnumerable<CoinPaprikaAssetContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
             if (deserializedData is not null)
             {
-                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
                 return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Success(deserializedData);
             }
 
