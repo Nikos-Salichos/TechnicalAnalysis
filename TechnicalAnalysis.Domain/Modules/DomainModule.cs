@@ -14,6 +14,7 @@ namespace TechnicalAnalysis.Domain.Modules
             services.AddOptions<CoinMarketCapSetting>().Bind(configuration.GetSection("CoinMarketCap"));
             services.AddOptions<CoinRankingSetting>().Bind(configuration.GetSection("CoinRanking"));
             services.AddOptions<RapidApiSetting>().Bind(configuration.GetSection("RapidApi"));
+            services.AddOptions<CoinPaprikaSetting>().Bind(configuration.GetSection("CoinPaprika"));
         }
     }
 }
