@@ -53,7 +53,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var deserializedData = await JsonSerializer.DeserializeAsync<CoinMarketCapAssetContract>(jsonStream, JsonHelper.JsonSerializerOptions);
             if (deserializedData is not null)
             {
-                logger.LogInformation("deserializedData '{@deserializedData}' ", deserializedData);
                 return Result<CoinMarketCapAssetContract, string>.Success(deserializedData);
             }
 
