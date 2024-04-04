@@ -29,12 +29,9 @@ namespace TechnicalAnalysis.Application.Extensions
                     property.SetValue(candlestick, dateTime);
                 }
             }
-            else if (property.PropertyType == typeof(long) || property.PropertyType == typeof(long?))
+            else if ((property.PropertyType == typeof(long) || property.PropertyType == typeof(long?)) && long.TryParse(cell.ToString(), out var value))
             {
-                if (long.TryParse(cell.ToString(), out var value))
-                {
-                    property.SetValue(candlestick, value);
-                }
+                property.SetValue(candlestick, value);
             }
         }
 
