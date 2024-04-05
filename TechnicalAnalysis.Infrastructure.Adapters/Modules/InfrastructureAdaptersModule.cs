@@ -51,7 +51,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<IBinanceHttpClient, BinanceHttpClient>();
             services.AddSingleton<IDexV3HttpClient, DexV3HttpClient>();
             services.AddSingleton<IAlpacaHttpClient, AlpacaHttpClient>();
-            services.AddSingleton<IWallStreetZenClient, WallStreetZenClient>();
+            services.AddSingleton<IWallStreetZenClient, WallStreetZenHttpClient>();
             services.AddSingleton<ICryptoFearAndGreedHttpClient, CryptoFearAndGreedHttpClient>();
             services.AddSingleton<ICoinPaprikaHttpClient, CoinPaprikaHttpClient>();
             services.AddSingleton<ICoinMarketCapHttpClient, CoinMarketCapHttpClient>();
