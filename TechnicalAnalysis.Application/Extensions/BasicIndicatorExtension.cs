@@ -350,14 +350,12 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    var aroon = Aroon.Create(
-                        candlestickId: candlestick.PrimaryId,
-                        period: 25,
-                        aroonUp: indicatorResult.AroonUp,
-                        aroonDown: indicatorResult.AroonDown,
-                        oscillator: indicatorResult.Oscillator
-                    );
-                    candlestick.Aroons.Add(aroon);
+                    candlestick.Aroons.Add(new Aroon(
+                    candlestick.PrimaryId,
+                    period: 25,
+                    indicatorResult.AroonUp,
+                    indicatorResult.AroonDown,
+                    indicatorResult.Oscillator));
                 }
             }
         }
