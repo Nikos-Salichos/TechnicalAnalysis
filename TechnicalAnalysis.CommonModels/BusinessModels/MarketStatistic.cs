@@ -28,5 +28,4 @@ public class MarketStatistic
             DailyStatistics.Remove(key);
         }
     }
-
 }

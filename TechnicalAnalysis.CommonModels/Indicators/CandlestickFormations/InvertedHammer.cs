@@ -2,16 +2,10 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.CandlestickFormations
 {
-    public class InvertedHammer : BaseIndicator
+    public class InvertedHammer(long candlestickId, int orderOfSignal, bool isInvertedHammer) : BaseIndicator(candlestickId)
     {
-        public bool IsInvertedHammer { get; init; }
-        public int OrderOfSignal { get; init; }
-        public InvertedHammer(long candlestickId, int orderOfSignal, bool isInvertedHammer)
-            : base(candlestickId)
-        {
-            IsInvertedHammer = isInvertedHammer;
-            OrderOfSignal = orderOfSignal;
-        }
+        public bool IsInvertedHammer { get; init; } = isInvertedHammer;
+        public int OrderOfSignal { get; init; } = orderOfSignal;
 
         public static InvertedHammer Create(long candlestickId, int orderOfSignal, bool isInvertedHammer)
         {

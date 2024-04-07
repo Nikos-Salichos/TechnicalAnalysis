@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class Rsi : BaseIndicator
+    public class Rsi(long candlestickId) : BaseIndicator(candlestickId)
     {
         public long Period { get; init; }
         public double Overbought { get; init; } = Constants.RsiOverbought;
@@ -13,9 +13,5 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Basic
         public bool RsiChangedDirectionFromPreviousCandlestick { get; set; }
         public long NumberOfConsecutiveLowerRsi { get; set; }
         public long NumberOfConsecutiveHigherRsi { get; set; }
-
-        public Rsi(long candlestickId) : base(candlestickId)
-        {
-        }
     }
 }

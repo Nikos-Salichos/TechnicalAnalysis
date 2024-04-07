@@ -6,6 +6,6 @@
 
         public string ValueClassification { get; init; } = string.Empty;
 
-        public DateTime DateTime { get; init; }
+        public DateTime DateTime { get; init; } = DateTime.UtcNow;
     }
 }

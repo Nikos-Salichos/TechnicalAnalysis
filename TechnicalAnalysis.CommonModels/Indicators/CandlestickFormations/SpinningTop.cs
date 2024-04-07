@@ -2,15 +2,10 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.CandlestickFormations
 {
-    public class SpinningTop : BaseIndicator
+    public class SpinningTop(long candlestickId, bool isSpinningTop) : BaseIndicator(candlestickId)
     {
-        public bool IsSpinningTop { get; init; }
+        public bool IsSpinningTop { get; init; } = isSpinningTop;
         public int OrderOfSignal { get; init; }
-        public SpinningTop(long candlestickId, bool isSpinningTop)
-            : base(candlestickId)
-        {
-            IsSpinningTop = isSpinningTop;
-        }
 
         public static SpinningTop Create(long candlestickId, bool isSpinningTop)
         {

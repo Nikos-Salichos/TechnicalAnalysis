@@ -2,16 +2,10 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.CandlestickFormations
 {
-    public class DragonFlyDoji : BaseIndicator
+    public class DragonFlyDoji(long candlestickId, bool isDragonflyDoji, int orderOfSignal) : BaseIndicator(candlestickId)
     {
-        public bool IsDragonFlyDoji { get; init; }
-        public int OrderOfSignal { get; init; }
-        public DragonFlyDoji(long candlestickId, bool isDragonflyDoji, int orderOfSignal)
-            : base(candlestickId)
-        {
-            IsDragonFlyDoji = isDragonflyDoji;
-            OrderOfSignal = orderOfSignal;
-        }
+        public bool IsDragonFlyDoji { get; init; } = isDragonflyDoji;
+        public int OrderOfSignal { get; init; } = orderOfSignal;
 
         public static DragonFlyDoji Create(long candlestickId, bool isDragonflyDoji, int orderOfSignal)
         {

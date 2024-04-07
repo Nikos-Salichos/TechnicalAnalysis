@@ -14,10 +14,5 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Basic
             VolatilityValue = volatilityValue;
             Period = period;
         }
-
-        public static Volatility Create(long candlestickId, double volatilityValue, long period)
-        {
-            return new Volatility(candlestickId, volatilityValue, period);
-        }
     }
 }

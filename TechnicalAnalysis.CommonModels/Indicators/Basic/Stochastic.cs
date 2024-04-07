@@ -2,19 +2,11 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class Stochastic : BaseIndicator
+    public class Stochastic(long candlestickId, double? oscillatorK, double? signalD, double? percentJ) : BaseIndicator(candlestickId)
     {
-        public double? OscillatorK { get; init; }
-        public double? SignalD { get; init; }
-        public double? PercentJ { get; init; }
-
-        public Stochastic(long candlestickId, double? oscillatorK, double? signalD, double? percentJ)
-            : base(candlestickId)
-        {
-            OscillatorK = oscillatorK;
-            SignalD = signalD;
-            PercentJ = percentJ;
-        }
+        public double? OscillatorK { get; init; } = oscillatorK;
+        public double? SignalD { get; init; } = signalD;
+        public double? PercentJ { get; init; } = percentJ;
 
         public static Stochastic Create(long candlestickId, double? oscillatorK, double? signalD, double? percentJ)
         {
