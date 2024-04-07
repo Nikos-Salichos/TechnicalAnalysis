@@ -700,7 +700,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 var candlestick = pair.Candlesticks[counter];
                 double valueAtIndex = hvpValues.ElementAtOrDefault(counter);
-                candlestick?.Volatilities.Add(Volatility.Create(candlestick.PrimaryId, valueAtIndex, period));
+                candlestick?.Volatilities.Add(new Volatility(candlestick.PrimaryId, valueAtIndex, period));
             }
         }
 
