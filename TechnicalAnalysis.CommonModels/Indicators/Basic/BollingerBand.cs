@@ -2,7 +2,7 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class BollingerBand : BaseIndicator
+    public class BollingerBand(long candlestickId) : BaseIndicator(candlestickId)
     {
         public long Period { get; init; }
         public int? StandardDeviation { get; init; } = 2;
@@ -19,10 +19,6 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Basic
         public decimal? BandWidth
         {
             get { return (UpperBand - LowerBand) / MiddleBand * 100; }
-        }
-
-        public BollingerBand(long candlestickId) : base(candlestickId)
-        {
         }
     }
 }
