@@ -239,7 +239,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var fractalTrend = new Indicator { Name = "FractalTrend", PairName = pair.Symbol };
 
-            for (int i = 0; i < pair?.Candlesticks.Count; i++)
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
@@ -288,7 +288,7 @@ namespace TechnicalAnalysis.Application.Services
             var lowestHighLowestLowFractal = new Indicator { Name = "lowestHighLowestLowFractal", PairName = pair.Symbol };
 
             var lastSignal = string.Empty;
-            for (int i = 0; i < pair?.Candlesticks.Count; i++)
+            for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
@@ -339,7 +339,7 @@ namespace TechnicalAnalysis.Application.Services
             {
                 foreach (var signal in candlestick.FlagsNestedCandlesticksBody.Where(s => s.NumberOfNestedCandlestickBodies >= 3))
                 {
-                    var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                    var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
                     if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
                     {
                         var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -455,7 +455,7 @@ namespace TechnicalAnalysis.Application.Services
                 {
                     if (signal.NumberOfFunnelCandlesticks >= 3)
                     {
-                        var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                        var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
 
                         if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
                         {
@@ -483,7 +483,7 @@ namespace TechnicalAnalysis.Application.Services
             {
                 foreach (var signal in candlestick.FlagsNestedCandlesticksBody.Where(s => s.NumberOfNestedCandlestickBodies >= 3))
                 {
-                    var candlestickFlagPoleId = pair?.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
+                    var candlestickFlagPoleId = pair.Candlesticks.Find(c => c.PrimaryId == signal.FlagPoleCandlestickId);
                     if (candlestickFlagPoleId?.Range > candlestickFlagPoleId?.AverageTrueRanges?.FirstOrDefault()?.AverageTrueRangeValue / 2)
                     {
                         var signalFound = indicator.Signals.FirstOrDefault(s => s.OpenedAt == candlestickFlagPoleId.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"));
