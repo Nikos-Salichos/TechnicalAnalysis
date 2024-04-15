@@ -25,7 +25,7 @@ builder.SerilogConfiguration();
 builder.Services.AddDomainModule(builder.Configuration);
 builder.Services.AddInfrastructurePersistenceModule(builder.Configuration);
 builder.Services.AddInfrastructureAdapterModule(builder.Configuration);
-builder.Services.AddApplicationModule(builder.Configuration);
+builder.Services.AddApplicationModule();
 builder.Services.AddInfrastructureHostModule();
 #endregion Layer Modules
 
