@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using TechnicalAnalysis.Application.Services;
@@ -12,7 +11,7 @@ namespace TechnicalAnalysis.Application.Modules
 {
     public static class ApplicationModule
     {
-        public static void AddApplicationModule(this IServiceCollection services, IConfiguration configuration)
+        public static void AddApplicationModule(this IServiceCollection services)
         {
             // Register the original service
             services.AddSingleton<AnalysisService>();
