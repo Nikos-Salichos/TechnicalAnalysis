@@ -248,7 +248,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             {
                 var pairsWithCandlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0).ToList();
                 var candlesticks = pairsWithCandlesticks.SelectMany(c => c.BinanceCandlesticks).ToList();
-                await mediator.Send(new InsertCandlesticksCommand(candlesticks.ToDomain()));
+                HashSet<BinanceCandlestick> uniqueCandlesticks = new HashSet<BinanceCandlestick>(candlesticks);
+                await mediator.Send(new InsertCandlesticksCommand(uniqueCandlesticks.ToDomain()));
             }
         }
     }
