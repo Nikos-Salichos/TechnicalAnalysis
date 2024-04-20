@@ -246,8 +246,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binancePairs.Any(pair => pair.BinanceCandlesticks.Count > 0))
             {
-                var pairsWithCandlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0).ToList();
-                var candlesticks = pairsWithCandlesticks.SelectMany(c => c.BinanceCandlesticks).ToList();
+                var candlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0).SelectMany(c => c.BinanceCandlesticks).ToList();
                 HashSet<BinanceCandlestick> uniqueCandlesticks = new HashSet<BinanceCandlestick>(candlesticks);
                 await mediator.Send(new InsertCandlesticksCommand(uniqueCandlesticks.ToDomain()));
             }
