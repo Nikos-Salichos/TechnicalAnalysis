@@ -48,9 +48,6 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
                 && CloseTime == other.CloseTime
                 && PairId == other.PairId;
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(OpenTime, OpenPrice, HighPrice, LowPrice, ClosePrice, PairId);
-        }
+        public override int GetHashCode() => HashCode.Combine(OpenTime, OpenPrice, HighPrice, LowPrice, ClosePrice, PairId);
     }
 }
