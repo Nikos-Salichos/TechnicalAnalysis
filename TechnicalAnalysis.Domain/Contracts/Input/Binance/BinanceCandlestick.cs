@@ -2,7 +2,7 @@
 
 namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
 {
-    public class BinanceCandlestick
+    public class BinanceCandlestick : IEquatable<BinanceCandlestick>
     {
         [JsonPropertyOrder(1)]
         public DateTime OpenTime { get; init; }
@@ -36,5 +36,21 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
         public string Period { get; set; } = string.Empty;
 
         public long PairId { get; set; }
+
+        public override bool Equals(object obj) => Equals(obj as BinanceCandlestick);
+
+        public bool Equals(BinanceCandlestick? other) => other != null
+                && OpenTime == other.OpenTime
+                && OpenPrice == other.OpenPrice
+                && HighPrice == other.HighPrice
+                && LowPrice == other.LowPrice
+                && ClosePrice == other.ClosePrice
+                && CloseTime == other.CloseTime;
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(OpenTime, OpenPrice, HighPrice, LowPrice, ClosePrice, CloseTime);
+        }
+
     }
 }
