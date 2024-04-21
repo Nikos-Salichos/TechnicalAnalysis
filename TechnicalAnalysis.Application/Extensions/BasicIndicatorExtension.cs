@@ -366,14 +366,13 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    var cci = Cci.Create(
-                        candlestickId: candlestick.PrimaryId,
-                        period: 20,
-                        value: indicatorResult.Cci,
-                        overbought: 100,
-                        oversold: -100
-                    );
-                    candlestick.Ccis.Add(cci);
+                    candlestick.Ccis.Add(new Cci(candlestick.PrimaryId)
+                    {
+                        Period = 20,
+                        Value = indicatorResult.Cci,
+                        Overbought = 100,
+                        Oversold = 100
+                    });
                 }
             }
         }
