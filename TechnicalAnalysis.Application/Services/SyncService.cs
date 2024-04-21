@@ -90,7 +90,7 @@ namespace TechnicalAnalysis.Application.Services
             }
             else
             {
-                logger.LogWarning("Synchronization failed for {Provider}", provider);
+                logger.LogError("Synchronization failed for {Provider}", provider);
             }
         }
     }
