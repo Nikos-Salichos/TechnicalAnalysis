@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.Extensions.Logging;
 using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Commands.Insert;
 using TechnicalAnalysis.Application.Mediatr.Queries;
@@ -9,8 +8,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class StockFearAndGreedAdapter(IStockFearAndGreedHttpClient stockFearAndGreedHttpClient, IMediator mediator,
-        ILogger<StockFearAndGreedAdapter> logger) : IAdapter
+    public class StockFearAndGreedAdapter(IStockFearAndGreedHttpClient stockFearAndGreedHttpClient, IMediator mediator) : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
