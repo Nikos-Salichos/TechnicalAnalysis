@@ -31,7 +31,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             var validationResult = _dataProviderTimeframeRequest.Validate(request);
             if (!validationResult.IsValid)
             {
-                logger.LogWarning("validationResult {@validationResult}", validationResult);
+                logger.LogError("validationResult {@validationResult}", validationResult);
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage);
                 return Task.FromResult<IActionResult>(BadRequest(errors));
             }
@@ -68,7 +68,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
             if (pairNames.Count is 0)
             {
-                logger.LogWarning("No pair names provided by the user {@pairNames}", pairNames);
+                logger.LogError("No pair names provided by the user {@pairNames}", pairNames);
                 return Task.FromResult<IActionResult>(BadRequest($"No pair names provided by the user {pairNames}"));
             }
 
