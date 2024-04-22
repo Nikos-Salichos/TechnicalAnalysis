@@ -46,7 +46,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<CoinMarketCapAssetContract, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
-
             using var content = httpResponseMessage.Content;
             await using var jsonStream = await content.ReadAsStreamAsync();
 
@@ -56,7 +55,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<CoinMarketCapAssetContract, string>.Success(deserializedData);
             }
 
-            logger.LogWarning("Deserialization Failed");
+            logger.LogError("Deserialization Failed");
             return Result<CoinMarketCapAssetContract, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
