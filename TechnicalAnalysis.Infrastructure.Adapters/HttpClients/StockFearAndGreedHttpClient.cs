@@ -39,7 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<StockFearAndGreedRoot, string>.Success(deserializedData);
             }
 
-            logger.LogWarning("Deserialization Failed");
+            logger.LogError("Deserialization Failed");
             return Result<StockFearAndGreedRoot, string>.Fail($"{nameof(GetStockFearAndGreedIndex)} Deserialization Failed");
         }
     }
