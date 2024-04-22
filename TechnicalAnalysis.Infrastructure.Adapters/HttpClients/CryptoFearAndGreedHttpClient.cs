@@ -35,7 +35,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(deserializedData.CryptoFearAndGreedDatas);
             }
 
-            logger.LogWarning("Deserialization Failed");
+            logger.LogError("Deserialization Failed");
             return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail($"{nameof(GetCryptoFearAndGreedIndex)} Deserialization Failed");
         }
     }
