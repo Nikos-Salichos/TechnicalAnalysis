@@ -98,7 +98,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    logger.LogWarning("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
                     return Result<DexV3ApiResponse, string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                 }
 
@@ -108,7 +108,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     return Result<DexV3ApiResponse, string>.Success(deserializedData);
                 }
-                logger.LogWarning("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
+                logger.LogError("Method {Method}: Deserialization Failed", nameof(GetMostActivePoolsAsync));
                 return Result<DexV3ApiResponse, string>.Fail($"{nameof(GetMostActivePoolsAsync)} Deserialization Failed");
             }
         }
