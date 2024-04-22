@@ -40,7 +40,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Success(deserializedData);
             }
 
-            logger.LogWarning("Deserialization Failed");
+            logger.LogError("Deserialization Failed");
             return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
