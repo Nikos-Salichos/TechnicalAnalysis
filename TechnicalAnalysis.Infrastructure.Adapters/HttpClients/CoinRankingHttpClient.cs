@@ -52,7 +52,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<CoinRankingAssetContract, string>.Success(deserializedData);
             }
 
-            logger.LogWarning("Deserialization Failed");
+            logger.LogError("Deserialization Failed");
             return Result<CoinRankingAssetContract, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
