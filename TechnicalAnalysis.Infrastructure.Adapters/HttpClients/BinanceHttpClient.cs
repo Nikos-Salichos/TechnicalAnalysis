@@ -41,7 +41,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
             }
 
-            logger.LogWarning("Deserialization Failed");
+            logger.LogError("Deserialization Failed");
             return Result<BinanceExchangeInfoResponse, string>.Fail($"{nameof(GetBinanceAssetsAndPairs)} Deserialization Failed");
         }
 
@@ -60,7 +60,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                logger.LogWarning("{httpResponseMessage.Content}", httpResponseMessage.Content);
+                logger.LogError("{httpResponseMessage.Content}", httpResponseMessage.Content);
                 return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
             }
 
@@ -70,7 +70,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             {
                 return Result<object[][], string>.Success(deserializedData);
             }
-            logger.LogWarning("Deserialization Failed");
+            logger.LogError("Deserialization Failed");
             return Result<object[][], string>.Fail($"{nameof(GetBinanceCandlesticks)} Deserialization Failed");
         }
     }
