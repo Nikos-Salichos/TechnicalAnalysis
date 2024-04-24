@@ -2,11 +2,13 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Serilog;
 using TechnicalAnalysis.Application.Modules;
+using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Modules;
 using TechnicalAnalysis.Infrastructure.Adapters.Modules;
 using TechnicalAnalysis.Infrastructure.Host.Hangfire;
 using TechnicalAnalysis.Infrastructure.Host.Middleware;
 using TechnicalAnalysis.Infrastructure.Host.Modules;
+using TechnicalAnalysis.Infrastructure.Host.RabbitMQ;
 using TechnicalAnalysis.Infrastructure.Host.Serilog;
 using TechnicalAnalysis.Infrastructure.Host.Services;
 using TechnicalAnalysis.Infrastructure.Persistence.Modules;
@@ -40,6 +42,10 @@ builder.Services.AddHangfire(configuration =>
     var hangfireConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
     configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(hangfireConnectionString));
 });
+
+#region RabbitMq
+builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+#endregion RabbitMq
 
 builder.Services.AddHangfireServer();
 
