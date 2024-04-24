@@ -9,7 +9,6 @@ using TechnicalAnalysis.Domain.Utilities;
 using TechnicalAnalysis.Infrastructure.Adapters.Adapters;
 using TechnicalAnalysis.Infrastructure.Adapters.HttpClients;
 using TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers;
-using TechnicalAnalysis.Infrastructure.Adapters.RabbitMQ;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
 {
@@ -64,7 +63,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
 
             services.AddSingleton<IMailer, Mailer>();
             services.AddSingleton<ICommunication, Communication>();
-            services.AddSingleton<IRabbitMqService, RabbitMqService>();
         }
     }
 }
