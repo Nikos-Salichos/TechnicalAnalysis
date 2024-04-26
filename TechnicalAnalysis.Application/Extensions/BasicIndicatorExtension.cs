@@ -463,7 +463,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateStandardPivotPoints(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateStandardPivotPoints(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetPivotPoints(PeriodSize.Day, PivotPointType.Standard))
             {
