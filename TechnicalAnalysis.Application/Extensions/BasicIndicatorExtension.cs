@@ -503,7 +503,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateAverageTrueRange(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateAverageTrueRange(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetAtr())
             {
