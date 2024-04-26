@@ -55,7 +55,7 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             foreach (var candlestick in pair.Candlesticks)
             {
-                var highestClose = candlestick.Highests.FirstOrDefault(c => c.PriceType == PriceType.Close && c.Period == 22);
+                var highestClose = candlestick.Highests.Find(c => c.PriceType == PriceType.Close && c.Period == 22);
 
                 if (highestClose is null || highestClose.Value is 0)
                 {
