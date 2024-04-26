@@ -428,7 +428,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateStandardDeviation(IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateStandardDeviation(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetStdDev(20))
             {
