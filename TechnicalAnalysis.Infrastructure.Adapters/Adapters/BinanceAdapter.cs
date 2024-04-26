@@ -54,7 +54,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             pairs.MapPairsToCandlesticks(candlesticks);
 
-            await SyncCandlesticks(pairs.ToContract().ToList(), timeframe);
+            await SyncCandlesticks(pairs.ToContract(), timeframe);
 
             binanceProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             var providerCandlestickSyncInfo = binanceProvider.GetOrCreateProviderCandlestickSyncInfo(provider, timeframe);
@@ -248,6 +248,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             {
                 var candlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0).SelectMany(c => c.BinanceCandlesticks).ToList();
                 HashSet<BinanceCandlestick> uniqueCandlesticks = new(candlesticks);
+
+                //To Check
+                var uniqueCandlesticks1 = new HashSet<BinanceCandlestick>(binancePairs
+                    .SelectMany(pair => pair.BinanceCandlesticks)
+                    .Where(candlestick => candlestick != null));
+
                 await mediator.Send(new InsertCandlesticksCommand(uniqueCandlesticks.ToDomain()));
             }
         }
