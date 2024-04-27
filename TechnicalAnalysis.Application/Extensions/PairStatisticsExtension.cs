@@ -9,12 +9,12 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static ILogger Logger { get; set; }
 
-        public static void CalculatePairStatistics(this IEnumerable<PairExtended> pairs)
+        public static void CalculatePairStatistics(this List<PairExtended> pairs)
         {
             CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(pairs);
         }
 
-        private static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(IEnumerable<PairExtended> pairs)
+        private static void CalculateAccumulatedCorrelationOfPairToAnotherPairCandlesticks(List<PairExtended> pairs)
         {
             var preCalculationCandlesticks = pairs.ToDictionary(
                 pair => pair.PrimaryId,
