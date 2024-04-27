@@ -660,7 +660,7 @@ namespace TechnicalAnalysis.Application.Services
 
             candlesticks.AddRange(dexCandlesticks);
 
-            var assets = await fetchedAssetsTask;
+            var assets = (await fetchedAssetsTask).ToList();
 
             pairs.MapPairsToAssets(assets);
             pairs.MapPairsToCandlesticks(candlesticks);
