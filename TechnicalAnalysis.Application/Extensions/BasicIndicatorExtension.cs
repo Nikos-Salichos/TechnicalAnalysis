@@ -763,7 +763,8 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateOnBalanceVolumeOscilator(PairExtended pair, IEnumerable<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
+        private static void CalculateOnBalanceVolumeOscilator(PairExtended pair, FrozenSet<Quote> quotes,
+            ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var indicatorResult in quotes.GetObv())
             {
