@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class PairExtension
     {
-        public static List<PairExtended> GetUniqueDollarPairs(IEnumerable<Asset> assets, IEnumerable<PairExtended> fetchedPairs)
+        public static List<PairExtended> GetUniqueDollarPairs(List<Asset> assets, List<PairExtended> fetchedPairs)
         {
             // Retrieve the IDs for USDT, USDC, DAI, and BUSD from the assets
             var assetIds = assets
@@ -26,7 +26,7 @@ namespace TechnicalAnalysis.Application.Extensions
                                        uniqueBaseAssetIds.Add(fetchedPair.BaseAssetId)).ToList();
         }
 
-        public static List<PairExtended> MapPairsToAssets(this IEnumerable<PairExtended> pairs, IEnumerable<Asset> assets)
+        public static List<PairExtended> MapPairsToAssets(this List<PairExtended> pairs, List<Asset> assets)
         {
             foreach (var pair in pairs)
             {
@@ -54,7 +54,7 @@ namespace TechnicalAnalysis.Application.Extensions
             return pairs.ToList();
         }
 
-        public static List<PairExtended> MapPairsToCandlesticks(this IEnumerable<PairExtended> pairs, IEnumerable<CandlestickExtended> candlesticks)
+        public static List<PairExtended> MapPairsToCandlesticks(this List<PairExtended> pairs, List<CandlestickExtended> candlesticks)
         {
             var candlestickDict = candlesticks.ToLookup(c => c.PoolOrPairId);
             foreach (var pair in pairs.Where(pair => candlestickDict.Contains(pair.PrimaryId)))
@@ -64,11 +64,11 @@ namespace TechnicalAnalysis.Application.Extensions
             return pairs.ToList();
         }
 
-        public static void FindNewCandlesticks(this IEnumerable<BinancePair> pairs, IEnumerable<BinancePair> pairsWithExistingCandles)
+        public static void FindNewCandlesticks(this List<BinancePair> pairs, List<BinancePair> pairsWithExistingCandles)
         {
             foreach (var pair in pairs)
             {
-                var existingPair = pairsWithExistingCandles.FirstOrDefault(p => p.Pair == pair.Pair);
+                var existingPair = pairsWithExistingCandles.Find(p => p.Pair == pair.Pair);
 
                 if (existingPair != null)
                 {
