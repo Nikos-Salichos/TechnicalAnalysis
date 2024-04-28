@@ -12,6 +12,13 @@ namespace TechnicalAnalysis.Application.Services
     public class CachedAnalysisService(IAnalysisService inner, IRedisRepository redisRepository,
         ICommunication communication, IRabbitMqService rabbitMqService) : IAnalysisService
     {
+
+        private static readonly ExecutionDataflowBlockOptions ExecutionDataflowBlockOptions = new()
+        {
+            MaxDegreeOfParallelism = 3 * Environment.ProcessorCount,
+            SingleProducerConstrained = true,
+        };
+
         public async Task<List<PairExtended>> GetIndicatorsByPairNamesAsync(List<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null)
         {
             var pairsFromCache = new List<PairExtended>();
@@ -40,10 +47,7 @@ namespace TechnicalAnalysis.Application.Services
                 await redisRepository.SetRecordAsync(pair.Symbol, pair);
                 pairsFromCache.Add(pair);
 
-            }, new ExecutionDataflowBlockOptions
-            {
-                MaxDegreeOfParallelism = 3 * Environment.ProcessorCount
-            });
+            }, ExecutionDataflowBlockOptions);
 
             foreach (var pair in fetchedPairs)
             {
@@ -69,7 +73,7 @@ namespace TechnicalAnalysis.Application.Services
                     rabbitMqService.PublishMessage(cachedPairs);
 
                     // Example how to consume message
-                    // var message = await rabbitMqService.ConsumeMessageAsync<IEnumerable<PairExtended>>();
+                    // var message = await rabbitMqService.ConsumeMessageAsync<List<PairExtended>>();
 
                     return cachedPairs;
                 }
