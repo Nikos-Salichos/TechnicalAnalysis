@@ -76,7 +76,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPoolsTask, fetchedCandlesticksTask);
 
-            var assetsResult = await fetchedAssetsTask;
+            var assetsResult = (await fetchedAssetsTask).ToList();
             var poolsResult = await fetchedPoolsTask;
             var candlesticksResult = await fetchedCandlesticksTask;
 
