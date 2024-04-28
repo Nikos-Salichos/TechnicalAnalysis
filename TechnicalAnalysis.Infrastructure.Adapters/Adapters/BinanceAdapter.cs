@@ -41,7 +41,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
 
             const string activeStatus = "TRADING";
-            var tradeableBinancePairs = response.SuccessValue.Symbols.Where(s => string.Equals(s.Status, activeStatus, StringComparison.InvariantCultureIgnoreCase));
+            var tradeableBinancePairs = response.SuccessValue.Symbols.Where(s => string.Equals(s.Status, activeStatus, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             await SyncAssets(tradeableBinancePairs);
             await SyncPairs(tradeableBinancePairs);
@@ -50,7 +50,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
 
             var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == provider).ToList();
-            var candlesticks = await fetchedCandlesticksTask;
+            var candlesticks = (await fetchedCandlesticksTask).ToList();
 
             pairs.MapPairsToCandlesticks(candlesticks);
 
@@ -62,7 +62,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             return true;
         }
 
-        private async Task SyncAssets(IEnumerable<BinanceSymbol> tradeablePairs)
+        private async Task SyncAssets(List<BinanceSymbol> tradeablePairs)
         {
             List<BinanceAsset> newAssets = new();
             foreach (var item in tradeablePairs)
@@ -112,9 +112,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        private async Task SyncCandlesticks(IList<BinancePair> binancePairs, Timeframe period = Timeframe.Daily)
+        private async Task SyncCandlesticks(List<BinancePair> binancePairs, Timeframe period = Timeframe.Daily)
         {
-            var pairsWithExistingCandles = JsonSerializer.Deserialize<IEnumerable<BinancePair>>(JsonSerializer.Serialize(binancePairs));
+            var pairsWithExistingCandles = JsonSerializer.Deserialize<List<BinancePair>>(JsonSerializer.Serialize(binancePairs));
 
             foreach (var binancePair in binancePairs)
             {
@@ -246,13 +246,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (binancePairs.Any(pair => pair.BinanceCandlesticks.Count > 0))
             {
-                var candlesticks = binancePairs.Where(pair => pair.BinanceCandlesticks.Count > 0).SelectMany(c => c.BinanceCandlesticks).ToList();
-                HashSet<BinanceCandlestick> uniqueCandlesticks = new(candlesticks);
-
-                //To Check
-                var uniqueCandlesticks1 = new HashSet<BinanceCandlestick>(binancePairs
+                var uniqueCandlesticks = new HashSet<BinanceCandlestick>(binancePairs
                     .SelectMany(pair => pair.BinanceCandlesticks)
-                    .Where(candlestick => candlestick != null));
+                    .Where(candlestick => candlestick != null))
+                    .ToList();
 
                 await mediator.Send(new InsertCandlesticksCommand(uniqueCandlesticks.ToDomain()));
             }
