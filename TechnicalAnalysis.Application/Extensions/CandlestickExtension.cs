@@ -72,7 +72,7 @@ namespace TechnicalAnalysis.Application.Extensions
             return (MissingCandles: missingDates, MissingSymbols: missingSymbols);
         }
 
-        public static void FillMissingDates(this IEnumerable<BinancePair> pairs)
+        public static void FillMissingDates(this List<BinancePair> pairs)
         {
             foreach (var pair in pairs.Select(p => p.BinanceCandlesticks))
             {
