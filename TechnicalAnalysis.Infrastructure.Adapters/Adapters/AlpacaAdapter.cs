@@ -161,9 +161,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
             var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
 
-            var fetchedAssets = await fetchedAssetsTask;
+            var fetchedAssets = (await fetchedAssetsTask).ToList();
             var fetchedPairs = await fetchedPairsTask;
-            var fetchedCandlesticks = await fetchedCandlesticksTask;
+            var fetchedCandlesticks = (await fetchedCandlesticksTask).ToList();
 
             var pairs = fetchedPairs.Where(p => p.Provider == DataProvider.Alpaca).ToList();
 
