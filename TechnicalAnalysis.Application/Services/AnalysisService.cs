@@ -65,7 +65,7 @@ namespace TechnicalAnalysis.Application.Services
             return filteredEnhancedScanPairs;
         }
 
-        private static List<PairExtended> FilterPairs(IEnumerable<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
+        private static List<PairExtended> FilterPairs(List<PairExtended> pairs, Func<CandlestickExtended, bool> predicate)
         {
             return pairs.OrderByDescending(pair => pair.CreatedAt)
                         .Select(pair =>
@@ -158,7 +158,7 @@ namespace TechnicalAnalysis.Application.Services
             return baseDirectory;
         }
 
-        private static Indicator CalculateEnhancedScanLongSignal(IEnumerable<Position> positionsStrategy, string indicatorName, string pairSymbol)
+        private static Indicator CalculateEnhancedScanLongSignal(List<Position> positionsStrategy, string indicatorName, string pairSymbol)
         {
             var enhancedScan = new Indicator { Name = indicatorName, PairName = pairSymbol };
             foreach (var position in positionsStrategy)
@@ -574,7 +574,7 @@ namespace TechnicalAnalysis.Application.Services
         }
 
         private static void CalculateEnhancedIsLongBasedOnStatistics(MarketStatistic marketStatistic,
-            IEnumerable<PairExtended> selectedPairs,
+            List<PairExtended> selectedPairs,
             Func<PairExtended, bool> filterPredicate)
         {
             var dailyStatisticsDict = marketStatistic.DailyStatistics
@@ -616,7 +616,7 @@ namespace TechnicalAnalysis.Application.Services
 
         }
 
-        private async Task CalculateTechnicalIndicators(IEnumerable<PairExtended> pairs)
+        private async Task CalculateTechnicalIndicators(List<PairExtended> pairs)
         {
             var cryptoFearAndGreedDataTask = mediator.Send(new GetCryptoFearAndGreedIndexQuery());
 
@@ -668,7 +668,7 @@ namespace TechnicalAnalysis.Application.Services
             return pairs;
         }
 
-        private async Task<MarketStatistic> GetCryptoPairsWithEnhancedScanIsLong(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> GetCryptoPairsWithEnhancedScanIsLong(List<PairExtended> pairs)
         {
             var cryptoMarketStatistic = new MarketStatistic();
 
@@ -724,7 +724,7 @@ namespace TechnicalAnalysis.Application.Services
             return cryptoMarketStatistic;
         }
 
-        private async Task<MarketStatistic> GetEtfStockPairWithEnhancedScanIsLong(IEnumerable<PairExtended> pairs)
+        private async Task<MarketStatistic> GetEtfStockPairWithEnhancedScanIsLong(List<PairExtended> pairs)
         {
             var etfStockMarketStatistic = new MarketStatistic();
 
