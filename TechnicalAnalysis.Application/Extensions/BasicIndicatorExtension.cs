@@ -171,14 +171,14 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(donchianChannelResult.Date, out var candlestick))
                 {
-                    var donchian = DonchianChannel.Create(
-                        candlestickId: candlestick.PrimaryId,
-                        period: 20,
-                        upperBand: donchianChannelResult.UpperBand,
-                        centerline: donchianChannelResult.Centerline,
-                        lowerBand: donchianChannelResult.LowerBand,
-                        width: donchianChannelResult.Width
-                    );
+                    var donchian = new DonchianChannel(candlestick.PrimaryId)
+                    {
+                        Centerline = donchianChannelResult.Centerline,
+                        UpperBand = donchianChannelResult.UpperBand,
+                        LowerBand = donchianChannelResult.LowerBand,
+                        Period = 20,
+                        Width = donchianChannelResult.Width
+                    };
                     candlestick.DonchianChannels.Add(donchian);
                 }
             }
@@ -351,12 +351,14 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    candlestick.Aroons.Add(new Aroon(
-                    candlestick.PrimaryId,
-                    period: 25,
-                    indicatorResult.AroonUp,
-                    indicatorResult.AroonDown,
-                    indicatorResult.Oscillator));
+                    candlestick.Aroons.Add(new Aroon(candlestick.PrimaryId)
+                    {
+                        AroonUp = indicatorResult.AroonUp,
+                        AroonDown = indicatorResult.AroonDown,
+                        Oscillator = indicatorResult.Oscillator,
+                        Period = 25,
+
+                    });
                 }
             }
         }
@@ -509,11 +511,13 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    candlestick?.AverageTrueRanges.Add(new AverageTrueRange(candlestick.PrimaryId,
-                        period: 14,
-                        (decimal?)indicatorResult.Tr,
-                        (decimal?)indicatorResult.Atr,
-                        (decimal?)indicatorResult.Atrp));
+                    candlestick?.AverageTrueRanges.Add(new AverageTrueRange(candlestick.PrimaryId)
+                    {
+                        AverageTrueRangePercent = (decimal?)indicatorResult.Atrp,
+                        AverageTrueRangeValue = (decimal?)indicatorResult.Atr,
+                        TrueRange = (decimal?)indicatorResult.Tr,
+                        Period = 14
+                    });
                 }
             }
         }
@@ -614,7 +618,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFractalLowestHigh(PairExtended pair)
         {
-            var candlesticksWithBearFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2) is not null)
+            var candlesticksWithBearFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2) is not null)
                                                                 .OrderBy(c => c.OpenDate)
                                                                 .ToList();
 
@@ -629,14 +633,20 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                var fractalBear = candlestick.Fractals?.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2);
-                var fractalBear1 = candlestick1.Fractals?.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2);
+                var fractalBear = candlestick.Fractals?.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2);
+                var fractalBear1 = candlestick1.Fractals?.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2);
 
                 if (fractalBear?.Value <= fractalBear1?.Value)
                 {
                     count++;
                     var candlestickInPair = pair.Candlesticks.Find(c => c.OpenDate == candlestick.OpenDate);
-                    candlestickInPair?.FractalLowests.Add(new FractalLowest(candlestick.PrimaryId, count, PriceType.High, candlestick.HighPrice));
+                    candlestickInPair?.FractalLowests.Add(
+                        new FractalLowest(candlestick.PrimaryId)
+                        {
+                            Consecutive = count,
+                            Price = candlestick.HighPrice,
+                            PriceType = PriceType.High
+                        });
                 }
                 else
                 {
@@ -647,7 +657,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFractalLowestLow(PairExtended pair)
         {
-            var candlesticksWithBullFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2) is not null)
+            var candlesticksWithBullFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2) is not null)
                                                                 .OrderBy(c => c.OpenDate).ToList();
 
             int count = 0;
@@ -661,17 +671,19 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                var FractalBull = candlestick.Fractals?.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2);
-                var FractalBull1 = candlestick1.Fractals?.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2);
+                var FractalBull = candlestick.Fractals?.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2);
+                var FractalBull1 = candlestick1.Fractals?.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2);
 
                 if (FractalBull?.Value <= FractalBull1?.Value)
                 {
                     count++;
                     var candlestickInPair = pair.Candlesticks.Find(c => c.OpenDate == candlestick.OpenDate);
-                    candlestickInPair?.FractalLowests.Add(new FractalLowest(candlestick.PrimaryId,
-                        count,
-                        PriceType.Low,
-                        candlestick.LowPrice));
+                    candlestickInPair?.FractalLowests.Add(new FractalLowest(candlestick.PrimaryId)
+                    {
+                        Consecutive = count,
+                        Price = candlestick.LowPrice,
+                        PriceType = PriceType.Low
+                    });
                 }
                 else
                 {
