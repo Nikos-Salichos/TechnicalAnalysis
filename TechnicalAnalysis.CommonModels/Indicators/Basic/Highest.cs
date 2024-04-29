@@ -5,8 +5,8 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
     public class Highest(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public long Period { get; init; }
-        public decimal? Value { get; set; }
-        public PriceType PriceType { get; init; }
+        public required long Period { get; init; }
+        public required decimal? Value { get; set; }
+        public required PriceType PriceType { get; init; }
     }
 }
