@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null && !openPosition)
                 {
-                    Position position = new Position
+                    Position position = new()
                     {
                         OpenPositionDate = candlestick.OpenDate,
                         EntryPositionPrice = candlestick.OpenPrice,
@@ -40,7 +40,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         && openPosition
                         && candlestick1.ClosePrice <= pricePercentageBelowEntry)
                     {
-                        Position position = new Position
+                        Position position = new()
                         {
                             OpenPositionDate = candlestick.OpenDate,
                             EntryPositionPrice = candlestick.ClosePrice,
@@ -82,7 +82,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         public static List<Position> AverageDownStrategyCloseOneByOnBasedInFractalBreak(this PairExtended pair)
         {
-            List<Position> positions = new();
+            List<Position> positions = [];
 
             _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
             bool openPosition = false;
