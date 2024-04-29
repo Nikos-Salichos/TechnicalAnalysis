@@ -3,10 +3,10 @@ using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class FractalLowest(long candlestickId, long consecutive, PriceType priceType, decimal? price) : BaseIndicator(candlestickId)
+    public class FractalLowest(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public long Consecutive { get; init; } = consecutive;
-        public decimal? Price { get; init; } = price;
-        public PriceType PriceType { get; init; } = priceType;
+        public required long Consecutive { get; init; }
+        public required decimal? Price { get; init; }
+        public required PriceType PriceType { get; init; }
     }
 }
