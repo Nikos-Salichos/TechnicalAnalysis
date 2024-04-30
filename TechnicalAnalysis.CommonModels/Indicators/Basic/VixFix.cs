@@ -4,7 +4,7 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
     public class VixFix(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public long Period { get; init; }
-        public decimal? Value { get; init; }
+        public required long Period { get; init; }
+        public required decimal? Value { get; init; }
     }
 }
