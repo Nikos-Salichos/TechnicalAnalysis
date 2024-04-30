@@ -2,9 +2,9 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class PsychologicalLine(long candlestickId, long period, double value) : BaseIndicator(candlestickId)
+    public class PsychologicalLine(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public long Period { get; init; } = period;
-        public double Value { get; init; } = value;
+        public required long Period { get; init; }
+        public required double Value { get; init; }
     }
 }
