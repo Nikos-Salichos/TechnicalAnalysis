@@ -3,15 +3,10 @@ using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class MovingAverage(long candlestickId, double period, double? value, MovingAverageType movingAverageType) : BaseIndicator(candlestickId)
+    public class MovingAverage(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public double Period { get; init; } = period;
-        public double? Value { get; init; } = value;
-        public MovingAverageType MovingAverageType { get; init; } = movingAverageType;
-
-        public static MovingAverage Create(long candlestickId, double period, double? value, MovingAverageType movingAverageType)
-        {
-            return new MovingAverage(candlestickId, period, value, movingAverageType);
-        }
+        public required double Period { get; init; }
+        public required double? Value { get; init; }
+        public required MovingAverageType MovingAverageType { get; init; }
     }
 }
