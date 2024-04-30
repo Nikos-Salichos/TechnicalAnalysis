@@ -190,21 +190,21 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(keltnerChannelResult.Date, out var candlestick))
                 {
-                    var keltner = KeltnerChannel.Create(
-                        candlestickId: candlestick.PrimaryId,
-                        period: 20,
-                        upperBand: keltnerChannelResult.UpperBand,
-                        centerline: keltnerChannelResult.Centerline,
-                        lowerBand: keltnerChannelResult.LowerBand
-                    );
-                    candlestick.KeltnerChannels.Add(keltner);
+                    var keltnerChannel = new KeltnerChannel(candlestick.PrimaryId)
+                    {
+                        Centerline = keltnerChannelResult.Centerline,
+                        LowerBand = keltnerChannelResult.LowerBand,
+                        UpperBand = keltnerChannelResult.UpperBand,
+                        Period = 20
+                    };
+                    candlestick.KeltnerChannels.Add(keltnerChannel);
                 }
             }
         }
 
         private static void CalculateStochastic(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            if (quotes.Count() <= 13)
+            if (quotes.Count <= 13)
             {
                 return;
             }
@@ -213,12 +213,12 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    var stochastic = Stochastic.Create(
-                        candlestickId: candlestick.PrimaryId,
-                        oscillatorK: indicatorResult.Oscillator,
-                        signalD: indicatorResult.Signal,
-                        percentJ: indicatorResult.PercentJ
-                    );
+                    var stochastic = new Stochastic(candlestick.PrimaryId)
+                    {
+                        OscillatorK = indicatorResult.Oscillator,
+                        PercentJ = indicatorResult.PercentJ,
+                        SignalD = indicatorResult.Signal
+                    };
                     candlestick.Stochastics.Add(stochastic);
                 }
             }
@@ -305,13 +305,12 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    var sma = MovingAverage.Create(
-                        candlestickId: candlestick.PrimaryId,
-                        period: Constants.SimpleMovingAveragePeriod,
-                        value: indicatorResult.Sma,
-                        movingAverageType: MovingAverageType.Simple
-                    );
-                    candlestick.MovingAverages.Add(sma);
+                    candlestick.MovingAverages.Add(new MovingAverage(candlestick.PrimaryId)
+                    {
+                        MovingAverageType = MovingAverageType.Simple,
+                        Period = Constants.SimpleMovingAveragePeriod,
+                        Value = indicatorResult.Sma
+                    });
 
                     // Compare ClosePrice with SMA and update the counter
                     if (candlestick.ClosePrice < (decimal?)indicatorResult.Sma)
@@ -479,7 +478,8 @@ namespace TechnicalAnalysis.Application.Extensions
                         Support3 = indicatorResult.S3,
                         Resistance1 = indicatorResult.R1,
                         Resistance2 = indicatorResult.R2,
-                        Resistance3 = indicatorResult.R3
+                        Resistance3 = indicatorResult.R3,
+                        Timeframe = Timeframe.Daily
                     };
                     candlestick.StandardPivotPoints.Add(pivotPoint);
                 }
@@ -488,18 +488,19 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateMacd(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var indicatorResult in quotes.GetMacd(7, 14, 9))
+            foreach (var indicatorResult in quotes.GetMacd(fastPeriods: 7, slowPeriods: 14, signalPeriods: 9))
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    var macd = Macd.Create(
-                        candlestickId: candlestick.PrimaryId,
-                        macdValue: indicatorResult.Macd,
-                        signal: indicatorResult.Signal,
-                        histogram: indicatorResult.Histogram,
-                        fastEma: indicatorResult.FastEma,
-                        slowEma: indicatorResult.SlowEma
-                    );
+                    var macd = new Macd(candlestick.PrimaryId)
+                    {
+                        FastEma = indicatorResult.FastEma,
+                        SlowEma = indicatorResult.SlowEma,
+                        Histogram = indicatorResult.Histogram,
+                        MacdValue = indicatorResult.Macd,
+                        Signal = indicatorResult.Signal,
+                    });
+
                     candlestick.Macds.Add(macd);
                 }
             }
@@ -712,7 +713,11 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 var candlestick = pair.Candlesticks[counter];
                 double valueAtIndex = hvpValues.ElementAtOrDefault(counter);
-                candlestick?.Volatilities.Add(new Volatility(candlestick.PrimaryId, valueAtIndex, period));
+                candlestick?.Volatilities.Add(new Volatility(candlestick.PrimaryId)
+                {
+                    Period = period,
+                    VolatilityValue = valueAtIndex
+                });
             }
         }
 
@@ -771,7 +776,11 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 var candlestick = pair.Candlesticks[counter];
                 double valueAtIndex = vhfValues.ElementAtOrDefault(counter);
-                candlestick?.VerticalHorizontalFilters.Add(new VerticalHorizontalFilter(candlestick.PrimaryId, period, valueAtIndex));
+                candlestick?.VerticalHorizontalFilters.Add(new VerticalHorizontalFilter(candlestick.PrimaryId)
+                {
+                    Period = period,
+                    Value = valueAtIndex
+                });
             }
         }
 
@@ -782,7 +791,11 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    candlestick?.OnBalanceVolumes.Add(new OnBalanceVolume(candlestick.PrimaryId, indicatorResult.Obv));
+                    candlestick?.OnBalanceVolumes.Add(
+                        new OnBalanceVolume(candlestick.PrimaryId)
+                        {
+                            Value = indicatorResult.Obv
+                        });
                 }
             }
 
@@ -829,7 +842,13 @@ namespace TechnicalAnalysis.Application.Extensions
                             .Count();
 
                     var psyValue = (decimal)risingPeriodsCount / period * 100;
-                    candlestickWithIndex.candlestick.PsychologicalLines.Add(new PsychologicalLine(candlestickWithIndex.candlestick.PrimaryId, period, (double)psyValue));
+
+                    candlestickWithIndex.candlestick.PsychologicalLines.Add
+                        (new PsychologicalLine(candlestickWithIndex.candlestick.PrimaryId)
+                        {
+                            Period = period,
+                            Value = (double)psyValue
+                        });
                 }
             }
 
