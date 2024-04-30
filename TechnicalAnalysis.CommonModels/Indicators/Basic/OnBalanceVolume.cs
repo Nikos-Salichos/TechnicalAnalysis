@@ -2,8 +2,8 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class OnBalanceVolume(long candlestickId, double value) : BaseIndicator(candlestickId)
+    public class OnBalanceVolume(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public double Value { get; init; } = value;
+        public required double Value { get; init; }
     }
 }
