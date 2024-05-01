@@ -2,20 +2,15 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class KeltnerChannel(long candlestickId, long period, double? upperBand, double? centerline, double? lowerBand) : BaseIndicator(candlestickId)
+    public class KeltnerChannel(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public long Period { get; init; } = period;
-        public double? UpperBand { get; init; } = upperBand;
-        public double? Centerline { get; init; } = centerline;
-        public double? LowerBand { get; init; } = lowerBand;
+        public required long Period { get; init; }
+        public required double? UpperBand { get; init; }
+        public required double? Centerline { get; init; }
+        public required double? LowerBand { get; init; }
         public double? Width
             => UpperBand.HasValue && LowerBand.HasValue
             ? Math.Abs(UpperBand.Value - LowerBand.Value)
             : null;
-
-        public static KeltnerChannel Create(long candlestickId, long period, double? upperBand, double? centerline, double? lowerBand)
-        {
-            return new KeltnerChannel(candlestickId, period, upperBand, centerline, lowerBand);
-        }
     }
 }
