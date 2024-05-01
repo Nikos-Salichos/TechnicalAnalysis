@@ -499,8 +499,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         Histogram = indicatorResult.Histogram,
                         MacdValue = indicatorResult.Macd,
                         Signal = indicatorResult.Signal,
-                    });
-
+                    };
                     candlestick.Macds.Add(macd);
                 }
             }
