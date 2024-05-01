@@ -3,8 +3,8 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands.Insert
 {
-    public class InsertCandlesticksCommand(IEnumerable<CandlestickExtended> candlesticks) : IRequest
+    public class InsertCandlesticksCommand(List<CandlestickExtended> candlesticks) : IRequest
     {
-        public IEnumerable<CandlestickExtended> Candlesticks { get; } = candlesticks;
+        public List<CandlestickExtended> Candlesticks { get; } = candlesticks;
     }
 }
