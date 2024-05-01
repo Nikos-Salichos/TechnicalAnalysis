@@ -20,7 +20,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
     {
         private readonly string _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
 
-        public async Task<IResult<IEnumerable<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndexAsync()
+        public async Task<IResult<List<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndexAsync()
         {
             return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
@@ -28,11 +28,11 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"TimestampAsDateTime\" FROM \"CryptoFearAndGreedIndex\"";
 
                 var assets = await dbConnection.QueryAsync<CryptoFearAndGreedData>(query);
-                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(assets);
+                return Result<List<CryptoFearAndGreedData>, string>.Success(assets.ToList());
             }, logger);
         }
 
-        public async Task<IResult<IEnumerable<StockFearAndGreedDomain>, string>> GetStockFearAndGreedIndexAsync()
+        public async Task<IResult<List<StockFearAndGreedDomain>, string>> GetStockFearAndGreedIndexAsync()
         {
             return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
@@ -40,22 +40,22 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
 
                 var assets = await dbConnection.QueryAsync<StockFearAndGreedDomain>(query);
-                return Result<IEnumerable<StockFearAndGreedDomain>, string>.Success(assets);
+                return Result<List<StockFearAndGreedDomain>, string>.Success(assets.ToList());
             }, logger);
         }
 
-        public async Task<IResult<IEnumerable<Asset>, string>> GetAssetsAsync()
+        public async Task<IResult<List<Asset>, string>> GetAssetsAsync()
         {
             return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol, \"AssetType\" AS AssetType FROM \"Assets\"";
                 var assets = await dbConnection.QueryAsync<Asset>(query);
-                return Result<IEnumerable<Asset>, string>.Success(assets);
+                return Result<List<Asset>, string>.Success(assets.ToList());
             }, logger);
         }
 
-        public async Task<IResult<IEnumerable<AssetRanking>, string>> GetCoinPaprikaAssetsAsync()
+        public async Task<IResult<List<AssetRanking>, string>> GetCoinPaprikaAssetsAsync()
         {
             return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
@@ -68,11 +68,11 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 "\"Provider\" AS DataProvider " +
                 "FROM \"CoinPaprikaAssets\"";
                 var assets = await dbConnection.QueryAsync<AssetRanking>(query);
-                return Result<IEnumerable<AssetRanking>, string>.Success(assets);
+                return Result<List<AssetRanking>, string>.Success(assets.ToList());
             }, logger);
         }
 
-        public async Task<IResult<IEnumerable<Candlestick>, string>> GetCandlesticksAsync()
+        public async Task<IResult<List<Candlestick>, string>> GetCandlesticksAsync()
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "SELECT \"Id\" AS PrimaryId, " +
@@ -87,18 +87,18 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 " \"timeframe\" AS Timeframe, " +
                 "\"pair_id\" AS PairId FROM \"Candlesticks\"";
             var candlesticks = await dbConnection.QueryAsync<Candlestick>(query);
-            return Result<IEnumerable<Candlestick>, string>.Success(candlesticks);
+            return Result<List<Candlestick>, string>.Success(candlesticks.ToList());
         }
 
-        public async Task<IResult<IEnumerable<Pair>, string>> GetPairsAsync()
+        public async Task<IResult<List<Pair>, string>> GetPairsAsync()
         {
             await using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "SELECT \"id\" AS PrimaryId, \"symbol\" AS Symbol, \"asset0_id\" AS BaseAssetId, \"asset1_id\" AS QuoteAssetId, \"provider_id\" AS Provider, \"is_active\" AS IsActive, \"all_candles\" AS AllCandles, \"created_at\" AS CreatedAt FROM \"Pairs\"";
             var pairs = await dbConnection.QueryAsync<Pair>(query);
-            return Result<IEnumerable<Pair>, string>.Success(pairs);
+            return Result<List<Pair>, string>.Success(pairs.ToList());
         }
 
-        public async Task<IResult<IEnumerable<ProviderSynchronization>, string>> GetProvidersAsync()
+        public async Task<IResult<List<ProviderSynchronization>, string>> GetProvidersAsync()
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
 
@@ -134,27 +134,27 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                             })
                         .ToList();
 
-            return Result<IEnumerable<ProviderSynchronization>, string>.Success(providerSynchronizations);
+            return Result<List<ProviderSynchronization>, string>.Success(providerSynchronizations);
         }
 
-        public async Task<IResult<IEnumerable<PoolEntity>, string>> GetPoolsAsync()
+        public async Task<IResult<List<PoolEntity>, string>> GetPoolsAsync()
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "SELECT \"Id\" AS PrimaryId, \"DexId\" AS Provider, \"PoolContract\", \"Token0Id\", \"Token0Contract\", \"Token1Id\", \"Token1Contract\", " +
                                  "\"FeeTier\" AS FeeTier, \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\", \"IsActive\" " +
                                  "FROM \"Pools\"";
             var pools = await dbConnection.QueryAsync<PoolEntity>(query);
-            return Result<IEnumerable<PoolEntity>, string>.Success(pools);
+            return Result<List<PoolEntity>, string>.Success(pools.ToList());
         }
 
-        public async Task<IResult<IEnumerable<DexCandlestick>, string>> GetDexCandlesticksAsync()
+        public async Task<IResult<List<DexCandlestick>, string>> GetDexCandlesticksAsync()
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             const string query = "SELECT \"Id\" AS PrimaryId, \"PoolContract\", \"PoolId\", \"OpenDate\", \"Open\" AS OpenPrice, \"High\" AS HighPrice, \"Low\" AS LowPrice, " +
                                  "\"Close\" AS ClosePrice, \"Timeframe\", \"Fees\", \"Liquidity\", \"TotalValueLocked\", \"Volume\", \"TxCount\" " +
                                  "FROM \"DexCandlesticks\"";
             var dexCandlesticks = await dbConnection.QueryAsync<DexCandlestick>(query);
-            return Result<IEnumerable<DexCandlestick>, string>.Success(dexCandlesticks);
+            return Result<List<DexCandlestick>, string>.Success(dexCandlesticks.ToList());
         }
 
         public async Task InsertCryptoFearAndGreedIndex(IEnumerable<CryptoFearAndGreedData> indexes)
