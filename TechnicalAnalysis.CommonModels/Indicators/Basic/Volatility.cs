@@ -2,17 +2,9 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Basic
 {
-    public class Volatility : BaseIndicator
+    public class Volatility(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public double VolatilityValue { get; init; }
-        public long Period { get; init; }
-
-        public Volatility(long candlestickId, double volatilityValue, long period)
-           : base(candlestickId)
-        {
-            Period = period;
-            VolatilityValue = volatilityValue;
-            Period = period;
-        }
+        public required double VolatilityValue { get; init; }
+        public required long Period { get; init; }
     }
 }
