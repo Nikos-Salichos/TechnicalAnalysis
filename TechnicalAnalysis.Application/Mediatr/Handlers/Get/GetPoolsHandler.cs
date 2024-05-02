@@ -5,14 +5,14 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
 {
-    public class GetPoolsHandler(IPostgreSqlRepository repository) : IRequestHandler<GetPoolsQuery, IEnumerable<PoolEntity>>
+    public class GetPoolsHandler(IPostgreSqlRepository repository) : IRequestHandler<GetPoolsQuery, List<PoolEntity>>
     {
-        public async Task<IEnumerable<PoolEntity>> Handle(GetPoolsQuery getPoolsQuery, CancellationToken cancellationToken)
+        public async Task<List<PoolEntity>> Handle(GetPoolsQuery getPoolsQuery, CancellationToken cancellationToken)
         {
             var result = await repository.GetPoolsAsync();
             if (result.HasError)
             {
-                return Enumerable.Empty<PoolEntity>();
+                return [];
             }
             return result.SuccessValue;
         }
