@@ -40,7 +40,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateFlagNestedCandlesticksBody(pair);
             CalculateFlagNestedCandlesticksRange(pair);
             CalculateFractalTrendBasedOnPreviousFractals(pair);
-            CalculateFractalTrendBasedOnCandlestickPrice(pair);
+            CalculatePriceTrendBasedOnFractalPattern(pair);
             CalculateConsecutiveClosePriceBelowPivot(pair);
             CalculateWilliamsVixFix(pair);
             CalculateHighestWilliamsVixFixValue(pair);
@@ -262,7 +262,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BullFractal
+                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BullFractal
                                                             && f.WindowPeriod == 2))
                 {
                     if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
@@ -273,7 +273,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                if (candlestick3.Fractals.Any(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2))
+                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2))
                 {
                     if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick?.PrimaryId)
                     {
@@ -320,7 +320,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateFractalTrendBasedOnCandlestickPrice(PairExtended pair)
+        private static void CalculatePriceTrendBasedOnFractalPattern(PairExtended pair)
         {
             CandlestickExtended? currentBullFractalCandlestick = null;
             CandlestickExtended? currentBearFractalCandlestick = null;
@@ -1665,9 +1665,9 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlestick2.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick3.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick4.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
+            return candlestick2.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
+                   candlestick3.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
+                   candlestick4.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
         }
 
         private static bool GetFractalEnhancedShortTrend(IList<CandlestickExtended> candlesticks, int currentIndex)
