@@ -5,9 +5,9 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
 {
-    public class GetAssetsRankingHandler(IPostgreSqlRepository repository) : IRequestHandler<GetAssetsRankingQuery, IEnumerable<AssetRanking>>
+    public class GetAssetsRankingHandler(IPostgreSqlRepository repository) : IRequestHandler<GetAssetsRankingQuery, List<AssetRanking>>
     {
-        public async Task<IEnumerable<AssetRanking>> Handle(GetAssetsRankingQuery getCoinPaprikaAssetsQuery, CancellationToken cancellationToken)
+        public async Task<List<AssetRanking>> Handle(GetAssetsRankingQuery getCoinPaprikaAssetsQuery, CancellationToken cancellationToken)
         {
             var result = await repository.GetCoinPaprikaAssetsAsync();
             if (result.HasError)
