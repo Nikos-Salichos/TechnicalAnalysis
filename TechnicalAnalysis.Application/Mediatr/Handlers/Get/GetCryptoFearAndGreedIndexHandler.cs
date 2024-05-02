@@ -5,9 +5,9 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
 {
-    public class GetCryptoFearAndGreedIndexHandler(IPostgreSqlRepository repository) : IRequestHandler<GetCryptoFearAndGreedIndexQuery, IEnumerable<CryptoFearAndGreedData>>
+    public class GetCryptoFearAndGreedIndexHandler(IPostgreSqlRepository repository) : IRequestHandler<GetCryptoFearAndGreedIndexQuery, List<CryptoFearAndGreedData>>
     {
-        public async Task<IEnumerable<CryptoFearAndGreedData>> Handle(GetCryptoFearAndGreedIndexQuery getCryptoFearAndGreedIndexQuery, CancellationToken cancellationToken)
+        public async Task<List<CryptoFearAndGreedData>> Handle(GetCryptoFearAndGreedIndexQuery getCryptoFearAndGreedIndexQuery, CancellationToken cancellationToken)
         {
             var result = await repository.GetCryptoFearAndGreedIndexAsync();
             if (result.HasError)
