@@ -7,9 +7,9 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
 {
     public class GetCandlesticksHandler(IPostgreSqlRepository repository)
-        : IRequestHandler<GetCandlesticksQuery, IEnumerable<CandlestickExtended>>
+        : IRequestHandler<GetCandlesticksQuery, List<CandlestickExtended>>
     {
-        public async Task<IEnumerable<CandlestickExtended>> Handle(GetCandlesticksQuery getCoinsQuery, CancellationToken cancellationToken)
+        public async Task<List<CandlestickExtended>> Handle(GetCandlesticksQuery getCoinsQuery, CancellationToken cancellationToken)
         {
             var result = await repository.GetCandlesticksAsync();
             if (result.HasError)
