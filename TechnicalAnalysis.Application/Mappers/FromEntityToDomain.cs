@@ -17,10 +17,10 @@ namespace TechnicalAnalysis.Application.Mappers
                 IsActive = pair.IsActive,
                 AllCandles = pair.AllCandles,
                 CreatedAt = pair.CreatedAt,
-                Candlesticks = new List<CandlestickExtended>()
+                Candlesticks = []
             };
 
-        public static List<PairExtended> ToDomain(this IEnumerable<Domain.Entities.Pair> pairs)
+        public static List<PairExtended> ToDomain(this List<Domain.Entities.Pair> pairs)
             => pairs.Select(c => c.ToDomain()).ToList();
 
         private static CandlestickExtended ToDomain(this Domain.Entities.Candlestick candlestick)
@@ -36,7 +36,7 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithCloseDate(candlestick.CloseDate)
                           .Build();
 
-        public static List<CandlestickExtended> ToDomain(this IEnumerable<Domain.Entities.Candlestick> assets)
+        public static List<CandlestickExtended> ToDomain(this List<Domain.Entities.Candlestick> assets)
             => assets.Select(c => c.ToDomain()).ToList();
 
         private static CandlestickExtended ToDomain(this Domain.Entities.DexCandlestick dexCandlestick)
@@ -57,7 +57,7 @@ namespace TechnicalAnalysis.Application.Mappers
                           .WithNumberOfTrades(dexCandlestick.NumberOfTrades)
                           .Build();
 
-        public static List<CandlestickExtended> DexCandlestickToDomain(this IEnumerable<Domain.Entities.DexCandlestick> assets)
+        public static List<CandlestickExtended> DexCandlestickToDomain(this List<Domain.Entities.DexCandlestick> assets)
             => assets.Select(c => c.ToDomain()).ToList();
 
         private static PairExtended PoolToDomain(this Domain.Entities.PoolEntity pool)
@@ -80,7 +80,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 Candlesticks = new List<CandlestickExtended>()
             };
 
-        public static List<PairExtended> PoolToDomain(this IEnumerable<Domain.Entities.PoolEntity> pairs)
+        public static List<PairExtended> PoolToDomain(this List<Domain.Entities.PoolEntity> pairs)
             => pairs.Select(c => c.PoolToDomain()).ToList();
     }
 }
