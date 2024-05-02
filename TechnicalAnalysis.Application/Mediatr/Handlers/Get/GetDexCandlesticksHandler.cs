@@ -5,15 +5,14 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Application.Mediatr.Handlers.Get
 {
-    public class GetDexCandlesticksHandler(IPostgreSqlRepository repository)
-        : IRequestHandler<GetDexCandlesticksQuery, IEnumerable<DexCandlestick>>
+    public class GetDexCandlesticksHandler(IPostgreSqlRepository repository) : IRequestHandler<GetDexCandlesticksQuery, List<DexCandlestick>>
     {
-        public async Task<IEnumerable<DexCandlestick>> Handle(GetDexCandlesticksQuery getDexCandlesticksQuery, CancellationToken cancellationToken)
+        public async Task<List<DexCandlestick>> Handle(GetDexCandlesticksQuery getDexCandlesticksQuery, CancellationToken cancellationToken)
         {
             var result = await repository.GetDexCandlesticksAsync();
             if (result.HasError)
             {
-                return Enumerable.Empty<DexCandlestick>();
+                return [];
             }
             return result.SuccessValue;
         }
