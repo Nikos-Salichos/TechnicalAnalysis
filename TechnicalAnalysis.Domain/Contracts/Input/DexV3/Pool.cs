@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.DexV3
         public Token Token1 { get; init; } = new Token();
 
         [JsonPropertyName("poolDayData")]
-        public IEnumerable<Data> PoolDayData { get; init; } = new List<Data>();
+        public IEnumerable<Data> PoolDayData { get; init; } = [];
 
         [JsonPropertyName("totalValueLockedUSD")]
         public override string TotalValueLockedRawData
