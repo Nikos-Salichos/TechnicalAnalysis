@@ -16,14 +16,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
 
-        public async Task<IResult<IEnumerable<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndex(int numberOfDates)
+        public async Task<IResult<List<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndex(int numberOfDates)
         {
             using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync($"https://api.alternative.me/fng/?limit={numberOfDates}", HttpCompletionOption.ResponseHeadersRead));
 
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
-                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                return Result<List<CryptoFearAndGreedData>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
             using var content = httpResponseMessage.Content;
@@ -32,11 +32,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             var deserializedData = await JsonSerializer.DeserializeAsync<CryptoFearAndGreedRoot>(jsonStream, JsonHelper.JsonSerializerOptions);
             if (deserializedData is not null)
             {
-                return Result<IEnumerable<CryptoFearAndGreedData>, string>.Success(deserializedData.CryptoFearAndGreedDatas);
+                return Result<List<CryptoFearAndGreedData>, string>.Success(deserializedData.CryptoFearAndGreedDatas.ToList());
             }
 
             logger.LogError("Deserialization Failed");
-            return Result<IEnumerable<CryptoFearAndGreedData>, string>.Fail($"{nameof(GetCryptoFearAndGreedIndex)} Deserialization Failed");
+            return Result<List<CryptoFearAndGreedData>, string>.Fail($"{nameof(GetCryptoFearAndGreedIndex)} Deserialization Failed");
         }
     }
 }
