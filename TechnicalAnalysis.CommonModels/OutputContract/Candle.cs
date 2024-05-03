@@ -20,6 +20,6 @@ namespace TechnicalAnalysis.CommonModels.OutputContract
         [JsonPropertyName("OPENED_AT")]
         public string OpenedAt { get; init; }
 
-        public IList<EnhancedScan> EnhancedScans { get; init; } = [];
+        public List<EnhancedScan> EnhancedScans { get; init; } = [];
     }
 }
