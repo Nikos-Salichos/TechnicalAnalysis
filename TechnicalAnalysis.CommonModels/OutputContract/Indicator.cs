@@ -9,6 +9,6 @@ namespace TechnicalAnalysis.CommonModels.OutputContract
         public string PairName { get; init; }
 
         [JsonPropertyName("signals")]
-        public IList<Signal> Signals { get; init; } = [];
+        public List<Signal> Signals { get; init; } = [];
     }
 }
