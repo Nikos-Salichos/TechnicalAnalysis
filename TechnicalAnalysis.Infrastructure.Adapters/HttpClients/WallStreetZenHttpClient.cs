@@ -9,7 +9,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
     public partial class WallStreetZenHttpClient : IWallStreetZenClient
     {
-        public IEnumerable<Stock> Sync()
+        public List<Stock> Sync()
         {
             var stockExchanges = new Dictionary<string, string>
             {
