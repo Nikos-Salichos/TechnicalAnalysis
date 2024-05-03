@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
 
-        public async Task<IResult<IEnumerable<CoinPaprikaAssetContract>, string>> SyncAssets()
+        public async Task<IResult<List<CoinPaprikaAssetContract>, string>> SyncAssets()
         {
             using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead));
 
@@ -28,20 +28,20 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
-                return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                return Result<List<CoinPaprikaAssetContract>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
             }
 
             using var content = httpResponseMessage.Content;
             await using var jsonStream = await content.ReadAsStreamAsync();
 
-            var deserializedData = await JsonSerializer.DeserializeAsync<IEnumerable<CoinPaprikaAssetContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
+            var deserializedData = await JsonSerializer.DeserializeAsync<List<CoinPaprikaAssetContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
             if (deserializedData is not null)
             {
-                return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Success(deserializedData);
+                return Result<List<CoinPaprikaAssetContract>, string>.Success(deserializedData);
             }
 
             logger.LogError("Deserialization Failed");
-            return Result<IEnumerable<CoinPaprikaAssetContract>, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
+            return Result<List<CoinPaprikaAssetContract>, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
 }
