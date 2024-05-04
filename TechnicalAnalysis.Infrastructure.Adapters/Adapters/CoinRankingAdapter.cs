@@ -28,7 +28,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return true;
             }
 
-            var fetchedAssets = (await mediator.Send(new GetAssetsRankingQuery())).ToList();
+            var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
 
             const int initialPage = 0;
             var initialResponse = await coinRankingHttpClient.SyncAssets(initialPage);
@@ -88,7 +88,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Name = newCoin.Name,
                         Symbol = newCoin.Symbol,
                         CreatedDate = DateTime.UnixEpoch.AddSeconds(newCoin.ListedAt),
-                        AssetType = AssetType.Layer1,
+                        AssetType = ProductType.Layer1,
                         DataProvider = DataProvider.CoinMarketCap
                     });
                 }
