@@ -34,7 +34,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return false;
             }
 
-            var fetchedAssets = (await mediator.Send(new GetAssetsRankingQuery())).ToList();
+            var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
 
             var newAssets = new List<AssetRanking>();
             foreach (var data in response.SuccessValue.Data)
@@ -47,7 +47,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Name = data.Name,
                         Symbol = data.Symbol,
                         CreatedDate = data.DateAdded,
-                        AssetType = AssetType.Layer1,
+                        AssetType = ProductType.Layer1,
                         DataProvider = DataProvider.CoinMarketCap
                     });
                 }
