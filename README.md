@@ -48,4 +48,3 @@ Technologies & Tools used:
 - Create an endpoint where consumers can pass candlestick data, and indicators will be produced on this data.
 - Implement WallStreetZen.
 - Add integration tests using TestContainers.
-- Export to NuGet (Client + Common models only).
