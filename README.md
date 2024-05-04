@@ -23,9 +23,6 @@ The project is built around two core services:
 ### Testing and User-Friendly Interface
 The project incorporates Swagger to facilitate easy testing of endpoints, ensuring a user-friendly experience for both developers and end-users.
 
-### Startup Configuration
-To set up the project, populate the `appsettings.json` file with specific configuration details.
-
 ### Architecture, Technologies & Tools
 The project follows the principles of Clean Architecture with some personal modifications. [Here's an architecture diagram](https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723) (pending update with the latest providers).
 
@@ -42,7 +39,7 @@ Technologies & Tools used:
 - Hangfire for jobs
 - Docker
 
-### How to Start
+### How to Start - Startup Configuration
 - Add your `appsettings.prod.json` file and ensure it is located at `./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json` (or modify the Docker path in the Docker Compose file).
 - Fill in your own details (such as API keys, etc.).
 - Navigate to the root folder and run `docker compose up`.
