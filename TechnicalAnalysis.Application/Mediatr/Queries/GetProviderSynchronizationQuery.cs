@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Queries
 {
-    public class GetProviderSynchronizationQuery : IRequest<IEnumerable<ProviderSynchronization>>
+    public class GetProviderSynchronizationQuery : IRequest<List<ProviderSynchronization>>
     {
     }
 }
