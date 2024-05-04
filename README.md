@@ -27,17 +27,16 @@ The project incorporates Swagger to facilitate easy testing of endpoints, ensuri
 The project follows the principles of Clean Architecture with some personal modifications. [Here's an architecture diagram](https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723) (pending update with the latest providers).
 
 Technologies & Tools used:
-- C# (.NET 8)
-- Docker
-- Mediatr (applied CQRS pattern)
-- PostgreSQL
-- Redis
-- Dapper
-- Structured logging with Seq
-- Multiple NuGet packages (HttpClient, Serilog, Polly, Fluent Validation, MailKit, HtmlAgilityPack, Moq, Xunit, .NetArchTest.Rules, TestContainers, Stock.Indicators, OoplesFinance.StockIndicators)
-- Brotli Compression in endpoints
-- Hangfire for jobs
-- Docker
+- C# ([ASP.NET Core 8](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-8.0))
+- [Docker](https://www.docker.com/)
+- [Mediatr](https://github.com/jbogard/MediatR) (CQRS pattern)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Redis](https://redis.io/)
+- [Dapper](https://github.com/DapperLib/Dapper)
+- Structured logging with [Seq](https://datalust.co/seq)
+- Multiple NuGet packages ([Serilog](https://serilog.net/), [Polly](https://www.pollydocs.org/), [FluentValidation](https://docs.fluentvalidation.net/en/latest/), [MailKit](https://github.com/jstedfast/MailKit), [HtmlAgilityPack](https://html-agility-pack.net/), [Moq](https://github.com/devlooped/moq), [Xunit](https://xunit.net/docs/getting-started/netfx/visual-studio), [NetArchTest](https://github.com/BenMorris/NetArchTest), [TestContainers](https://dotnet.testcontainers.org/), [StockIndicators](https://dotnet.stockindicators.dev/), [OoplesFinanceStockIndicators](https://github.com/ooples/OoplesFinance.StockIndicators), [WireMock-Net](https://github.com/WireMock-Net/WireMock.Net), [AlpacaSDK](https://github.com/alpacahq/alpaca-trade-api-csharp) )
+- [Brotli](https://devblogs.microsoft.com/dotnet/introducing-support-for-brotli-compression/) Compression in endpoints
+- [Hangfire](https://www.hangfire.io/) for jobs
 
 ### How to Start - Startup Configuration
 - Add your `appsettings.prod.json` file and ensure it is located at `./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json` (or modify the Docker path in the Docker Compose file).
