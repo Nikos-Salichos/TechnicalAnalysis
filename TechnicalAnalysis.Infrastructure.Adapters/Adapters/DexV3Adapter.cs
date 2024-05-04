@@ -68,7 +68,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             return true;
         }
 
-        private async Task<IEnumerable<PairExtended>> FormatDexAssetsPoolsCandlesticks(DataProvider provider)
+        private async Task<List<PairExtended>> FormatDexAssetsPoolsCandlesticks(DataProvider provider)
         {
             var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPoolsTask = mediator.Send(new GetPoolsQuery());
@@ -76,11 +76,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPoolsTask, fetchedCandlesticksTask);
 
-            var assetsResult = (await fetchedAssetsTask).ToList();
+            var assetsResult = await fetchedAssetsTask;
             var poolsResult = await fetchedPoolsTask;
             var candlesticksResult = await fetchedCandlesticksTask;
 
-            var pairs = poolsResult.Where(p => p.Provider == provider).PoolToDomain();
+            var pairs = poolsResult.Where(p => p.Provider == provider).ToList().PoolToDomain();
             var candlesticks = candlesticksResult.DexCandlestickToDomain();
             pairs.MapPairsToAssets(assetsResult);
             pairs.MapPairsToCandlesticks(candlesticks);
@@ -88,7 +88,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             return pairs;
         }
 
-        private async Task SaveTokens(IEnumerable<Pool> pools)
+        private async Task SaveTokens(List<Pool> pools)
         {
             var fetchedTokensResult = await mediator.Send(new GetAssetsQuery());
 
@@ -116,7 +116,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        private static IEnumerable<Pool> FilterPoolsBasedOnStable(PoolResponse poolResponse)
+        private static List<Pool> FilterPoolsBasedOnStable(PoolResponse poolResponse)
         {
             return poolResponse.Pools.Where(p =>
                 p.Token0.Symbol == Constants.Usdt ||
@@ -127,10 +127,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 p.Token1.Symbol == Constants.Usdc ||
                 p.Token1.Symbol == Constants.Busd ||
                 p.Token1.Symbol == Constants.Dai
-            );
+            ).ToList();
         }
 
-        private async Task SavePools(IEnumerable<Pool> pools, DataProvider provider)
+        private async Task SavePools(List<Pool> pools, DataProvider provider)
         {
             List<PairExtended> newPairs = [];
 
@@ -139,15 +139,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             await Task.WhenAll(fetchedAssetsTask, fetchedPoolsTask);
 
-            var tokens = await fetchedAssetsTask;
+            var tokens = (await fetchedAssetsTask).ToList();
             var pairs = (await fetchedPoolsTask).PoolToDomain().Where(d => d.Provider == provider);
 
             foreach (var pair in pools.ToDomain())
             {
                 pair.Provider = provider;
 
-                var token0Id = tokens.FirstOrDefault(p => p.Symbol == pair.BaseAssetName);
-                var token1Id = tokens.FirstOrDefault(p => p.Symbol == pair.QuoteAssetName);
+                var token0Id = tokens.Find(p => p.Symbol == pair.BaseAssetName);
+                var token1Id = tokens.Find(p => p.Symbol == pair.QuoteAssetName);
 
                 if (token0Id != null)
                 {
