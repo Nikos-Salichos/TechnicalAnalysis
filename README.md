@@ -44,9 +44,9 @@ Technologies & Tools used:
 - Fill in your own details (such as API keys, etc.).
 - Navigate to the root folder and run `docker compose up`.
 
-Swagger: `http://localhost:5000/swagger/index.html`
-Seq Events: `http://localhost:5341/#/events`
-Hangfire Jobs: `http://localhost:5000/hangfire`
+Swagger: `http://localhost:5000/swagger/index.html` <br>
+Seq Events: `http://localhost:5341/#/events` <br>
+Hangfire Jobs: `http://localhost:5000/hangfire` <br>
 
 
 ### Roadmap
