@@ -28,7 +28,7 @@ The project incorporates Swagger to facilitate easy testing of endpoints, ensuri
 The project follows the principles of [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) with some personal modifications. [Here's an architecture diagram](https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723) (pending update with the latest providers).
 
 Technologies & Tools used:
-- C# ([ASP.NET Core 8](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-8.0))
+- [ASP.NET Core 8](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-8.0)
 - [Docker](https://www.docker.com/)
 - [Mediatr](https://github.com/jbogard/MediatR) ([CQRS](https://docs.microsoft.com/en-us/azure/architecture/guide/architecture-styles/cqrs) pattern)
 - [PostgreSQL](https://www.postgresql.org/)
