@@ -8,7 +8,8 @@ This project features a versatile system that seamlessly connects with multiple 
 
 - **[Binance](https://www.binance.com/)**: Utilizing the REST API for data retrieval.
 - **[Alpaca](https://alpaca.markets/)**: Employing the C# SDK for Alpaca for streamlined integration.
-- **[UniswapV3](https://app.uniswap.org/explore) and [PancakeswapV3](https://pancakeswap.finance/info/v3)**: Utilizing GraphQL for efficient data access.
+- **[UniswapV3](https://app.uniswap.org/explore)**: Utilizing GraphQL for efficient data access within the Ethereum ecosystem.
+- **[PancakeswapV3](https://pancakeswap.finance/info/v3)**:Utilizing GraphQL for efficient data access within the Binance ecosystem.
 - **[Alternative.me](https://alternative.me/crypto/fear-and-greed-index/)**: Utilizing the REST API for data retrieval for the Crypto Fear And Greed Index.
 - **[CNN Stock Fear And Greed Index](https://rapidapi.com/rpi4gx/api/fear-and-greed-index)**: Utilizing the REST API for data retrieval from RapidApi.
 - **[CoinPaprika](https://coinpaprika.com/)**, **[CoinMarketCap](https://coinmarketcap.com/)**, **[CoinRanking](https://coinranking.com/)**: Utilizing the REST API for data retrieval and filtering for layer 1 blockchains.
