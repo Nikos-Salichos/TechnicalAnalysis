@@ -40,11 +40,11 @@ namespace TechnicalAnalysis.Application.Extensions
             DateTime currentDate = DateTime.UtcNow;
             DayOfWeek currentDayOfWeek = currentDate.DayOfWeek;
 
-            int dayDifference = (currentDayOfWeek - DayOfWeek.Monday + 7) % 7;
+            int daysSinceMonday = (currentDayOfWeek - DayOfWeek.Monday + 7) % 7;
 
             return provider.CandlestickSyncInfos.Exists(candlestickSyncInfo =>
                     candlestickSyncInfo?.LastCandlestickSync.Date == DateTime.UtcNow.Date
-                    && dayDifference > 0
+                    && daysSinceMonday > 0
                     && candlestickSyncInfo.Timeframe == timeframe
                     && timeframe == Timeframe.Weekly);
         }
@@ -61,13 +61,13 @@ namespace TechnicalAnalysis.Application.Extensions
                     DataProvider = providerSynchronization.ProviderPairAssetSyncInfo.DataProvider,
                     Timeframe = timeframe,
                 };
-                newProviderCandlestickSyncInfo.UpdateCandlestickInfo();
+                newProviderCandlestickSyncInfo.LastCandlestickSync = DateTime.UtcNow;
                 providerSynchronization.CandlestickSyncInfos.Add(newProviderCandlestickSyncInfo);
                 return newProviderCandlestickSyncInfo;
             }
             else
             {
-                providerCandlestickSyncInfoProviderFound.UpdateCandlestickInfo();
+                providerCandlestickSyncInfoProviderFound.LastCandlestickSync = DateTime.UtcNow;
                 return providerCandlestickSyncInfoProviderFound;
             }
         }
