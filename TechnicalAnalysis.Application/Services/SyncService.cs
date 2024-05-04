@@ -13,7 +13,7 @@ namespace TechnicalAnalysis.Application.Services
     {
         public async Task SynchronizeProvidersAsync(DataProviderTimeframeRequest dataProviderTimeframeRequest)
         {
-            var exchanges = (await mediator.Send(new GetProviderSynchronizationQuery())).ToList();
+            var exchanges = await mediator.Send(new GetProviderSynchronizationQuery());
 
             await InternalSynchronizeProvidersAsync(dataProviderTimeframeRequest.DataProvider, dataProviderTimeframeRequest.Timeframe, exchanges);
 
