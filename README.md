@@ -37,7 +37,7 @@ Architecture Diagram: https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213
 Technologies & Tools used:
 - .C# (.NET 8)
 - Docker
-- Mediatr
+- Mediatr (applied CQRS pattern)
 - PostgreSql
 - Redis
 - Dapper
@@ -45,6 +45,7 @@ Technologies & Tools used:
 - Multiple nugets(HttpClient, Serilog, Polly, Fluent Validation, MailKit, HtmlAgilityPack, Moq, Xunit, .NetArchTest.Rules, TestContainers, Stock.Indicators, OoplesFinance.StockIndicators)
 - Brotli Compression in endpoints
 - Hangfire for jobs
+- Docker
 
 ### How to start it
 - Add your appsettings.prod.json file and be sure it is under the following path ./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json (or you have to change the docker path in docker compose file) 
