@@ -33,7 +33,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return false;
             }
 
-            var fetchedAssets = (await mediator.Send(new GetAssetsRankingQuery())).ToList();
+            var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
 
             var newAssets = new List<AssetRanking>();
 
@@ -47,7 +47,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Name = asset.Name,
                         Symbol = asset.Symbol,
                         CreatedDate = (asset.CreatedAt == DateTime.MinValue) ? DateTime.UtcNow : asset.CreatedAt,
-                        AssetType = AssetType.Layer1,
+                        AssetType = ProductType.Layer1,
                         DataProvider = DataProvider.CoinPaprika,
                     });
                 }
