@@ -44,6 +44,11 @@ Technologies & Tools used:
 - Fill in your own details (such as API keys, etc.).
 - Navigate to the root folder and run `docker compose up`.
 
+Swagger: `http://localhost:5000/swagger/index.html`
+Seq Events: `http://localhost:5341/#/events`
+Hangfire Jobs: `http://localhost:5000/hangfire`
+
+
 ### Roadmap
 - Create an endpoint where consumers can pass candlestick data, and indicators will be produced on this data.
 - Implement WallStreetZen.
