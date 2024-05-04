@@ -27,28 +27,29 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 ProviderPairAssetSyncInfo = new ProviderPairAssetSyncInfo { DataProvider = provider }
             };
 
-            var tenStocksToOwnForever = new List<string> {
+            List<string> tenStocksToOwnForever =
+                [
                 "ZTS","ODFL", "SYK", "LVMH", "CSU", "GAW", "MKL", "WSO", "BRO", "BRK"
-            };
+                ];
 
             //Add more stocks from here: https://www.wallstreetzen.com/stock-screener?p=1&s=mc&sd=desc&t=1
             //Check top owned stocks: https://www.dataroma.com/m/home.php
-            List<string> stockTickers = new()
-                {
+            List<string> stockTickers =
+                [
                     "nke", "ba", "tsla", "aapl", "googl", "abnb", "JNJ", "XOM", "WMT", "META",
                     "JPM", "V", "KO", "PEP", "MCD", "AVGO", "ACN", "NFLX", "WCF", "ABDE",
                     "MA", "BAC", "MS", "SCHW", "RY", "MSFT", "NVDA", "CRM", "VZ", "IBM",
                     "PYPL", "IWD", "IJH", "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG",
-                    "NSRGY", "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG"
-                };
+                    "NSRGY", "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG",
+                ];
 
-            List<string> etfTickers = new()
-                {
+            List<string> etfTickers =
+                [
                     "vt", "vti", "VTV", "PFF", "SPHD", "XLRE", "EWH", "MCHI", "EWS", "FEZ",
                     "IWM", "SPY", "DIA", "DAX", "VGK", "QQQ", "IVV", "VUG", "VB", "VNQ",
                     "XLE", "XLF", "BND", "vea", "VWO", "GLD", "VXUS", "VO", "JEPI", "SPYV",
-                    "VOT", "VDE", "voo", "ITOT"
-                };
+                    "VOT", "VDE", "voo", "ITOT", "MEDP", "ELF",
+                ];
 
             var allSymbols = new List<string>();
             allSymbols.AddRange(tenStocksToOwnForever);
@@ -60,7 +61,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                        .ToList();
 
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
-            var fetchedAssetNames = fetchedAssets.Select(f => f.Symbol).ToList();
+            var fetchedAssetNames = fetchedAssets.ConvertAll(f => f.Symbol);
 
             bool allStockSymbolsExist = true;
             foreach (var symbol in allSymbols)
@@ -94,7 +95,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             return true;
         }
 
-        private async Task SyncAssets(IEnumerable<Asset> fetchedAssets, IEnumerable<string> stockSymbols)
+        private async Task SyncAssets(List<Asset> fetchedAssets, List<string> stockSymbols)
         {
             var existingAssetNames = fetchedAssets.Select(a => a.Symbol).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
 
@@ -114,7 +115,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        public async Task SyncPairs(IEnumerable<string> stockSymbols)
+        public async Task SyncPairs(List<string> stockSymbols)
         {
             var fetchedAssetsTask = mediator.Send(new GetAssetsQuery());
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
@@ -143,7 +144,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Provider = DataProvider.Alpaca,
                         Symbol = baseAsset.Symbol,
                         IsActive = true,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        ProductType = ProductType.StockOrETF
                     };
                     newPairs.Add(newPair);
                 }
@@ -161,9 +163,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
             var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
 
-            var fetchedAssets = (await fetchedAssetsTask).ToList();
+            var fetchedAssets = await fetchedAssetsTask;
             var fetchedPairs = await fetchedPairsTask;
-            var fetchedCandlesticks = (await fetchedCandlesticksTask).ToList();
+            var fetchedCandlesticks = await fetchedCandlesticksTask;
 
             var pairs = fetchedPairs.Where(p => p.Provider == DataProvider.Alpaca).ToList();
 
