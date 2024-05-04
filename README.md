@@ -6,13 +6,13 @@ The primary objective of this project is to download financial data from various
 ### Design Highlights
 This project features a versatile system that seamlessly connects with multiple financial providers to obtain essential data. Integration has been achieved with the following providers:
 
-- **Binance**: Utilizing the REST API for data retrieval.
-- **Alpaca**: Employing the C# SDK for Alpaca for streamlined integration.
-- **UniswapV3 and PancakeswapV3**: Utilizing GraphQL for efficient data access.
-- **Crypto Fear And Greed Index**: Utilizing the REST API for data retrieval from [Alternative.me](https://alternative.me/crypto/fear-and-greed-index/).
-- **CNN Stock Fear And Greed Index**: Utilizing the REST API for data retrieval from RapidApi.
-- **CoinPaprika**, **CoinMarketCap**, **CoinRanking**: Utilizing the REST API for data retrieval and filtering for layer 1 blockchains.
-- **WallStreetZen**: Preparing for integration (coming soon).
+- **[Binance](https://www.binance.com/)**: Utilizing the REST API for data retrieval.
+- **[Alpaca](https://alpaca.markets/)**: Employing the C# SDK for Alpaca for streamlined integration.
+- **[UniswapV3](https://app.uniswap.org/explore) and [PancakeswapV3](https://pancakeswap.finance/info/v3)**: Utilizing GraphQL for efficient data access.
+- **[Alternative.me](https://alternative.me/crypto/fear-and-greed-index/)**: Utilizing the REST API for data retrieval for the Crypto Fear And Greed Index.
+- **[CNN Stock Fear And Greed Index](https://rapidapi.com/rpi4gx/api/fear-and-greed-index)**: Utilizing the REST API for data retrieval from RapidApi.
+- **[CoinPaprika](https://coinpaprika.com/)**, **[CoinMarketCap](https://coinmarketcap.com/)**, **[CoinRanking](https://coinranking.com/)**: Utilizing the REST API for data retrieval and filtering for layer 1 blockchains.
+- **[WallStreetZen](https://www.wallstreetzen.com/)**: Preparing for integration (coming soon).
 
 ### Design Components
 The project is built around two core services:
