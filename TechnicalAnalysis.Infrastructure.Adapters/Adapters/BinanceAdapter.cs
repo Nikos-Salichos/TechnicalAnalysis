@@ -50,7 +50,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var fetchedCandlesticksTask = mediator.Send(new GetCandlesticksQuery());
 
             var pairs = (await fetchedPairsTask).Where(fp => fp.Provider == provider).ToList();
-            var candlesticks = (await fetchedCandlesticksTask).ToList();
+            var candlesticks = await fetchedCandlesticksTask;
 
             pairs.MapPairsToCandlesticks(candlesticks);
 
@@ -81,13 +81,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             }
         }
 
-        private async Task SyncPairs(IEnumerable<BinanceSymbol> tradeableBinancePairs)
+        private async Task SyncPairs(List<BinanceSymbol> tradeableBinancePairs)
         {
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
-            var fetchedAssets = (await mediator.Send(new GetAssetsQuery())).ToList();
+            var fetchedAssets = await mediator.Send(new GetAssetsQuery());
             var assetDictionary = fetchedAssets.ToDictionary(asset => asset.Symbol, asset => asset.PrimaryId);
 
-            var binancePairs = tradeableBinancePairs.Select(tradeablePair => new PairExtended
+            var binancePairs = tradeableBinancePairs.ConvertAll(tradeablePair => new PairExtended
             {
                 Symbol = $"{tradeablePair.BaseAsset}-{tradeablePair.QuoteAsset}",
                 BaseAssetId = assetDictionary.TryGetValue(tradeablePair.BaseAsset, out long baseAssetId) ? baseAssetId : 0,
@@ -95,10 +95,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 Provider = DataProvider.Binance,
                 AllCandles = false,
                 IsActive = true,
-            }).ToList();
+            });
 
             var newDollarPairs = PairExtension.GetUniqueDollarPairs(fetchedAssets, binancePairs);
-            var fetchedPairs = (await fetchedPairsTask).ToList();
+            var fetchedPairs = await fetchedPairsTask;
 
             var missingDollarPairs = newDollarPairs.Except(fetchedPairs).Distinct().ToList();
             foreach (var dollarPair in missingDollarPairs)
