@@ -24,7 +24,7 @@ The project is built around two core services:
 The project incorporates Swagger to facilitate easy testing of endpoints, ensuring a user-friendly experience for both developers and end-users.
 
 ### Architecture, Technologies & Tools
-The project follows the principles of Clean Architecture with some personal modifications. [Here's an architecture diagram](https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723) (pending update with the latest providers).
+The project follows the principles of [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) with some personal modifications. [Here's an architecture diagram](https://miro.com/app/board/uXjVMsAK0lU=/?share_link_id=213007625723) (pending update with the latest providers).
 
 Technologies & Tools used:
 - C# ([ASP.NET Core 8](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-8.0))
