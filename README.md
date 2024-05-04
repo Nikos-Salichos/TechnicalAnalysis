@@ -29,7 +29,7 @@ The project follows the principles of [Clean Architecture](https://blog.cleancod
 Technologies & Tools used:
 - C# ([ASP.NET Core 8](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-8.0))
 - [Docker](https://www.docker.com/)
-- [Mediatr](https://github.com/jbogard/MediatR) (CQRS pattern)
+- [Mediatr](https://github.com/jbogard/MediatR) ([CQRS](https://docs.microsoft.com/en-us/azure/architecture/guide/architecture-styles/cqrs) pattern)
 - [PostgreSQL](https://www.postgresql.org/)
 - [Redis](https://redis.io/)
 - [Dapper](https://github.com/DapperLib/Dapper)
