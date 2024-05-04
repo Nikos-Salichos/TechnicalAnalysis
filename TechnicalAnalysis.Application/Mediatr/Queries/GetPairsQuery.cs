@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Queries
 {
-    public class GetPairsQuery : IRequest<IEnumerable<PairExtended>>
+    public class GetPairsQuery : IRequest<List<PairExtended>>
     {
     }
 }
