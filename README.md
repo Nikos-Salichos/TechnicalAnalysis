@@ -45,7 +45,6 @@ Technologies & Tools used:
 - Navigate to the root folder and run `docker compose up`.
 
 ### Roadmap
-- Develop client endpoints.
 - Create an endpoint where consumers can pass candlestick data, and indicators will be produced on this data.
 - Implement WallStreetZen.
 - Add integration tests using TestContainers.
