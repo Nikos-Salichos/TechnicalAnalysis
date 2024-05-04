@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return true;
             }
 
-            var cryptoFearAndGreedIndexData = (await mediator.Send(new GetCryptoFearAndGreedIndexQuery())).ToList();
+            var cryptoFearAndGreedIndexData = await mediator.Send(new GetCryptoFearAndGreedIndexQuery());
 
             int calculatedDates = 0;
             if (cryptoFearAndGreedIndexData.Count > 0)
