@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Queries
 {
-    public class GetAssetsRankingQuery : IRequest<IEnumerable<AssetRanking>>
+    public class GetAssetsRankingQuery : IRequest<List<AssetRanking>>
     {
     }
 }
