@@ -52,4 +52,4 @@ Hangfire Jobs: `http://localhost:5000/hangfire` <br>
 ### Roadmap
 - Create an endpoint where consumers can pass candlestick data, and indicators will be produced on this data.
 - Implement WallStreetZen.
-- Add integration tests using TestContainers.
+- Add more tests
