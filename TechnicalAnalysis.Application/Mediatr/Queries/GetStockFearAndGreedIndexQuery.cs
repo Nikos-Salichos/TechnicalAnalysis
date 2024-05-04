@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Queries
 {
-    public class GetStockFearAndGreedIndexQuery : IRequest<IEnumerable<StockFearAndGreedDomain>>
+    public class GetStockFearAndGreedIndexQuery : IRequest<List<StockFearAndGreedDomain>>
     {
     }
 }
