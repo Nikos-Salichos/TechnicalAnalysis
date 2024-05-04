@@ -47,8 +47,9 @@ Technologies & Tools used:
 - Hangfire for jobs
 
 ### How to start it
-- Rename appsettings.json to appsettings.prod.json
+- Add your appsettings.prod.json file and be sure it is under the following path ./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json (or you have to change the docker path in docker compose file) 
 - Fill it your own details (like API keys etc)
+- Navigate in root folder and run 'docker compose up'
 
 ### Roadmap:
 - Develop client endpoints
