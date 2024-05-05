@@ -49,6 +49,7 @@ Technologies & Tools used:
 Swagger: `http://localhost:5000/swagger/index.html` <br>
 Seq Events: `http://localhost:5341/#/events` <br>
 Hangfire Jobs: `http://localhost:5000/hangfire` <br>
+Grafana: `http://localhost:3000/` <br>
 
 
 ### Roadmap
