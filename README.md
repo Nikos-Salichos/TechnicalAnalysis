@@ -38,6 +38,7 @@ Technologies & Tools used:
 - Multiple NuGet packages ([Serilog](https://serilog.net/), [Polly](https://www.pollydocs.org/), [FluentValidation](https://docs.fluentvalidation.net/en/latest/), [MailKit](https://github.com/jstedfast/MailKit), [HtmlAgilityPack](https://html-agility-pack.net/), [Moq](https://github.com/devlooped/moq), [Xunit](https://xunit.net/docs/getting-started/netfx/visual-studio), [NetArchTest](https://github.com/BenMorris/NetArchTest), [TestContainers](https://dotnet.testcontainers.org/), [StockIndicators](https://dotnet.stockindicators.dev/), [OoplesFinanceStockIndicators](https://github.com/ooples/OoplesFinance.StockIndicators), [WireMock-Net](https://github.com/WireMock-Net/WireMock.Net), [AlpacaSDK](https://github.com/alpacahq/alpaca-trade-api-csharp) )
 - [Brotli](https://devblogs.microsoft.com/dotnet/introducing-support-for-brotli-compression/) Compression in endpoints
 - [Hangfire](https://www.hangfire.io/) for jobs
+- [Prometheus](https://github.com/prometheus-net/prometheus-net)
 
 ### How to Start - Startup Configuration
 - Add your `appsettings.prod.json` file and ensure it is located at `./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json` (or modify the Docker path in the Docker Compose file).
