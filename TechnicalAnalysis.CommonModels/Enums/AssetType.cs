@@ -1,11 +1,11 @@
 ﻿namespace TechnicalAnalysis.CommonModels.Enums
 {
-    public enum AssetType
+    public enum ProductType
     {
         Unknown = 0,
         Layer1 = 1,
         Layer2 = 2,
-        ETF = 3,
-        Stock = 4
+        CryptoUnknownLayer = 3,
+        StockOrETF = 4,
     }
 }
