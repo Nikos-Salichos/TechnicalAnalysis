@@ -7,7 +7,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public string Symbol { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public DateTime CreatedDate { get; init; }
-        public AssetType AssetType { get; init; }
+        public ProductType AssetType { get; init; }
         public DataProvider DataProvider { get; init; }
     }
 }
