@@ -51,8 +51,7 @@ Seq Events: `http://localhost:5341/#/events` <br>
 Hangfire Jobs: `http://localhost:5000/hangfire` <br>
 Grafana: `http://localhost:3000/` <br>
 Prometheus Graph: `http://localhost:9090/graph` <br>
-
-
+Prometheus Metrics: `http://localhost:9090/metrics` <br>
 
 ### Roadmap
 - Create an endpoint where consumers can pass candlestick data, and indicators will be produced on this data.
