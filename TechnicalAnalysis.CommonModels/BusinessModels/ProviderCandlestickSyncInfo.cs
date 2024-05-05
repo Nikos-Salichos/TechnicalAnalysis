@@ -7,11 +7,6 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
     {
         public DataProvider DataProvider { get; init; }
         public Timeframe Timeframe { get; init; }
-        public DateTime LastCandlestickSync { get; private set; }
-
-        public void UpdateCandlestickInfo()
-        {
-            LastCandlestickSync = DateTime.UtcNow;
-        }
+        public DateTime LastCandlestickSync { get; set; }
     }
 }
