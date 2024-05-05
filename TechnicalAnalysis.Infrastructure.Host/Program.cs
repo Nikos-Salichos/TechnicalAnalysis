@@ -1,5 +1,6 @@
 using Hangfire;
 using Hangfire.PostgreSql;
+using Prometheus;
 using Serilog;
 using TechnicalAnalysis.Application.Modules;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
@@ -37,22 +38,30 @@ builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader =
 builder.Services.ConfigureRateLimit();
 #endregion Api Rate Limit
 
-builder.Services.AddHangfire(configuration =>
+if (builder.Environment.EnvironmentName != "IntegrationTest")
 {
-    var hangfireConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-    configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(hangfireConnectionString));
-});
+    builder.Services.AddHangfire(configuration =>
+    {
+        var hangfireConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+        configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(hangfireConnectionString));
+    });
+}
 
 #region RabbitMq
 builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
 #endregion RabbitMq
 
-builder.Services.AddHangfireServer();
+if (builder.Environment.EnvironmentName != "IntegrationTest")
+{
+    builder.Services.AddHangfireServer();
+}
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
+
+app.UseMetricServer();//Starting the metrics exporter, will expose "/metrics"
 
 app.UseSwagger();
 
@@ -75,13 +84,21 @@ app.UseRateLimiter();
 
 app.UseMiddleware<SecureHeadersMiddleware>();
 
-app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+if (builder.Environment.EnvironmentName != "IntegrationTest")
 {
-    Authorization = new[] { new DashboardNoAuthorizationFilter() }
-});
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+    {
+        Authorization = new[] { new DashboardNoAuthorizationFilter() }
+    });
 
-//Note: Swagger will not run before jobs finish
-await HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
+    //Note: Swagger will not run before jobs finish
+    await HangfireStartupJob.EnqueueSynchronizeProvidersJob(app);
+}
+
+app.UseHttpMetrics(options =>
+{
+    options.AddCustomLabel("host", context => context.Request.Host.Host);
+});
 
 app.UseAuthentication(); //first line should be
 

@@ -4,10 +4,8 @@ using TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses;
 
 namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
 {
-    public sealed class PostgreSqlRepositoryTest : BaseIntegrationTest
+    public sealed class PostgreSqlRepositoryTest(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
     {
-        public PostgreSqlRepositoryTest(IntegrationTestWebAppFactory factory) : base(factory) { }
-
         [Fact]
         public async Task ExecuteAssetsCommand_Successful()
         {
@@ -21,11 +19,11 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
             var retrievedAssets = await PostgreSqlRepository.GetAssetsAsync();
             retrievedAssets.Should().NotBeNull();
             retrievedAssets.FailValue.Should().BeNull();
-            retrievedAssets.SuccessValue.First().Symbol.Should().Be(assets[0].Symbol);
+            retrievedAssets.SuccessValue[0].Symbol.Should().Be(assets[0].Symbol);
         }
 
         [Fact]
-        public async Task InsertDuplicateAssets_Fail()
+        public async Task InsertAssetsAsync_ThrowsPostgresExceptionOnDuplicateKey()
         {
             List<Asset> assets = new()
             {
@@ -33,10 +31,9 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
                 new() { Symbol = "BTC"},
             };
 
-            var insertedAssets = await PostgreSqlRepository.InsertAssetsAsync(assets);
+            var exception = await Assert.ThrowsAsync<Npgsql.PostgresException>(() => PostgreSqlRepository.InsertAssetsAsync(assets));
 
-            insertedAssets.FailValue.Should().NotBeEmpty();
-            insertedAssets.SuccessValue.Should().BeNull();
+            Assert.Contains("23505: duplicate key value violates unique constraint", exception.Message);
         }
     }
 }

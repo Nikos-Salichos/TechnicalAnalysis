@@ -20,7 +20,6 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
         {
             PostgreSqlContainer = new PostgreSqlBuilder()
                 .WithImage("postgres:latest")
-                .WithName("postgresql-testcontainer")
                 .WithUsername("postgres")
                 .WithPassword("admin")
                 .WithDatabase("TechnicalAnalysisTest")
@@ -31,40 +30,39 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("IntegrationTest");
+
+            var solutionDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
+            var basePath = Path.Combine(solutionDirectory, "TechnicalAnalysis.Infrastructure.Host");
+
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(basePath)
+                .AddJsonFile("appsettings.prod.json");
+
+            var config = configBuilder.Build();
+            var apiKey = config["ApiKey"];
+
             var connectionString = PostgreSqlContainer.GetConnectionString();
 
             builder.ConfigureTestServices(services =>
             {
                 // Register the database configuration
                 var configurationBuilder = new ConfigurationBuilder();
+
                 configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    {"ConnectionStrings:PostgreSqlTechnicalAnalysisDockerCompose", connectionString}
+                    {"ConnectionStrings:PostgreSqlTechnicalAnalysisDockerCompose", connectionString},
                 });
 
                 var configuration = configurationBuilder.Build();
 
-                services.AddSingleton<IConfiguration>(configuration);
+                configuration.GetSection("ApiKey").Value = apiKey;
 
-                // Register the repository
+                services.AddSingleton<IConfiguration>(configuration);
                 services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
 
                 // Add options for database settings
                 services.Configure<DatabaseSetting>(configuration.GetSection("ConnectionStrings"));
-
-                // If you need to replace an existing DbContext, you can do it here
-                /*
-                var descriptorType = typeof(DbContextOptions<ApplicationDbContext);
-                var descriptor = services.SingleOrDefault(s => s.ServiceType == descriptorType);
-
-                if (descriptor is not null)
-                {
-                    services.Remove(descriptor);
-                }
-
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString()));
-                */
             });
         }
 

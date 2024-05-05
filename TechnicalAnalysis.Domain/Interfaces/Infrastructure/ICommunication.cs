@@ -2,6 +2,6 @@
 {
     public interface ICommunication
     {
-        public Task CreateAttachmentSendMessage<T>(IEnumerable<T> data, string fileName);
+        public Task CreateAttachmentSendMessage<T>(List<T> data, string fileName);
     }
 }

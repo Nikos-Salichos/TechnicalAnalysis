@@ -3,6 +3,6 @@
     public interface IRabbitMqService
     {
         public void PublishMessage<T>(T message);
-        public Task<IEnumerable<T>> ConsumeMessageAsync<T>();
+        public Task<List<T>> ConsumeMessageAsync<T>();
     }
 }

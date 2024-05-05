@@ -23,7 +23,7 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
             const string apiUrl = "IndicatorsByPairName";
             var requestData = new { pairNames, timeframe };
 
-            var result = await SendHttpRequestAsync<IEnumerable<PairExtended>>(apiUrl, HttpMethod.Get, requestData);
+            var result = await SendHttpRequestAsync<List<PairExtended>>(apiUrl, HttpMethod.Get, requestData);
             return Ok(result);
         }
 

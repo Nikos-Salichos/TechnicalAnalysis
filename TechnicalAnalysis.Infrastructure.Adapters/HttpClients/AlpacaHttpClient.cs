@@ -15,14 +15,22 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         public async Task<IResult<IMultiPage<IBar>, string>> GetAlpacaData(string pairName, DateTime fromDateTime, DateTime toDateTime, BarTimeFrame barTimeFrame)
         {
-            logger.LogInformation("Method {Method}, pairName {pairName}, toDateTime {toDateTime}, barTimeFrame {barTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
-            var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(alpacaSettings.CurrentValue.ApiKey, alpacaSettings.CurrentValue.ApiSecret));
-            HistoricalBarsRequest historicalBarsRequest = new(pairName, fromDateTime, toDateTime, barTimeFrame)
+            try
             {
-                Adjustment = Adjustment.SplitsAndDividends
-            };
-            var stockData = await _retryPolicy.ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
-            return Result<IMultiPage<IBar>, string>.Success(stockData);
+                logger.LogInformation("Method {Method}, pairName {pairName}, toDateTime {toDateTime}, barTimeFrame {barTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
+                var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(alpacaSettings.CurrentValue.ApiKey, alpacaSettings.CurrentValue.ApiSecret));
+                HistoricalBarsRequest historicalBarsRequest = new(pairName, fromDateTime, toDateTime, barTimeFrame)
+                {
+                    Adjustment = Adjustment.SplitsAndDividends
+                };
+                var stockData = await _retryPolicy.ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
+                return Result<IMultiPage<IBar>, string>.Success(stockData);
+            }
+            catch (Exception exception)
+            {
+                logger.LogError("Method {Method}, Exception {Exception} ", nameof(GetAlpacaData), exception);
+                return Result<IMultiPage<IBar>, string>.Fail(exception.Message);
+            }
         }
     }
 }

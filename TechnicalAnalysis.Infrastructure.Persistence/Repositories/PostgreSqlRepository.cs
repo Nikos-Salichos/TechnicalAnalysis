@@ -157,7 +157,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             return Result<List<DexCandlestick>, string>.Success(dexCandlesticks.ToList());
         }
 
-        public async Task InsertCryptoFearAndGreedIndex(IEnumerable<CryptoFearAndGreedData> indexes)
+        public async Task InsertCryptoFearAndGreedIndex(List<CryptoFearAndGreedData> indexes)
         {
             try
             {
@@ -201,7 +201,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await transaction.CommitAsync();
         }
 
-        public async Task InsertPairsAsync(IEnumerable<Pair> pairs)
+        public async Task InsertPairsAsync(List<Pair> pairs)
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
@@ -223,7 +223,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await writer.CompleteAsync();
         }
 
-        public async Task<IResult<string, string>> InsertAssetsAsync(IEnumerable<Asset> assets)
+        public async Task InsertAssetsAsync(List<Asset> assets)
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
@@ -238,10 +238,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
 
             await writer.CompleteAsync();
-            return Result<string, string>.Success(string.Empty);
         }
 
-        public async Task<IResult<string, string>> InsertCoinPaprikaAssetsAsync(IEnumerable<AssetRanking> assets)
+        public async Task InsertCoinPaprikaAssetsAsync(List<AssetRanking> assets)
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
@@ -257,10 +256,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
 
             await writer.CompleteAsync();
-            return Result<string, string>.Success(string.Empty);
         }
 
-        public async Task InsertCandlesticksAsync(IEnumerable<Candlestick> candlesticks)
+        public async Task InsertCandlesticksAsync(List<Candlestick> candlesticks)
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
@@ -285,7 +283,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await writer.CompleteAsync();
         }
 
-        public async Task InsertDexCandlesticksAsync(IEnumerable<DexCandlestick> candlesticks)
+        public async Task InsertDexCandlesticksAsync(List<DexCandlestick> candlesticks)
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
@@ -313,7 +311,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await writer.CompleteAsync();
         }
 
-        public async Task InsertPoolsAsync(IEnumerable<PoolEntity> pools)
+        public async Task InsertPoolsAsync(List<PoolEntity> pools)
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
@@ -372,7 +370,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             await transaction.CommitAsync();
         }
 
-        public async Task<IResult<string, string>> DeleteEntitiesByIdsAsync<T>(IEnumerable<long> ids, string tableName)
+        public async Task<IResult<string, string>> DeleteEntitiesByIdsAsync<T>(List<long> ids, string tableName)
         {
             var validTableNames = new HashSet<string> { "DexCandlesticks", "Pools" };
             if (!validTableNames.Contains(tableName))

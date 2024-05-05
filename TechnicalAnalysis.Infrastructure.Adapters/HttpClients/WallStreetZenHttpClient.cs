@@ -1,5 +1,5 @@
 ﻿using HtmlAgilityPack;
-using System.Collections.Immutable;
+using System.Collections.Frozen;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
@@ -21,9 +21,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 { "googl", "nasdaq" },
                 { "abnb", "nasdaq" },
                 { "brk.b", "nyse" },
-            }.ToImmutableDictionary();
+            }.ToFrozenDictionary();
 
-            List<Stock> stocks = new List<Stock>();
+            List<Stock> stocks = new();
 
             foreach (var stockExchange in stockExchanges)
             {

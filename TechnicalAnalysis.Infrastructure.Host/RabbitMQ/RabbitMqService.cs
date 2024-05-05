@@ -61,7 +61,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
             channel.BasicPublish(exchange: _exchangeName, routingKey: _routingKey, basicProperties: properties, body: body);
         }
 
-        public async Task<IEnumerable<T>> ConsumeMessageAsync<T>()
+        public async Task<List<T>> ConsumeMessageAsync<T>()
         {
             using var connection = connectionFactory.CreateConnection();
             using var channel = connection.CreateModel();

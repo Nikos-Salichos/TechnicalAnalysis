@@ -5,6 +5,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface ICoinPaprikaHttpClient
     {
-        Task<IResult<IEnumerable<CoinPaprikaAssetContract>, string>> SyncAssets();
+        Task<IResult<List<CoinPaprikaAssetContract>, string>> SyncAssets();
     }
 }

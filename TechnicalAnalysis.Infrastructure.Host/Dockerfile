@@ -24,7 +24,7 @@ RUN dotnet build "TechnicalAnalysis.Infrastructure.Host.csproj" -c Release -o /a
 FROM build AS publish
 RUN dotnet publish "TechnicalAnalysis.Infrastructure.Host.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-#Test line to check appsettings
+#Verify appsettings
 COPY TechnicalAnalysis.Infrastructure.Host/appsettings.json /app/appsettings.prod.json
 
 # Final stage

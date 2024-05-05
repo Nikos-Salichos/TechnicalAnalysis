@@ -5,6 +5,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface ICryptoFearAndGreedHttpClient
     {
-        Task<IResult<IEnumerable<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndex(int numberOfDates);
+        Task<IResult<List<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndex(int numberOfDates);
     }
 }

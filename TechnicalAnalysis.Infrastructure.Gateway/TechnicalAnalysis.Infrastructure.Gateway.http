@@ -1,4 +1,4 @@
-@TechnicalAnalysis.Infrastructure.Gateway_HostAddress = http://localhost:3000
+@TechnicalAnalysis.Infrastructure.Gateway_HostAddress = http://localhost:6000
 
 GET {{TechnicalAnalysis.Infrastructure.Gateway_HostAddress}}/weatherforecast/
 Accept: application/json

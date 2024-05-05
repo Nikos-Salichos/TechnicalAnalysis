@@ -1,32 +1,45 @@
 ﻿using FluentAssertions;
-using Newtonsoft.Json;
-using System.Text;
-using TechnicalAnalysis.CommonModels.ApiRequests;
+using Microsoft.Extensions.Configuration;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses;
 
 namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
 {
-    public class ControllerTest : BaseIntegrationTest
+    public sealed class ControllerTest(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
     {
-        private readonly IntegrationTestWebAppFactory _factory;
-        public ControllerTest(IntegrationTestWebAppFactory factory) : base(factory)
+        [Fact]
+        public async Task Should_Return_Unauthorized_On_HttpGet_SynchronizeProviders_Without_ApiKey()
         {
-            _factory = factory;
+            var client = factory.CreateClient();
+
+            string url = $"api/v1/analysis/SynchronizeProviders?dataProvider={DataProvider.Alpaca}&timeframe={Timeframe.Weekly}";
+
+            var response = await client.GetAsync(url);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
         }
 
-        //TODO Finish the test
         [Fact]
-        public async Task Should_return_ok_on_http_get_synchronizeProviders()
+        public async Task Should_Return_BadRequest_On_HttpGet_SynchronizeProviders()
         {
-            var client = _factory.CreateClient();
+            var solutionDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
+            var basePath = Path.Combine(solutionDirectory, "TechnicalAnalysis.Infrastructure.Host");
 
-            var dataProviderTimeframeRequest = new DataProviderTimeframeRequest(DataProvider.Binance, Timeframe.Weekly);
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(basePath)
+                .AddJsonFile("appsettings.prod.json");
 
-            var jsonContent = new StringContent(JsonConvert.SerializeObject(dataProviderTimeframeRequest), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("api/v1/analysis/SynchronizeProviders", jsonContent);
+            var config = configBuilder.Build();
 
-            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var apiKey = config["ApiKey"];
+
+            var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add("ApiKey", apiKey);
+
+            string url = $"api/v1/analysis/SynchronizeProviders?dataProvider={DataProvider.Alpaca}&timeframe={Timeframe.Weekly}";
+
+            var response = await client.GetAsync(url);
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
         }
     }
 }

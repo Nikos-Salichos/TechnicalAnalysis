@@ -10,7 +10,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
     public class Communication(IMailer mailService, IConfiguration configuration) : ICommunication
     {
-        public async Task CreateAttachmentSendMessage<T>(IEnumerable<T> data, string fileName)
+        public async Task CreateAttachmentSendMessage<T>(List<T> data, string fileName)
         {
             List<MimePart> mailInformation = [];
             CreateAttachment(fileName, ".json", mailInformation, data.ToList());
@@ -40,7 +40,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
         }
 
         private static void CreateAttachment<T>(string fileName, string filetype, List<MimePart> attachments,
-            IEnumerable<T> data, JsonSerializerOptions? jsonSerializerOptions = null)
+            List<T> data, JsonSerializerOptions? jsonSerializerOptions = null)
         {
             string json = JsonSerializer.Serialize(data, jsonSerializerOptions ?? JsonHelper.JsonSerializerOptions);
 

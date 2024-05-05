@@ -20,28 +20,36 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         public async Task<IResult<List<CoinPaprikaAssetContract>, string>> SyncAssets()
         {
-            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead));
-
-            logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
-                coinPaprikaSetting.CurrentValue.Endpoint, httpResponseMessage);
-
-            if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+            try
             {
-                logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
-                return Result<List<CoinPaprikaAssetContract>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead));
+
+                logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
+                    coinPaprikaSetting.CurrentValue.Endpoint, httpResponseMessage);
+
+                if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    return Result<List<CoinPaprikaAssetContract>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                }
+
+                using var content = httpResponseMessage.Content;
+                await using var jsonStream = await content.ReadAsStreamAsync();
+
+                var deserializedData = await JsonSerializer.DeserializeAsync<List<CoinPaprikaAssetContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
+                if (deserializedData is not null)
+                {
+                    return Result<List<CoinPaprikaAssetContract>, string>.Success(deserializedData);
+                }
+
+                logger.LogError("Deserialization Failed");
+                return Result<List<CoinPaprikaAssetContract>, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
             }
-
-            using var content = httpResponseMessage.Content;
-            await using var jsonStream = await content.ReadAsStreamAsync();
-
-            var deserializedData = await JsonSerializer.DeserializeAsync<List<CoinPaprikaAssetContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
-            if (deserializedData is not null)
+            catch (Exception exception)
             {
-                return Result<List<CoinPaprikaAssetContract>, string>.Success(deserializedData);
+                logger.LogError("Method {Method}, Exception {Exception} ", nameof(SyncAssets), exception);
+                return Result<List<CoinPaprikaAssetContract>, string>.Fail(exception.Message);
             }
-
-            logger.LogError("Deserialization Failed");
-            return Result<List<CoinPaprikaAssetContract>, string>.Fail($"{nameof(SyncAssets)} Deserialization Failed");
         }
     }
 }

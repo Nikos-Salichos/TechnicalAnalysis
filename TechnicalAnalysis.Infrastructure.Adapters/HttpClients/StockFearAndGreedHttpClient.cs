@@ -20,27 +20,35 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         public async Task<IResult<StockFearAndGreedRoot, string>> GetStockFearAndGreedIndex()
         {
-            _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Key", rapidApiSetting.CurrentValue.StockFearAndGreedApiKey);
-            _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Host", rapidApiSetting.CurrentValue.StockFearAndGreedHost);
-            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(rapidApiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
-
-            if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+            try
             {
-                logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
-                return Result<StockFearAndGreedRoot, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Key", rapidApiSetting.CurrentValue.StockFearAndGreedApiKey);
+                _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Host", rapidApiSetting.CurrentValue.StockFearAndGreedHost);
+                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(rapidApiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
+
+                if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    return Result<StockFearAndGreedRoot, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                }
+
+                using var content = httpResponseMessage.Content;
+                await using var jsonStream = await content.ReadAsStreamAsync();
+
+                var deserializedData = await JsonSerializer.DeserializeAsync<StockFearAndGreedRoot>(jsonStream, JsonHelper.JsonSerializerOptions);
+                if (deserializedData is not null)
+                {
+                    return Result<StockFearAndGreedRoot, string>.Success(deserializedData);
+                }
+
+                logger.LogError("Deserialization Failed");
+                return Result<StockFearAndGreedRoot, string>.Fail($"{nameof(GetStockFearAndGreedIndex)} Deserialization Failed");
             }
-
-            using var content = httpResponseMessage.Content;
-            await using var jsonStream = await content.ReadAsStreamAsync();
-
-            var deserializedData = await JsonSerializer.DeserializeAsync<StockFearAndGreedRoot>(jsonStream, JsonHelper.JsonSerializerOptions);
-            if (deserializedData is not null)
+            catch (Exception exception)
             {
-                return Result<StockFearAndGreedRoot, string>.Success(deserializedData);
+                logger.LogError("Method {Method}, Exception {Exception} ", nameof(GetStockFearAndGreedIndex), exception);
+                return Result<StockFearAndGreedRoot, string>.Fail(exception.Message);
             }
-
-            logger.LogError("Deserialization Failed");
-            return Result<StockFearAndGreedRoot, string>.Fail($"{nameof(GetStockFearAndGreedIndex)} Deserialization Failed");
         }
     }
 }

@@ -2,28 +2,35 @@
 
 namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
-    public class ApiKeyMiddleware(RequestDelegate requestDelegate)
+    public class ApiKeyMiddleware(RequestDelegate next, IConfiguration configuration)
     {
-        private const string APIKEYNAME = "ApiKey";
+        private const string APIKeyHeaderName = "ApiKey";
+        private readonly string _hangfireDashboardPath = "/hangfire";
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (!context.Request.Headers.TryGetValue(APIKEYNAME, out var extractedApiKey))
+            if (context.Request.Path.StartsWithSegments(_hangfireDashboardPath))
             {
-                await UnauthorizedResponse(context, "Api Key was not provided. (Using ApiKeyMiddleware)");
+                // Allow unrestricted access to Hangfire dashboard
+                await next(context);
                 return;
             }
 
-            var appSettings = context.RequestServices.GetRequiredService<IConfiguration>();
-            var apiKey = appSettings.GetValue<string>(APIKEYNAME);
-
-            if (apiKey?.Equals(extractedApiKey) != true)
+            if (!context.Request.Headers.TryGetValue(APIKeyHeaderName, out var extractedApiKey))
             {
-                await UnauthorizedResponse(context, "Unauthorized client. (Using ApiKeyMiddleware)");
+                await UnauthorizedResponse(context, "Api Key was not provided.");
                 return;
             }
 
-            await requestDelegate(context);
+            var apiKey = configuration["ApiKey"];
+
+            if (apiKey?.Equals(extractedApiKey, StringComparison.InvariantCultureIgnoreCase) != true)
+            {
+                await UnauthorizedResponse(context, "Unauthorized client.");
+                return;
+            }
+
+            await next(context);
         }
 
         private static async Task UnauthorizedResponse(HttpContext context, string message)

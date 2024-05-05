@@ -20,58 +20,73 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
         {
-            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
-
-            logger.LogInformation("SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
-             binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
-
-            if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+            try
             {
-                logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
-                return Result<BinanceExchangeInfoResponse, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
+
+                logger.LogInformation("SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
+                 binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
+
+                if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    return Result<BinanceExchangeInfoResponse, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                }
+
+                using var content = httpResponseMessage.Content;
+                await using var jsonStream = await content.ReadAsStreamAsync();
+
+                var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
+                if (deserializedData is not null)
+                {
+                    return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
+                }
+
+                logger.LogError("Deserialization Failed");
+                return Result<BinanceExchangeInfoResponse, string>.Fail($"{nameof(GetBinanceAssetsAndPairs)} Deserialization Failed");
             }
-
-
-            using var content = httpResponseMessage.Content;
-            await using var jsonStream = await content.ReadAsStreamAsync();
-
-            var deserializedData = await JsonSerializer.DeserializeAsync<BinanceExchangeInfoResponse>(jsonStream, JsonHelper.JsonSerializerOptions);
-            if (deserializedData is not null)
+            catch (Exception exception)
             {
-                return Result<BinanceExchangeInfoResponse, string>.Success(deserializedData);
+                logger.LogError("Method {Method}, Exception {Exception} ", nameof(GetBinanceAssetsAndPairs), exception);
+                return Result<BinanceExchangeInfoResponse, string>.Fail(exception.Message);
             }
-
-            logger.LogError("Deserialization Failed");
-            return Result<BinanceExchangeInfoResponse, string>.Fail($"{nameof(GetBinanceAssetsAndPairs)} Deserialization Failed");
         }
 
         public async Task<IResult<object[][], string>> GetBinanceCandlesticks(IDictionary<string, string>? queryParams = null)
         {
-            var binanceCandlestickPath = binanceSettings.CurrentValue.CandlestickPath;
-            if (queryParams != null)
+            try
             {
-                binanceCandlestickPath += "?" + string.Join("&", queryParams.Select(p => $"{p.Key}={p.Value}"));
+                var binanceCandlestickPath = binanceSettings.CurrentValue.CandlestickPath;
+                if (queryParams != null)
+                {
+                    binanceCandlestickPath += "?" + string.Join("&", queryParams.Select(p => $"{p.Key}={p.Value}"));
+                }
+
+                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
+
+                logger.LogInformation("binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {StatusCode} ",
+                    binanceCandlestickPath, httpResponseMessage.StatusCode);
+
+                if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    logger.LogError("{httpResponseMessage.Content}", httpResponseMessage.Content);
+                    return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
+                }
+
+                await using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                var deserializedData = await JsonSerializer.DeserializeAsync<object[][]>(jsonStream, JsonHelper.JsonSerializerOptions);
+                if (deserializedData is not null)
+                {
+                    return Result<object[][], string>.Success(deserializedData);
+                }
+                logger.LogError("Deserialization Failed");
+                return Result<object[][], string>.Fail($"{nameof(GetBinanceCandlesticks)} Deserialization Failed");
             }
-
-            using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
-
-            logger.LogInformation("binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {StatusCode} ",
-                binanceCandlestickPath, httpResponseMessage.StatusCode);
-
-            if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+            catch (Exception exception)
             {
-                logger.LogError("{httpResponseMessage.Content}", httpResponseMessage.Content);
-                return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
+                logger.LogError("Method {Method}, Exception {Exception} ", nameof(GetBinanceCandlesticks), exception);
+                return Result<object[][], string>.Fail(exception.Message);
             }
-
-            await using var jsonStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-            var deserializedData = await JsonSerializer.DeserializeAsync<object[][]>(jsonStream, JsonHelper.JsonSerializerOptions);
-            if (deserializedData is not null)
-            {
-                return Result<object[][], string>.Success(deserializedData);
-            }
-            logger.LogError("Deserialization Failed");
-            return Result<object[][], string>.Fail($"{nameof(GetBinanceCandlesticks)} Deserialization Failed");
         }
     }
 }
