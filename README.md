@@ -39,6 +39,7 @@ Technologies & Tools used:
 - [Brotli](https://devblogs.microsoft.com/dotnet/introducing-support-for-brotli-compression/) Compression in endpoints
 - [Hangfire](https://www.hangfire.io/) for jobs
 - [Prometheus](https://github.com/prometheus-net/prometheus-net)
+- [Grafana](https://grafana.com/)
 
 ### How to Start - Startup Configuration
 - Add your `appsettings.prod.json` file and ensure it is located at `./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json` (or modify the Docker path in the Docker Compose file).
