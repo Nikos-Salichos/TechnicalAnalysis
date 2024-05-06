@@ -37,7 +37,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers.BaseClasses
 
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.prod.json");
+                .AddJsonFile("appsettings.json");
 
             var config = configBuilder.Build();
             var apiKey = config["ApiKey"];
