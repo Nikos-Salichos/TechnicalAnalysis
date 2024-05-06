@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using System.Globalization;
 using TechnicalAnalysis.Domain.Extensions;
 
 namespace TechnicalAnalysis.Tests.UnitTests
@@ -23,8 +24,8 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var longNumberWithTenDigits = numberAsString.ReduceDigitsToFitLongLength();
 
             longNumberWithTenDigits.Should().NotBeNull();
-            longNumberWithTenDigits.Value.ToString().Length.Should().Be(10);
-            longNumberWithTenDigits.Value.ToString().Should().NotContain("nikos");
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Length.Should().Be(10);
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Should().NotContain("nikos");
         }
 
         [Fact]
@@ -34,8 +35,8 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var longNumberWithTenDigits = numberAsString.ReduceDigitsToFitLongLength();
 
             longNumberWithTenDigits.Should().NotBeNull();
-            longNumberWithTenDigits.Value.ToString().Length.Should().Be(10);
-            longNumberWithTenDigits.Value.ToString().Should().NotContain("nikos");
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Length.Should().Be(10);
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Should().NotContain("nikos");
         }
 
         [Fact]
@@ -45,8 +46,8 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var longNumberWithTenDigits = numberAsString.ReduceDigitsToFitLongLength();
 
             longNumberWithTenDigits.Should().NotBeNull();
-            longNumberWithTenDigits.Value.ToString().Length.Should().Be(10);
-            longNumberWithTenDigits.Value.ToString().Should().NotContain("nikos");
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Length.Should().Be(10);
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Should().NotContain("nikos");
         }
 
         [Fact]
@@ -56,7 +57,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var longNumberWithTenDigits = numberAsString.ReduceDigitsToFitDecimalLength();
 
             longNumberWithTenDigits.Should().NotBeNull();
-            longNumberWithTenDigits.Value.ToString().Length.Should().Be(25);
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Length.Should().Be(25);
         }
 
         [Fact]
@@ -66,8 +67,8 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var longNumberWithTenDigits = numberAsString.ReduceDigitsToFitDecimalLength();
 
             longNumberWithTenDigits.Should().NotBeNull();
-            longNumberWithTenDigits.Value.ToString().Length.Should().Be(25);
-            longNumberWithTenDigits.Value.ToString().Should().Contain(",");
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Length.Should().Be(25);
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Should().Contain(",");
         }
     }
 }
