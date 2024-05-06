@@ -26,7 +26,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.TestContainers
 
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.prod.json");
+                .AddJsonFile("appsettings.json");
 
             var config = configBuilder.Build();
 
