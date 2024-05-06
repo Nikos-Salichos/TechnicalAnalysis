@@ -17,7 +17,7 @@
     <None Include="grafana\dashboards\ApiDashboard.json" />
     <None Include="grafana\dashboards\dashboard.yml" />
     <None Include="grafana\datasources\prometheus_ds.yml" />
-    <None Include="prometheus\prometheus.yml" />
+    <None Include="Prometheus\prometheus.yml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Grafana\Dashboards\" />
