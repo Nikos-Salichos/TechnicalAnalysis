@@ -68,7 +68,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
 
             longNumberWithTenDigits.Should().NotBeNull();
             longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Length.Should().Be(25);
-            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Should().Contain(",");
+            longNumberWithTenDigits.Value.ToString(CultureInfo.InvariantCulture).Should().Contain(".");
         }
     }
 }
