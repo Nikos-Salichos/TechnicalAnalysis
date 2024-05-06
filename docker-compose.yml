@@ -87,7 +87,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     networks:
        - postgres-db-network
 
@@ -114,13 +114,13 @@ services:
       - postgres-db-network
 
   grafana:
-    container_name: grafana_grafprom
+    container_name: ta-grafana
     image: grafana/grafana:master
     ports:
       - "3000:3000"
     volumes:
-        - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-        - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+        - ./Grafana/Datasources:/etc/grafana/provisioning/datasources
+        - ./Grafana/Dashboards:/etc/grafana/provisioning/dashboards
     depends_on:
         prometheus:
             condition: service_healthy
@@ -133,12 +133,12 @@ services:
 
   prometheus:
     image: prom/prometheus
-    container_name: prometheus_grafprom
+    container_name: ta-prometheus
     restart: always
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     healthcheck:
         test: wget -q --tries=1 -O- http://localhost:9090/
         interval: 3s
