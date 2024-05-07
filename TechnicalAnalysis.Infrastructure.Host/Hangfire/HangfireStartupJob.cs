@@ -24,6 +24,10 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
                         CommonModels.Enums.Timeframe.Daily)),
 
                     syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.RapidApiStockFearAndGreedProvider,
+                        CommonModels.Enums.Timeframe.Daily)),
+
+                    syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
                         CommonModels.Enums.DataProvider.AlternativeMeCryptoFearAndGreedProvider,
                         CommonModels.Enums.Timeframe.Daily)),
 
