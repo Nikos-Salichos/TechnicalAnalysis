@@ -25,10 +25,9 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Modules
                     EndPoints = { configuration["ConnectionStrings:RedisDockerCompose"] },
                     AbortOnConnectFail = false,
                     ConnectTimeout = 5,
-                    ConnectRetry = 2
+                    ConnectRetry = 10,
                 };
-                // Use Task.Run to asynchronously create and connect the multiplexer
-                return Task.Run(() => ConnectionMultiplexer.Connect(options)).Result;
+                return ConnectionMultiplexer.Connect(options);
             });
 
             // Register IDistributedCache as a singleton
