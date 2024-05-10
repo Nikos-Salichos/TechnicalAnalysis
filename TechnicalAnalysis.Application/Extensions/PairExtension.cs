@@ -30,8 +30,8 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             foreach (var pair in pairs)
             {
-                var asset0Id = assets.FirstOrDefault(a => a.PrimaryId == pair.BaseAssetId);
-                var asset1Id = assets.FirstOrDefault(a => a.PrimaryId == pair.QuoteAssetId);
+                var asset0Id = assets.Find(a => a.PrimaryId == pair.BaseAssetId);
+                var asset1Id = assets.Find(a => a.PrimaryId == pair.QuoteAssetId);
                 if (asset0Id != null)
                 {
                     pair.BaseAssetId = asset0Id.PrimaryId;
