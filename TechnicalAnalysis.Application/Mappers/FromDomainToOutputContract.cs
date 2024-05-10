@@ -17,9 +17,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         private static List<Candle> ToOutputContract(this List<CandlestickExtended> domainCandlesticks)
-            => domainCandlesticks is null
-                ? []
-                : domainCandlesticks.ConvertAll(c => c.ToOutputContract());
+            => domainCandlesticks.ConvertAll(c => c.ToOutputContract());
 
         public static PartialPair ToOutputContract(this PairExtended domain)
             => new()
