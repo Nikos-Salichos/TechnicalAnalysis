@@ -66,15 +66,19 @@ if (builder.Environment.EnvironmentName != "IntegrationTest")
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+//Global Exception Handler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
-app.UseMetricServer();//Starting the metrics exporter, will expose "/metrics"
+app.UseMetricServer(); //Starting the metrics exporter, will expose "/metrics"
 
 app.UseSwagger();
 
 app.UseSwaggerUI();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseExceptionHandler();
 
 app.UseSerilogRequestLogging(options
   => options.EnrichDiagnosticContext = LogRequestEnricher.LogAdditionalInfo);
