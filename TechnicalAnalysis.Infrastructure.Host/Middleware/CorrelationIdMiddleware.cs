@@ -44,5 +44,4 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
             });
         }
     }
-
 }
