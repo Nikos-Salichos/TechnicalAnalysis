@@ -624,8 +624,8 @@ namespace TechnicalAnalysis.Application.Services
             AdvancedIndicatorExtension.Logger = logger;
             PairStatisticsExtension.Logger = logger;
 
-            var cryptoFearAndGreedData = (await cryptoFearAndGreedDataTask).OrderByDescending(c => c.TimestampAsDateTime).ToList();
-            var cryptoFearAndGreedDataPerDatetime = cryptoFearAndGreedData.ToDictionary(c => c.TimestampAsDateTime.Date, c => c);
+            var cryptoFearAndGreedData = (await cryptoFearAndGreedDataTask).OrderByDescending(c => c.DateTime).ToList();
+            var cryptoFearAndGreedDataPerDatetime = cryptoFearAndGreedData.ToDictionary(c => c.DateTime.Date, c => c);
 
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime));
