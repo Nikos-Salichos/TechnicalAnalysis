@@ -52,8 +52,8 @@ Hangfire Jobs: `http://localhost:5000/hangfire` <br>
 Grafana: `http://localhost:3000/` <br>
 Prometheus Graph: `http://localhost:9090/graph` <br>
 Prometheus Metrics: `http://localhost:9090/metrics` <br>
-Gateway API: https://localhost:6001/swagger/index.html <br>
-PgAdmin4: http://localhost:16543/login <br>
+Gateway API: `https://localhost:6001/swagger/index.html` <br>
+PgAdmin4: `http://localhost:16543/login` <br>
   - Username: admin@admin.com (unless you change docker-compose.yml file)
   - Password: admin (unless you change docker-compose.yml file)
 
