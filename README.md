@@ -54,8 +54,8 @@ Prometheus Graph: `http://localhost:9090/graph` <br>
 Prometheus Metrics: `http://localhost:9090/metrics` <br>
 Gateway API: `https://localhost:6001/swagger/index.html` <br>
 PgAdmin4: `http://localhost:16543/login` <br>
-  - Username: admin@admin.com (unless you change docker-compose.yml file)
-  - Password: admin (unless you change docker-compose.yml file)
+  - Username: `admin@admin.com` (unless you change docker-compose.yml file)
+  - Password: `admin` (unless you change docker-compose.yml file)
 
 ### Roadmap
 - Create an endpoint where consumers can pass candlestick data, and indicators will be produced on this data.
