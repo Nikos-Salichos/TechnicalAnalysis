@@ -122,5 +122,38 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
+        public static ValueClassificationType ToValueClassificationType(this string valueClassification)
+        {
+            valueClassification = new string(valueClassification
+                                       .Where(c => !char.IsWhiteSpace(c))
+                                       .ToArray())
+                                       .ToUpper();
+
+            if (string.Equals(valueClassification, "EXTREMEFEAR", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ValueClassificationType.ExtremeFear;
+            }
+            else if (string.Equals(valueClassification, "FEAR", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ValueClassificationType.Fear;
+            }
+            else if (string.Equals(valueClassification, "NEUTRAL", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ValueClassificationType.Neutral;
+            }
+            else if (string.Equals(valueClassification, "GREED", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ValueClassificationType.Greed;
+            }
+            else if (string.Equals(valueClassification, "EXTREMEGREED", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ValueClassificationType.ExtremeGreed;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid valueClassification: {valueClassification}");
+            }
+        }
+
     }
 }
