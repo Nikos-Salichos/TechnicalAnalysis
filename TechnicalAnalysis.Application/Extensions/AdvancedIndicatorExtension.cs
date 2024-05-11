@@ -4,7 +4,6 @@ using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 using TechnicalAnalysis.CommonModels.Indicators.Basic;
 using TechnicalAnalysis.CommonModels.Indicators.CandlestickFormations;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 
 namespace TechnicalAnalysis.Application.Extensions
 {
@@ -13,7 +12,7 @@ namespace TechnicalAnalysis.Application.Extensions
         public static ILogger Logger { get; set; }
 
         public static void CalculateSignalIndicators(this PairExtended pair,
-            Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
+            Dictionary<DateTime, FearAndGreedModel> fearAndGreedPerDate)
         {
             Logger.LogInformation("Pair details - {PairPropertyName}: {PairName}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
@@ -45,8 +44,8 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateWilliamsVixFix(pair);
             CalculateHighestWilliamsVixFixValue(pair);
 
-            CalculateEnchancedLong(pair, cryptoFearAndGreedDataPerDatetime);
-            CalculateEnchancedShort(pair, cryptoFearAndGreedDataPerDatetime);
+            CalculateEnchancedLong(pair, fearAndGreedPerDate);
+            CalculateEnchancedShort(pair, fearAndGreedPerDate);
             CalculateResistanceBreakout(pair);
             CalculateVerticalHorizontalFilterRange(pair);
         }
@@ -463,7 +462,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateEnchancedLong(PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
+        private static void CalculateEnchancedLong(PairExtended pair, Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime)
         {
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
@@ -486,9 +485,9 @@ namespace TechnicalAnalysis.Application.Extensions
                     or DataProvider.Uniswap
                     or DataProvider.Pancakeswap)
                 {
-                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassification == "Extreme Fear"
-                          || cryptoFearAndGreedIndex.ValueClassification == "Fear"
-                          || cryptoFearAndGreedIndex.ValueClassification == "Neutral";
+                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeFear
+                          || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Fear
+                          || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Neutral;
 
                     if (!greedAndFearCondition)
                     {
@@ -577,7 +576,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateEnchancedShort(PairExtended pair, Dictionary<DateTime, CryptoFearAndGreedData> cryptoFearAndGreedDataPerDatetime)
+        private static void CalculateEnchancedShort(PairExtended pair, Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime)
         {
             decimal? candlestickHighestPrice = -1;
 
@@ -591,8 +590,9 @@ namespace TechnicalAnalysis.Application.Extensions
                     or DataProvider.Uniswap
                     or DataProvider.Pancakeswap)
                 {
-                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassification == "Extreme Greed"
-                          || cryptoFearAndGreedIndex.ValueClassification == "Greed";
+                    //TODO Fix extreme greed etc, make them enum
+                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Greed
+                          || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeGreed;
 
                     if (!greedAndFearCondition)
                     {
@@ -713,9 +713,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                     count++;
 
-                    var verticalHorizontalFilterRange = new VerticalHorizontalFilterRange(
-                        currentCandlestick.PrimaryId, Constants.VerticalHorizontalFilterRangeLimit, count);
-
+                    var verticalHorizontalFilterRange = new VerticalHorizontalFilterRange(currentCandlestick.PrimaryId)
+                    {
+                        NumberOfCandlesticksInRange = count,
+                        RangeLimit = Constants.VerticalHorizontalFilterRangeLimit
+                    };
                     currentCandlestick.VerticalHorizontalFilterRanges.Add(verticalHorizontalFilterRange);
                 }
                 else
@@ -783,7 +785,10 @@ namespace TechnicalAnalysis.Application.Extensions
                 )
             {
                 candlestick.DragonFlyDojis.Add(
-                    DragonFlyDoji.Create(candlestick.PrimaryId, true, 1));
+                    new DragonFlyDoji(candlestick.PrimaryId)
+                    {
+                        IsDragonFlyDoji = true
+                    });
             }
         }
 
@@ -792,7 +797,7 @@ namespace TechnicalAnalysis.Application.Extensions
             if (candlestick.Body >= candlestick.Range * 0.9m)
             {
                 candlestick.Marubozus.Add(
-                    Marubozu.Create(candlestick.PrimaryId, true, 1));
+                    new Marubozu(candlestick.PrimaryId) { IsMarubozu = true });
             }
         }
 
@@ -806,7 +811,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 )
             {
                 candlestick.Hammers.Add(
-                    Hammer.Create(candlestick.PrimaryId, true, 1));
+                    new Hammer(candlestick.PrimaryId) { IsHammer = true });
             }
         }
 
@@ -817,11 +822,10 @@ namespace TechnicalAnalysis.Application.Extensions
                  && (candlestick.HighPrice - candlestick.ClosePrice) / candlestick.Range > 0.5m //Close price position higher that mid
                  && (candlestick.HighPrice - candlestick.OpenPrice) / candlestick.Range > 0.5m //Open price position higher that mid
                  && candlestick.OpenPrice <= candlestick.BottomTwentyPercentOfRangeInPriceUnit
-                 && candlestick.ClosePrice <= candlestick.BottomTwentyPercentOfRangeInPriceUnit
-                 )
+                 && candlestick.ClosePrice <= candlestick.BottomTwentyPercentOfRangeInPriceUnit)
             {
                 candlestick.InvertedHammers.Add(
-                    InvertedHammer.Create(candlestick.PrimaryId, 0, true));
+                    new InvertedHammer(candlestick.PrimaryId) { IsInvertedHammer = true });
             }
         }
 
@@ -836,7 +840,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 )
             {
                 candlestick.SpinningTops.Add(
-                    SpinningTop.Create(candlestick.PrimaryId, true));
+                    new SpinningTop(candlestick.PrimaryId) { IsSpinningTop = true });
             }
         }
 
