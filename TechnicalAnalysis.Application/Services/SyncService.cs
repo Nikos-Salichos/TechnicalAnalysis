@@ -73,6 +73,11 @@ namespace TechnicalAnalysis.Application.Services
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.RapidApiStockFearAndGreedProvider, timeframe, exchanges));
                 }
 
+                if (provider == DataProvider.CnnApiStockFearAndGreedProvider || provider == DataProvider.All)
+                {
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CnnApiStockFearAndGreedProvider, timeframe, exchanges));
+                }
+
                 if (adaptersToSync.Count > 0)
                 {
                     await Task.WhenAll(adaptersToSync);
@@ -84,14 +89,32 @@ namespace TechnicalAnalysis.Application.Services
         {
             var adapter = adapterFactory(provider);
             var providerSynced = await adapter.Sync(provider, timeframe, exchanges);
+
             if (providerSynced)
             {
                 logger.LogInformation("Synchronization completed for {Provider}", provider);
             }
             else
             {
-                logger.LogError("Synchronization failed for {Provider}", provider);
+                if (provider == DataProvider.CnnApiStockFearAndGreedProvider)
+                {
+                    logger.LogError("Synchronization failed for {CnnApiStockFearAndGreedProvider} and we trigger the next {CnnApiStockFearAndGreedProvider}",
+                        DataProvider.CnnApiStockFearAndGreedProvider, DataProvider.RapidApiStockFearAndGreedProvider);
+
+                    providerSynced = await adapter.Sync(DataProvider.RapidApiStockFearAndGreedProvider, timeframe, exchanges);
+                    provider = DataProvider.RapidApiStockFearAndGreedProvider;
+                }
+
+                if (providerSynced)
+                {
+                    logger.LogInformation("Synchronization completed for {Provider}", provider);
+                }
+                else
+                {
+                    logger.LogError("Synchronization failed for {Provider}", provider);
+                }
             }
         }
+
     }
 }
