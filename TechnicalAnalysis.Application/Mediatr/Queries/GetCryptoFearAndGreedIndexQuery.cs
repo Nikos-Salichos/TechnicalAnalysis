@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
+using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Queries
 {
-    public class GetCryptoFearAndGreedIndexQuery : IRequest<List<CryptoFearAndGreedData>>
+    public class GetCryptoFearAndGreedIndexQuery : IRequest<List<FearAndGreedModel>>
     {
     }
 }
