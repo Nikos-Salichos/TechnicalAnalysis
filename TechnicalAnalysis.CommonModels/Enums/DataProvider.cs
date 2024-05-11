@@ -13,6 +13,7 @@
         CoinPaprika = 8,
         CoinMarketCap = 9,
         CoinRanking = 10,
-        RapidApiStockFearAndGreedProvider = 11
+        RapidApiStockFearAndGreedProvider = 11,
+        CnnApiStockFearAndGreedProvider = 12
     }
 }
