@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
+using TechnicalAnalysis.CommonModels.BusinessModels;
 
 namespace TechnicalAnalysis.Application.Mediatr.Commands.Insert
 {
-    public class InsertCryptoFearAndGreedIndexCommand(List<CryptoFearAndGreedData> cryptoFearAndGreedDatas) : IRequest
+    public class InsertCryptoFearAndGreedIndexCommand(List<FearAndGreedModel> fearAndGreedModels) : IRequest
     {
-        public List<CryptoFearAndGreedData> CryptoFearAndGreedDatas { get; } = cryptoFearAndGreedDatas;
+        public List<FearAndGreedModel> CryptoFearAndGreedDatas { get; } = fearAndGreedModels;
     }
 }
