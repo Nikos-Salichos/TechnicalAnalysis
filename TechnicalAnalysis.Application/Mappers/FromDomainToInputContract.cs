@@ -6,7 +6,7 @@ namespace TechnicalAnalysis.Application.Mappers
     public static class FromDomainToInputContract
     {
         public static List<BinancePair> ToContract(this List<PairExtended> pairs)
-            => pairs.Select(p => p.ToContract()).ToList();
+            => pairs.ConvertAll(p => p.ToContract());
 
         private static BinanceCandlestick ToContract(this CandlestickExtended candlestick)
             => new()
