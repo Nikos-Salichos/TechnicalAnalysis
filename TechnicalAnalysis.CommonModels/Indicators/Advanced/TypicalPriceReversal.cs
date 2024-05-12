@@ -6,6 +6,6 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
     {
         public bool TypicalPriceReversalIsBuy { get; init; }
         public bool TypicalPriceReversalIsSell { get; init; }
-        public int OrderOfSignal { get; init; }
+        public required int OrderOfSignal { get; init; }
     }
 }
