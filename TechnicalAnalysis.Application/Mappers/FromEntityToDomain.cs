@@ -21,7 +21,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static List<PairExtended> ToDomain(this List<Domain.Entities.Pair> pairs)
-            => pairs.Select(c => c.ToDomain()).ToList();
+            => pairs.ConvertAll(c => c.ToDomain());
 
         private static CandlestickExtended ToDomain(this Domain.Entities.Candlestick candlestick)
             => new CandlestickBuilder().WithId(candlestick.PrimaryId)
@@ -37,7 +37,7 @@ namespace TechnicalAnalysis.Application.Mappers
                           .Build();
 
         public static List<CandlestickExtended> ToDomain(this List<Domain.Entities.Candlestick> assets)
-            => assets.Select(c => c.ToDomain()).ToList();
+            => assets.ConvertAll(c => c.ToDomain());
 
         private static CandlestickExtended ToDomain(this Domain.Entities.DexCandlestick dexCandlestick)
             => new CandlestickBuilder().WithId(dexCandlestick.PrimaryId)
@@ -58,7 +58,7 @@ namespace TechnicalAnalysis.Application.Mappers
                           .Build();
 
         public static List<CandlestickExtended> DexCandlestickToDomain(this List<Domain.Entities.DexCandlestick> assets)
-            => assets.Select(c => c.ToDomain()).ToList();
+            => assets.ConvertAll(c => c.ToDomain());
 
         private static PairExtended PoolToDomain(this Domain.Entities.PoolEntity pool)
             => new()
@@ -81,6 +81,6 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static List<PairExtended> PoolToDomain(this List<Domain.Entities.PoolEntity> pairs)
-            => pairs.Select(c => c.PoolToDomain()).ToList();
+            => pairs.ConvertAll(c => c.PoolToDomain());
     }
 }
