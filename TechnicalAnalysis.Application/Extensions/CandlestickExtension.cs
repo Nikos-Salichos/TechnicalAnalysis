@@ -89,7 +89,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         {
                             DateTime newOpenTime = missingCandleTime;
                             DateTime newCloseTime = newOpenTime.AddDays(1).AddTicks(-1);
-                            BinanceCandlestick newCandlestick = new BinanceCandlestick
+                            BinanceCandlestick newCandlestick = new()
                             {
                                 OpenTime = newOpenTime,
                                 CloseTime = newCloseTime
