@@ -4,10 +4,10 @@ namespace TechnicalAnalysis.CommonModels.Indicators.CandlestickFormations
 {
     public class FlagNestedCandlestickRange(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public bool IsFlag { get; init; }
+        public required bool IsFlag { get; init; }
 
-        public int NumberOfNestedCandlestickRanges { get; init; }
+        public required int NumberOfNestedCandlestickRanges { get; init; }
 
-        public long FlagPoleCandlestickId { get; init; }
+        public required long FlagPoleCandlestickId { get; init; }
     }
 }
