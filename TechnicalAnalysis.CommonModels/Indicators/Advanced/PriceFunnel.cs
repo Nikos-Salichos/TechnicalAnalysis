@@ -4,9 +4,9 @@ namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
 {
     public class PriceFunnel(long candlestickId) : BaseIndicator(candlestickId)
     {
-        public bool IsFunnel { get; init; }
+        public required bool IsFunnel { get; init; }
 
-        public int NumberOfFunnelCandlesticks { get; init; }
+        public required int NumberOfFunnelCandlesticks { get; init; }
 
         public decimal? HighestPriceOfFunnel { get; init; }
 
