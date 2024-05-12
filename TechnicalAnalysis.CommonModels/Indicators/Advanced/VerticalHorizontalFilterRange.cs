@@ -2,10 +2,10 @@
 
 namespace TechnicalAnalysis.CommonModels.Indicators.Advanced
 {
-    public sealed class VerticalHorizontalFilterRange(long candlestickId, double rangeLimit, int numberOfCandlesticksInRange)
+    public sealed class VerticalHorizontalFilterRange(long candlestickId)
         : BaseIndicator(candlestickId)
     {
-        public double RangeLimit { get; init; } = rangeLimit;
-        public int NumberOfCandlesticksInRange { get; init; } = numberOfCandlesticksInRange;
+        public required double RangeLimit { get; init; }
+        public required int NumberOfCandlesticksInRange { get; init; }
     }
 }
