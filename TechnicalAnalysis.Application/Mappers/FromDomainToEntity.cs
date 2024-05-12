@@ -21,7 +21,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static List<Pair> ToEntity(this List<PairExtended> pairs)
-            => pairs.Select(c => c.ToEntity()).ToList();
+            => pairs.ConvertAll(c => c.ToEntity());
 
         private static Candlestick ToEntity(this CandlestickExtended candlestick)
             => new()
@@ -39,7 +39,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static List<Candlestick> ToEntity(this List<CandlestickExtended> candlesticks)
-            => candlesticks.Select(c => c.ToEntity()).ToList();
+            => candlesticks.ConvertAll(c => c.ToEntity());
 
         private static DexCandlestick DexToEntityCandlestick(this CandlestickExtended candlestick)
             => new()
@@ -60,7 +60,7 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static List<DexCandlestick> DexToEntityCandlestick(this List<CandlestickExtended> candlesticks)
-            => candlesticks.Select(c => c.DexToEntityCandlestick()).ToList();
+            => candlesticks.ConvertAll(c => c.DexToEntityCandlestick());
 
         private static PoolEntity DexToEntityToken(this PairExtended pair)
             => new()
@@ -82,6 +82,6 @@ namespace TechnicalAnalysis.Application.Mappers
             };
 
         public static List<PoolEntity> DexPoolToEntityPool(this List<PairExtended> pairs)
-            => pairs.Select(c => c.DexToEntityToken()).ToList();
+            => pairs.ConvertAll(c => c.DexToEntityToken());
     }
 }
