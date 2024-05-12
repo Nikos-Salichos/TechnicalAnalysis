@@ -13,7 +13,7 @@ namespace TechnicalAnalysis.Application.Mappers
     public static class FromContractToDomain
     {
         public static List<CandlestickExtended> ToDomain(this List<BinanceCandlestick> binanceCandlesticks)
-            => binanceCandlesticks.Select(c => c.ToDomain()).ToList();
+            => binanceCandlesticks.ConvertAll(c => c.ToDomain());
 
         private static Asset ToDomain(this BinanceAsset binanceAsset)
             => new()
@@ -51,10 +51,10 @@ namespace TechnicalAnalysis.Application.Mappers
                           .Build();
 
         public static List<CandlestickExtended> FromDexCandlesticksV3ToDomain(this List<Data> dexCandlesticks)
-            => dexCandlesticks.Select(c => c.FromDexCandlesticksV3ToDomain()).ToList();
+            => dexCandlesticks.ConvertAll(c => c.FromDexCandlesticksV3ToDomain());
 
         public static List<PairExtended> ToDomain(this List<Pool> pools)
-            => pools.Select(c => c.ToDomain()).ToList();
+            => pools.ConvertAll(c => c.ToDomain());
 
         private static PairExtended ToDomain(this Pool pool)
             => new()
