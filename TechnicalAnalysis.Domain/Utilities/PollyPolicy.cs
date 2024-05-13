@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
-using Polly.Timeout;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 
 namespace TechnicalAnalysis.Domain.Utilities
@@ -10,32 +9,17 @@ namespace TechnicalAnalysis.Domain.Utilities
     {
         private readonly ILogger<PollyPolicy> _logger = logger;
 
-        public IAsyncPolicy<T> CreatePolicies<T>(int retries, TimeSpan timeSpan)
+        public IAsyncPolicy<T> CreatePolicies<T>(int retries)
         {
-            var retryDelays = DecorrelatedJitterBackoffV2(retries);
+            var retryDelays = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(5), retryCount: retries).ToArray();
 
-            var timeoutPolicy = Policy.TimeoutAsync<T>(
-                timeSpan, TimeoutStrategy.Optimistic, onTimeoutAsync: (context, timespan, task) =>
-                {
-                    _logger.LogError("Timeout occurred after {TimeSpan}. Context: {Context}", timespan, context);
-                    return Task.CompletedTask;
-                });
-
-            var retryPolicy = Policy<T>.Handle<Exception>().WaitAndRetryAsync(
+            return Policy<T>.Handle<Exception>().WaitAndRetryAsync(
                 retryDelays,
                 onRetry: (exception, delay, retryAttempt, context) =>
                 {
-                    _logger.LogError("Retry attempt {RetryAttempt} of {Retries}. Delaying for {Delay} seconds. Exception: {Exception}",
-                        retryAttempt, retries, delay.TotalSeconds, exception);
+                    _logger.LogError("Retry attempt {RetryAttempt} of {Retries}. Delaying for {Delay} seconds, context {context}. Exception: {Exception}",
+                        retryAttempt, retries, delay.TotalSeconds, context, exception);
                 });
-
-            return Policy.WrapAsync(timeoutPolicy, retryPolicy);
-        }
-
-        private static TimeSpan[] DecorrelatedJitterBackoffV2(int retries)
-        {
-            return Backoff.DecorrelatedJitterBackoffV2(
-                medianFirstRetryDelay: TimeSpan.FromSeconds(5), retryCount: retries).ToArray();
         }
     }
 }
