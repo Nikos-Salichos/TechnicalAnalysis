@@ -261,8 +261,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BullFractal
-                                                            && f.WindowPeriod == 2))
+                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2))
                 {
                     if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
                     {
@@ -304,15 +303,15 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (currentBullFractalCandlestick?.LowPrice > previousBullFractalCandlestick?.LowPrice
-                    && currentBearFractalCandlestick?.HighPrice < previousBearFractalCandlestick?.HighPrice)
+                if (currentBullFractalCandlestick?.LowPrice >= previousBullFractalCandlestick?.LowPrice
+                    && currentBearFractalCandlestick?.HighPrice <= previousBearFractalCandlestick?.HighPrice)
                 {
                     candlestick.FractalTrend = Trend.Sideways;
                     continue;
                 }
 
-                if (currentBullFractalCandlestick?.LowPrice < previousBullFractalCandlestick?.LowPrice
-                    && currentBearFractalCandlestick?.HighPrice > previousBearFractalCandlestick?.HighPrice)
+                if (currentBullFractalCandlestick?.LowPrice <= previousBullFractalCandlestick?.LowPrice
+                    && currentBearFractalCandlestick?.HighPrice >= previousBearFractalCandlestick?.HighPrice)
                 {
                     candlestick.FractalTrend = Trend.Sideways;
                 }
@@ -590,7 +589,6 @@ namespace TechnicalAnalysis.Application.Extensions
                     or DataProvider.Uniswap
                     or DataProvider.Pancakeswap)
                 {
-                    //TODO Fix extreme greed etc, make them enum
                     var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Greed
                           || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeGreed;
 
