@@ -53,5 +53,17 @@ namespace TechnicalAnalysis.Domain.Extensions
                 return null;
             }
         }
+
+        public static long ToLong(this string value)
+        {
+            if (long.TryParse(value, out long result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid long format", nameof(value));
+            }
+        }
     }
 }
