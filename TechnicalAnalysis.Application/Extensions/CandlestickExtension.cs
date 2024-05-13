@@ -127,7 +127,7 @@ namespace TechnicalAnalysis.Application.Extensions
             valueClassification = new string(valueClassification
                                        .Where(c => !char.IsWhiteSpace(c))
                                        .ToArray())
-                                       .ToUpper();
+                                       .ToUpperInvariant();
 
             if (string.Equals(valueClassification, "EXTREMEFEAR", StringComparison.InvariantCultureIgnoreCase))
             {
