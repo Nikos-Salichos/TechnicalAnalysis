@@ -25,5 +25,22 @@ namespace TechnicalAnalysis.Tests.UnitTests
             // Assert
             result.Should().Be(expectedResult);
         }
+
+        [Theory]
+        [InlineData("2024-05-01", "2024-05-31", 1)] // Different day
+
+        public void GetDailyDateRanges_ReturnsCorrectRanges(string startDateStr, string endDateStr, int countOfDateRanges)
+        {
+            // Arrange
+            var startDate = DateTime.Parse(startDateStr);
+            var endDate = DateTime.Parse(endDateStr);
+
+            // Act
+            var dateRanges = DatetimeExtension.GetDailyDateRanges(startDate, endDate);
+
+            // Assert
+            dateRanges.Count.Should().Be(countOfDateRanges);
+        }
+
     }
 }
