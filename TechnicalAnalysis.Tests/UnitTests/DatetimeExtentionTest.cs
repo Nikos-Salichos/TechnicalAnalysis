@@ -8,6 +8,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
     {
         [Theory]
         [InlineData("2024-05-14 10:30", "2024-05-14 10:30", true)] // Same date and time
+        [InlineData("2024-05-14 10:30", "2024-05-14 10:31", false)] // Different minute
 
         public void EqualsYearMonthDayHourMinute_True(string datetimeStr1, string datetimeStr2, bool expectedResult)
         {
