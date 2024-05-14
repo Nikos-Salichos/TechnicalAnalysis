@@ -20,7 +20,7 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./TechnicalAnalysis.Infrastructure.Gateway.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 #Copy pfx file
-COPY ["../aspnetapp.pfx", "/app/aspnetapp.pfx"]
+#COPY ["../aspnetapp.pfx", "/app/aspnetapp.pfx"]
 
 FROM base AS final
 WORKDIR /app

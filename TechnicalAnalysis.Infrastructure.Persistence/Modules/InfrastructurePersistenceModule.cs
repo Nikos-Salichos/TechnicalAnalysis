@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using Dapper;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using StackExchange.Redis;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Settings;
 using TechnicalAnalysis.Infrastructure.Persistence.Repositories;
+using TechnicalAnalysis.Infrastructure.Persistence.SqlHandlers;
 
 namespace TechnicalAnalysis.Infrastructure.Persistence.Modules
 {
@@ -42,6 +44,8 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Modules
             });
 
             services.AddOptions<DatabaseSetting>().Bind(configuration.GetSection("ConnectionStrings"));
+
+            SqlMapper.AddTypeHandler(new ValueClassificationTypeHandler());
         }
     }
 }

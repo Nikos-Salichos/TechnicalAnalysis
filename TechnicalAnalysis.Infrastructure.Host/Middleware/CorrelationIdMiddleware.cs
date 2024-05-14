@@ -39,7 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
         {
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers.Append(_correlationIdHeader, new[] { correlationId.ToString() });
+                context.Response.Headers.TryAdd(_correlationIdHeader, new[] { correlationId.ToString() });
                 return Task.CompletedTask;
             });
         }

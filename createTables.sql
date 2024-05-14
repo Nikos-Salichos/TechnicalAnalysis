@@ -161,10 +161,9 @@ ALTER TABLE public."Candlesticks" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDEN
 CREATE TABLE public."CryptoFearAndGreedIndex" (
     "PrimaryId" bigint NOT NULL,
     "Value" text NOT NULL,
-    "ValueClassification" text NOT NULL,
-    "TimestampAsDateTime" timestamp without time zone NOT NULL
+    "ValueClassificationType" bigint NOT NULL,
+    "DateTime" timestamp without time zone NOT NULL
 );
-
 
 ALTER TABLE public."CryptoFearAndGreedIndex" OWNER TO postgres;
 
@@ -187,7 +186,7 @@ ALTER TABLE public."CryptoFearAndGreedIndex" ALTER COLUMN "PrimaryId" ADD GENERA
 CREATE TABLE public."StockFearAndGreedIndex" (
     "PrimaryId" bigint NOT NULL,
     "Value" text NOT NULL,
-    "ValueClassification" text NOT NULL,
+    "ValueClassificationType" bigint NOT NULL,
     "DateTime" timestamp without time zone NOT NULL
 );
 
@@ -426,7 +425,8 @@ INSERT INTO public."Providers" ("Id", "Name") VALUES
   (8, 'CoinPaprika'),
   (9, 'CoinMarketCap'),
   (10, 'CoinRanking'),
-  (11, 'RapidApiCryptoFearAndGreedIndex');
+  (11, 'RapidApiCryptoFearAndGreedIndex'),
+  (12, 'CnnApiCryptoFearAndGreedIndex');
 
 
 --
@@ -672,7 +672,7 @@ ALTER TABLE ONLY public."Providers"
 --
 
 ALTER TABLE ONLY public."CryptoFearAndGreedIndex"
-    ADD CONSTRAINT unique_timestamp UNIQUE ("TimestampAsDateTime");
+    ADD CONSTRAINT unique_timestamp UNIQUE ("DateTime");
 
 
 --

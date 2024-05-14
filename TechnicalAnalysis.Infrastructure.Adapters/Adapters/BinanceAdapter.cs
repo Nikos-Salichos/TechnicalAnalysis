@@ -199,7 +199,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         foreach (object[] row in response.SuccessValue)
                         {
                             // Create a new candlestick object.
-                            BinanceCandlestick newCandlestick = new BinanceCandlestick();
+                            BinanceCandlestick newCandlestick = new();
 
                             // Get the properties of the candlestick object.
                             PropertyInfo[] properties = typeof(BinanceCandlestick).GetProperties();
@@ -244,7 +244,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 binancePairs.FindNewCandlesticks(pairsWithExistingCandles);
             }
 
-            if (binancePairs.Any(pair => pair.BinanceCandlesticks.Count > 0))
+            if (binancePairs.Exists(pair => pair.BinanceCandlesticks.Count > 0))
             {
                 var uniqueCandlesticks = new HashSet<BinanceCandlestick>(binancePairs
                     .SelectMany(pair => pair.BinanceCandlesticks)

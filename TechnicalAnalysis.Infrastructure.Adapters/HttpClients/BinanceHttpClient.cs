@@ -15,8 +15,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy) : IBinanceHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
+        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
 
         public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
         {

@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<CoinMarketCapHttpClient> logger, IPollyPolicy pollyPolicy) : ICoinMarketCapHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
+        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
 
         public async Task<IResult<CoinMarketCapAssetContract, string>> SyncAssets()
         {
@@ -36,8 +36,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
                 uriBuilder.Query = queryString.ToString();
 
-                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(uriBuilder.ToString(),
-                    HttpCompletionOption.ResponseHeadersRead));
+                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(uriBuilder.ToString(), HttpCompletionOption.ResponseHeadersRead));
 
                 logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
                     coinMarketCapSettings.CurrentValue.ListingsLatestEndpoint, httpResponseMessage);

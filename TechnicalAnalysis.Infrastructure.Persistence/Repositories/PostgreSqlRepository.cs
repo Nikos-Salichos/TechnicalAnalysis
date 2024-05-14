@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using NpgsqlTypes;
 using TechnicalAnalysis.CommonModels.BusinessModels;
-using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Entities;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
@@ -20,27 +21,28 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
     {
         private readonly string _connectionStringKey = databaseSettings.CurrentValue.PostgreSqlTechnicalAnalysisDockerCompose;
 
-        public async Task<IResult<List<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndexAsync()
+        public async Task<IResult<List<FearAndGreedModel>, string>> GetCryptoFearAndGreedIndexAsync()
         {
             return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"TimestampAsDateTime\" FROM \"CryptoFearAndGreedIndex\"";
+                const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassificationType\", \"DateTime\" FROM \"CryptoFearAndGreedIndex\"";
 
-                var assets = await dbConnection.QueryAsync<CryptoFearAndGreedData>(query);
-                return Result<List<CryptoFearAndGreedData>, string>.Success(assets.ToList());
+                var assets = await dbConnection.QueryAsync<FearAndGreedModel>(query);
+                return Result<List<FearAndGreedModel>, string>.Success(assets.ToList());
             }, logger);
         }
 
-        public async Task<IResult<List<StockFearAndGreedDomain>, string>> GetStockFearAndGreedIndexAsync()
+        public async Task<IResult<List<FearAndGreedModel>, string>> GetStockFearAndGreedIndexAsync()
         {
             return await ExecutionTimeLogger.LogExecutionTime(async () =>
             {
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassification\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
+                const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassificationType\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
 
-                var assets = await dbConnection.QueryAsync<StockFearAndGreedDomain>(query);
-                return Result<List<StockFearAndGreedDomain>, string>.Success(assets.ToList());
+                var assets = await dbConnection.QueryAsync<FearAndGreedModel>(query);
+
+                return Result<List<FearAndGreedModel>, string>.Success(assets.ToList());
             }, logger);
         }
 
@@ -92,7 +94,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         public async Task<IResult<List<Pair>, string>> GetPairsAsync()
         {
-            await using NpgsqlConnection dbConnection = new NpgsqlConnection(_connectionStringKey);
+            await using NpgsqlConnection dbConnection = new(_connectionStringKey);
             const string query = "SELECT \"id\" AS PrimaryId, \"symbol\" AS Symbol, \"asset0_id\" AS BaseAssetId, \"asset1_id\" AS QuoteAssetId, \"provider_id\" AS Provider, \"is_active\" AS IsActive, \"all_candles\" AS AllCandles, \"created_at\" AS CreatedAt FROM \"Pairs\"";
             var pairs = await dbConnection.QueryAsync<Pair>(query);
             return Result<List<Pair>, string>.Success(pairs.ToList());
@@ -102,23 +104,27 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
 
-            const string providerPairAssetSyncInfoQuery = @"
-                                        SELECT
-                                            p.""Id"" AS PrimaryId,
-                                            p.""ProviderId"" AS DataProvider,
-                                            p.""LastAssetSync"",
-                                            p.""LastPairSync""
-                                        FROM
-                                            public.""ProviderPairAssetSyncInfos"" p";
-
-            const string providerCandlestickSyncInfoQuery = @"
+            const string providerPairAssetSyncInfoQuery =
+                                        """
                                             SELECT
-                                                p.""Id"" AS PrimaryId,
-                                                p.""ProviderId"" AS DataProvider,
-                                                p.""LastCandlestickSync"" AS LastCandlestickSync,
-                                                p.""TimeframeId"" AS Timeframe
+                                            p."Id" AS PrimaryId,
+                                            p."ProviderId" AS DataProvider,
+                                            p."LastAssetSync",
+                                            p."LastPairSync"
                                             FROM
-                                                public.""ProviderCandlestickSyncInfos"" p";
+                                            public."ProviderPairAssetSyncInfos" p
+                                        """;
+
+            const string providerCandlestickSyncInfoQuery =
+                                               """
+                                                SELECT
+                                                p."Id" AS PrimaryId,
+                                                p."ProviderId" AS DataProvider,
+                                                p."LastCandlestickSync" AS LastCandlestickSync,
+                                                p."TimeframeId" AS Timeframe
+                                                FROM
+                                                public."ProviderCandlestickSyncInfos" p 
+                                               """;
 
             var syncInfos = await dbConnection.QueryMultipleAsync(providerPairAssetSyncInfoQuery + ";" + providerCandlestickSyncInfoQuery);
 
@@ -157,21 +163,21 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             return Result<List<DexCandlestick>, string>.Success(dexCandlesticks.ToList());
         }
 
-        public async Task InsertCryptoFearAndGreedIndex(List<CryptoFearAndGreedData> indexes)
+        public async Task InsertCryptoFearAndGreedIndex(List<FearAndGreedModel> fearAndGreedModels)
         {
             try
             {
                 await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
                 await dbConnection.OpenAsync();
 
-                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"CryptoFearAndGreedIndex\" (\"Value\", \"ValueClassification\", \"TimestampAsDateTime\") FROM STDIN BINARY");
+                await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"CryptoFearAndGreedIndex\" (\"Value\", \"ValueClassificationType\", \"DateTime\") FROM STDIN BINARY");
 
-                foreach (var index in indexes)
+                foreach (var index in fearAndGreedModels)
                 {
                     await writer.StartRowAsync();
                     await WriteParameter(writer, index.Value);
-                    await WriteParameter(writer, index.ValueClassification);
-                    await WriteParameter(writer, index.TimestampAsDateTime);
+                    await WriteParameter(writer, index.ValueClassificationType);
+                    await WriteParameter(writer, index.DateTime);
                 }
 
                 await writer.CompleteAsync();
@@ -182,23 +188,30 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task InsertStockFearAndGreedIndex(StockFearAndGreedDomain stockFearAndGreedEntity)
+        public async Task InsertStockFearAndGreedIndex(List<FearAndGreedModel> fearAndGreedModels)
         {
-            const string query =
-                """
-                        INSERT INTO "StockFearAndGreedIndex" ("Value", "ValueClassification", "DateTime")
-                        VALUES (@Value, @ValueClassification, @DateTime)
-                        ON CONFLICT ("DateTime") DO UPDATE
-                        SET "Value" = EXCLUDED."Value",
-                            "ValueClassification" = EXCLUDED."ValueClassification"
-                    """;
+            try
+            {
+                const string query =
+                               """
+                                    INSERT INTO "StockFearAndGreedIndex" ("Value", "ValueClassificationType", "DateTime")
+                                    VALUES (@Value, @ValueClassificationType, @DateTime)
+                                    ON CONFLICT ("DateTime") DO UPDATE
+                                    SET "Value" = EXCLUDED."Value",
+                                        "ValueClassificationType" = EXCLUDED."ValueClassificationType"
+                                """;
 
-            await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-            await dbConnection.OpenAsync();
+                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                await dbConnection.OpenAsync();
 
-            await using var transaction = await dbConnection.BeginTransactionAsync();
-            await dbConnection.ExecuteAsync(query, stockFearAndGreedEntity, transaction: transaction);
-            await transaction.CommitAsync();
+                await using var transaction = await dbConnection.BeginTransactionAsync();
+                await dbConnection.ExecuteAsync(query, fearAndGreedModels, transaction: transaction);
+                await transaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                logger.LogError("Exception:{@exception}", exception);
+            }
         }
 
         public async Task InsertPairsAsync(List<Pair> pairs)
@@ -398,8 +411,20 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             }
             else
             {
-                await writer.WriteAsync(value);
+                switch (value)
+                {
+                    case ValueClassificationType enumValue:
+                        // Convert enum to bigint
+                        await writer.WriteAsync((int)enumValue, NpgsqlDbType.Bigint);
+                        break;
+                    default:
+                        // Assuming other values are handled appropriately based on their types
+                        await writer.WriteAsync(value);
+                        break;
+                }
             }
         }
+
+
     }
 }

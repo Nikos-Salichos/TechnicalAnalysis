@@ -14,11 +14,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.BaseClasses
 {
     public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
-        public PostgreSqlContainer PostgreSqlContainer;
-
-        public IntegrationTestWebAppFactory()
-        {
-            PostgreSqlContainer = new PostgreSqlBuilder()
+        public PostgreSqlContainer PostgreSqlContainer = new PostgreSqlBuilder()
                 .WithImage("postgres:latest")
                 .WithUsername("postgres")
                 .WithPassword("admin")
@@ -26,7 +22,6 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.BaseClasses
                 .WithCleanUp(true)
                 .WithAutoRemove(true)
                 .Build();
-        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

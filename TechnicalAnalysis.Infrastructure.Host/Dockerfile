@@ -14,7 +14,6 @@ WORKDIR /src
 COPY ["TechnicalAnalysis.Infrastructure.Host/TechnicalAnalysis.Infrastructure.Host.csproj", "TechnicalAnalysis.Infrastructure.Host/"]
 COPY ["TechnicalAnalysis.Application/TechnicalAnalysis.Application.csproj", "TechnicalAnalysis.Application/"]
 COPY ["TechnicalAnalysis.Domain/TechnicalAnalysis.Domain.csproj", "TechnicalAnalysis.Domain/"]
-COPY ["TechnicalAnalysis.Infrastructure.Client/TechnicalAnalysis.Infrastructure.Client.csproj", "TechnicalAnalysis.Infrastructure.Client/"]
 RUN dotnet restore "TechnicalAnalysis.Infrastructure.Host/TechnicalAnalysis.Infrastructure.Host.csproj"
 COPY . .
 WORKDIR "/src/TechnicalAnalysis.Infrastructure.Host"

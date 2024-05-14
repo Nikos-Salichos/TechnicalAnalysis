@@ -16,8 +16,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080 # Application listens on port 8080 within the container
       - ASPNETCORE_HTTPS_PORTS=8081 # Application listens on port 8081 within the container
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456789
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
+      #- ASPNETCORE_Kestrel__Certificates__Default__Password=123456789
+      #- ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
     ports:
        - "6000:8080"
        - "6001:8081"

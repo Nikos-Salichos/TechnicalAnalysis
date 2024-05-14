@@ -17,8 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<DexV3HttpClient> logger, IPollyPolicy pollyPolicy) : IDexV3HttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-
-        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
+        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
 
         public Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
         {

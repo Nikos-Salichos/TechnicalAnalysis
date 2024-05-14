@@ -15,6 +15,10 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
             {
                 List<Task> tasks =
                 [
+                      syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.CoinMarketCap,
+                        CommonModels.Enums.Timeframe.Daily)),
+
                     syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
                         CommonModels.Enums.DataProvider.Alpaca,
                         CommonModels.Enums.Timeframe.Daily)),
@@ -23,24 +27,20 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
                         CommonModels.Enums.DataProvider.Binance,
                         CommonModels.Enums.Timeframe.Daily)),
 
-                    syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                        CommonModels.Enums.DataProvider.RapidApiStockFearAndGreedProvider,
-                        CommonModels.Enums.Timeframe.Daily)),
-
-                    syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                        CommonModels.Enums.DataProvider.AlternativeMeCryptoFearAndGreedProvider,
-                        CommonModels.Enums.Timeframe.Daily)),
-
                    syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
                         CommonModels.Enums.DataProvider.CoinPaprika,
                         CommonModels.Enums.Timeframe.Daily)),
 
                    syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                        CommonModels.Enums.DataProvider.CoinMarketCap,
+                        CommonModels.Enums.DataProvider.CoinRanking,
                         CommonModels.Enums.Timeframe.Daily)),
 
                    syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
-                        CommonModels.Enums.DataProvider.CoinRanking,
+                        CommonModels.Enums.DataProvider.CnnApiStockFearAndGreedProvider,
+                        CommonModels.Enums.Timeframe.Daily)),
+
+                  syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.AlternativeMeCryptoFearAndGreedProvider,
                         CommonModels.Enums.Timeframe.Daily)),
                 ];
 
@@ -60,9 +60,15 @@ namespace TechnicalAnalysis.Infrastructure.Host.Hangfire
                          CommonModels.Enums.Timeframe.Daily)),
                     "*/30 * * * *");
 
-                RecurringJob.AddOrUpdate("synchronize_providers_job_alternative_me_crypto_and_fear_index",
+                RecurringJob.AddOrUpdate("synchronize_providers_job_alternative_me_crypto_fear_and_greed_index", // Unique identifier for the job
                     () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
                         CommonModels.Enums.DataProvider.AlternativeMeCryptoFearAndGreedProvider,
+                        CommonModels.Enums.Timeframe.Daily)),
+                     "*/30 * * * *");
+
+                RecurringJob.AddOrUpdate("synchronize_providers_job_cnn__stock_fear_and_greed_index", // Unique identifier for the job
+                    () => syncService.SynchronizeProvidersAsync(new DataProviderTimeframeRequest(
+                        CommonModels.Enums.DataProvider.CnnApiStockFearAndGreedProvider,
                         CommonModels.Enums.Timeframe.Daily)),
                      "*/30 * * * *");
 

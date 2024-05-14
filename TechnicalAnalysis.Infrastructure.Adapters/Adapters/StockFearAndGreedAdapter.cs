@@ -25,7 +25,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 }
 
                 var stockFearAndGreedDomain = response.SuccessValue.ToDomain();
-                await mediator.Send(new InsertStockFearAndGreedIndexCommand(stockFearAndGreedDomain));
+                await mediator.Send(new InsertStockFearAndGreedIndexCommand([stockFearAndGreedDomain]));
             }
 
             return true;

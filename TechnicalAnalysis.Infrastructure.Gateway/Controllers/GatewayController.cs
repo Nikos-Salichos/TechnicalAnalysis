@@ -3,6 +3,8 @@ using System.Text;
 using System.Text.Json;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
+using TechnicalAnalysis.Domain.Contracts.Output;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
 {
@@ -17,7 +19,7 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
             PropertyNameCaseInsensitive = true
         };
 
-        [HttpGet]
+        [HttpGet("IndicatorsByPairName")]
         public async Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
         {
             const string apiUrl = "IndicatorsByPairName";
@@ -27,7 +29,17 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
             return Ok(result);
         }
 
-        private async Task<T?> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null, Dictionary<string, string> headers = null)
+        [HttpGet("EnhancedIndicatorPairResults")]
+        public async Task<IActionResult> GetEnhancedIndicatorPairResultsAsync([FromQuery] DataProvider dataProvider)
+        {
+            const string apiUrl = "EnhancedIndicatorPairResults";
+            var requestData = new { dataProvider };
+
+            var result = await SendHttpRequestAsync<List<EnhancedPairResult>>(apiUrl, HttpMethod.Get, requestData);
+            return Ok(result);
+        }
+
+        private async Task<T?> SendHttpRequestAsync<T>(string apiUrl, HttpMethod httpMethod, object? requestData = null, Dictionary<string, string>? headers = null)
         {
             HttpResponseMessage response;
 
@@ -79,7 +91,8 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
             }
 
             await using var jsonStream = await response.Content.ReadAsStreamAsync();
-            var deserializedResponse = await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions);
+            var deserializedResponse = JsonSerializer.Deserialize<T>(jsonStream, _jsonSerializerOptions);
+
             return deserializedResponse ?? default;
         }
 

@@ -13,8 +13,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         : ICryptoFearAndGreedHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(3, TimeSpan.FromMinutes(5));
+        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
 
         public async Task<IResult<List<CryptoFearAndGreedData>, string>> GetCryptoFearAndGreedIndex(int numberOfDates)
         {

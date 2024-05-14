@@ -17,13 +17,13 @@ using TechnicalAnalysis.Infrastructure.Persistence.Modules;
 var builder = WebApplication.CreateBuilder(args);
 
 #region Read Configuration
-if (builder.Environment.EnvironmentName != "IntegrationTest")
+if (builder.Environment.EnvironmentName == "IntegrationTest")
 {
-    builder.Configuration.AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 }
 else
 {
-    builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("appsettings.prod.json", optional: false, reloadOnChange: true);
 }
 #endregion Read Configuration
 
@@ -108,6 +108,10 @@ if (builder.Environment.EnvironmentName != "IntegrationTest")
 
 app.UseHttpMetrics(options =>
 {
+    options.CaptureMetricsUrl = true;
+    options.RequestCount.Enabled = true;
+    options.RequestDuration.Enabled = true;
+    options.InProgress.Enabled = true;
     options.AddCustomLabel("host", context => context.Request.Host.Host);
 });
 

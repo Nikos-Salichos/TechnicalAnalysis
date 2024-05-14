@@ -9,9 +9,10 @@ using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
-    public class AlpacaHttpClient(IOptionsMonitor<AlpacaSetting> alpacaSettings, ILogger<AlpacaHttpClient> logger, IPollyPolicy pollyPolicy) : IAlpacaHttpClient
+    public class AlpacaHttpClient(IOptionsMonitor<AlpacaSetting> alpacaSettings, ILogger<AlpacaHttpClient> logger,
+        IPollyPolicy pollyPolicy) : IAlpacaHttpClient
     {
-        private readonly IAsyncPolicy<IMultiPage<IBar>> _retryPolicy = pollyPolicy.CreatePolicies<IMultiPage<IBar>>(3, TimeSpan.FromMinutes(5));
+        private readonly IAsyncPolicy<IMultiPage<IBar>> _retryPolicy = pollyPolicy.CreatePolicies<IMultiPage<IBar>>(5);
 
         public async Task<IResult<IMultiPage<IBar>, string>> GetAlpacaData(string pairName, DateTime fromDateTime, DateTime toDateTime, BarTimeFrame barTimeFrame)
         {
@@ -23,7 +24,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 {
                     Adjustment = Adjustment.SplitsAndDividends
                 };
+
                 var stockData = await _retryPolicy.ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
+
                 return Result<IMultiPage<IBar>, string>.Success(stockData);
             }
             catch (Exception exception)

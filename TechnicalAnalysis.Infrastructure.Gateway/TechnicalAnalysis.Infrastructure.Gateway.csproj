@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TechnicalAnalysis.CommonModels\TechnicalAnalysis.CommonModels.csproj" />
+    <ProjectReference Include="..\TechnicalAnalysis.Domain\TechnicalAnalysis.Domain.csproj" />
   </ItemGroup>
 
 </Project>

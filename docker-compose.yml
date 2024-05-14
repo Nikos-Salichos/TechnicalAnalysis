@@ -35,7 +35,7 @@ services:
      DB_CONNECTION_STRING: "Host=postgresql.api;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
     networks:
       - postgres-db-network
-# Be careful and use same path in other pc
+#Be careful and use same path
     volumes:
       - ./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json
     restart: on-failure
@@ -92,7 +92,7 @@ services:
        - postgres-db-network
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     container_name: ta-pgadmin
     restart: always
     environment:

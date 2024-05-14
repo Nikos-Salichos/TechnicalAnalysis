@@ -13,8 +13,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
         {
             //Cors
             services.AddCors(options =>
-            options.AddDefaultPolicy(builder =>
-            builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+                             options.AddDefaultPolicy(builder =>
+                                                      builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
             //Set Json options for controllers
             services.AddControllers().AddJsonOptions(options =>
