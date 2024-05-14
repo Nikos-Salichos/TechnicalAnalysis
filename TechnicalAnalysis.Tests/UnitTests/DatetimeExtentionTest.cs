@@ -29,6 +29,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
         [Theory]
         [InlineData("2024-05-01", "2024-05-31", 1)] // Different day
         [InlineData("2024-05-01", "2024-06-01", 1)] // Different month
+        [InlineData("2024-05-01", "2024-07-01", 1)] // Different year
 
         public void GetDailyDateRanges_ReturnsCorrectRanges(string startDateStr, string endDateStr, int countOfDateRanges)
         {
