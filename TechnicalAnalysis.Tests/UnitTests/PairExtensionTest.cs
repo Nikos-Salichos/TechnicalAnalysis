@@ -40,7 +40,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var dollarPairs = PairExtension.GetUniqueDollarPairs(binanceAssets, binancePair);
 
             // Assert
-            Assert.Equal(expectedResult, dollarPairs.Any(p => p.Symbol == pair));
+            Assert.Equal(expectedResult, dollarPairs.Exists(p => p.Symbol == pair));
         }
     }
 
