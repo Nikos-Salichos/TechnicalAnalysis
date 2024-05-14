@@ -11,6 +11,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
         [InlineData("2024-05-14 10:30", "2024-05-14 10:31", false)] // Different minute
         [InlineData("2024-05-14 10:30", "2024-05-14 11:30", false)] // Different hour
         [InlineData("2024-05-14 10:30", "2024-05-15 10:30", false)] // Different day
+        [InlineData("2024-05-14 10:30", "2024-06-14 10:30", false)] // Different month
 
         public void EqualsYearMonthDayHourMinute_True(string datetimeStr1, string datetimeStr2, bool expectedResult)
         {
