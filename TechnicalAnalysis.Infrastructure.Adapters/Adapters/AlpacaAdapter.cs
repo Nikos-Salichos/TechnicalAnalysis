@@ -36,11 +36,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             //Check top owned stocks: https://www.dataroma.com/m/home.php
             List<string> stockTickers =
                 [
-                    "nke", "ba", "tsla", "aapl", "googl", "abnb", "JNJ", "XOM", "WMT", "META",
+                    "nke", "ba", "tsla", "aapl", "googl", "abnb", "XOM", "WMT", "META",
                     "JPM", "V", "KO", "PEP", "MCD", "AVGO", "ACN", "NFLX", "WCF", "ABDE",
-                    "MA", "BAC", "MS", "SCHW", "RY", "MSFT", "NVDA", "CRM", "VZ", "IBM",
+                    "MA", "BAC", "MS", "SCHW", "RY", "NVDA", "CRM", "VZ", "IBM",
                     "PYPL", "IWD", "IJH", "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG",
-                    "NSRGY", "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG",
+                    "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG",
                 ];
 
             List<string> etfTickers =
@@ -51,10 +51,21 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "VOT", "VDE", "voo", "ITOT", "MEDP", "ELF",
                 ];
 
-            var allSymbols = new List<string>();
-            allSymbols.AddRange(tenStocksToOwnForever);
-            allSymbols.AddRange(stockTickers);
-            allSymbols.AddRange(etfTickers);
+            List<string> stocksWithHighProfitMargin =
+                [
+                    "FANG", "TSM", "TRI", "WPC", "JNJ", "AER", "UTHR", "PSA", "KSPI", "MA",
+                    "BAM", "MSCI", "EWBC", "RPRX", "ABNB", "LNG", "NVDA", "GLPI", "WPM", "BCH",
+                    "V", "VRSN", "CME", "ARCC", "TPL", "FCNCA", "EMR", "VICI", "MSTR",
+                    "CI", "DIS", "ELV", "BRK.B", "HD", "UPS", "NKE", "XOM", "CVX",
+                    "TSLA", "VZ", "WFC", "JNJ", "META", "GOOG", "BAC", "MRK", "AAPL",
+                    "JPM", "PFE", "MSFT"
+                ];
+
+            var allSymbols = stocksWithHighProfitMargin
+                .Concat(tenStocksToOwnForever)
+                .Concat(stockTickers)
+                .Concat(etfTickers)
+                .ToList();
 
             allSymbols = allSymbols.Select(symbol => symbol.ToUpperInvariant())
                                        .Distinct(StringComparer.InvariantCultureIgnoreCase)
@@ -99,7 +110,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         {
             var existingAssetNames = fetchedAssets.Select(a => a.Symbol).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
 
-            List<Asset> newAssets = new();
+            List<Asset> newAssets = [];
             foreach (var stockSymbol in stockSymbols)
             {
                 if (!existingAssetNames.Contains(stockSymbol, StringComparer.InvariantCultureIgnoreCase))
