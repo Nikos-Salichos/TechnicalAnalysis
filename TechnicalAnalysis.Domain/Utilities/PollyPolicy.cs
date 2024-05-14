@@ -17,8 +17,8 @@ namespace TechnicalAnalysis.Domain.Utilities
                 retryDelays,
                 onRetry: (exception, delay, retryAttempt, context) =>
                 {
-                    _logger.LogError("Retry attempt {RetryAttempt} of {Retries}. Delaying for {Delay} seconds, context {context}. Exception: {Exception}",
-                        retryAttempt, retries, delay.TotalSeconds, context, exception);
+                    _logger.LogError("Retry attempt {RetryAttempt} of {Retries}. Delaying for {Delay} seconds, context {context}. Exception: {ExceptionResult} {ExceptionMessage} {ExceptionData}",
+                        retryAttempt, retries, delay.TotalSeconds, context, exception.Result, exception.Exception.Message, exception.Exception.Data);
                 });
         }
     }
