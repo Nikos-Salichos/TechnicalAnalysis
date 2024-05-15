@@ -62,5 +62,20 @@ namespace TechnicalAnalysis.Tests.UnitTests
             dateRanges.Count.Should().Be(countOfDateRanges);
         }
 
+        [Theory]
+        [InlineData("2024-05-01", "2024-05-31", 1)] // Same month, multiple weeks
+        public void GetWeeklyDateRanges_ReturnsCorrectRanges(string startDateStr, string endDateStr, int countOfDateRanges)
+        {
+            // Arrange
+            var startDate = DateTime.Parse(startDateStr);
+            var endDate = DateTime.Parse(endDateStr);
+
+            // Act
+            var dateRanges = DatetimeExtension.GetWeeklyDateRanges(startDate, endDate);
+
+            // Assert
+            dateRanges.Count.Should().Be(countOfDateRanges);
+        }
+
     }
 }
