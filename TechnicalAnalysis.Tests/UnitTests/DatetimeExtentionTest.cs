@@ -48,6 +48,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
         [InlineData("2024-05-01", "2024-05-02", 1)] // Different day
         [InlineData("2024-05-01", "2024-05-10", 1)] // Different month
         [InlineData("2024-05-01", "2024-06-01", 1)] // Different year
+        [InlineData("2014-05-01", "2025-05-31", 98)] // Different decade
         public void GetHourlyDateRanges_ReturnsCorrectRanges(string startDateStr, string endDateStr, int countOfDateRanges)
         {
             // Arrange
