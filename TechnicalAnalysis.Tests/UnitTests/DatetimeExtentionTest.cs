@@ -46,6 +46,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
 
         [Theory]
         [InlineData("2024-05-01", "2024-05-02", 1)] // Different day
+        [InlineData("2024-05-01", "2024-05-10", 1)] // Different month
         public void GetHourlyDateRanges_ReturnsCorrectRanges(string startDateStr, string endDateStr, int countOfDateRanges)
         {
             // Arrange
