@@ -64,6 +64,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
 
         [Theory]
         [InlineData("2024-05-01", "2024-05-31", 1)] // Same month, multiple weeks
+        [InlineData("2024-05-01", "2024-06-01", 1)] // Different month
         public void GetWeeklyDateRanges_ReturnsCorrectRanges(string startDateStr, string endDateStr, int countOfDateRanges)
         {
             // Arrange
