@@ -13,12 +13,14 @@
 
         public static List<(DateTime, DateTime)> GetDailyDateRanges(DateTime startDate, DateTime endDate)
         {
+            const int maximumDaysPerRange = 1000;
+
             var dateRanges = new List<(DateTime, DateTime)>();
             var daysRemaining = (int)(endDate - startDate).TotalDays;
             var batchStart = new DateTime(startDate.Year, startDate.Month, startDate.Day, 0, 0, 0);
-            while (daysRemaining > 1000)
+            while (daysRemaining > maximumDaysPerRange)
             {
-                var daysInBatch = Math.Min(1000, daysRemaining);
+                var daysInBatch = Math.Min(maximumDaysPerRange, daysRemaining);
                 var batchEnd = batchStart.AddDays(daysInBatch).Date.Add(new TimeSpan(23, 59, 59));
                 dateRanges.Add((batchStart, batchEnd));
                 daysRemaining -= daysInBatch;
@@ -38,12 +40,14 @@
 
         public static List<(DateTime, DateTime)> GetWeeklyDateRanges(DateTime startDate, DateTime endDate)
         {
+            const int maximumDaysPerRange = 1000;
+
             var dateRanges = new List<(DateTime, DateTime)>();
             var weeksRemaining = (int)Math.Ceiling((endDate - startDate).TotalDays / 7.0);
             var batchStart = new DateTime(startDate.Year, startDate.Month, startDate.Day, 0, 0, 0);
-            while (weeksRemaining > 1000)
+            while (weeksRemaining > maximumDaysPerRange)
             {
-                var weeksInBatch = Math.Min(1000, weeksRemaining);
+                var weeksInBatch = Math.Min(maximumDaysPerRange, weeksRemaining);
                 var batchEnd = batchStart.AddDays(weeksInBatch * 7).Date.Add(new TimeSpan(23, 59, 59));
                 dateRanges.Add((batchStart, batchEnd));
                 weeksRemaining -= weeksInBatch;
