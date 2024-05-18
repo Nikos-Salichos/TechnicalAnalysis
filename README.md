@@ -32,6 +32,7 @@ Technologies & Tools used:
 - [Docker](https://www.docker.com/)
 - [Mediatr](https://github.com/jbogard/MediatR) ([CQRS](https://docs.microsoft.com/en-us/azure/architecture/guide/architecture-styles/cqrs) pattern)
 - [PostgreSQL](https://www.postgresql.org/)
+- [PgAdmin](https://www.pgadmin.org/) 
 - [Redis](https://redis.io/)
 - [Dapper](https://github.com/DapperLib/Dapper)
 - Structured logging with [Seq](https://datalust.co/seq)
@@ -44,7 +45,12 @@ Technologies & Tools used:
 ### How to Start - Startup Configuration
 - Add your `appsettings.prod.json` file and ensure it is located at `./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json` (or modify the Docker path in the Docker Compose file).
 - Fill in your own details (such as API keys, etc.).
-- Navigate to the root folder and run `docker compose up`.
+- Open the Command Prompt.
+- Navigate to the root folder with the Docker Compose file using `cd path`.
+- Run the `docker compose up --build` command.
+
+Docker command to stop all containers:<br>
+`docker stop $(docker ps -a -q)`
 
 Swagger: `http://localhost:5000/swagger/index.html` <br>
 Seq Events: `http://localhost:5341/#/events` <br>
