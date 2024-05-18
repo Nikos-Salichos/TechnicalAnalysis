@@ -18,5 +18,20 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.False(result);
         }
 
+
+        [Fact]
+        public void IsProviderAssetPairsSyncedTodayProvider_ReturnsTrue()
+        {
+            // Arrange
+            ProviderSynchronization provider = new();
+            provider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
+
+            // Act
+            var result = DataProviderExtension.IsProviderAssetPairsSyncedToday(provider);
+
+            // Assert
+            Assert.True(result);
+        }
+
     }
 }
