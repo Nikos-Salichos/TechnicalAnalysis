@@ -12,14 +12,10 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
-                && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date)
-            {
-                return true;
-            }
+            var currentDate = DateTime.UtcNow.Date;
 
-            return provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == DateTime.UtcNow.Date
-            && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == DateTime.UtcNow.Date;
+            return provider.ProviderPairAssetSyncInfo.LastAssetSync.Date == currentDate
+                && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == currentDate;
         }
 
         public static bool IsProviderCandlesticksSyncedToday(this ProviderSynchronization provider, Timeframe timeframe)
