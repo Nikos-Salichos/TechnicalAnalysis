@@ -1,5 +1,6 @@
 ﻿using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 
 namespace TechnicalAnalysis.Tests.UnitTests
 {
@@ -42,6 +43,55 @@ namespace TechnicalAnalysis.Tests.UnitTests
             // Assert
             Assert.Equal(expectedResult, dollarPairs.Exists(p => p.Symbol == pair));
         }
-    }
 
+        [Fact]
+        public void FindNewCandlesticks_NoExistingCandles_NoChanges()
+        {
+            // Arrange
+            var fixedDatetime = new DateTime(2024, 5, 14, 12, 0, 0);
+
+            var pairs = new List<BinancePair>
+            {
+                new() { Pair = "BTCUSDT", BinanceCandlesticks =
+                    [
+                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
+                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" }
+                    ]
+            },
+                new() { Pair = "ETHUSDT", BinanceCandlesticks =
+                    [
+                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
+                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" }
+                    ]
+                }
+            };
+
+            var pairsWithExistingCandles = new List<BinancePair>();
+
+            // Act
+            pairs.FindNewCandlesticks(pairsWithExistingCandles);
+
+            // Assert
+            Assert.Collection(pairs,
+                pair =>
+                {
+                    Assert.Equivalent(2, pair.BinanceCandlesticks.Count);
+                    Assert.Collection(pair.BinanceCandlesticks,
+                        candlestick => Assert.Equivalent(fixedDatetime, candlestick.OpenTime),
+                        candlestick => Assert.Equivalent(fixedDatetime, candlestick.OpenTime)
+                    );
+                },
+                pair =>
+                {
+                    Assert.Equivalent(2, pair.BinanceCandlesticks.Count);
+                    Assert.Collection(pair.BinanceCandlesticks,
+                        candlestick => Assert.Equivalent(fixedDatetime, candlestick.OpenTime),
+                        candlestick => Assert.Equivalent(fixedDatetime, candlestick.OpenTime)
+                    );
+                }
+            );
+        }
+
+
+    }
 }
