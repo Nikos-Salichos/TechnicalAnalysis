@@ -92,6 +92,43 @@ namespace TechnicalAnalysis.Tests.UnitTests
             );
         }
 
+        [Fact]
+        public void FindNewCandlesticks_WithExistingCandles_FindNewCandles()
+        {
+            // Arrange
+            var fixedDatetime = new DateTime(2024, 5, 14, 12, 0, 0);
+            var newFixedDatetime = new DateTime(2025, 5, 14, 12, 0, 0);
+
+            var existingListOfCandlesticks = new List<BinancePair>{ new()
+            {
+                Pair = "BTCUSDT", BinanceCandlesticks =
+                    [
+                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
+                    ]
+               },
+            };
+
+            var listOfNewCandlesticks = new List<BinancePair> { new()
+            {
+                Pair = "BTCUSDT", BinanceCandlesticks =
+                    [
+                    new() { OpenTime = newFixedDatetime, CloseTime = newFixedDatetime, Period = "1h" }
+                    ]
+                }
+            };
+
+            // Act
+            existingListOfCandlesticks.FindNewCandlesticks(listOfNewCandlesticks);
+
+            // Assert
+            Assert.Collection(listOfNewCandlesticks,
+                pair =>
+                {
+                    Assert.Single(pair.BinanceCandlesticks);
+                    Assert.Equivalent(newFixedDatetime, pair.BinanceCandlesticks[0].OpenTime);
+                }
+            );
+        }
 
     }
 }
