@@ -32,6 +32,7 @@ Technologies & Tools used:
 - [Docker](https://www.docker.com/)
 - [Mediatr](https://github.com/jbogard/MediatR) ([CQRS](https://docs.microsoft.com/en-us/azure/architecture/guide/architecture-styles/cqrs) pattern)
 - [PostgreSQL](https://www.postgresql.org/)
+- [PgAdmin](https://www.pgadmin.org/) 
 - [Redis](https://redis.io/)
 - [Dapper](https://github.com/DapperLib/Dapper)
 - Structured logging with [Seq](https://datalust.co/seq)
