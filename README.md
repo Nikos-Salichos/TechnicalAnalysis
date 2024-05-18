@@ -45,6 +45,7 @@ Technologies & Tools used:
 - Add your `appsettings.prod.json` file and ensure it is located at `./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json` (or modify the Docker path in the Docker Compose file).
 - Fill in your own details (such as API keys, etc.).
 - Open cmd
+- Navigate in root folder with docker compose file using "cd path"
 
 
 Swagger: `http://localhost:5000/swagger/index.html` <br>
