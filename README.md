@@ -48,7 +48,7 @@ Technologies & Tools used:
 - Navigate to the root folder with the Docker Compose file using cd path.
 - Run the `docker compose up --build` command.
 
-Docker command to stop all containers:
+Docker command to stop all containers:<br>
 `docker stop $(docker ps -a -q)`
 
 Swagger: `http://localhost:5000/swagger/index.html` <br>
