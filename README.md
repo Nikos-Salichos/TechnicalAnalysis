@@ -42,7 +42,7 @@ Technologies & Tools used:
 - [Grafana](https://grafana.com/)
 
 ### How to Start - Startup Configuration
-- Add your appsettings.prod.json file and ensure it is located at ./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json (or modify the Docker path in the Docker Compose file).
+- Add your `appsettings.prod.json` file and ensure it is located at `./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json` (or modify the Docker path in the Docker Compose file).
 - Fill in your own details (such as API keys, etc.).
 - Open the Command Prompt.
 - Navigate to the root folder with the Docker Compose file using `cd path`.
