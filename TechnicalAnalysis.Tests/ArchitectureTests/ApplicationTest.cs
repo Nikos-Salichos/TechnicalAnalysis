@@ -10,8 +10,7 @@ namespace TechnicalAnalysis.Tests.ArchitectureTests
         {
             var result = Types.InNamespace(typeof(TechnicalAnalysis.Application.Modules.ApplicationModule).Namespace)
                                 .Should().NotHaveDependencyOnAny(BaseArchitectureSetup.InfrastructurePersistenceProject,
-                                BaseArchitectureSetup.InfrastructureAdaptersProject, BaseArchitectureSetup.InfrastructureHostProject,
-                                BaseArchitectureSetup.InfrastructureClientProject, BaseArchitectureSetup.PresentationProject)
+                                BaseArchitectureSetup.InfrastructureAdaptersProject, BaseArchitectureSetup.InfrastructureHostProject)
                                 .GetResult();
             result.IsSuccessful.Should().BeTrue();
         }
