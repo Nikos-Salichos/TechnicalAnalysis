@@ -13,8 +13,7 @@ namespace TechnicalAnalysis.Tests.ArchitectureTests
                 .NotHaveDependencyOnAny(BaseArchitectureSetup.InfrastructurePersistenceProject,
                     BaseArchitectureSetup.InfrastructureAdaptersProject,
                     BaseArchitectureSetup.InfrastructureHostProject,
-                    BaseArchitectureSetup.InfrastructureClientProject,
-                    BaseArchitectureSetup.PresentationProject,
+                    BaseArchitectureSetup.InfrastructureGatewayProject,
                     BaseArchitectureSetup.DomainProject)
                 .GetResult();
 
