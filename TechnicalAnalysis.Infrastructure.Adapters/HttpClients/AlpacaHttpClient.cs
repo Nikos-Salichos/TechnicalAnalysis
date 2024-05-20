@@ -25,7 +25,15 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     Adjustment = Adjustment.SplitsAndDividends
                 };
 
-                var stockData = await _retryPolicy.ExecuteAsync(() => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest));
+                var context = new Context
+                {
+                    ["PairName"] = pairName,
+                    ["fromDateTime"] = fromDateTime,
+                    ["toDateTime"] = toDateTime,
+                    ["barTimeFrame"] = barTimeFrame
+                };
+
+                var stockData = await _retryPolicy.ExecuteAsync((_) => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest), context);
 
                 return Result<IMultiPage<IBar>, string>.Success(stockData);
             }
