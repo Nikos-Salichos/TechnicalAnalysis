@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
+using System.Text.Json;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 
 namespace TechnicalAnalysis.Domain.Utilities
@@ -17,10 +18,14 @@ namespace TechnicalAnalysis.Domain.Utilities
                 retryDelays,
                 onRetry: (exception, delay, retryAttempt, context) =>
                 {
+                    var contextDictionary = context.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                    var contextJson = JsonSerializer.Serialize(contextDictionary);
+
                     _logger.LogError("Retry attempt {RetryAttempt} of {Retries}. Delaying for {Delay} seconds, context {context}. " +
-                        "Exception: {ExceptionResult} {ExceptionMessage} {ExceptionData}",
+                        "Exception: {ExceptionResult} {ExceptionMessage} {ExceptionData}," +
+                        "Context: {contextJson}",
                         retryAttempt, retries, delay.TotalSeconds,
-                        context, exception.Result, exception.Exception.Message, exception.Exception.Data);
+                        context, exception.Result, exception.Exception.Message, exception.Exception.Data, contextJson);
                 });
         }
     }
