@@ -1,12 +1,12 @@
 version: '3.4'
 
-
 volumes:
   app-data:  # Define the shared volume
 
 networks:
     postgres-db-network:
         driver: bridge
+    otel:
 
 services:
 
@@ -33,8 +33,10 @@ services:
       - 5000:5000
     environment:
      DB_CONNECTION_STRING: "Host=postgresql.api;Port=5432;Database=TechnicalAnalysis;Username=postgres;Password=admin"
+     OTEL_EXPORTER_OTLP_ENDPOINT: "http://ta.aspire.dashboard:18889"
     networks:
       - postgres-db-network
+      - otel
 #Be careful and use same path
     volumes:
       - ./TechnicalAnalysis.Infrastructure.Host/appsettings.prod.json:/app/appsettings.prod.json
@@ -145,3 +147,11 @@ services:
         timeout: 3s
         retries: 10
         start_period: 10s
+
+  ta.aspire.dashboard:
+    image: mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest
+    container_name: ta.aspire.dashboard
+    ports:
+      - 18888:18888
+    networks:
+      - otel
