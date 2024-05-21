@@ -1,5 +1,10 @@
 using Hangfire;
 using Hangfire.PostgreSql;
+using Npgsql;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Prometheus;
 using Serilog;
 using TechnicalAnalysis.Application.Modules;
@@ -62,6 +67,37 @@ if (builder.Environment.EnvironmentName != "IntegrationTest")
 {
     builder.Services.AddHangfireServer();
 }
+
+#region Open Telemetry
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("TechnicalAnalysis"))
+    .WithMetrics(metrics =>
+    {
+        metrics.AddAspNetCoreInstrumentation()
+               .AddHttpClientInstrumentation()
+               .AddRuntimeInstrumentation();
+
+        metrics.AddMeter("TechnicalAnalysis");
+
+        metrics.AddOtlpExporter();
+    })
+    .WithTracing(tracing =>
+    {
+        tracing.AddAspNetCoreInstrumentation()
+               .AddHttpClientInstrumentation()
+               .AddNpgsql();
+
+        tracing.AddOtlpExporter();
+    });
+
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options.AddOtlpExporter();
+    //options.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TechnicalAnalysis"));
+    options.IncludeScopes = true;
+    options.IncludeFormattedMessage = true;
+});
+#endregion  Open Telemetry
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
