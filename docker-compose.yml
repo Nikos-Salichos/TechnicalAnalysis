@@ -149,7 +149,7 @@ services:
         start_period: 10s
 
   ta.aspire.dashboard:
-    image: mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest
+    image: mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.4
     container_name: ta.aspire.dashboard
     ports:
       - 18888:18888
