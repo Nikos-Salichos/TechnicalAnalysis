@@ -93,7 +93,6 @@ builder.Services.AddOpenTelemetry()
 builder.Logging.AddOpenTelemetry(options =>
 {
     options.AddOtlpExporter();
-    //options.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TechnicalAnalysis"));
     options.IncludeScopes = true;
     options.IncludeFormattedMessage = true;
 });
