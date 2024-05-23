@@ -1,5 +1,6 @@
 ﻿using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
 
 namespace TechnicalAnalysis.Tests.UnitTests
 {
@@ -12,12 +13,11 @@ namespace TechnicalAnalysis.Tests.UnitTests
             ProviderSynchronization provider = null;
 
             // Act
-            var result = DataProviderExtension.IsProviderAssetPairsSyncedToday(provider);
+            var result = provider.IsProviderAssetPairsSyncedToday();
 
             // Assert
             Assert.False(result);
         }
-
 
         [Fact]
         public void IsProviderAssetPairsSyncedTodayProvider_ReturnsTrue()
@@ -27,11 +27,67 @@ namespace TechnicalAnalysis.Tests.UnitTests
             provider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
 
             // Act
-            var result = DataProviderExtension.IsProviderAssetPairsSyncedToday(provider);
+            var result = provider.IsProviderAssetPairsSyncedToday();
 
             // Assert
             Assert.True(result);
         }
 
+        [Fact]
+        public void IsProviderCandlesticksSyncedToday_WithNullProvider_ReturnsFalse()
+        {
+            // Arrange
+            ProviderSynchronization provider = null;
+
+            // Act
+            var result = provider.IsProviderCandlesticksSyncedToday(Timeframe.Daily);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void IsProviderCandlesticksSyncedToday_DailySyncToday_ReturnsTrue()
+        {
+            // Arrange
+            var provider = new ProviderSynchronization
+            {
+                CandlestickSyncInfos = new List<ProviderCandlestickSyncInfo>
+            {
+                new() {
+                    LastCandlestickSync = DateTime.UtcNow.Date,
+                    Timeframe = Timeframe.Daily
+                }
+            }
+            };
+
+            // Act
+            var result = provider.IsProviderCandlesticksSyncedToday(Timeframe.Daily);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void IsProviderCandlesticksSyncedToday_DailySyncNotToday_ReturnsFalse()
+        {
+            // Arrange
+            var provider = new ProviderSynchronization
+            {
+                CandlestickSyncInfos = new List<ProviderCandlestickSyncInfo>
+            {
+                new() {
+                    LastCandlestickSync = DateTime.UtcNow.Date.AddDays(-1),
+                    Timeframe = Timeframe.Daily
+                }
+            }
+            };
+
+            // Act
+            var result = provider.IsProviderCandlesticksSyncedToday(Timeframe.Daily);
+
+            // Assert
+            Assert.False(result);
+        }
     }
 }
