@@ -619,6 +619,7 @@ namespace TechnicalAnalysis.Application.Services
         private async Task CalculateTechnicalIndicators(List<PairExtended> pairs)
         {
             var cryptoFearAndGreedDataTask = mediator.Send(new GetCryptoFearAndGreedIndexQuery());
+            var stockFearAndGreedDataTask = mediator.Send(new GetStockFearAndGreedIndexQuery());
 
             BasicIndicatorExtension.Logger = logger;
             AdvancedIndicatorExtension.Logger = logger;
@@ -627,8 +628,11 @@ namespace TechnicalAnalysis.Application.Services
             var cryptoFearAndGreedData = (await cryptoFearAndGreedDataTask).OrderByDescending(c => c.DateTime).ToList();
             var cryptoFearAndGreedDataPerDatetime = cryptoFearAndGreedData.ToDictionary(c => c.DateTime.Date, c => c);
 
+            var stockFearAndGreedData = (await stockFearAndGreedDataTask).OrderByDescending(c => c.DateTime).ToList();
+            var stockFearAndGreedDataPerDatetime = stockFearAndGreedData.ToDictionary(c => c.DateTime.Date, c => c);
+
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
-            Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime));
+            Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime, stockFearAndGreedDataPerDatetime));
 
             var cryptoMarketStatistic = await GetCryptoPairsWithEnhancedScanIsLong(pairs);
             var etfStockMarketStatistic = await GetEtfStockPairWithEnhancedScanIsLong(pairs);
