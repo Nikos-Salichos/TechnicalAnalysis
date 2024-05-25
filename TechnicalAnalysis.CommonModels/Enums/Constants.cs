@@ -27,6 +27,6 @@
 
         public const int DecimalPlacesRound = 20;
         public const double EtfThresholdPercentage = 5;
-        public const double CryptoThresholdPercentage = 5;
+        public const double CryptoThresholdPercentage = 1;
     }
 }
