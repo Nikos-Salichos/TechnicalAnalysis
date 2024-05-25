@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using System.Globalization;
-using TechnicalAnalysis.Domain.Extensions;
+using TechnicalAnalysis.Application.Extensions;
 
 namespace TechnicalAnalysis.Tests.UnitTests
 {
