@@ -12,7 +12,8 @@ namespace TechnicalAnalysis.Application.Extensions
         public static ILogger Logger { get; set; }
 
         public static void CalculateSignalIndicators(this PairExtended pair,
-            Dictionary<DateTime, FearAndGreedModel> fearAndGreedPerDate)
+            Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime,
+            Dictionary<DateTime, FearAndGreedModel> stockFearAndGreedDataPerDatetime)
         {
             Logger.LogInformation("Pair details - {PairPropertyName}: {PairName}, " +
                 "{BaseAssetContractPropertyName}: {BaseAssetContract}, " +
@@ -44,8 +45,8 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateWilliamsVixFix(pair);
             CalculateHighestWilliamsVixFixValue(pair);
 
-            CalculateEnchancedLong(pair, fearAndGreedPerDate);
-            CalculateEnchancedShort(pair, fearAndGreedPerDate);
+            CalculateEnchancedLong(pair, cryptoFearAndGreedDataPerDatetime, stockFearAndGreedDataPerDatetime);
+            CalculateEnchancedShort(pair, cryptoFearAndGreedDataPerDatetime, stockFearAndGreedDataPerDatetime);
             CalculateResistanceBreakout(pair);
             CalculateVerticalHorizontalFilterRange(pair);
         }
@@ -461,15 +462,17 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateEnchancedLong(PairExtended pair, Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime)
+        private static void CalculateEnchancedLong(PairExtended pair,
+            Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime,
+            Dictionary<DateTime, FearAndGreedModel> stockFearAndGreedDataPerDatetime)
         {
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2024, 03, 15).Date
-                    && string.Equals(pair.Symbol, "CREAM", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2020, 02, 20).Date
+                    && string.Equals(pair.Symbol, "VOO", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
@@ -487,6 +490,20 @@ namespace TechnicalAnalysis.Application.Extensions
                     var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeFear
                           || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Fear
                           || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Neutral;
+
+                    if (!greedAndFearCondition)
+                    {
+                        continue;
+                    }
+                }
+
+                if (stockFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var stockFearAndGreedIndex)
+                     && stockFearAndGreedIndex is not null && pair.Provider
+                     is DataProvider.Alpaca)
+                {
+                    var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeFear
+                          || stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Fear
+                          || stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Neutral;
 
                     if (!greedAndFearCondition)
                     {
@@ -575,7 +592,9 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateEnchancedShort(PairExtended pair, Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime)
+        private static void CalculateEnchancedShort(PairExtended pair,
+            Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime,
+            Dictionary<DateTime, FearAndGreedModel> stockFearAndGreedDataPerDatetime)
         {
             decimal? candlestickHighestPrice = -1;
 
@@ -591,6 +610,19 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                     var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Greed
                           || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeGreed;
+
+                    if (!greedAndFearCondition)
+                    {
+                        continue;
+                    }
+                }
+
+                if (stockFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var stockFearAndGreedIndex)
+                    && stockFearAndGreedIndex is not null && pair.Provider
+                    is DataProvider.Alpaca)
+                {
+                    var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Greed
+                          || stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeGreed;
 
                     if (!greedAndFearCondition)
                     {
