@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = pair.Candlesticks[i - 1];
 
-                if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null && !openPosition)
+                if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
                 {
                     Position position = new()
                     {
@@ -36,7 +36,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     var percentage = candlestick1.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
                     var thresholdValue = positionFound?.EntryPositionPrice * percentage * 2;
                     var pricePercentageBelowEntry = positionFound?.EntryPositionPrice - thresholdValue;
-                    if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null
+                    if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true
                         && openPosition
                         && candlestick1.ClosePrice <= pricePercentageBelowEntry)
                     {
@@ -92,7 +92,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = pair.Candlesticks[i - 1];
 
-                if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null && !openPosition)
+                if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
                 {
                     Position position = new Position
                     {
@@ -112,7 +112,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     var percentage = candlestick1.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
                     var thresholdValue = positionFound?.EntryPositionPrice * percentage * 2;
                     var pricePercentageBelowEntry = positionFound?.EntryPositionPrice - thresholdValue;
-                    if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null
+                    if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true
                         && openPosition
                         && candlestick1.ClosePrice <= pricePercentageBelowEntry)
                     {
@@ -178,7 +178,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 CandlestickExtended? candlestick = pair.Candlesticks[i];
 
-                if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null && !openPosition)
+                if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
                 {
                     Position position = new Position
                     {
@@ -199,7 +199,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     var percentage = candlestick.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
                     var thresholdValue = positionFound.EntryPositionPrice * percentage;
                     var pricePercentageBelowEntry = positionFound.EntryPositionPrice - thresholdValue;
-                    if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null
+                    if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true
                         && openPosition
                         && candlestick.ClosePrice <= pricePercentageBelowEntry)
                     {
@@ -276,7 +276,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 CandlestickExtended? candlestick = pair.Candlesticks[i];
 
-                if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null && !openPosition)
+                if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
                 {
                     Position position = new Position
                     {
@@ -297,7 +297,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     var percentage = candlestick.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
                     var thresholdValue = positionFound.EntryPositionPrice * percentage * 2;
                     var pricePercentageBelowEntry = positionFound.EntryPositionPrice - thresholdValue;
-                    if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong != null
+                    if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true
                         && openPosition
                         && candlestick.ClosePrice <= pricePercentageBelowEntry)
                     {
