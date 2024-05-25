@@ -6,7 +6,6 @@ using TechnicalAnalysis.Domain.Contracts.Input.Cnn;
 using TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts;
 using TechnicalAnalysis.Domain.Contracts.Input.DexV3;
 using TechnicalAnalysis.Domain.Contracts.Input.StockFearAndGreedContracts;
-using TechnicalAnalysis.Domain.Extensions;
 
 namespace TechnicalAnalysis.Application.Mappers
 {
