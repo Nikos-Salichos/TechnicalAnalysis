@@ -10,7 +10,6 @@ using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Builders;
 using TechnicalAnalysis.Domain.Contracts.Input.DexV3;
-using TechnicalAnalysis.Domain.Extensions;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
