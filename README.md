@@ -14,6 +14,7 @@ This project features a versatile system that seamlessly connects with multiple 
 - **[CNN Stock Fear And Greed Index](https://rapidapi.com/rpi4gx/api/fear-and-greed-index)**: Utilizing the REST API for data retrieval from RapidApi.
 - **[CoinPaprika](https://coinpaprika.com/)**, **[CoinMarketCap](https://coinmarketcap.com/)**, **[CoinRanking](https://coinranking.com/)**: Utilizing the REST API for data retrieval and filtering for layer 1 blockchains.
 - **[WallStreetZen](https://www.wallstreetzen.com/)**: Preparing for integration (coming soon).
+- **[GeckoTerminal](https://www.geckoterminal.com/dex-api)**: Coming soon.
 
 ### Design Components
 The project is built around two core services:
