@@ -67,4 +67,5 @@ PgAdmin4: `http://localhost:16543/login` <br>
 ### Roadmap
 - Create an endpoint where consumers can pass candlestick data, and indicators will be produced on this data.
 - Implement WallStreetZen.
+- Implement GeckoTerminal.
 - Add more tests
