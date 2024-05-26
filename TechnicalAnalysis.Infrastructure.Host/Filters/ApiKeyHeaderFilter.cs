@@ -8,7 +8,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Filters
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            operation.Parameters ??= new List<OpenApiParameter>();
+            operation.Parameters ??= [];
 
             var apiKeyParameter = new OpenApiParameter
             {
@@ -18,8 +18,16 @@ namespace TechnicalAnalysis.Infrastructure.Host.Filters
                 Example = new OpenApiString("123")
             };
 
+            var clearCacheParameter = new OpenApiParameter
+            {
+                Name = "X-Cache-Refresh",
+                In = ParameterLocation.Header,
+                Required = false,
+                Example = new OpenApiString("true")
+            };
+
             operation.Parameters.Add(apiKeyParameter);
+            operation.Parameters.Add(clearCacheParameter);
         }
     }
-
 }
