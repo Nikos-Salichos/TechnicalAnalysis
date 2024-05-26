@@ -39,15 +39,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Remove="C:\Users\Nikos\source\repos\TechnicalAnalysis\createTables.sql" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="$(SolutionDir)createTables.sql">
 			<Link>createTables.sql</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
-	<Target Name="CopyCreateTablesFile" AfterTargets="Build">
-		<Copy SourceFiles="$(SolutionDir)createTables.sql" DestinationFolder="$(ProjectDir)TechnicalAnalysis\TechnicalAnalysis.Tests\bin\Debug\net8.0\" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
-	</Target>
-
 
 </Project>
