@@ -768,7 +768,7 @@ namespace TechnicalAnalysis.Application.Services
                 }
             }
 
-            etfStockMarketStatistic.CalculateAndFilterPercentages(Constants.EtfThresholdPercentage);
+            etfStockMarketStatistic.CalculateAndFilterPercentages(Constants.StockThresholdPercentage);
 
             var baseDirectory = GetBaseDirectory();
             if (string.IsNullOrWhiteSpace(baseDirectory))
