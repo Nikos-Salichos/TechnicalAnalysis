@@ -77,7 +77,7 @@ namespace TechnicalAnalysis.Application.Mappers
                 Volume = pool.Volume,
                 NumberOfTrades = pool.NumberOfTrades,
                 IsActive = pool.IsActive,
-                Candlesticks = new List<CandlestickExtended>()
+                Candlesticks = []
             };
 
         public static List<PairExtended> PoolToDomain(this List<Domain.Entities.PoolEntity> pairs)
