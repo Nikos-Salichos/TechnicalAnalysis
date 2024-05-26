@@ -40,7 +40,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "JPM", "V", "KO", "PEP", "MCD", "AVGO", "ACN", "NFLX", "WCF", "ABDE",
                     "MA", "BAC", "MS", "SCHW", "RY", "NVDA", "CRM", "VZ", "IBM",
                     "PYPL", "IWD", "IJH", "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG",
-                    "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG",
+                    "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG", "DVA", "CVX",
+                    "KR", "HD", "WSO", "DE", "AME", "MKL", "HEI", "NVR", "TDG", "BN",
+                    "RACE", "MU", "DJCO", "SYK", "PM", "ADP", "WAT", "PEP", "MKC", "FIS",
+                    "WTW", "CRH", "WBA", "WSO", "ASML", "ADBE", "REGN", "FTNT", "ODFL", "CPRT", "ACN", "ZTS"
                 ];
 
             List<string> etfTickers =
