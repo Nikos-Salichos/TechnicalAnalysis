@@ -1,29 +1,41 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
-using Polly.Contrib.WaitAndRetry;
+using Polly.Retry;
+using System.Reflection;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
 
 namespace TechnicalAnalysis.Domain.Utilities
 {
     public class PollyPolicy(ILogger<PollyPolicy> logger) : IPollyPolicy
     {
-        private readonly ILogger<PollyPolicy> _logger = logger;
-
-        public IAsyncPolicy<T> CreatePolicies<T>(int retries)
+        public ResiliencePipeline CreatePolicies(int retries)
         {
-            var retryDelays = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(5), retryCount: retries).ToArray();
-
-            return Policy<T>.Handle<Exception>().WaitAndRetryAsync(
-                retryDelays,
-                onRetry: (exception, delay, retryAttempt, context) =>
+            var retryStrategyOptions = new RetryStrategyOptions
+            {
+                MaxRetryAttempts = retries,
+                Delay = TimeSpan.FromSeconds(5),
+                BackoffType = DelayBackoffType.Exponential,
+                ShouldHandle = new PredicateBuilder().Handle<Exception>(),
+                OnRetry = (args) =>
                 {
-                    _logger.LogError("Retry attempt {RetryAttempt} of {Retries}. Delaying for {Delay} seconds." +
-                        "Exception: {ExceptionResult} {ExceptionMessage} {ExceptionData}," +
-                        "Context: {context}",
-                        retryAttempt, retries, delay.TotalSeconds,
-                        exception.Result, exception.Exception.Message, exception.Exception.Data,
-                        context);
-                });
+                    // Use reflection to access the internal Options property
+                    var optionsProperty = typeof(ResilienceProperties)
+                        .GetProperty("Options", bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
+
+                    var options = optionsProperty?.GetValue(args.Context.Properties) as IDictionary<string, object>;
+
+                    logger.LogError("Retry attempt {AttemptNumber} of {Retries}. Delaying for {RetryDelay} seconds. " +
+                                    "Exception: {ExceptionMessage} {ExceptionData}, " +
+                                    "Context: {Context}",
+                                    args.AttemptNumber, retries, args.RetryDelay.TotalSeconds,
+                                    args.Outcome.Exception.Message, args.Outcome.Exception.Data,
+                                    options);
+                    return default;
+                }
+            };
+
+            return new ResiliencePipelineBuilder().AddRetry(retryStrategyOptions)
+                                                  .AddTimeout(TimeSpan.FromSeconds(5)).Build();
         }
     }
 }
