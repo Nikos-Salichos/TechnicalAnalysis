@@ -14,15 +14,16 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var pollyPolicy = new PollyPolicy(loggerMock.Object);
             const int retries = 3;
             var exceptionsThrown = 0;
+            var resiliencePipeline = pollyPolicy.CreatePolicies(retries);
 
             // Act
-            var policy = pollyPolicy.CreatePolicies<int>(retries);
-
-            // Prepare to simulate failures
-            var result = await policy.ExecuteAndCaptureAsync(() =>
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                exceptionsThrown++;
-                throw new InvalidOperationException("Test exception");
+                await resiliencePipeline.ExecuteAsync((ctx) =>
+                {
+                    exceptionsThrown++;
+                    throw new InvalidOperationException("Test exception");
+                });
             });
 
             // Assert
