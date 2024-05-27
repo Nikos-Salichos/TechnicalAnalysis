@@ -358,5 +358,77 @@ namespace TechnicalAnalysis.Application.Extensions
 
             return positions;
         }
+
+        public static List<Position> AverageDownStrategyCloseAllBasedOnEnhancedReversalSignal(this PairExtended pair)
+        {
+            List<Position> positions = [];
+            _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
+            bool openPosition = false;
+
+            for (int i = 1; i < pair.Candlesticks.Count; i++)
+            {
+                var candlestick = pair.Candlesticks[i];
+                var candlestick1 = pair.Candlesticks[i - 1];
+
+                if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
+                {
+                    Position position = new()
+                    {
+                        OpenPositionDate = candlestick.OpenDate,
+                        EntryPositionPrice = candlestick.OpenPrice,
+                        SignalType = nameof(EnhancedScan),
+                        OpenPosition = true
+                    };
+                    positions.Add(position);
+
+                    openPosition = true;
+                }
+
+                var positionFound = positions.LastOrDefault();
+                if (positionFound?.OpenPosition == true && candlestick1.AverageTrueRanges.Count is not 0)
+                {
+                    var percentage = candlestick1.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
+                    var thresholdValue = positionFound?.EntryPositionPrice * percentage * 2;
+                    var pricePercentageBelowEntry = positionFound?.EntryPositionPrice - thresholdValue;
+                    if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true
+                        && openPosition
+                        && candlestick1.ClosePrice <= pricePercentageBelowEntry)
+                    {
+                        Position position = new()
+                        {
+                            OpenPositionDate = candlestick.OpenDate,
+                            EntryPositionPrice = candlestick.ClosePrice,
+                            SignalType = nameof(EnhancedScan)
+                        };
+                        positions.Add(position);
+                        position.OpenPosition = true;
+
+                        openPosition = true;
+                    }
+                }
+
+                var openPositions = positions.Where(p => p.OpenPosition).ToList();
+                if (openPositions.Count > 0)
+                {
+                    var closeLongSignal = candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsShort;
+
+                    if (candlestick.ClosePrice < candlestick1.ClosePrice.Value && closeLongSignal is true)
+                    {
+                        foreach (var position in openPositions)
+                        {
+                            if (candlestick.ClosePrice > position.EntryPositionPrice)
+                            {
+                                position.ClosePositionPrice = candlestick.ClosePrice;
+                                position.ClosePositionDate = candlestick.CloseDate;
+                                position.OpenPosition = false;
+                                openPosition = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return positions;
+        }
     }
 }
