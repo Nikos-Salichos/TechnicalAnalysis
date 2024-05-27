@@ -49,22 +49,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
 
             services.AddHttpClient("default")
                     .ConfigureHttpClient(client => client.DefaultRequestHeaders.Add("User-Agent", "Tracking prices application"));
-            /*.AddStandardResilienceHandler(options =>
-            {
-                options.Retry.ShouldHandle = new PredicateBuilder<HttpResponseMessage>().HandleResult(response => !response.IsSuccessStatusCode)
-                                                                                        .Handle<HttpRequestException>();
-                options.Retry.Delay = TimeSpan.FromSeconds(5);
-                options.Retry.MaxRetryAttempts = 10;
-                options.Retry.BackoffType = DelayBackoffType.Exponential;
-                options.Retry.UseJitter = true;
-                options.Retry.OnRetry = args =>
-                {
-                    var serviceProvider = services.BuildServiceProvider();
-                    var logger = serviceProvider.GetService<ILogger>();
-                    logger.LogError("Retry attempt {RetryAttempt}. Delaying for {Delay} seconds. Exception: {Exception}",
-                        args.AttemptNumber, args.RetryDelay, args.Outcome); return default;
-                };
-            });*/
 
             //Headers required by CNN Api
             services.AddHttpClient("cnn")
