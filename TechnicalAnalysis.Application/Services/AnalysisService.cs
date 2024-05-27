@@ -101,11 +101,13 @@ namespace TechnicalAnalysis.Application.Services
 
                 var positionsCloseOneByOne = selectedPair.AverageDownStrategyCloseOneByOnBasedInFractalBreak();
                 var positionsCloseAll = selectedPair.AverageDownStrategyCloseAllBasedInFractalBreak();
+                var positionsCloseAllBasedOnEnhancedReversalSignal = selectedPair.AverageDownStrategyCloseAllBasedOnEnhancedReversalSignal();
 
                 var indicatorReports = new List<Indicator>
                 {
                     CalculateEnhancedScanLongSignal(positionsCloseOneByOne, "EnhancedScan_CloseOneByOne", selectedPair.Symbol),
                     CalculateEnhancedScanLongSignal(positionsCloseAll, "EnhancedScan_CloseAll", selectedPair.Symbol),
+                    CalculateEnhancedScanLongSignal(positionsCloseAllBasedOnEnhancedReversalSignal, "EnhancedScan_CloseAll_BasedOnReverseSignal", selectedPair.Symbol),
                     CalculateEnhancedScanAllSignals(selectedPair),
                     PrintFractalTrend(selectedPair),
                     PrintLowestHighFractalSignals(selectedPair),
