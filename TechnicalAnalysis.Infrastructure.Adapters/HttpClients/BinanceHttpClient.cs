@@ -15,13 +15,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<BinanceHttpClient> logger, IPollyPolicy pollyPolicy) : IBinanceHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
+        private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
         public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
         {
             try
             {
-                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
+                using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
+                 => await _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
                 logger.LogInformation("SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
                  binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
@@ -61,7 +62,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     binanceCandlestickPath += "?" + string.Join("&", queryParams.Select(p => $"{p.Key}={p.Value}"));
                 }
 
-                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
+                using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
+                    => await _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
 
                 logger.LogInformation("binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {StatusCode} ",
                     binanceCandlestickPath, httpResponseMessage.StatusCode);
