@@ -906,10 +906,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var lowestLow = candlesticks[currentIndex].Lowests.FirstOrDefault();
-            var lowestLow1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Lowests.FirstOrDefault(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Lowests.FirstOrDefault(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Lowests.FirstOrDefault(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.FirstOrDefault(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
+            var lowestLow1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
+            var lowestLow2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
+            var lowestLow3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
+            var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
 
             return candlesticks[currentIndex].LowPrice <= lowestLow?.Value
                 || (lowestLow1 is not null && candlesticks[currentIndex - 1].LowPrice <= lowestLow1.Value)
@@ -925,22 +925,22 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            var highestHighVixFix = candlesticks[currentIndex].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5);
+            var highestHighVixFix = candlesticks[currentIndex].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5);
 
             var highestHighVixFix1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count
-                ? candlesticks[currentIndex - 1].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 1].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
                 : null;
 
             var highestHighVixFix2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count
-                ? candlesticks[currentIndex - 2].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 2].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
                 : null;
 
             var highestHighVixFix3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count
-                ? candlesticks[currentIndex - 3].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 3].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
                 : null;
 
             var highestHighVixFix4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count
-                ? candlesticks[currentIndex - 4].Highests.FirstOrDefault(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 4].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
                 : null;
 
             return candlesticks[currentIndex].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix?.Value
@@ -1031,9 +1031,9 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlestick2.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick3.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick4.Fractals.FirstOrDefault(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
+            return candlestick2.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
+                   candlestick3.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
+                   candlestick4.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
         }
 
         private static bool GetOversoldRsiConditions(List<CandlestickExtended> candlesticks, int currentIndex)
@@ -1276,11 +1276,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            var obvLowest = candlesticks[currentIndex].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value;
-            var obvLowest1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
-            var obvLowest2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
-            var obvLowest3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
-            var obvLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest = candlesticks[currentIndex].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value;
+            var obvLowest1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
 
             if (obvLowest == null || obvLowest1 == null || obvLowest2 == null || obvLowest3 == null || obvLowest4 == null)
             {
@@ -1312,11 +1312,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            var valueLowest = candlesticks[currentIndex].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value;
-            var valueLowest1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
-            var valueLowest2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
-            var valueLowest3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
-            var valueLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.FirstOrDefault(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest = candlesticks[currentIndex].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value;
+            var valueLowest1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
 
             if (valueLowest == null || valueLowest1 == null || valueLowest2 == null || valueLowest3 == null || valueLowest4 == null)
             {
