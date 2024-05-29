@@ -16,13 +16,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<CnnStockFearAndGreedHttpClient> logger, IPollyPolicy pollyPolicy) : ICnnStockFearAndGreedHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("cnn");
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
+        private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
         public async Task<IResult<RootStockFearAndGreed, string>> GetCnnStockFearAndGreedIndex()
         {
             try
             {
-                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(apiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
+                using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
+                    => await _httpClient.GetAsync(apiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
