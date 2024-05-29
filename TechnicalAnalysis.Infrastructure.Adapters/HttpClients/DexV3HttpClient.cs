@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<DexV3HttpClient> logger, IPollyPolicy pollyPolicy) : IDexV3HttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-        private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
+        private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
         public Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
         {
@@ -91,7 +91,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             {
                 try
                 {
-                    using var httpResponseMessage = await _retryPolicy.ExecuteAsync(() => _httpClient.PostAsJsonAsync(endpoint, body));
+                    using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
+                        => await _httpClient.PostAsJsonAsync(endpoint, body));
 
                     logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, " +
                         "httpResponseMessage StatusCode {StatusCode}",
