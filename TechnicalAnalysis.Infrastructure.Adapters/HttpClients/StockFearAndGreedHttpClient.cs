@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<StockFearAndGreedHttpClient> logger, IPollyPolicy pollyPolicy) : IStockFearAndGreedHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
+        private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
         public async Task<IResult<StockFearAndGreedRoot, string>> GetStockFearAndGreedIndex()
         {
@@ -23,7 +23,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             {
                 _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Key", rapidApiSetting.CurrentValue.StockFearAndGreedApiKey);
                 _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Host", rapidApiSetting.CurrentValue.StockFearAndGreedHost);
-                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(rapidApiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
+
+                using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
+                    => await _httpClient.GetAsync(rapidApiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
