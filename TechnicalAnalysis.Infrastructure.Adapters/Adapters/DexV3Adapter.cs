@@ -35,7 +35,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             var pairs = await FormatDexAssetsPoolsCandlesticks(provider);
             var candlestickIds = pairs.SelectMany(p => p.Candlesticks.Select(c => c.PrimaryId)).ToList();
-            var poolIds = pairs.Select(p => p.PrimaryId).ToList();
+            var poolIds = pairs.ConvertAll(p => p.PrimaryId);
 
             var deleteCandlesticksResult = await mediator.Send(new DeleteDexCandlesticksCommand(candlestickIds));
             var poolsResult = await mediator.Send(new DeletePoolsCommand(poolIds));
