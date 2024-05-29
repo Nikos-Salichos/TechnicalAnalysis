@@ -12,7 +12,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
     public class AlpacaHttpClient(IOptionsMonitor<AlpacaSetting> alpacaSettings, ILogger<AlpacaHttpClient> logger,
         IPollyPolicy pollyPolicy) : IAlpacaHttpClient
     {
-        private readonly IAsyncPolicy<IMultiPage<IBar>> _retryPolicy = pollyPolicy.CreatePolicies<IMultiPage<IBar>>(5);
+        private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
         public async Task<IResult<IMultiPage<IBar>, string>> GetAlpacaData(string pairName, DateTime fromDateTime, DateTime toDateTime, BarTimeFrame barTimeFrame)
         {
@@ -25,17 +25,16 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     Adjustment = Adjustment.SplitsAndDividends
                 };
 
-                var context = new Context
-                {
-                    ["PairName"] = pairName,
-                    ["fromDateTime"] = fromDateTime,
-                    ["toDateTime"] = toDateTime,
-                    ["barTimeFrame"] = barTimeFrame
-                };
+                ResilienceContext resilienceContext = ResilienceContextPool.Shared.Get();
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("pairName"), pairName);
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("fromDateTime"), fromDateTime.ToString());
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("toDateTime"), toDateTime.ToString());
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("barTimeFrame"), barTimeFrame.ToString());
 
-                var stockData = await _retryPolicy.ExecuteAsync((_) => alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest), context);
+                var alpacaStockData = await _resiliencePipeline.ExecuteAsync(async (ctx)
+                    => await alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest), resilienceContext);
 
-                return Result<IMultiPage<IBar>, string>.Success(stockData);
+                return Result<IMultiPage<IBar>, string>.Success(alpacaStockData);
             }
             catch (Exception exception)
             {
