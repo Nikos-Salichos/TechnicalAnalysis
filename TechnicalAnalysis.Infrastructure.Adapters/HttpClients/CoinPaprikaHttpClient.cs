@@ -15,13 +15,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         ILogger<CoinPaprikaHttpClient> logger, IPollyPolicy pollyPolicy) : ICoinPaprikaHttpClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
-        private readonly IAsyncPolicy<HttpResponseMessage> _pollyPolicy = pollyPolicy.CreatePolicies<HttpResponseMessage>(5);
+        private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
         public async Task<IResult<List<CoinPaprikaAssetContract>, string>> SyncAssets()
         {
             try
             {
-                using var httpResponseMessage = await _pollyPolicy.ExecuteAsync(() => _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead));
+                using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
+                    => await _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead));
 
                 logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
                     coinPaprikaSetting.CurrentValue.Endpoint, httpResponseMessage);
