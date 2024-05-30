@@ -4,6 +4,7 @@ using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Mappers;
 using TechnicalAnalysis.Application.Mediatr.Commands.Insert;
 using TechnicalAnalysis.Application.Mediatr.Commands.Update;
+using TechnicalAnalysis.Application.Mediatr.Queries;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
@@ -28,6 +29,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 return true;
             }
 
+            var stockFearAndGreedDataTask = mediator.Send(new GetStockFearAndGreedIndexQuery());
+
             var response = await httpClient.GetCnnStockFearAndGreedIndex();
             if (response.HasError)
             {
@@ -41,7 +44,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                                        .Select(group => group.First())
                                                        .ToList();
 
-            await mediator.Send(new InsertStockFearAndGreedIndexCommand(distinctItems));
+            var stockFearAndGreedData = (await stockFearAndGreedDataTask).ToList();
+
+            var dataNotInStockFearAndGreedData = distinctItems.Except(stockFearAndGreedData).ToList();
+
+            await mediator.Send(new InsertStockFearAndGreedIndexCommand(dataNotInStockFearAndGreedData));
 
             cnnProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
             await mediator.Send(new UpdateExchangeCommand(cnnProvider.ProviderPairAssetSyncInfo));
