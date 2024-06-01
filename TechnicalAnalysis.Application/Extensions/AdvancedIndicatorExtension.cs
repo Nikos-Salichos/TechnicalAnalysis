@@ -1519,11 +1519,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlesticks[currentIndex].HighPrice >= bollingerBand?.UpperBand
-                || candlesticks[currentIndex - 1].HighPrice >= bollingerBand1?.UpperBand
-                || candlesticks[currentIndex - 2].HighPrice >= bollingerBand2?.UpperBand
-                || candlesticks[currentIndex - 3].HighPrice >= bollingerBand3?.UpperBand
-                || candlesticks[currentIndex - 4].HighPrice >= bollingerBand4?.UpperBand;
+            return candlesticks[currentIndex].HighPrice >= bollingerBand.UpperBand
+                || candlesticks[currentIndex - 1].HighPrice >= bollingerBand1.UpperBand
+                || candlesticks[currentIndex - 2].HighPrice >= bollingerBand2.UpperBand
+                || candlesticks[currentIndex - 3].HighPrice >= bollingerBand3.UpperBand
+                || candlesticks[currentIndex - 4].HighPrice >= bollingerBand4.UpperBand;
         }
 
         private static bool GetOverboughtKeltnerConditions(List<CandlestickExtended> candlesticks, int currentIndex)
