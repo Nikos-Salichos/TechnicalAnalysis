@@ -1132,11 +1132,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlesticks[currentIndex].LowPrice <= bollingerBand?.LowerBand
-                || candlesticks[currentIndex - 1].LowPrice <= bollingerBand1?.LowerBand
-                || candlesticks[currentIndex - 2].LowPrice <= bollingerBand2?.LowerBand
-                || candlesticks[currentIndex - 3].LowPrice <= bollingerBand3?.LowerBand
-                || candlesticks[currentIndex - 4].LowPrice <= bollingerBand4?.LowerBand;
+            return candlesticks[currentIndex].LowPrice <= bollingerBand.LowerBand
+                || candlesticks[currentIndex - 1].LowPrice <= bollingerBand1.LowerBand
+                || candlesticks[currentIndex - 2].LowPrice <= bollingerBand2.LowerBand
+                || candlesticks[currentIndex - 3].LowPrice <= bollingerBand3.LowerBand
+                || candlesticks[currentIndex - 4].LowPrice <= bollingerBand4.LowerBand;
         }
 
         private static bool GetOversoldKeltnerConditions(List<CandlestickExtended> candlesticks, int currentIndex)
@@ -1166,11 +1166,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlesticks[currentIndex].LowPrice <= (decimal)keltnerChannel?.LowerBand
-                || candlesticks[currentIndex - 1].LowPrice <= (decimal)keltnerChannel1?.LowerBand
-                || candlesticks[currentIndex - 2].LowPrice <= (decimal)keltnerChannel2?.LowerBand
-                || candlesticks[currentIndex - 3].LowPrice <= (decimal)keltnerChannel3?.LowerBand
-                || candlesticks[currentIndex - 4].LowPrice <= (decimal)keltnerChannel4?.LowerBand;
+            return candlesticks[currentIndex].LowPrice <= (decimal)keltnerChannel.LowerBand
+                || candlesticks[currentIndex - 1].LowPrice <= (decimal)keltnerChannel1.LowerBand
+                || candlesticks[currentIndex - 2].LowPrice <= (decimal)keltnerChannel2.LowerBand
+                || candlesticks[currentIndex - 3].LowPrice <= (decimal)keltnerChannel3.LowerBand
+                || candlesticks[currentIndex - 4].LowPrice <= (decimal)keltnerChannel4.LowerBand;
         }
 
         private static bool GetOversoldDonchianConditions(List<CandlestickExtended> candlesticks, int currentIndex)
