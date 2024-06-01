@@ -1191,11 +1191,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return (candlesticks[currentIndex]?.LowPrice != null && donchianChannel?.LowerBand is not null && candlesticks[currentIndex].LowPrice <= (decimal)donchianChannel.LowerBand)
-                || (candlesticks[currentIndex - 1]?.LowPrice is not null && donchianChannel1?.LowerBand != null && candlesticks[currentIndex - 1].LowPrice <= (decimal)donchianChannel1.LowerBand)
-                || (candlesticks[currentIndex - 2]?.LowPrice is not null && donchianChannel2?.LowerBand != null && candlesticks[currentIndex - 2].LowPrice <= (decimal)donchianChannel2.LowerBand)
-                || (candlesticks[currentIndex - 3]?.LowPrice != null && donchianChannel3?.LowerBand is not null && candlesticks[currentIndex - 3].LowPrice <= (decimal)donchianChannel3.LowerBand)
-                || (candlesticks[currentIndex - 4]?.LowPrice != null && donchianChannel4?.LowerBand is not null && candlesticks[currentIndex - 4].LowPrice <= (decimal)donchianChannel4.LowerBand);
+            return (candlesticks[currentIndex]?.LowPrice != null && donchianChannel.LowerBand is not null && candlesticks[currentIndex].LowPrice <= (decimal)donchianChannel.LowerBand)
+                || (candlesticks[currentIndex - 1]?.LowPrice is not null && donchianChannel1.LowerBand != null && candlesticks[currentIndex - 1].LowPrice <= (decimal)donchianChannel1.LowerBand)
+                || (candlesticks[currentIndex - 2]?.LowPrice is not null && donchianChannel2.LowerBand != null && candlesticks[currentIndex - 2].LowPrice <= (decimal)donchianChannel2.LowerBand)
+                || (candlesticks[currentIndex - 3]?.LowPrice != null && donchianChannel3.LowerBand is not null && candlesticks[currentIndex - 3].LowPrice <= (decimal)donchianChannel3.LowerBand)
+                || (candlesticks[currentIndex - 4]?.LowPrice != null && donchianChannel4.LowerBand is not null && candlesticks[currentIndex - 4].LowPrice <= (decimal)donchianChannel4.LowerBand);
         }
 
         private static bool GetOversoldAroonConditions(List<CandlestickExtended> candlesticks, int currentIndex)
