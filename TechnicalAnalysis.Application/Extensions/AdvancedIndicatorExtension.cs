@@ -1553,11 +1553,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlesticks[currentIndex].HighPrice >= (decimal)keltnerChannel?.UpperBand
-                || candlesticks[currentIndex - 1].HighPrice >= (decimal)keltnerChannel1?.UpperBand
-                || candlesticks[currentIndex - 2].HighPrice >= (decimal)keltnerChannel2?.UpperBand
-                || candlesticks[currentIndex - 3].HighPrice >= (decimal)keltnerChannel3?.UpperBand
-                || candlesticks[currentIndex - 4].HighPrice >= (decimal)keltnerChannel4?.UpperBand;
+            return candlesticks[currentIndex].HighPrice >= (decimal)keltnerChannel.UpperBand
+                || candlesticks[currentIndex - 1].HighPrice >= (decimal)keltnerChannel1.UpperBand
+                || candlesticks[currentIndex - 2].HighPrice >= (decimal)keltnerChannel2.UpperBand
+                || candlesticks[currentIndex - 3].HighPrice >= (decimal)keltnerChannel3.UpperBand
+                || candlesticks[currentIndex - 4].HighPrice >= (decimal)keltnerChannel4.UpperBand;
         }
 
         private static bool GetOverboughtDonchianConditions(List<CandlestickExtended> candlesticks, int currentIndex)
