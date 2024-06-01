@@ -879,14 +879,14 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             if (
                  candlestick1?.TypicalPrice <= candlestick2?.LowPrice &&
-                 candlestick1?.Body >= candlestick1?.Range * 0.5m &&
-                 candlestick1.ClosePrice <= candlestick1?.OpenPrice &&
+                 candlestick1.Body >= candlestick1.Range * 0.5m &&
+                 candlestick1.ClosePrice <= candlestick1.OpenPrice &&
                  candlestick.Body >= candlestick.Range * 0.5m &&
                  candlestick.ClosePrice >= candlestick.OpenPrice &&
-                 candlestick1?.TypicalPrice <= candlestick.HighPrice &&
-                 candlestick1?.TypicalPrice >= candlestick.LowPrice &&
-                 candlestick.TypicalPrice <= candlestick1?.HighPrice &&
-                 candlestick.TypicalPrice >= candlestick1?.LowPrice
+                 candlestick1.TypicalPrice <= candlestick.HighPrice &&
+                 candlestick1.TypicalPrice >= candlestick.LowPrice &&
+                 candlestick.TypicalPrice <= candlestick1.HighPrice &&
+                 candlestick.TypicalPrice >= candlestick1.LowPrice
                 )
             {
                 candlestick.TypicalPriceReversals.Add(new TypicalPriceReversal(candlestick.PrimaryId)
