@@ -388,7 +388,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             var validTableNames = new HashSet<string> { "DexCandlesticks", "Pools" };
             if (!validTableNames.Contains(tableName))
             {
-                throw new ArgumentException("Invalid table");
+                return Result<string, string>.Fail("Invalid table");
             }
 
             string query = $"DELETE FROM \"{tableName}\" WHERE \"Id\" = ANY(@Ids)";
