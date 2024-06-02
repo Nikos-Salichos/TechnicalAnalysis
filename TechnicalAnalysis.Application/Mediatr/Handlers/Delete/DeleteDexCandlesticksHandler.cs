@@ -10,6 +10,10 @@ public class DeleteDexCandlesticksHandler(IPostgreSqlRepository repository) : IR
     public async Task<bool> Handle(DeleteDexCandlesticksCommand request, CancellationToken cancellationToken)
     {
         var result = await repository.DeleteEntitiesByIdsAsync<DexCandlestick>(request.Ids, tableName: "DexCandlesticks");
+        if (result.HasError)
+        {
+            return false;
+        }
         return result.IsSuccess;
     }
 }
