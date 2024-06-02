@@ -1,6 +1,5 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
@@ -8,7 +7,7 @@ using TechnicalAnalysis.Domain.Messages;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
-    public class Mailer(ILogger<Mailer> logger, IOptionsMonitor<MailSettings> settings) : IMailer
+    public class Mailer(IOptionsMonitor<MailSettings> settings) : IMailer
     {
         public async Task SendAsync(MailData mailData, CancellationToken cancellationToken)
         {
