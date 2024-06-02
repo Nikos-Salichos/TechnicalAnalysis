@@ -27,9 +27,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             foreach (var stockExchange in stockExchanges)
             {
-                Stock stock = new Stock();
-                stock.Symbol = stockExchange.Key;
-                stock.Exchange = stockExchange.Value;
+                Stock stock = new()
+                {
+                    Symbol = stockExchange.Key,
+                    Exchange = stockExchange.Value
+                };
                 // GetStockForecast(stock); //TODO In progress
                 // GetStockData(stock); //TODO In progress
                 stocks.Add(stock);
