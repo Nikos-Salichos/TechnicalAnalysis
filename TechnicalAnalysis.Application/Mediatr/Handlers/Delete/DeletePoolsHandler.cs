@@ -10,6 +10,10 @@ public class DeletePoolsHandler(IPostgreSqlRepository repository) : IRequestHand
     public async Task<bool> Handle(DeletePoolsCommand request, CancellationToken cancellationToken)
     {
         var result = await repository.DeleteEntitiesByIdsAsync<Pool>(request.Ids, tableName: "Pools");
+        if (result.HasError)
+        {
+            return false;
+        }
         return result.IsSuccess;
     }
 }
