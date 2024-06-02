@@ -52,12 +52,12 @@ namespace TechnicalAnalysis.Application.Extensions
 
             if (providerCandlestickSyncInfoProviderFound is null)
             {
-                var newProviderCandlestickSyncInfo = new ProviderCandlestickSyncInfo()
+                var newProviderCandlestickSyncInfo = new ProviderCandlestickSyncInfo
                 {
                     DataProvider = providerSynchronization.ProviderPairAssetSyncInfo.DataProvider,
                     Timeframe = timeframe,
+                    LastCandlestickSync = DateTime.UtcNow
                 };
-                newProviderCandlestickSyncInfo.LastCandlestickSync = DateTime.UtcNow;
                 providerSynchronization.CandlestickSyncInfos.Add(newProviderCandlestickSyncInfo);
                 return newProviderCandlestickSyncInfo;
             }
