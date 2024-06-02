@@ -8,6 +8,6 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.StockFearAndGreedContracts
         public int EpochUnixSeconds { get; set; }
 
         [JsonPropertyName("humanDate")]
-        public string HumanDate { get; set; }
+        public string? HumanDate { get; set; }
     }
 }
