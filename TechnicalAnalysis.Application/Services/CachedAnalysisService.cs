@@ -97,5 +97,8 @@ namespace TechnicalAnalysis.Application.Services
 
             return layerOneAssets;
         }
+
+        public Task<List<CandlestickExtended>> GetCustomCandlesticksAnalysisAsync(List<CustomCandlestickData> customCandlestickData)
+            => inner.GetCustomCandlesticksAnalysisAsync(customCandlestickData);
     }
 }
