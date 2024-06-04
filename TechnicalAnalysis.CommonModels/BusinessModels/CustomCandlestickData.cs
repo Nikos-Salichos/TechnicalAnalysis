@@ -7,7 +7,7 @@
         public required decimal LowPrice { get; init; }
         public required decimal ClosePrice { get; init; }
         public required decimal Volume { get; init; }
-        public DateTime OpenDate { get; init; }
-        public DateTime CloseDate { get; init; }
+        public required DateTime OpenDate { get; init; }
+        public required DateTime CloseDate { get; init; }
     }
 }
