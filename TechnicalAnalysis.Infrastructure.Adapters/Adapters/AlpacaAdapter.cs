@@ -43,7 +43,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG", "DVA", "CVX",
                     "KR", "HD", "WSO", "DE", "AME", "MKL", "HEI", "NVR", "TDG", "BN",
                     "RACE", "MU", "DJCO", "SYK", "PM", "ADP", "WAT", "PEP", "MKC", "FIS",
-                    "WTW", "CRH", "WBA", "WSO", "ASML", "ADBE", "REGN", "FTNT", "ODFL", "CPRT", "ACN", "ZTS"
+                    "WTW", "CRH", "WBA", "WSO", "ASML", "ADBE", "REGN", "FTNT", "ODFL", "CPRT", "ACN", "ZTS",
+                    "LOW", "FAST", "O", "MO", "APD", "VZ"
                 ];
 
             List<string> etfTickers =
@@ -56,7 +57,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             List<string> stocksWithHighProfitMargin =
                 [
-                    "FANG", "TSM", "TRI", "WPC", "JNJ", "AER", "UTHR", "PSA", "KSPI", "MA",
+                    "FANG", "TSM", "TRI", "WPC", "AER", "UTHR", "PSA", "KSPI", "MA",
                     "BAM", "MSCI", "EWBC", "RPRX", "ABNB", "LNG", "NVDA", "GLPI", "WPM", "BCH",
                     "V", "VRSN", "CME", "ARCC", "TPL", "FCNCA", "EMR", "VICI", "MSTR",
                     "CI", "DIS", "ELV", "BRK.B", "HD", "UPS", "NKE", "XOM", "CVX",
