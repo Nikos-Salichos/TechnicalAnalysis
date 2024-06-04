@@ -37,7 +37,7 @@ namespace TechnicalAnalysis.Application.Services
                 return [];
             }
 
-            await CalculateTechnicalIndicators(pairs);
+            await CalculateTechnicalIndicatorsAndStatistics(pairs);
 
             var pairsWithEnhancedScanCandlesticks = FilterPairs(pairs, c => c.EnhancedScans.Exists(e => e.EnhancedScanIsLong || e.EnhancedScanIsShort));
 
@@ -91,7 +91,7 @@ namespace TechnicalAnalysis.Application.Services
                 return [];
             }
 
-            await CalculateTechnicalIndicators(fetchedPairs);
+            await CalculateTechnicalIndicatorsAndStatistics(fetchedPairs);
 
             var indicatorReportsPerPair = new Dictionary<PairExtended, List<Indicator>>();
 
@@ -618,6 +618,22 @@ namespace TechnicalAnalysis.Application.Services
 
         }
 
+        private async Task CalculateTechnicalIndicatorsAndStatistics(List<PairExtended> pairs)
+        {
+            await CalculateTechnicalIndicators(pairs);
+
+            var cryptoMarketStatistic = await GetCryptoPairsWithEnhancedScanIsLong(pairs);
+            var etfStockMarketStatistic = await GetEtfStockPairWithEnhancedScanIsLong(pairs);
+
+            CalculateEnhancedIsLongBasedOnStatistics(cryptoMarketStatistic, pairs, p => p.Provider == DataProvider.Binance
+            || p.Provider == DataProvider.Uniswap
+            || p.Provider == DataProvider.Pancakeswap);
+
+            CalculateEnhancedIsLongBasedOnStatistics(etfStockMarketStatistic, pairs, p => p.Provider == DataProvider.Alpaca);
+
+            // pairs.CalculatePairStatistics();
+        }
+
         private async Task CalculateTechnicalIndicators(List<PairExtended> pairs)
         {
             var cryptoFearAndGreedDataTask = mediator.Send(new GetCryptoFearAndGreedIndexQuery());
@@ -635,17 +651,6 @@ namespace TechnicalAnalysis.Application.Services
 
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateBasicIndicators());
             Parallel.ForEach(pairs, ParallelConfig.GetOptions(), pair => pair.CalculateSignalIndicators(cryptoFearAndGreedDataPerDatetime, stockFearAndGreedDataPerDatetime));
-
-            var cryptoMarketStatistic = await GetCryptoPairsWithEnhancedScanIsLong(pairs);
-            var etfStockMarketStatistic = await GetEtfStockPairWithEnhancedScanIsLong(pairs);
-
-            CalculateEnhancedIsLongBasedOnStatistics(cryptoMarketStatistic, pairs, p => p.Provider == DataProvider.Binance
-            || p.Provider == DataProvider.Uniswap
-            || p.Provider == DataProvider.Pancakeswap);
-
-            CalculateEnhancedIsLongBasedOnStatistics(etfStockMarketStatistic, pairs, p => p.Provider == DataProvider.Alpaca);
-
-            // pairs.CalculatePairStatistics();
         }
 
         private async Task<List<PairExtended>> FormatAssetsPairsCandlesticks()
@@ -788,6 +793,33 @@ namespace TechnicalAnalysis.Application.Services
         {
             var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
             return fetchedAssets.Where(a => a.AssetType is ProductType.Layer1).OrderByDescending(a => a.CreatedDate).ToList();
+        }
+
+        public async Task<List<CandlestickExtended>> GetCustomCandlesticksAnalysisAsync(List<CustomCandlestickData> customCandlestickData)
+        {
+            var pair = new PairExtended();
+            foreach (var customCandlestick in customCandlestickData)
+            {
+                var candlestickExtended = new CandlestickExtended
+                {
+                    OpenPrice = customCandlestick.OpenPrice,
+                    HighPrice = customCandlestick.HighPrice,
+                    LowPrice = customCandlestick.LowPrice,
+                    ClosePrice = customCandlestick.ClosePrice,
+                    Volume = customCandlestick.Volume,
+                    OpenDate = customCandlestick.OpenDate,
+                    CloseDate = customCandlestick.CloseDate
+                };
+                pair.Candlesticks.Add(candlestickExtended);
+            }
+
+            var pairs = new List<PairExtended>
+            {
+                pair
+            };
+
+            await CalculateTechnicalIndicators(pairs);
+            return pair.Candlesticks;
         }
     }
 }
