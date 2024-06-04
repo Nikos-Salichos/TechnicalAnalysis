@@ -11,9 +11,11 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             if (property.PropertyType == typeof(decimal) || property.PropertyType == typeof(decimal?))
             {
-                decimal.TryParse(cell.ToString()?.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var value);
-                value = decimal.Round(value, 8);
-                property.SetValue(candlestick, value);
+                if (decimal.TryParse(cell.ToString()?.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
+                {
+                    value = decimal.Round(value, 8);
+                    property.SetValue(candlestick, value);
+                }
             }
             else if (property.PropertyType == typeof(DateTime))
             {
@@ -72,7 +74,7 @@ namespace TechnicalAnalysis.Application.Extensions
             return (MissingCandles: missingDates, MissingSymbols: missingSymbols);
         }
 
-        public static void FillMissingDates(this List<BinancePair> pairs)
+        public static void FillMissingDatesInDays(this List<BinancePair> pairs)
         {
             foreach (var pair in pairs.Select(p => p.BinanceCandlesticks))
             {
@@ -154,6 +156,5 @@ namespace TechnicalAnalysis.Application.Extensions
                 throw new ArgumentException($"Invalid valueClassification: {valueClassification}");
             }
         }
-
     }
 }
