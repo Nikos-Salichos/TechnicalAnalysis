@@ -4,14 +4,15 @@
     {
         public static void AddInfrastructureHostModule(this WebApplicationBuilder webApplicationBuilder, IConfiguration configuration)
         {
-            var apiKeyOptions = configuration.GetSection("ApiKey");
+            var apiKeySection = configuration.GetSection("ApiKey");
+            var baseAddressSection = configuration.GetSection("BaseAddress");
 
             // Configure HttpClient for all environments
             webApplicationBuilder.Services.AddHttpClient("taapi", client =>
             {
-                client.BaseAddress = new Uri("http://host.docker.internal:5000/api/v1/analysis/");
+                client.BaseAddress = new Uri(baseAddressSection.Value ?? throw new ArgumentNullException($"{nameof(baseAddressSection.Value)} cannot be null"));
                 client.DefaultRequestHeaders.Add("User-Agent", "Tracking prices application");
-                client.DefaultRequestHeaders.Add("ApiKey", apiKeyOptions.Value);
+                client.DefaultRequestHeaders.Add("ApiKey", apiKeySection.Value);
             })
             // Add a delegating handler in the development environment which bypasses SSL validation
             .ConfigurePrimaryHttpMessageHandler(() =>
