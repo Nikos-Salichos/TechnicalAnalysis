@@ -126,5 +126,28 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.Equal($"Invalid period: {period}", exception.Message);
         }
 
+        [Theory]
+        [InlineData("EXTREMEFEAR", ValueClassificationType.ExtremeFear)]
+        [InlineData("FEAR", ValueClassificationType.Fear)]
+        [InlineData("NEUTRAL", ValueClassificationType.Neutral)]
+        [InlineData("GREED", ValueClassificationType.Greed)]
+        [InlineData("EXTREMEGREED", ValueClassificationType.ExtremeGreed)]
+        [InlineData("extremefear", ValueClassificationType.ExtremeFear)]
+        [InlineData("fear", ValueClassificationType.Fear)]
+        [InlineData("neutral", ValueClassificationType.Neutral)]
+        [InlineData("greed", ValueClassificationType.Greed)]
+        [InlineData("extremegreed", ValueClassificationType.ExtremeGreed)]
+        [InlineData(" EXTREME FEAR ", ValueClassificationType.ExtremeFear)]
+        [InlineData(" FEAR ", ValueClassificationType.Fear)]
+        [InlineData(" NEUTRAL ", ValueClassificationType.Neutral)]
+        [InlineData(" GREED ", ValueClassificationType.Greed)]
+        [InlineData(" EXTREME GREED ", ValueClassificationType.ExtremeGreed)]
+        public void ToValueClassificationType_ReturnsCorrectValueClassificationType_ForValidInputs(string valueClassification,
+    ValueClassificationType expectedType)
+        {
+            var result = valueClassification.ToValueClassificationType();
+            Assert.Equal(expectedType, result);
+        }
+
     }
 }
