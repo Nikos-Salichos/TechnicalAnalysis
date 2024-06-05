@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using TechnicalAnalysis.CommonModels.ApiRequests;
+using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
@@ -89,6 +90,17 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         public async Task<IActionResult> GetLayerOneAssetsAsync()
         {
             var result = await analysisService.GetLayerOneAssetsAsync();
+            return Ok(result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+        [HttpPost("CustomCandlesticks")]
+        [EnableRateLimiting("fixed-by-ip")]
+        public async Task<IActionResult> GetCustomCandlesticksAnalysisAsync([FromBody] List<CustomCandlestickData> customCandlestickData)
+        {
+            var result = await analysisService.GetCustomCandlesticksAnalysisAsync(customCandlestickData);
             return Ok(result);
         }
     }
