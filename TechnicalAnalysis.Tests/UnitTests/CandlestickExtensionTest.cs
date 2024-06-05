@@ -143,7 +143,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
         [InlineData(" GREED ", ValueClassificationType.Greed)]
         [InlineData(" EXTREME GREED ", ValueClassificationType.ExtremeGreed)]
         public void ToValueClassificationType_ReturnsCorrectValueClassificationType_ForValidInputs(string valueClassification,
-    ValueClassificationType expectedType)
+            ValueClassificationType expectedType)
         {
             var result = valueClassification.ToValueClassificationType();
             Assert.Equal(expectedType, result);
