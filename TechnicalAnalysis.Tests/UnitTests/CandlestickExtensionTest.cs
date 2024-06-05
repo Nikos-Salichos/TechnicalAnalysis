@@ -52,5 +52,18 @@ namespace TechnicalAnalysis.Tests.UnitTests
 
             Assert.Equal(new DateTime(2021, 1, 1, 0, 0, 0), candlestick.OpenTime);
         }
+
+        [Fact]
+        public void ParseCandlestickData_SetsLongProperty_Correctly()
+        {
+            var candlestick = new BinanceCandlestick();
+            var cell = "100000";
+            var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.Volume));
+
+            CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
+
+            Assert.Equal(100000L, candlestick.Volume);
+        }
+
     }
 }
