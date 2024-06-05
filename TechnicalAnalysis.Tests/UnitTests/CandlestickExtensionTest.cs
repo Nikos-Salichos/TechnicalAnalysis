@@ -1,4 +1,5 @@
 ﻿using TechnicalAnalysis.Application.Extensions;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 
 namespace TechnicalAnalysis.Tests.UnitTests
@@ -99,6 +100,19 @@ namespace TechnicalAnalysis.Tests.UnitTests
             CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
 
             Assert.Null(candlestick.Volume);
+        }
+
+        [Theory]
+        [InlineData("1d", Timeframe.Daily)]
+        [InlineData("1w", Timeframe.Weekly)]
+        [InlineData("1h", Timeframe.OneHour)]
+        [InlineData("1D", Timeframe.Daily)]
+        [InlineData("1W", Timeframe.Weekly)]
+        [InlineData("1H", Timeframe.OneHour)]
+        public void ToTimeFrame_ReturnsCorrectTimeframe_ForValidPeriods(string period, Timeframe expectedTimeframe)
+        {
+            var result = period.ToTimeFrame();
+            Assert.Equal(expectedTimeframe, result);
         }
 
     }
