@@ -77,5 +77,17 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.Null(candlestick.OpenPrice);
         }
 
+        [Fact]
+        public void ParseCandlestickData_DoesNotSetInvalidDateTimeProperty()
+        {
+            var candlestick = new BinanceCandlestick();
+            var cell = "invalid";
+            var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.OpenTime));
+
+            CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
+
+            Assert.Equal(default, candlestick.OpenTime);
+        }
+
     }
 }
