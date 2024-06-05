@@ -40,5 +40,17 @@ namespace TechnicalAnalysis.Tests.UnitTests
 
             Assert.Equal(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc), candlestick.OpenTime);
         }
+
+        [Fact]
+        public void ParseCandlestickData_SetsDateTimeProperty_CorrectlyFromString()
+        {
+            var candlestick = new BinanceCandlestick();
+            var cell = "2021-01-01T00:00:00";
+            var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.OpenTime));
+
+            CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
+
+            Assert.Equal(new DateTime(2021, 1, 1, 0, 0, 0), candlestick.OpenTime);
+        }
     }
 }
