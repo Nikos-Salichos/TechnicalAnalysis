@@ -65,5 +65,17 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.Equal(100000L, candlestick.Volume);
         }
 
+        [Fact]
+        public void ParseCandlestickData_DoesNotSetInvalidDecimalProperty()
+        {
+            var candlestick = new BinanceCandlestick();
+            var cell = "invalid";
+            var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.OpenPrice));
+
+            CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
+
+            Assert.Null(candlestick.OpenPrice);
+        }
+
     }
 }
