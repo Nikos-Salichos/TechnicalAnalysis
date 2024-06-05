@@ -115,5 +115,16 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.Equal(expectedTimeframe, result);
         }
 
+
+        [Theory]
+        [InlineData("2d")]
+        [InlineData("1m")]
+        [InlineData("daily")]
+        public void ToTimeFrame_ThrowsArgumentException_ForInvalidPeriods(string period)
+        {
+            var exception = Assert.Throws<ArgumentException>(() => period.ToTimeFrame());
+            Assert.Equal($"Invalid period: {period}", exception.Message);
+        }
+
     }
 }
