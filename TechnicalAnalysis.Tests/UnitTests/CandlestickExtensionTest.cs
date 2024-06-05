@@ -89,5 +89,17 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.Equal(default, candlestick.OpenTime);
         }
 
+        [Fact]
+        public void ParseCandlestickData_DoesNotSetInvalidLongProperty()
+        {
+            var candlestick = new BinanceCandlestick();
+            var cell = "invalid";
+            var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.Volume));
+
+            CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
+
+            Assert.Null(candlestick.Volume);
+        }
+
     }
 }
