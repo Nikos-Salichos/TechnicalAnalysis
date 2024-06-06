@@ -12,6 +12,6 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
         public bool IsActive { get; init; }
         public bool AllCandles { get; init; }
         public DateTime CreatedAt { get; } = DateTime.UtcNow;
-        public List<BinanceCandlestick> BinanceCandlesticks { get; set; } = new List<BinanceCandlestick>();
+        public List<BinanceCandlestick> BinanceCandlesticks { get; set; } = [];
     }
 }
