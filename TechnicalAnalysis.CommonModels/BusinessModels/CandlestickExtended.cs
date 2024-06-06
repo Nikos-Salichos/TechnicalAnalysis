@@ -118,5 +118,4 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
                   ? null
                   : Liquidity / TotalValueLockedUsd;
     }
-
 }
