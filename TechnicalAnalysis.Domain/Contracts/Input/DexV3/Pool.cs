@@ -4,7 +4,6 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.DexV3
 {
     public class Pool : BaseDexContract
     {
-
         [JsonPropertyName("id")]
         public string PoolId { get; init; } = string.Empty;
 
@@ -22,11 +21,8 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.DexV3
         [JsonPropertyName("totalValueLockedUSD")]
         public override string TotalValueLockedRawData
         {
-            get { return base.TotalValueLockedRawData; }
-            set
-            {
-                base.TotalValueLockedRawData = value; // call the base setter to maintain the original logic
-            }
+            get => base.TotalValueLockedRawData;
+            set => base.TotalValueLockedRawData = value; // call the base setter to maintain the original logic
         }
     }
 }
