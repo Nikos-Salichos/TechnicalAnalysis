@@ -615,7 +615,6 @@ namespace TechnicalAnalysis.Application.Services
                     }
                 }
             });
-
         }
 
         private async Task CalculateTechnicalIndicatorsAndStatistics(List<PairExtended> pairs)
