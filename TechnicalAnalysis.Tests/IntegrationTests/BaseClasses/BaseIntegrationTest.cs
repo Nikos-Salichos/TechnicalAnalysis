@@ -5,6 +5,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.BaseClasses
 {
     public abstract class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>, IDisposable
     {
+        private bool _disposed;
         private readonly IServiceScope _serviceScope;
         protected readonly IPostgreSqlRepository PostgreSqlRepository;
 
@@ -16,7 +17,29 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.BaseClasses
 
         public void Dispose()
         {
-            _serviceScope?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // Dispose managed resources here
+                    _serviceScope?.Dispose();
+                }
+
+                // Dispose unmanaged resources here
+
+                _disposed = true;
+            }
+        }
+
+        ~BaseIntegrationTest()
+        {
+            Dispose(false);
         }
     }
 }
