@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.CommonModels.OutputContract
         public decimal? Close { get; init; }
 
         [JsonPropertyName("OPENED_AT")]
-        public string OpenedAt { get; init; }
+        public string? OpenedAt { get; init; }
 
         public List<EnhancedScan> EnhancedScans { get; init; } = [];
     }
