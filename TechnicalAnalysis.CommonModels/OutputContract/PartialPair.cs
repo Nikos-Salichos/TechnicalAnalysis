@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.CommonModels.OutputContract
     public class PartialPair
     {
         [JsonPropertyName("symbol")]
-        public string Symbol { get; init; }
+        public string? Symbol { get; init; }
 
         [JsonPropertyName("candles")]
         public IEnumerable<Candle> Candles { get; init; } = [];
