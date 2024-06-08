@@ -91,8 +91,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         {
             var fetchedTokensResult = await mediator.Send(new GetAssetsQuery());
 
-            HashSet<string> existingSymbols = new HashSet<string>(fetchedTokensResult.Select(t => t.Symbol));
-            List<Asset> newAssets = new List<Asset>();
+            HashSet<string> existingSymbols = new(fetchedTokensResult.Select(t => t.Symbol));
+            List<Asset> newAssets = new();
 
             foreach (var pool in pools)
             {
@@ -125,8 +125,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 p.Token1.Symbol == Constants.Usdt ||
                 p.Token1.Symbol == Constants.Usdc ||
                 p.Token1.Symbol == Constants.Busd ||
-                p.Token1.Symbol == Constants.Dai
-            ).ToList();
+                p.Token1.Symbol == Constants.Dai).ToList();
         }
 
         private async Task SavePools(List<Pool> pools, DataProvider provider)
