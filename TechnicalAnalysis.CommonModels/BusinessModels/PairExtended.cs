@@ -5,19 +5,19 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
     public sealed class PairExtended : BaseEntity, IEquatable<PairExtended>
     {
-        public string Symbol { get; set; }
-        public string ContractAddress { get; init; }
+        public string? Symbol { get; set; }
+        public string? ContractAddress { get; init; }
         public long BaseAssetId { get; set; }
         public long QuoteAssetId { get; set; }
-        public string BaseAssetContract { get; init; }
-        public string QuoteAssetContract { get; init; }
-        public string BaseAssetName { get; set; }
-        public string QuoteAssetName { get; set; }
+        public string? BaseAssetContract { get; init; }
+        public string? QuoteAssetContract { get; init; }
+        public string? BaseAssetName { get; set; }
+        public string? QuoteAssetName { get; set; }
         public DataProvider Provider { get; set; }
         public bool IsActive { get; set; } = true;
         public bool AllCandles { get; init; }
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-        public string FeeTier { get; init; }
+        public string? FeeTier { get; init; }
         public decimal? Fees { get; init; }
         public long? Liquidity { get; init; }
         public decimal? TotalValueLocked { get; init; }
