@@ -9,10 +9,10 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.RepositoryTests
         [Fact]
         public async Task ExecuteAssetsCommand_Successful()
         {
-            List<Asset> assets = new()
-            {
+            List<Asset> assets =
+            [
                 new() { Symbol = "TestContainersAsset" },
-            };
+            ];
 
             await PostgreSqlRepository.InsertAssetsAsync(assets);
 
@@ -25,11 +25,11 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.RepositoryTests
         [Fact]
         public async Task InsertAssetsAsync_ThrowsPostgresExceptionOnDuplicateKey()
         {
-            List<Asset> assets = new()
-            {
+            List<Asset> assets =
+            [
                 new() { Symbol = "BTC"},
                 new() { Symbol = "BTC"},
-            };
+            ];
 
             var exception = await Assert.ThrowsAsync<Npgsql.PostgresException>(() => PostgreSqlRepository.InsertAssetsAsync(assets));
 
