@@ -45,10 +45,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Modules
                 options.Providers.Add<BrotliCompressionProvider>();
             });
 
-            services.Configure<BrotliCompressionProviderOptions>(options =>
-            {
-                options.Level = CompressionLevel.Optimal;
-            });
+            services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
 
             return services;
         }
