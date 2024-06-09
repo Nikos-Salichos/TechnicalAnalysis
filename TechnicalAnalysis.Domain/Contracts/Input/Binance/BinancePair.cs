@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
     public class BinancePair
     {
         public long Id { get; init; }
-        public string Pair { get; init; } = string.Empty;
+        public string? Pair { get; init; }
         public long BaseAssetId { get; init; }
         public long QuoteAssetId { get; init; }
         public DataProvider Provider { get; init; }
