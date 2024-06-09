@@ -11,7 +11,7 @@
         public decimal? ClosePositionPrice { get; set; }
         public decimal? OpenProfitAndLoss { get; set; }
         public bool OpenPosition { get; set; }
-        public string SignalType { get; set; } = string.Empty;
+        public string? SignalType { get; set; }
 
         public TimeSpan DaysInPosition
             => ClosePositionDate - OpenPositionDate;
