@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
     public class BinanceExchangeInfoResponse
     {
         [JsonPropertyName("timezone")]
-        public string Timezone { get; init; } = string.Empty;
+        public string? Timezone { get; init; }
 
         [JsonPropertyName("serverTime")]
         public long ServerTime { get; init; }
