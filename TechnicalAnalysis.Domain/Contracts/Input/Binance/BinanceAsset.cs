@@ -3,7 +3,7 @@
     public sealed class BinanceAsset : IEquatable<BinanceAsset>
     {
         public long Id { get; init; }
-        public string Asset { get; init; } = string.Empty;
+        public string? Asset { get; init; }
 
         public bool Equals(BinanceAsset? other)
         {
