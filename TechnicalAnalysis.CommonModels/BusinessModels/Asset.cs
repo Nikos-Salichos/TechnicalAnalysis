@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
     public sealed class Asset : BaseEntity, IEquatable<Asset>
     {
-        public string Symbol { get; init; } = string.Empty;
+        public string? Symbol { get; init; }
         public DateTime CreatedDate { get; } = DateTime.UtcNow;
         public ProductType AssetType { get; init; }
 
