@@ -55,7 +55,10 @@ namespace TechnicalAnalysis.Application.Extensions
                         var currentOtherPairCandlestickSubset = new ArraySegment<double>(otherPairCandles, 0, i + 1);
 
                         var correlation = Correlation.Pearson(currentOtherPairCandlestickSubset, currentCandlestickSubset);
-                        pair.Candlesticks[i].CorrelationPerPair.TryAdd(correlatedPair.BaseAssetName, correlation);
+                        if (correlatedPair.BaseAssetName != null)
+                        {
+                            pair.Candlesticks[i].CorrelationPerPair.TryAdd(correlatedPair.BaseAssetName, correlation);
+                        }
                     }
                 }
             });
