@@ -11,7 +11,7 @@ namespace TechnicalAnalysis.CommonModels.OutputContract
         public int Sell { get; set; }
 
         [JsonPropertyName("OPENED_AT")]
-        public string OpenedAt { get; set; } = string.Empty;
+        public string? OpenedAt { get; set; }
         public decimal? EntryPrice { get; init; }
     }
 }
