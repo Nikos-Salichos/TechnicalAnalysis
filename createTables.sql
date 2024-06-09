@@ -685,15 +685,6 @@ ALTER TABLE ONLY public."Pairs"
 
 
 --
--- TOC entry 3301 (class 2606 OID 48763)
--- Name: Pools fk_assets_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."Pools"
-    ADD CONSTRAINT fk_assets_id FOREIGN KEY ("Id") REFERENCES public."Assets"("Id") NOT VALID;
-
-
---
 -- TOC entry 3299 (class 2606 OID 48768)
 -- Name: ProviderCandlestickSyncInfos fk_provider_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
