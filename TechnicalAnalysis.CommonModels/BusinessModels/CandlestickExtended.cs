@@ -9,7 +9,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
     public class CandlestickExtended : BaseEntity
     {
         public long PoolOrPairId { get; set; }
-        public string PoolOrPairName { get; set; } = string.Empty;
+        public string? PoolOrPairName { get; set; }
         public decimal? OpenPrice { get; set; }
         public decimal? HighPrice { get; set; }
         public decimal? LowPrice { get; set; }
