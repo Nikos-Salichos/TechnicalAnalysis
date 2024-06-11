@@ -9,12 +9,12 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.DexV3
         public long Id { get; init; }
 
         [JsonPropertyName("id")]
-        public string TokenId { get; init; } = string.Empty;
+        public string? TokenId { get; init; }
         public Chain ChainId { get; init; }
-        public string Symbol { get; init; } = string.Empty;
-        public string Name { get; init; } = string.Empty;
+        public string? Symbol { get; init; }
+        public string? Name { get; init; }
 
         [JsonPropertyName("TokenDayData")]
-        public List<Data> TokenDayData { get; init; }
+        public List<Data> TokenDayData { get; init; } = [];
     }
 }
