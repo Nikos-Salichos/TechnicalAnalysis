@@ -2,7 +2,7 @@
 {
     public class EnhancedPairResult
     {
-        public string Symbol { get; init; } = string.Empty;
+        public string? Symbol { get; init; }
         public List<EnhancedScanGroup> EnhancedScans { get; init; } = [];
     }
 }
