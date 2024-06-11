@@ -5,9 +5,9 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.DexV3
     public class Pool : BaseDexContract
     {
         [JsonPropertyName("id")]
-        public string PoolId { get; init; } = string.Empty;
+        public string? PoolId { get; init; }
 
-        public string FeeTier { get; init; } = string.Empty;
+        public string? FeeTier { get; init; }
 
         [JsonPropertyName("token0")]
         public Token Token0 { get; init; } = new Token();
@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.DexV3
         public IEnumerable<Data> PoolDayData { get; init; } = [];
 
         [JsonPropertyName("totalValueLockedUSD")]
-        public override string TotalValueLockedRawData
+        public override string? TotalValueLockedRawData
         {
             get => base.TotalValueLockedRawData;
             set => base.TotalValueLockedRawData = value; // call the base setter to maintain the original logic
