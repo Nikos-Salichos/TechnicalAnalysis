@@ -17,13 +17,13 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.CoinMarketCap
         public int Id { get; init; }
 
         [JsonPropertyName("name")]
-        public string Name { get; init; }
+        public string? Name { get; init; }
 
         [JsonPropertyName("symbol")]
-        public string Symbol { get; init; }
+        public string? Symbol { get; init; }
 
         [JsonPropertyName("slug")]
-        public string Slug { get; init; }
+        public string? Slug { get; init; }
 
         [JsonPropertyName("num_market_pairs")]
         public int NumMarketPairs { get; init; }
@@ -44,7 +44,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.CoinMarketCap
         public int ErrorCode { get; init; }
 
         [JsonPropertyName("error_message")]
-        public string ErrorMessage { get; init; }
+        public string? ErrorMessage { get; init; }
 
         [JsonPropertyName("elapsed")]
         public int Elapsed { get; init; }
