@@ -45,7 +45,7 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Cnn
         public double Score { get; init; }
 
         [JsonPropertyName("rating")]
-        public string Rating { get; init; }
+        public string? Rating { get; init; }
     }
 
     public class CnnFearAndGreedHistorical
