@@ -642,7 +642,6 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (pair.Symbol == "CREAM-USDT" && candlestick.CloseDate.Date == new DateTime(2024, 03, 29))
                 {
-
                 }
 
                 bool[] conditions =
@@ -1416,12 +1415,6 @@ namespace TechnicalAnalysis.Application.Extensions
 
             return rateOfChange?.Value >= rateOfChange1?.Value;
         }
-
-
-
-
-
-
 
         private static bool GetOverboughtRsiConditions(List<CandlestickExtended> candlesticks, int currentIndex)
         {
