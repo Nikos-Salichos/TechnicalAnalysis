@@ -1,7 +1,10 @@
-﻿namespace TechnicalAnalysis.Domain.Settings
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TechnicalAnalysis.Domain.Settings
 {
     public class DatabaseSetting
     {
-        public string PostgreSqlTechnicalAnalysisDockerCompose { get; init; } = string.Empty;
+        [Required]
+        public required string? PostgreSqlTechnicalAnalysisDockerCompose { get; init; }
     }
 }
