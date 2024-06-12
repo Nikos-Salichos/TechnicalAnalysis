@@ -2,6 +2,6 @@
 {
     public class CnnApiSetting
     {
-        public string StockFearAndGreedUri { get; init; } = string.Empty;
+        public string? StockFearAndGreedUri { get; init; }
     }
 }
