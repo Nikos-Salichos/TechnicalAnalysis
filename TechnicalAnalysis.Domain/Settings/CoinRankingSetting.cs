@@ -2,7 +2,7 @@
 {
     public class CoinRankingSetting
     {
-        public string ApiKey { get; init; } = string.Empty;
-        public string ListingsLatestEndpoint { get; init; } = string.Empty;
+        public string? ApiKey { get; init; }
+        public string? ListingsLatestEndpoint { get; init; }
     }
 }
