@@ -424,7 +424,5 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 }
             }
         }
-
-
     }
 }
