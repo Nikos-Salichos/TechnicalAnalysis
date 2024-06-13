@@ -43,7 +43,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Modules
                 });
             });
 
-            services.AddOptions<DatabaseSetting>().Bind(configuration.GetSection("ConnectionStrings"));
+            services.AddOptions<DatabaseSetting>().Bind(configuration.GetSection("ConnectionStrings")).ValidateDataAnnotations();
 
             SqlMapper.AddTypeHandler(new ValueClassificationTypeHandler());
         }
