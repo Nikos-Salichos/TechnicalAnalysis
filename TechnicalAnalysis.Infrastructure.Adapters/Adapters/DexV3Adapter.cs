@@ -91,7 +91,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         {
             var fetchedTokensResult = await mediator.Send(new GetAssetsQuery());
 
-            HashSet<string> existingSymbols = new(fetchedTokensResult.Select(t => t.Symbol));
+            HashSet<string> existingSymbols = new(fetchedTokensResult
+                .Where(t => t.Symbol != null)
+                .Select(t => t.Symbol!));
+
             List<Asset> newAssets = new();
 
             foreach (var pool in pools)
@@ -166,10 +169,20 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 }
             }
 
-            var pairsHashSet = new HashSet<(string poolContractAddress, DataProvider Provider)>(pairs.Select(p => (p.ContractAddress, p.Provider)));
-            var uniquePairs = newPairs.Where(np => !pairsHashSet.Contains((np.ContractAddress, np.Provider))).ToList();
+            var pairsHashSet = new HashSet<(string poolContractAddress, DataProvider Provider)>(
+                pairs.Select(p => p.ContractAddress != null
+                                                    ? (p.ContractAddress, p.Provider)
+                                                    : default)
+                     .Where(pair => pair != default));
 
-            await mediator.Send(new InsertPoolsCommand(uniquePairs.DexPoolToEntityPool()));
+            var uniquePairs = newPairs
+                .Where(np => np.ContractAddress != null && !pairsHashSet.Contains((np.ContractAddress!, np.Provider)))
+                .ToList();
+
+            if (uniquePairs.Count > 0)
+            {
+                await mediator.Send(new InsertPoolsCommand(uniquePairs.DexPoolToEntityPool()));
+            }
         }
 
         private async Task SaveCandlesticks(PoolResponse poolResponse, DataProvider provider)
@@ -251,7 +264,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 }
             }
 
-            await mediator.Send(new InsertDexCandlesticksCommand(newCandlesticks.DexToEntityCandlestick()));
+            if (newCandlesticks.Count > 0)
+            {
+                await mediator.Send(new InsertDexCandlesticksCommand(newCandlesticks.DexToEntityCandlestick()));
+            }
         }
     }
 }
