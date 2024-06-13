@@ -10,6 +10,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.SqlHandlers
         {
             return (ValueClassificationType)Enum.ToObject(typeof(ValueClassificationType), value);
         }
+
         public override void SetValue(IDbDataParameter parameter, ValueClassificationType value)
         {
             parameter.Value = (long)value;
