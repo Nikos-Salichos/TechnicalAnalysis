@@ -85,7 +85,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
         {
             var fetchedPairsTask = mediator.Send(new GetPairsQuery());
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
-            var assetDictionary = fetchedAssets.ToDictionary(asset => asset.Symbol, asset => asset.PrimaryId);
+            var assetDictionary = fetchedAssets
+                .Where(asset => asset.Symbol != null)
+                .ToDictionary(asset => asset.Symbol!, asset => asset.PrimaryId);
 
             var binancePairs = tradeableBinancePairs.ConvertAll(tradeablePair => new PairExtended
             {
