@@ -25,7 +25,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                  => await _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
                 logger.LogInformation("SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
-                 binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
+                binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
