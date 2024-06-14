@@ -25,7 +25,7 @@ namespace TechnicalAnalysis.Domain.Builders
             return this;
         }
 
-        public ICandlestickBuilder WithPoolOrPairName(string poolOrPairName)
+        public ICandlestickBuilder WithPoolOrPairName(string? poolOrPairName)
         {
             _candlestick.PoolOrPairName = poolOrPairName;
             return this;
