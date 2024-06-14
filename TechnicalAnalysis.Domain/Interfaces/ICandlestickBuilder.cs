@@ -7,7 +7,7 @@ namespace TechnicalAnalysis.Domain.Interfaces
     {
         ICandlestickBuilder WithId(long id);
         ICandlestickBuilder WithPoolOrPairId(long pairId);
-        ICandlestickBuilder WithPoolOrPairName(string poolOrPairName);
+        ICandlestickBuilder WithPoolOrPairName(string? poolOrPairName);
         ICandlestickBuilder WithOpenPrice(decimal? openPrice);
         ICandlestickBuilder WithHighPrice(decimal? highPrice);
         ICandlestickBuilder WithLowPrice(decimal? lowPrice);
