@@ -29,23 +29,161 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             List<string> tenStocksToOwnForever =
                 [
-                "ZTS","ODFL", "SYK", "LVMH", "CSU", "GAW", "MKL", "WSO", "BRO", "BRK"
+                "ZTS","ODFL", "SYK", "LVMH", "CSU", "MKL", "WSO", "BRO", "BRK"
                 ];
 
             //Add more stocks from here: https://www.wallstreetzen.com/stock-screener?p=1&s=mc&sd=desc&t=1
             //Check top owned stocks: https://www.dataroma.com/m/home.php
             List<string> stockTickers =
                 [
-                    "nke", "ba", "tsla", "aapl", "googl", "abnb", "XOM", "WMT", "META",
-                    "JPM", "V", "KO", "PEP", "MCD", "AVGO", "ACN", "NFLX", "WCF", "ABDE",
-                    "MA", "BAC", "MS", "SCHW", "RY", "NVDA", "CRM", "VZ", "IBM",
-                    "PYPL", "IWD", "IJH", "BRK.A", "AMZN", "GIS", "KLG", "KHC", "MDLZ", "PG",
-                    "LLY", "NVO", "BRK.B", "UNH", "ABBV", "AMD", "TM", "MRK", "GOOG", "DVA", "CVX",
-                    "KR", "HD", "WSO", "DE", "AME", "MKL", "HEI", "NVR", "TDG", "BN",
+                    "nke", "ba", "tsla", "aapl", "abnb", "WMT",
+                    "WCF", "ABDE", "RY", "CRM", "VZ",
+                    "IWD", "IJH", "BRK.A", "GIS", "KLG", "KHC", "MDLZ",
+                    "NVO", "TM", "MRK", "GOOG", "DVA",
+                    "KR", "WSO", "DE", "AME", "MKL", "HEI", "NVR", "TDG", "BN",
                     "RACE", "MU", "DJCO", "SYK", "PM", "ADP", "WAT", "PEP", "MKC", "FIS",
                     "WTW", "CRH", "WBA", "WSO", "ASML", "ADBE", "REGN", "FTNT", "ODFL", "CPRT", "ACN", "ZTS",
-                    "LOW", "FAST", "O", "MO", "APD", "VZ"
+                    "LOW", "MO"
                 ];
+
+            List<string> dividendAristocrats =
+                [
+                    "O",         // Realty Income Corp.
+                    "BEN",       // Franklin Resources, Inc.
+                    "AMCR",      // Amcor Plc
+                    "TROW",      // T. Rowe Price Group Inc.
+                    "FRT",       // Federal Realty Investment Trust
+                    "IBM",       // International Business Machines Corp.
+                    "ABBV",      // Abbvie Inc
+                    "CVX",       // Chevron Corp.
+                    "KVUE",      // Kenvue Inc
+                    "ESS",       // Essex Property Trust, Inc.
+                    "SJM",       // J.M. Smucker Co.
+                    "KMB",       // Kimberly-Clark Corp.
+                    "SWK",       // Stanley Black & Decker Inc
+                    "ED",        // Consolidated Edison, Inc.
+                    "CLX",       // Clorox Co.
+                    "JNJ",       // Johnson & Johnson
+                    "MDT",       // Medtronic Plc
+                    "ADM",       // Archer Daniels Midland Co.
+                    "HRL",       // Hormel Foods Corp.
+                    "XOM",       // Exxon Mobil Corp.
+                    "KO",        // Coca-Cola Co
+                    "CHRW",      // C.H. Robinson Worldwide, Inc.
+                    "PEP",       // PepsiCo Inc
+                    "APD",       // Air Products & Chemicals Inc.
+                    "NEE",       // NextEra Energy Inc
+                    "CINF",      // Cincinnati Financial Corp.
+                    "SYY",       // Sysco Corp.
+                    "TGT",       // Target Corp
+                    "ATO",       // Atmos Energy Corp.
+                    "GPC",       // Genuine Parts Co.
+                    "MCD",       // McDonald's Corp
+                    "PG",        // Procter & Gamble Co.
+                    "AFL",       // Aflac Inc.
+                    "ADP",       // Automatic Data Processing Inc.
+                    "FAST",      // Fastenal Co.
+                    "ITW",       // Illinois Tool Works, Inc.
+                    "MKC",       // McCormick & Co., Inc.
+                    "ABT",       // Abbott Laboratories
+                    "CL",        // Colgate-Palmolive Co.
+                    "CAH",       // Cardinal Health, Inc.
+                    "GD",        // General Dynamics Corp.
+                    "LOW",       // Lowe's Cos., Inc.
+                    "PPG",       // PPG Industries, Inc.
+                    "BF.B",      // Brown-Forman Corp.
+                    "EMR",       // Emerson Electric Co.
+                    "BDX",       // Becton Dickinson & Co.
+                    "AOS",       // A.O. Smith Corp.
+                    "CAT",       // Caterpillar Inc.
+                    "WMT",       // Walmart Inc
+                    "CB",        // Chubb Limited
+                    "LIN",       // Linde Plc.
+                    "NUE",       // Nucor Corp.
+                    "ALB",       // Albemarle Corp.
+                    "EXPD",      // Expeditors International Of Washington, Inc.
+                    "CHD",       // Church & Dwight Co., Inc.
+                    "DOV",       // Dover Corp.
+                    "PNR",       // Pentair plc
+                    "ECL",       // Ecolab, Inc.
+                    "NDSN",      // Nordson Corp.
+                    "SHW",       // Sherwin-Williams Co.
+                    "GWW",       // W.W. Grainger Inc.
+                    "CTAS",      // Cintas Corporation
+                    "SPGI",      // S&P Global Inc
+                    "BRO",       // Brown & Brown, Inc.
+                    "ROP",       // Roper Technologies Inc
+                    "WST"        // West Pharmaceutical Services, Inc.
+                ];
+
+            List<string> semiconductors =
+                [
+                    // IP and R&D
+                    "SNPS",    // Synopsys
+                    "CDNS",    // Cadence
+                    "QCOM",    // Qualcomm
+                    "ANSS",    // Ansys
+                    "KEYS",    // Keysight Technologies
+                    "SIEGY",   // Siemens
+                    "CEVA",    // CEVA
+                    "RMBS",    // Rambus
+                
+                    // Equipment & Components
+                    "ASMIY",   // ASM International
+                    "ASML",    // ASML
+                    "AIXA.DE", // Aixtron
+                    "CAJ",     // Canon
+                    "HTHIY",   // Hitachi
+                    "ACMR",    // ACM Research
+                    "LRCX",    // Lam Research
+                    "KLAC",    // KLA
+                    "AMAT",    // Applied Materials
+                    "TOELY",   // Tokyo Electron
+                    "NINOY",   // Nikon
+                    "BESI.AS", // Besi
+                
+                    // IDM (Integrated Device Manufacturer)
+                    "INTC",    // Intel
+                    "MU",      // Micron
+                    "QRVO",    // Qorvo
+                    "ON",      // onsemi
+                    "WOLF",    // Wolfspeed
+                    "TXN",     // Texas Instruments
+                    "MCHP",    // Microchip
+                    "ADI",     // Analog Devices
+                    "SWKS",    // Skyworks
+                    "IFNNY",   // Infineon
+                    "NXPI",    // NXP
+                    "STM",     // STMicroelectronics
+                    "TOSYY",   // Toshiba
+                    "RNECY",   // Renesas
+                    "MRAAY",   // Murata
+                    "SSNLF",   // Samsung
+                    "HXSCL",   // SK hynix
+                
+                    // Fabless Design
+                    "NVDA",    // Nvidia
+                    "AAPL",    // Apple
+                    "CSCO",    // Cisco
+                    "AVGO",    // Broadcom
+                    "QCOM",    // Qualcomm (duplicate)
+                    "MPWR",    // Monolithic Power Systems
+                    "AMD",     // AMD
+                    "GOOG",    // Alphabet (Google) Class C
+                    "GOOGL",   // Alphabet (Google) Class A
+                    "MRVL",    // Marvell
+                    "META",    // Meta (Facebook)
+                    "CRUS",    // Cirrus Logic
+                
+                    // Foundries
+                    "TSM",     // TSMC
+                    "UMC",     // UMC
+                    "TSEM",    // Tower Semiconductor
+                    "GFS",     // GlobalFoundries
+                    "SSNLF"    // Samsung (duplicate)
+                ];
+
+
 
             List<string> etfTickers =
                 [
@@ -61,7 +199,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "BAM", "MSCI", "EWBC", "RPRX", "ABNB", "LNG", "NVDA", "GLPI", "WPM", "BCH",
                     "V", "VRSN", "CME", "ARCC", "TPL", "FCNCA", "EMR", "VICI", "MSTR",
                     "CI", "DIS", "ELV", "BRK.B", "HD", "UPS", "NKE", "XOM", "CVX",
-                    "TSLA", "VZ", "WFC", "JNJ", "META", "GOOG", "BAC", "MRK", "AAPL",
+                    "TSLA", "VZ", "WFC", "JNJ", "META", "GOOG", "BAC", "MRK",
                     "JPM", "PFE", "MSFT"
                 ];
 
