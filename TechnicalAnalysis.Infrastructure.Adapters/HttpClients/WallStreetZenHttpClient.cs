@@ -32,8 +32,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     Symbol = stockExchange.Key,
                     Exchange = stockExchange.Value
                 };
-                // GetStockForecast(stock); //TODO In progress
-                // GetStockData(stock); //TODO In progress
+                GetStockForecast(stock); //TODO In progress
+                GetStockData(stock); //TODO In progress
                 stocks.Add(stock);
             }
 
