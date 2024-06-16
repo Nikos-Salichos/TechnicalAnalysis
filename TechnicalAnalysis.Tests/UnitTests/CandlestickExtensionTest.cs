@@ -115,7 +115,6 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.Equal(expectedTimeframe, result);
         }
 
-
         [Theory]
         [InlineData("2d")]
         [InlineData("1m")]
@@ -149,5 +148,131 @@ namespace TechnicalAnalysis.Tests.UnitTests
             Assert.Equal(expectedType, result);
         }
 
+        [Theory]
+        [InlineData("EXTREMEHAPPINESS")]
+        [InlineData("SADNESS")]
+        [InlineData("ANGRY")]
+        [InlineData("JOY")]
+        [InlineData("")]
+        [InlineData("  ")]
+        public void ToValueClassificationType_ThrowsArgumentException_ForInvalidInputs(string valueClassification)
+        {
+            var exception = Assert.Throws<ArgumentException>(() => valueClassification.ToValueClassificationType());
+            Assert.Equal($"Invalid valueClassification: {new string(value: valueClassification
+                .Where(c => !char.IsWhiteSpace(c))
+                .ToArray()).ToUpperInvariant()}", exception.Message);
+        }
+
+        [Fact]
+        public void FillMissingDatesInDays_AddsMissingDates_Correctly()
+        {
+            var pairs = new List<BinancePair>
+    {
+        new() {
+            BinanceCandlesticks = new List<BinanceCandlestick>
+            {
+                new() { OpenTime = new(2023, 1, 1), CloseTime = new(2023, 1, 1, 23, 59, 59) },
+                new() { OpenTime = new(2023, 1, 4), CloseTime = new(2023, 1, 4, 23, 59, 59) }
+            }
+        }
+    };
+
+            pairs.FillMissingDatesInDays();
+
+            var expectedDates = new List<DateTime>
+    {
+        new(2023, 1, 1),
+        new(2023, 1, 2),
+        new(2023, 1, 3),
+        new(2023, 1, 4)
+    };
+
+            var actualDates = pairs[0].BinanceCandlesticks.OrderBy(c => c.OpenTime).Select(c => c.OpenTime.Date).ToList();
+
+            Assert.Equal(expectedDates, actualDates);
+        }
+
+        [Fact]
+        public void FillMissingDates_NoMissingDates()
+        {
+            var pairs = new List<BinancePair>
+    {
+        new() {
+            BinanceCandlesticks =
+            [
+                new BinanceCandlestick { OpenTime = new DateTime(2023, 1, 1), CloseTime = new DateTime(2023, 1, 1, 23, 59, 59) },
+                new BinanceCandlestick { OpenTime = new DateTime(2023, 1, 2), CloseTime = new DateTime(2023, 1, 2, 23, 59, 59) }
+            ]
+        }
+    };
+
+            pairs.FillMissingDatesInDays();
+
+            var actualDates = pairs[0].BinanceCandlesticks.OrderBy(c => c.OpenTime).Select(c => c.OpenTime).ToList();
+            var expectedDates = new List<DateTime>
+    {
+        new(2023, 1, 1),
+        new(2023, 1, 2)
+    };
+
+            Assert.Equal(expectedDates, actualDates);
+        }
+
+        [Fact]
+        public void FillMissingDatesInDays_MultiplePairs_AddsMissingDates_Correctly()
+        {
+            var pairs = new List<BinancePair>
+    {
+        new() {
+            BinanceCandlesticks =
+            [
+                new() { OpenTime = new DateTime(2023, 1, 1), CloseTime = new DateTime(2023, 1, 1, 23, 59, 59) },
+                new() { OpenTime = new DateTime(2023, 1, 3), CloseTime = new DateTime(2023, 1, 3, 23, 59, 59) }
+            ]
+        },
+        new() {
+            BinanceCandlesticks =
+            [
+                new() { OpenTime = new(2023, 1, 5), CloseTime = new(2023, 1, 5, 23, 59, 59) },
+                new() { OpenTime = new(2023, 1, 7), CloseTime = new(2023, 1, 7, 23, 59, 59) }
+            ]
+        }
+    };
+
+            pairs.FillMissingDatesInDays();
+
+            var expectedOpenTimesPair1 = new List<DateTime>
+    {
+        new(2023, 1, 1),
+        new(2023, 1, 2),
+        new(2023, 1, 3)
+    };
+
+            var expectedOpenTimesPair2 = new List<DateTime>
+    {
+        new(2023, 1, 5),
+        new(2023, 1, 6),
+        new(2023, 1, 7)
+    };
+
+            var actualOpenTimesPair1 = pairs[0].BinanceCandlesticks.OrderBy(c => c.OpenTime).Select(c => c.OpenTime.Date).ToList();
+            var actualOpenTimesPair2 = pairs[1].BinanceCandlesticks.OrderBy(c => c.OpenTime).Select(c => c.OpenTime.Date).ToList();
+
+            Assert.Equal(expectedOpenTimesPair1, actualOpenTimesPair1);
+            Assert.Equal(expectedOpenTimesPair2, actualOpenTimesPair2);
+        }
+
+        [Fact]
+        public void FillMissingDates_NoCandles()
+        {
+            var pairs = new List<BinancePair>
+    {
+        new() { BinanceCandlesticks = [] }
+    };
+
+            pairs.FillMissingDatesInDays();
+
+            Assert.Empty(pairs[0].BinanceCandlesticks);
+        }
     }
 }
