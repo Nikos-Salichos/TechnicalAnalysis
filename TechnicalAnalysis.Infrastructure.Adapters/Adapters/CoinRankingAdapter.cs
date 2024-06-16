@@ -56,8 +56,17 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 var response = await coinRankingHttpClient.SyncAssets(pageIndex);
                 if (response.HasError)
                 {
-                    logger.LogError("{DataProvider} response error on page {PageIndex} with {FailValue}", nameof(provider), pageIndex, response.FailValue);
-                    continue;
+                    if (pageIndex >= 2)
+                    {
+                        // Free version of API in CoinRanking allows only 1 page of data, any page >=2 will fail
+                        logger.LogError("{DataProvider} response error on page {PageIndex} with {FailValue} in Premium API", nameof(provider), pageIndex, response.FailValue);
+                        continue;
+                    }
+                    else
+                    {
+                        logger.LogError("{DataProvider} response error on page {PageIndex} with {FailValue} in Free API", nameof(provider), pageIndex, response.FailValue);
+                        return false;
+                    }
                 }
 
                 await ProcessNewAssets(fetchedAssets, response.SuccessValue.Data.Coins);
