@@ -471,8 +471,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2020, 02, 20).Date
-                    && string.Equals(pair.Symbol, "VOO", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2023, 01, 06).Date
+                    && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
@@ -513,23 +513,23 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 bool[] conditions =
                 [
+                    GetOversoldBollingerConditions(pair.Candlesticks, i),
+                    GetOversoldDonchianConditions(pair.Candlesticks, i),
+                    GetOversoldKeltnerConditions(pair.Candlesticks, i),
+                    GetLowestLowCondition(pair.Candlesticks, i),
                     GetOversoldRsiConditions(pair.Candlesticks, i),
                     GetOversoldStochasticConditions(pair.Candlesticks, i),
-                    GetOversoldAdxConditions(pair.Candlesticks, i),
                     GetOversoldCciConditions(pair.Candlesticks, i),
-                    GetOversoldBollingerConditions(pair.Candlesticks, i),
-                    GetOversoldKeltnerConditions(pair.Candlesticks, i),
+                    GetOversoldAdxConditions(pair.Candlesticks, i),
                     GetOversoldAroonConditions(pair.Candlesticks, i),
-                    GetOversoldDonchianConditions(pair.Candlesticks, i),
-                    GetLowestLowCondition(pair.Candlesticks, i),
                     GetFractalBullCondition(pair.Candlesticks, i),
+                    GetHighestHighVixFix(pair.Candlesticks, i),
                     GetPivotSupportOversoldCondition(pair.Candlesticks, i),
                     GetFractalEnhancedLongTrend(pair.Candlesticks, i),
                     GetPriceEnhancedLongTrend(pair.Candlesticks, i),
-                    GetHighestHighVixFix(pair.Candlesticks, i),
                     GetOnBalanceVolumeCondition(pair.Candlesticks, i),
                     GetPsychologicalLineCondition(pair.Candlesticks, i),
-                    // GetVolumeCondition(pair.Candlesticks, i)
+                    GetVolumeCondition(pair.Candlesticks, i)
                     // GetOversoldMacdConditions(pair.Candlesticks, i), //It is bad for signal
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
                 ];
@@ -1210,11 +1210,11 @@ namespace TechnicalAnalysis.Application.Extensions
             var aroon3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Aroons.FirstOrDefault() : null;
             var aroon4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Aroons.FirstOrDefault() : null;
 
-            return aroon?.AroonDown >= 80 || aroon?.AroonUp <= 20
-                || aroon1?.AroonDown >= 80 || aroon1?.AroonUp >= 20
-                || aroon2?.AroonDown >= 80 || aroon2?.AroonUp >= 20
-                || aroon3?.AroonDown >= 80 || aroon3?.AroonUp >= 20
-                || aroon4?.AroonDown >= 80 || aroon4?.AroonUp >= 20;
+            return aroon?.AroonDown >= 80
+                || aroon1?.AroonDown >= 80
+                || aroon2?.AroonDown >= 80
+                || aroon3?.AroonDown >= 80
+                || aroon4?.AroonDown >= 80;
         }
 
         private static bool GetOversoldCciConditions(List<CandlestickExtended> candlesticks, int currentIndex)
@@ -1351,14 +1351,15 @@ namespace TechnicalAnalysis.Application.Extensions
             var volume1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Volume : null;
             var volume2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Volume : null;
             var volume3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Volume : null;
+            var volume4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Volume : null;
 
-            if (volume == null || volume1 == null || volume2 == null || volume3 == null)
+            if (volume == null || volume1 == null || volume2 == null || volume3 == null || volume4 == null)
             {
                 return false;
             }
 
-            decimal minVolume = Math.Min((decimal)volume1, Math.Min((decimal)volume2, (decimal)volume3));
-            decimal maxVolume = Math.Max((decimal)volume1, Math.Max((decimal)volume2, (decimal)volume3));
+            decimal minVolume = Math.Min((decimal)volume1, Math.Min((decimal)volume2, Math.Min((decimal)volume3, (decimal)volume4)));
+            decimal maxVolume = Math.Max((decimal)volume1, Math.Max((decimal)volume2, Math.Max((decimal)volume3, (decimal)volume4)));
 
             return volume <= minVolume || volume >= maxVolume;
         }
