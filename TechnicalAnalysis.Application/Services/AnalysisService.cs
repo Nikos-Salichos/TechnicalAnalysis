@@ -304,22 +304,17 @@ namespace TechnicalAnalysis.Application.Services
                     && (string.IsNullOrWhiteSpace(lastSignal) || string.Equals(lastSignal, "sell", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     lastSignal = "buy";
-                    var signalIndicator = new Signal
-                    {
-                        OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                        Buy = 1,
-                    };
-                    lowestHighLowestLowFractal.Signals.Add(signalIndicator);
                 }
 
                 if (candlestick1.FractalTrend == Trend.Down
                     && (string.IsNullOrWhiteSpace(lastSignal) || string.Equals(lastSignal, "buy", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     lastSignal = "sell";
+                    //We invest contrarian
                     var signalIndicator = new Signal
                     {
                         OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                        Sell = 1,
+                        Buy = 1,
                     };
                     lowestHighLowestLowFractal.Signals.Add(signalIndicator);
                 }
