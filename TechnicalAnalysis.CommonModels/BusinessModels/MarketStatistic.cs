@@ -13,13 +13,13 @@ public class MarketStatistic
             var dailyStats = kvp.Value;
             double percentage = dailyStats.PairsWithEnhancedScan.Count / (double)dailyStats.NumberOfPairs * 100;
 
-            if (percentage < thresholdPercentage)
+            if (percentage >= thresholdPercentage)
             {
-                keysToRemove.Add(kvp.Key);
+                dailyStats.Percentage = percentage;
             }
             else
             {
-                dailyStats.Percentage = percentage;
+                keysToRemove.Add(kvp.Key);
             }
         }
 
