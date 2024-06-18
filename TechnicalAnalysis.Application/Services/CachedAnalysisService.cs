@@ -23,7 +23,8 @@ namespace TechnicalAnalysis.Application.Services
         {
             var pairsFromCache = new List<PairExtended>();
 
-            if (httpContext?.Request.Headers.TryGetValue("X-Cache-Refresh", out var headerValue) == true && headerValue == "true")
+            if (httpContext?.Request.Headers.TryGetValue("X-Cache-Refresh", out var headerValue) == false
+                && string.Equals(headerValue, "false", StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach (var pairName in pairNames)
                 {
