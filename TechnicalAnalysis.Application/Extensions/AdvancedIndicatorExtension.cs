@@ -487,9 +487,9 @@ namespace TechnicalAnalysis.Application.Extensions
                     or DataProvider.Uniswap
                     or DataProvider.Pancakeswap)
                 {
-                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeFear
-                          || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Fear
-                          || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Neutral;
+                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType is ValueClassificationType.ExtremeFear
+                          or ValueClassificationType.Fear
+                          or ValueClassificationType.Neutral;
 
                     if (!greedAndFearCondition)
                     {
@@ -501,9 +501,9 @@ namespace TechnicalAnalysis.Application.Extensions
                      && stockFearAndGreedIndex is not null && pair.Provider
                      is DataProvider.Alpaca)
                 {
-                    var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeFear
-                          || stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Fear
-                          || stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Neutral;
+                    var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType is ValueClassificationType.ExtremeFear
+                          or ValueClassificationType.Fear
+                          or ValueClassificationType.Neutral;
 
                     if (!greedAndFearCondition)
                     {
@@ -608,8 +608,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     or DataProvider.Uniswap
                     or DataProvider.Pancakeswap)
                 {
-                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Greed
-                          || cryptoFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeGreed;
+                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType is ValueClassificationType.Greed
+                          or ValueClassificationType.ExtremeGreed;
 
                     if (!greedAndFearCondition)
                     {
@@ -621,8 +621,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     && stockFearAndGreedIndex is not null && pair.Provider
                     is DataProvider.Alpaca)
                 {
-                    var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.Greed
-                          || stockFearAndGreedIndex.ValueClassificationType == ValueClassificationType.ExtremeGreed;
+                    var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType is ValueClassificationType.Greed
+                          or ValueClassificationType.ExtremeGreed;
 
                     if (!greedAndFearCondition)
                     {
@@ -731,8 +731,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     && currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD >= 20
                     && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK >= 20;
 
-                bool hasRsiRange = currentCandlestick?.Rsis?.FirstOrDefault()?.Value <= 70 &&
-                    currentCandlestick?.Rsis?.FirstOrDefault()?.Value >= 30;
+                bool hasRsiRange = currentCandlestick?.Rsis?.FirstOrDefault()?.Value is <= 70 and
+                    >= 30;
 
                 //TODO Calculate vixfix under a specific level <-- new strategy, just added it here as note
                 bool hasBollingerBandsRange = currentCandlestick?.ClosePrice <= currentCandlestick?.BollingerBands?.FirstOrDefault()?.UpperBand
