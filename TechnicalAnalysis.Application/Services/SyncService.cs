@@ -23,57 +23,57 @@ namespace TechnicalAnalysis.Application.Services
 
                 logger.LogInformation("Synchronization started for {Provider}", provider);
 
-                if (provider == DataProvider.Binance || provider == DataProvider.All)
+                if (provider is DataProvider.Binance or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Binance, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.Alpaca || provider == DataProvider.All)
+                if (provider is DataProvider.Alpaca or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Alpaca, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.Uniswap || provider == DataProvider.All)
+                if (provider is DataProvider.Uniswap or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Uniswap, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.Pancakeswap || provider == DataProvider.All)
+                if (provider is DataProvider.Pancakeswap or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.Pancakeswap, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.WallStreetZen || provider == DataProvider.All)
+                if (provider is DataProvider.WallStreetZen or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.WallStreetZen, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.AlternativeMeCryptoFearAndGreedProvider || provider == DataProvider.All)
+                if (provider is DataProvider.AlternativeMeCryptoFearAndGreedProvider or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.AlternativeMeCryptoFearAndGreedProvider, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.CoinPaprika || provider == DataProvider.All)
+                if (provider is DataProvider.CoinPaprika or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CoinPaprika, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.CoinMarketCap || provider == DataProvider.All)
+                if (provider is DataProvider.CoinMarketCap or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CoinMarketCap, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.CoinRanking || provider == DataProvider.All)
+                if (provider is DataProvider.CoinRanking or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CoinRanking, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.RapidApiStockFearAndGreedProvider || provider == DataProvider.All)
+                if (provider is DataProvider.RapidApiStockFearAndGreedProvider or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.RapidApiStockFearAndGreedProvider, timeframe, exchanges));
                 }
 
-                if (provider == DataProvider.CnnApiStockFearAndGreedProvider || provider == DataProvider.All)
+                if (provider is DataProvider.CnnApiStockFearAndGreedProvider or DataProvider.All)
                 {
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CnnApiStockFearAndGreedProvider, timeframe, exchanges));
                 }
