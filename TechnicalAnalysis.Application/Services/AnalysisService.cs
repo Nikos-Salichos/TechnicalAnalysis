@@ -619,9 +619,9 @@ namespace TechnicalAnalysis.Application.Services
             var cryptoMarketStatistic = await GetCryptoPairsWithEnhancedScanIsLong(pairs);
             var etfStockMarketStatistic = await GetEtfStockPairWithEnhancedScanIsLong(pairs);
 
-            CalculateEnhancedIsLongBasedOnStatistics(cryptoMarketStatistic, pairs, p => p.Provider == DataProvider.Binance
-            || p.Provider == DataProvider.Uniswap
-            || p.Provider == DataProvider.Pancakeswap);
+            CalculateEnhancedIsLongBasedOnStatistics(cryptoMarketStatistic, pairs, p => p.Provider is DataProvider.Binance
+            or DataProvider.Uniswap
+            or DataProvider.Pancakeswap);
 
             CalculateEnhancedIsLongBasedOnStatistics(etfStockMarketStatistic, pairs, p => p.Provider == DataProvider.Alpaca);
 
