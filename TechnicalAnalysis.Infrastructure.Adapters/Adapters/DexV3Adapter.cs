@@ -203,10 +203,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                 var firstTokenIsStable = false;
 
-                if (pool.Token0.Symbol == Constants.Usdt ||
-                    pool.Token0.Symbol == Constants.Usdc ||
-                    pool.Token0.Symbol == Constants.Busd ||
-                    pool.Token0.Symbol == Constants.Dai)
+                if (pool.Token0.Symbol is Constants.Usdt or
+                    Constants.Usdc or
+                    Constants.Busd or
+                    Constants.Dai)
                 {
                     foreach (var tokenDayData in pool.Token1.TokenDayData)
                     {
@@ -236,10 +236,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     continue;
                 }
 
-                if (pool.Token1.Symbol == Constants.Usdt ||
-                    pool.Token1.Symbol == Constants.Usdc ||
-                    pool.Token1.Symbol == Constants.Busd ||
-                    pool.Token1.Symbol == Constants.Dai)
+                if (pool.Token1.Symbol is Constants.Usdt or
+                    Constants.Usdc or
+                    Constants.Busd or
+                    Constants.Dai)
                 {
                     foreach (var tokenDayData in pool.Token0.TokenDayData)
                     {
