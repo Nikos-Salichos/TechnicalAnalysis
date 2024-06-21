@@ -405,7 +405,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
 
         private static async Task WriteParameter(NpgsqlBinaryImporter writer, object value)
         {
-            if (value == null || value is DBNull)
+            if (value is null or DBNull)
             {
                 await writer.WriteNullAsync();
             }
