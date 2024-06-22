@@ -12,7 +12,6 @@ namespace TechnicalAnalysis.Application.Services
     public class CachedAnalysisService(IAnalysisService inner, IRedisRepository redisRepository,
         ICommunication communication, IRabbitMqService rabbitMqService) : IAnalysisService
     {
-
         private static readonly ExecutionDataflowBlockOptions ExecutionDataflowBlockOptions = new()
         {
             MaxDegreeOfParallelism = 3 * Environment.ProcessorCount,
@@ -65,7 +64,8 @@ namespace TechnicalAnalysis.Application.Services
         {
             var fileName = $"All-Pairs-Indicators-{DateTime.UtcNow}";
 
-            if (httpContext?.Request.Headers.ContainsKey("Cache-Invalid") == false)
+            if (httpContext?.Request.Headers.TryGetValue("X-Cache-Refresh", out var headerValue) == false
+               && string.Equals(headerValue, "false", StringComparison.InvariantCultureIgnoreCase))
             {
                 var cachedPairs = await redisRepository.GetRecordAsync<List<EnhancedPairResult>>(provider.ToString());
                 if (cachedPairs?.Count > 0)
