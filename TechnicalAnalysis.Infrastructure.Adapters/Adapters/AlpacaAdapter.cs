@@ -43,7 +43,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "KR", "WSO", "DE", "AME", "MKL", "HEI", "NVR", "TDG", "BN",
                     "RACE", "MU", "DJCO", "SYK", "PM", "ADP", "WAT", "PEP", "MKC", "FIS",
                     "WTW", "CRH", "WBA", "WSO", "ASML", "ADBE", "REGN", "FTNT", "ODFL", "CPRT", "ACN", "ZTS",
-                    "LOW", "MO"
+                    "LOW", "MO", "SJW","TGT","PPG"
                 ];
 
             List<string> dividendAristocrats =
@@ -183,8 +183,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "SSNLF"    // Samsung (duplicate)
                 ];
 
-
-
             List<string> etfTickers =
                 [
                     "vt", "vti", "VTV", "PFF", "SPHD", "XLRE", "EWH", "MCHI", "EWS", "FEZ",
@@ -207,11 +205,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 .Concat(tenStocksToOwnForever)
                 .Concat(stockTickers)
                 .Concat(etfTickers)
+                .Concat(dividendAristocrats)
+                .Concat(semiconductors)
                 .ToList();
 
-            allSymbols = allSymbols.Select(symbol => symbol.ToUpperInvariant())
-                                       .Distinct(StringComparer.InvariantCultureIgnoreCase)
-                                       .ToList();
+            allSymbols = allSymbols.Select(symbol => symbol.Trim().ToUpperInvariant())
+                                   .Distinct(StringComparer.InvariantCultureIgnoreCase)
+                                   .ToList();
 
             var fetchedAssets = await mediator.Send(new GetAssetsQuery());
             var fetchedAssetNames = fetchedAssets.ConvertAll(f => f.Symbol);
