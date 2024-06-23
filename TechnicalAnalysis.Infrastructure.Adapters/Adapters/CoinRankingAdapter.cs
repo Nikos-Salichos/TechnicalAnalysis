@@ -51,7 +51,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var newAssets = new List<AssetRanking>();
             foreach (var newCoin in newCoins)
             {
-                var pairExists = existingAssets.Find(f => string.Equals(f.Name.Trim(), newCoin.Name.Trim(), StringComparison.InvariantCultureIgnoreCase));
+                var pairExists = existingAssets.Find(f => string.Equals(f.Name?.Trim(), newCoin.Name.Trim(), StringComparison.InvariantCultureIgnoreCase));
                 if (pairExists is null)
                 {
                     newAssets.Add(new AssetRanking
