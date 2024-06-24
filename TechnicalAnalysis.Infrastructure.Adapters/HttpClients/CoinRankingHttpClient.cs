@@ -29,9 +29,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 queryString["tags"] = "layer-1";
                 queryString["orderBy"] = "listedAt";
                 queryString["limit"] = "100";
-                queryString["offset"] = offset.ToString();
 
                 uriBuilder.Query = queryString.ToString();
+                var requestUrl = uriBuilder.ToString();
 
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await _httpClient.GetAsync(uriBuilder.ToString(), HttpCompletionOption.ResponseHeadersRead));
