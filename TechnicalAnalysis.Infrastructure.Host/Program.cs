@@ -111,7 +111,10 @@ app.UseMetricServer(); //Starting the metrics exporter, will expose "/metrics"
 
 app.UseSwagger();
 
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    options.DisplayRequestDuration();
+});
 
 app.UseExceptionHandler();
 
