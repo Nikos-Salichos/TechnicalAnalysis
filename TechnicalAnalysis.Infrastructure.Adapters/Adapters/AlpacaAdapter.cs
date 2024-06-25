@@ -114,6 +114,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "BRO",       // Brown & Brown, Inc.
                     "ROP",       // Roper Technologies Inc
                     "WST"        // West Pharmaceutical Services, Inc.
+                    "NOW"        // ServiceNow 
                 ];
 
             List<string> semiconductors =
