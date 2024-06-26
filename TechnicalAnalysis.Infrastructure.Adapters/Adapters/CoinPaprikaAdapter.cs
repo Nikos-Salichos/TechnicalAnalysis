@@ -39,7 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             foreach (var asset in response.SuccessValue.Where(c => c.Type is "coin"))
             {
-                var pairExists = fetchedAssets.Find(f => string.Equals(f.Name?.Trim(), asset.Name.Trim(), StringComparison.InvariantCultureIgnoreCase));
+                var pairExists = fetchedAssets.Find(f => string.Equals(f.Name?.Trim(), asset.Name?.Trim(), StringComparison.InvariantCultureIgnoreCase));
                 if (pairExists is null)
                 {
                     newAssets.Add(new AssetRanking
