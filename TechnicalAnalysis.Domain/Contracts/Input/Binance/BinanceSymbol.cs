@@ -16,22 +16,4 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Binance
         [JsonPropertyName("status")]
         public string? Status { get; init; }
     }
-
-    public class BinanceSymbolComparer : IEqualityComparer<BinanceSymbol>
-    {
-        public bool Equals(BinanceSymbol? x, BinanceSymbol? y)
-        {
-            if (x == null || y == null)
-            {
-                return false;
-            }
-
-            return x.Symbol == y.Symbol;
-        }
-
-        public int GetHashCode(BinanceSymbol obj)
-        {
-            return obj.Symbol.GetHashCode();
-        }
-    }
 }
