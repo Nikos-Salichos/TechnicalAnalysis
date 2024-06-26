@@ -113,7 +113,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "SPGI",      // S&P Global Inc
                     "BRO",       // Brown & Brown, Inc.
                     "ROP",       // Roper Technologies Inc
-                    "WST"        // West Pharmaceutical Services, Inc.
+                    "WST",        // West Pharmaceutical Services, Inc.
                     "NOW"        // ServiceNow 
                 ];
 
