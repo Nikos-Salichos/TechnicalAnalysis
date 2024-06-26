@@ -1180,10 +1180,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var donchianChannel = candlesticks[currentIndex].DonchianChannels.FirstOrDefault();
-            var donchianChannel1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].DonchianChannels.FirstOrDefault() : null;
-            var donchianChannel2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].DonchianChannels.FirstOrDefault() : null;
-            var donchianChannel3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].DonchianChannels.FirstOrDefault() : null;
-            var donchianChannel4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].DonchianChannels.FirstOrDefault() : null;
+            var donchianChannel1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].DonchianChannels.FirstOrDefault() : null;
+            var donchianChannel2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].DonchianChannels.FirstOrDefault() : null;
+            var donchianChannel3 = currentIndex >= 3 ? candlesticks[currentIndex - 3].DonchianChannels.FirstOrDefault() : null;
+            var donchianChannel4 = currentIndex >= 4 ? candlesticks[currentIndex - 4].DonchianChannels.FirstOrDefault() : null;
 
             if (donchianChannel == null || donchianChannel1 == null || donchianChannel2 == null || donchianChannel3 == null || donchianChannel4 == null)
             {
