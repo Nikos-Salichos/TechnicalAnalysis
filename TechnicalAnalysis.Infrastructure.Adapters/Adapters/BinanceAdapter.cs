@@ -194,7 +194,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                         if (response.HasError)
                         {
-                            logger.LogError("Error: {response.FailValue.}, queryParams: {@QueryParams}", response.FailValue, queryParams);
+                            logger.LogError("Error: {FailValue}, queryParams: {@QueryParams}", response.FailValue, queryParams);
                             break;
                         }
 
