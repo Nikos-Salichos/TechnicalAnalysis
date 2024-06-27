@@ -1279,7 +1279,7 @@ namespace TechnicalAnalysis.Application.Extensions
             var obvLowest1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
             var obvLowest2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
             var obvLowest3 = currentIndex >= 3 ? candlesticks[currentIndex - 3].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
-            var obvLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var obvLowest4 = currentIndex >= 4 ? candlesticks[currentIndex - 4].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
 
             if (obvLowest == null || obvLowest1 == null || obvLowest2 == null || obvLowest3 == null || obvLowest4 == null)
             {
