@@ -1251,7 +1251,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             var pivot = candlesticks[currentIndex].StandardPivotPoints.FirstOrDefault();
             var pivot1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].StandardPivotPoints.FirstOrDefault() : null;
-            var pivot2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].StandardPivotPoints.FirstOrDefault() : null;
+            var pivot2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].StandardPivotPoints.FirstOrDefault() : null;
             var pivot3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].StandardPivotPoints.FirstOrDefault() : null;
             var pivot4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].StandardPivotPoints.FirstOrDefault() : null;
 
