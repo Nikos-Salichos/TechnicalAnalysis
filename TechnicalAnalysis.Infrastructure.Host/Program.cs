@@ -159,7 +159,7 @@ app.UseAuthorization(); //second line should be
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
 
 /// <summary>
 /// I must declare Program partial class for testcontainers nuget (integration tests)
