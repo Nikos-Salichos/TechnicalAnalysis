@@ -1288,7 +1288,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             var obv = candlesticks[currentIndex].OnBalanceVolumes.FirstOrDefault()?.Value;
             var obv1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].OnBalanceVolumes.FirstOrDefault()?.Value : null;
-            var obv2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var obv2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].OnBalanceVolumes.FirstOrDefault()?.Value : null;
             var obv3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].OnBalanceVolumes.FirstOrDefault()?.Value : null;
             var obv4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].OnBalanceVolumes.FirstOrDefault()?.Value : null;
 
