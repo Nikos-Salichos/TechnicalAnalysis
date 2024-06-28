@@ -1312,7 +1312,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var valueLowest = candlesticks[currentIndex].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value;
-            var valueLowest1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
+            var valueLowest1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
             var valueLowest2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
             var valueLowest3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
             var valueLowest4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Lowests.Find(l => l.PriceType is PriceType.OnBalanceVolume)?.Value : null;
