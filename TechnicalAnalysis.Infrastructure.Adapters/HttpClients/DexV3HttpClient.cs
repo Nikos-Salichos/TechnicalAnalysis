@@ -94,13 +94,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                     using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
                         => await _httpClient.PostAsJsonAsync(endpoint, body));
 
-                    logger.LogInformation("Method {Method}, dexEndpoint {dexEndpoint}, " +
+                    logger.LogInformation("Method {Method}, dexEndpoint {DexEndpoint}, " +
                         "httpResponseMessage StatusCode {StatusCode}",
                             nameof(GetMostActivePoolsAsync), endpoint, httpResponseMessage.StatusCode);
 
                     if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                        logger.LogError("{HttpResponseMessageStatusCode}", httpResponseMessage.StatusCode);
                         return Result<DexV3ApiResponse, string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                     }
 
