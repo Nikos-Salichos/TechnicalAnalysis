@@ -25,8 +25,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             {
                 _httpClient.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", coinMarketCapSettings.CurrentValue.ApiKey);
                 _httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+                UriBuilder uriBuilder = new(coinMarketCapSettings.CurrentValue.ListingsLatestEndpoint
+                    ?? throw new ArgumentOutOfRangeException("coinMarketCapSettings.CurrentValue.ListingsLatestEndpoint is null"));
 
-                UriBuilder uriBuilder = new(coinMarketCapSettings.CurrentValue.ListingsLatestEndpoint);
                 var queryString = HttpUtility.ParseQueryString(string.Empty);
                 queryString["cryptocurrency_type"] = "coins";
                 queryString["limit"] = "5000";
@@ -39,12 +40,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await _httpClient.GetAsync(uriBuilder.ToString(), HttpCompletionOption.ResponseHeadersRead));
 
-                logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
+                logger.LogInformation("SymbolsPairsPath {BaseUrl}, httpResponseMessage '{@HttpResponseMessage}' ",
                     coinMarketCapSettings.CurrentValue.ListingsLatestEndpoint, httpResponseMessage);
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    logger.LogError("{HttpResponseMessageStatusCode}", httpResponseMessage.StatusCode);
                     return Result<CoinMarketCapAssetContract, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
                 }
 
