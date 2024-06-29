@@ -24,24 +24,23 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             {
                 _httpClient.DefaultRequestHeaders.Add("x-access-token", settings.CurrentValue.ApiKey);
 
-                UriBuilder uriBuilder = new(settings.CurrentValue.ListingsLatestEndpoint);
+                UriBuilder uriBuilder = new(settings.CurrentValue.ListingsLatestEndpoint ?? throw new ArgumentNullException("settings.CurrentValue.ListingsLatestEndpoint is null"));
                 var queryString = HttpUtility.ParseQueryString(string.Empty);
                 queryString["tags"] = "layer-1";
                 queryString["orderBy"] = "listedAt";
                 queryString["limit"] = "100";
 
                 uriBuilder.Query = queryString.ToString();
-                var requestUrl = uriBuilder.ToString();
 
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await _httpClient.GetAsync(uriBuilder.ToString(), HttpCompletionOption.ResponseHeadersRead));
 
-                logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
+                logger.LogInformation("SymbolsPairsPath {BaseUrl}, httpResponseMessage '{@HttpResponseMessage}' ",
                     settings.CurrentValue.ListingsLatestEndpoint, httpResponseMessage);
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    logger.LogError("{HttpResponseMessageStatusCode}", httpResponseMessage.StatusCode);
                     return Result<CoinRankingAssetContract, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
                 }
 
