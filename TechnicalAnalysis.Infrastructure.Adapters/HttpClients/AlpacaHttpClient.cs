@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         {
             try
             {
-                logger.LogInformation("Method {Method}, pairName {pairName}, toDateTime {toDateTime}, barTimeFrame {barTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
+                logger.LogInformation("Method {Method}, pairName {PairName}, toDateTime {ToDateTime}, barTimeFrame {BarTimeFrame} ", nameof(GetAlpacaData), pairName, toDateTime, barTimeFrame);
                 var alpacaDataClient = Environments.Paper.GetAlpacaDataClient(new SecretKey(alpacaSettings.CurrentValue.ApiKey, alpacaSettings.CurrentValue.ApiSecret));
                 HistoricalBarsRequest historicalBarsRequest = new(pairName, fromDateTime, toDateTime, barTimeFrame)
                 {
@@ -26,10 +26,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 };
 
                 ResilienceContext resilienceContext = ResilienceContextPool.Shared.Get();
-                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("pairName"), pairName);
-                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("fromDateTime"), fromDateTime.ToString());
-                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("toDateTime"), toDateTime.ToString());
-                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("barTimeFrame"), barTimeFrame.ToString());
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("PairName"), pairName);
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("FromDateTime"), fromDateTime.ToString());
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("ToDateTime"), toDateTime.ToString());
+                resilienceContext.Properties.Set(new ResiliencePropertyKey<string>("BarTimeFrame"), barTimeFrame.ToString());
 
                 var alpacaStockData = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest), resilienceContext);
