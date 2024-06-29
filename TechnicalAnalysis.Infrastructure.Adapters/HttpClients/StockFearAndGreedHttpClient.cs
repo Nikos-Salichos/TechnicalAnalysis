@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    logger.LogError("{HttpResponseMessageStatusCode}", httpResponseMessage.StatusCode);
                     return Result<StockFearAndGreedRoot, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
                 }
 
