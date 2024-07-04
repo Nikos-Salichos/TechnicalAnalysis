@@ -471,7 +471,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2023, 01, 06).Date
+                if (candlestick.CloseDate.Date == new DateTime(2024, 04, 23).Date
                     && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
@@ -529,7 +529,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetPriceEnhancedLongTrend(pair.Candlesticks, i),
                     GetOnBalanceVolumeCondition(pair.Candlesticks, i),
                     GetPsychologicalLineCondition(pair.Candlesticks, i),
-                    GetVolumeCondition(pair.Candlesticks, i)
+                    // GetVolumeCondition(pair.Candlesticks, i)
                     // GetOversoldMacdConditions(pair.Candlesticks, i), //It is bad for signal
                     // GetOversoldRateOfChange(pair.Candlesticks, i) //It is bad for signal
                 ];
@@ -911,10 +911,10 @@ namespace TechnicalAnalysis.Application.Extensions
             var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
 
             return candlesticks[currentIndex].LowPrice <= lowestLow?.Value
-                || (lowestLow1 is not null && candlesticks[currentIndex - 1].LowPrice <= lowestLow1.Value)
-                || (lowestLow2 is not null && candlesticks[currentIndex - 2].LowPrice <= lowestLow2.Value)
-                || (lowestLow3 is not null && candlesticks[currentIndex - 3].LowPrice <= lowestLow3.Value)
-                || (lowestLow4 is not null && candlesticks[currentIndex - 4].LowPrice <= lowestLow4.Value);
+                || candlesticks[currentIndex - 1].LowPrice <= lowestLow1?.Value
+                || candlesticks[currentIndex - 2].LowPrice <= lowestLow2?.Value
+                || candlesticks[currentIndex - 3].LowPrice <= lowestLow3?.Value
+                || candlesticks[currentIndex - 4].LowPrice <= lowestLow4?.Value;
         }
 
         private static bool GetHighestHighVixFix(List<CandlestickExtended> candlesticks, int currentIndex)
