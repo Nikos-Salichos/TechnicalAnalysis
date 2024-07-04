@@ -80,17 +80,19 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
         }
 
-        [GeneratedRegex("Min Forecast\\$([0-9.]+)([+-][0-9.]+)%")]
+        [GeneratedRegex("Min Forecast\\$([0-9.]+)([+-][0-9.]+)%", RegexOptions.Compiled)]
         private static partial Regex MinimumPriceForecastPattern();
 
-        [GeneratedRegex("Avg Forecast\\$([0-9.]+)([+-][0-9.]+)%")]
+        [GeneratedRegex("Avg Forecast\\$([0-9.]+)([+-][0-9.]+)%", RegexOptions.Compiled)]
         private static partial Regex AveragePriceForecastPattern();
 
-        [GeneratedRegex("Max Forecast\\$([0-9.]+)([+-][0-9.]+)%")]
+        [GeneratedRegex("Max Forecast\\$([0-9.]+)([+-][0-9.]+)%", RegexOptions.Compiled)]
         private static partial Regex MaximumPriceForecastPattern();
-        [GeneratedRegex("Fair Value Price\\$([0-9.]+)")]
+
+        [GeneratedRegex("Fair Value Price\\$([0-9.]+)", RegexOptions.Compiled)]
         private static partial Regex FairPricePattern();
-        [GeneratedRegex("Undervalued by([0-9.]+)%")]
+
+        [GeneratedRegex("Undervalued by([0-9.]+)%", RegexOptions.Compiled)]
         private static partial Regex UndervaluePricePattern();
     }
 }
