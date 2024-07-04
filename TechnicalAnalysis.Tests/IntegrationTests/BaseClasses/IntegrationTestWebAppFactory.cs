@@ -6,7 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
+using TechnicalAnalysis.Domain.Messages;
 using TechnicalAnalysis.Domain.Settings;
+using TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers;
 using TechnicalAnalysis.Infrastructure.Persistence.Repositories;
 using Testcontainers.PostgreSql;
 
@@ -43,7 +45,6 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.BaseClasses
             {
                 // Register the database configuration
                 var configurationBuilder = new ConfigurationBuilder();
-
                 configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     {"ConnectionStrings:PostgreSqlTechnicalAnalysisDockerCompose", connectionString},
@@ -55,6 +56,10 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.BaseClasses
 
                 services.AddSingleton<IConfiguration>(configuration);
                 services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
+
+                //Register mailer
+                services.Configure<MailSettings>(config.GetSection("MailSettings"));
+                services.AddSingleton<IMailer, Mailer>();
 
                 // Add options for database settings
                 services.Configure<DatabaseSetting>(configuration.GetSection("ConnectionStrings"));
