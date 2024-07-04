@@ -24,12 +24,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
                  => await _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
 
-                logger.LogInformation("SymbolsPairsPath {_binanceSettings.CurrentValue.SymbolsPairsPath}, httpResponseMessage '{@httpResponseMessage}' ",
+                logger.LogInformation("SymbolsPairsPath {BinanceSettingsCurrentValueSymbolsPairsPath}, httpResponseMessage '{@HttpResponseMessage}' ",
                 binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    logger.LogError("{httpResponseMessage.StatusCode}", httpResponseMessage.StatusCode);
+                    logger.LogError("{HttpResponseMessageStatusCode}", httpResponseMessage.StatusCode);
                     return Result<BinanceExchangeInfoResponse, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
                 }
 
@@ -65,12 +65,12 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
 
-                logger.LogInformation("binanceCandlestickPath {binanceCandlestickPath}, httpResponseMessage StatusCode {StatusCode} ",
+                logger.LogInformation("binanceCandlestickPath {BinanceCandlestickPath}, httpResponseMessage StatusCode {StatusCode} ",
                     binanceCandlestickPath, httpResponseMessage.StatusCode);
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    logger.LogError("{httpResponseMessage.Content}", httpResponseMessage.Content);
+                    logger.LogError("{HttpResponseMessageContent}", httpResponseMessage.Content);
                     return Result<object[][], string>.Fail(httpResponseMessage.StatusCode + " " + httpResponseMessage.Content);
                 }
 
