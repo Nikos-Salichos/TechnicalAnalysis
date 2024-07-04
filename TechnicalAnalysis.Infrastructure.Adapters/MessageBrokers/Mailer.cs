@@ -9,85 +9,83 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
     public class Mailer(IOptionsMonitor<MailSettings> settings) : IMailer
     {
+        private readonly MailSettings _settings = settings?.CurrentValue ?? throw new ArgumentNullException(nameof(settings));
+
         public async Task SendAsync(MailData mailData, CancellationToken cancellationToken)
+        {
+            var mail = CreateEmailMessage(mailData);
+
+            using var smtp = new SmtpClient();
+            await ConnectToSmtpServerAsync(smtp, cancellationToken);
+            await smtp.AuthenticateAsync(_settings.EmailAddress, _settings.Password, cancellationToken);
+            await smtp.SendAsync(mail, cancellationToken);
+            await smtp.DisconnectAsync(true, cancellationToken);
+        }
+
+        private MimeMessage CreateEmailMessage(MailData mailData)
         {
             var mail = new MimeMessage();
 
-            // Sender
-            mail.From.Add(new MailboxAddress(settings.CurrentValue.DisplayName, mailData.From ?? settings.CurrentValue.From));
-            mail.Sender = new MailboxAddress(mailData.DisplayName ?? settings.CurrentValue.DisplayName, mailData.From ?? settings.CurrentValue.From);
+            mail.From.Add(new MailboxAddress(_settings.DisplayName, mailData.From ?? _settings.From));
+            mail.Sender = new MailboxAddress(mailData.DisplayName ?? _settings.DisplayName, mailData.From ?? _settings.From);
 
-            // Receiver
-            foreach (string mailAddress in mailData.To)
+            AddMailAddresses(mail.To, mailData.To);
+            AddMailAddresses(mail.ReplyTo, [mailData.ReplyTo], mailData.ReplyToName);
+            AddMailAddresses(mail.Bcc, mailData.Bcc);
+            AddMailAddresses(mail.Cc, mailData.Cc);
+
+            var bodyBuilder = new BodyBuilder
             {
-                if (MailboxAddress.TryParse(mailAddress.Trim(), out var value))
-                {
-                    mail.To.Add(value);
-                }
-            }
-
-            // Set Reply to if specified in mail data
-            if (!string.IsNullOrEmpty(mailData.ReplyTo))
-            {
-                mail.ReplyTo.Add(new MailboxAddress(mailData.ReplyToName, mailData.ReplyTo));
-            }
-
-            // BCC
-            // Check if a BCC was supplied in the request
-            if (mailData.Bcc != null)
-            {
-                // Get only addresses where value is not null or with whitespace. x = value of address
-                foreach (string mailAddress in mailData.Bcc.Where(x => !string.IsNullOrWhiteSpace(x)))
-                {
-                    if (MailboxAddress.TryParse(mailAddress.Trim(), out var value))
-                    {
-                        mail.Bcc.Add(value);
-                    }
-                }
-            }
-
-            // CC
-            // Check if a CC address was supplied in the request
-            if (mailData.Cc != null)
-            {
-                foreach (string mailAddress in mailData.Cc.Where(x => !string.IsNullOrWhiteSpace(x)))
-                {
-                    if (MailboxAddress.TryParse(mailAddress.Trim(), out var value))
-                    {
-                        mail.Cc.Add(value);
-                    }
-                }
-            }
-
-            // Add Content to Mime Message
-            var body = new BodyBuilder();
-            mail.Subject = mailData.Subject;
-            body.TextBody = mailData.Body;
+                TextBody = mailData.Body
+            };
 
             if (mailData.Attachments != null)
             {
                 foreach (var attachment in mailData.Attachments)
                 {
-                    body.Attachments.Add(attachment);
+                    bodyBuilder.Attachments.Add(attachment);
                 }
             }
 
-            mail.Body = body.ToMessageBody();
+            mail.Subject = mailData.Subject;
+            mail.Body = bodyBuilder.ToMessageBody();
 
+            return mail;
+        }
 
-            using var smtp = new SmtpClient();
-
-            if (settings.CurrentValue.UseSSL)
+        private static void AddMailAddresses(InternetAddressList addressList, IEnumerable<string> addresses, string? displayName = null)
+        {
+            if (addresses == null)
             {
-                await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.SslOnConnect, cancellationToken);
+                return;
             }
-            else if (settings.CurrentValue.UseStartTls)
+
+            foreach (var address in addresses.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
-                await smtp.ConnectAsync(settings.CurrentValue.Host, settings.CurrentValue.Port, SecureSocketOptions.StartTls, cancellationToken);
+                if (MailboxAddress.TryParse(address.Trim(), out var mailboxAddress))
+                {
+                    addressList.Add(string.IsNullOrEmpty(displayName) ? mailboxAddress : new MailboxAddress(displayName, mailboxAddress.Address));
+                }
             }
-            await smtp.AuthenticateAsync(settings.CurrentValue.EmailAddress, settings.CurrentValue.Password, cancellationToken);
-            await smtp.SendAsync(mail, cancellationToken);
-            await smtp.DisconnectAsync(true, cancellationToken);
+        }
+
+        private async Task ConnectToSmtpServerAsync(SmtpClient smtp, CancellationToken cancellationToken)
+        {
+            SecureSocketOptions options;
+            if (_settings.UseSSL)
+            {
+                options = SecureSocketOptions.SslOnConnect;
+            }
+            else if (_settings.UseStartTls)
+            {
+                options = SecureSocketOptions.StartTls;
+            }
+            else
+            {
+                options = SecureSocketOptions.Auto;
+            }
+
+            await smtp.ConnectAsync(_settings.Host, _settings.Port, options, cancellationToken);
         }
     }
 }
