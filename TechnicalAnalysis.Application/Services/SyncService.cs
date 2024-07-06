@@ -98,7 +98,7 @@ namespace TechnicalAnalysis.Application.Services
             {
                 if (provider == DataProvider.CnnApiStockFearAndGreedProvider)
                 {
-                    logger.LogError("Synchronization failed for {CnnApiStockFearAndGreedProvider} and we trigger the next {CnnApiStockFearAndGreedProvider}",
+                    logger.LogError("Synchronization failed for {CnnApiStockFearAndGreedProvider} and we trigger the next {RapidApiStockFearAndGreedProvider}",
                         DataProvider.CnnApiStockFearAndGreedProvider, DataProvider.RapidApiStockFearAndGreedProvider);
 
                     providerSynced = await adapter.Sync(DataProvider.RapidApiStockFearAndGreedProvider, timeframe, exchanges);
