@@ -2,30 +2,14 @@
 
 namespace TechnicalAnalysis.Domain.Contracts.Input.CoinPaprika
 {
-    public class CoinPaprikaAssetContract
-    {
-        [JsonPropertyName("id")]
-        public string? CoinPaprikaId { get; set; }
-
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
-        [JsonPropertyName("symbol")]
-        public string? Symbol { get; set; }
-
-        [JsonPropertyName("rank")]
-        public int Rank { get; set; }
-
-        [JsonPropertyName("is_new")]
-        public bool IsNew { get; set; }
-
-        [JsonPropertyName("is_active")]
-        public bool IsActive { get; set; }
-
-        [JsonPropertyName("type")]
-        public string? Type { get; set; }
-
-        [JsonPropertyName("CreatedAt")]
-        public DateTime CreatedAt { get; set; }
-    }
+    public record CoinPaprikaAssetContract(
+        [property: JsonPropertyName("id")] string? CoinPaprikaId,
+        [property: JsonPropertyName("name")] string? Name,
+        [property: JsonPropertyName("symbol")] string? Symbol,
+        [property: JsonPropertyName("rank")] int Rank,
+        [property: JsonPropertyName("is_new")] bool IsNew,
+        [property: JsonPropertyName("is_active")] bool IsActive,
+        [property: JsonPropertyName("type")] string? Type,
+        [property: JsonPropertyName("CreatedAt")] DateTime CreatedAt
+    );
 }
