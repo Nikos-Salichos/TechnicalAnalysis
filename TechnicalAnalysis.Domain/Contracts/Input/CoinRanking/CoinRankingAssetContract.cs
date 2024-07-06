@@ -2,51 +2,28 @@
 
 namespace TechnicalAnalysis.Domain.Contracts.Input.CoinRanking
 {
-    public class Coin
-    {
-        [JsonPropertyName("symbol")]
-        public string Symbol { get; init; }
+    public record Coin(
+        [property: JsonPropertyName("symbol")] string Symbol,
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("listedAt")] int ListedAt
+    );
 
-        [JsonPropertyName("name")]
-        public string Name { get; init; }
+    public record Data(
+        [property: JsonPropertyName("stats")] Stats Stats,
+        [property: JsonPropertyName("coins")] List<Coin> Coins
+    );
 
-        [JsonPropertyName("listedAt")]
-        public int ListedAt { get; init; }
-    }
+    public record CoinRankingAssetContract(
+        [property: JsonPropertyName("status")] string Status,
+        [property: JsonPropertyName("data")] Data Data
+    );
 
-    public class Data
-    {
-        [JsonPropertyName("stats")]
-        public Stats Stats { get; init; }
+    public record Stats(
+        [property: JsonPropertyName("total")] int Total,
+        [property: JsonPropertyName("totalCoins")] int TotalCoins,
+        [property: JsonPropertyName("totalMarkets")] int TotalMarkets,
+        [property: JsonPropertyName("totalMarketCap")] string TotalMarketCap,
+        [property: JsonPropertyName("total24hVolume")] string Total24hVolume
+    );
 
-        [JsonPropertyName("coins")]
-        public List<Coin> Coins { get; init; }
-    }
-
-    public class CoinRankingAssetContract
-    {
-        [JsonPropertyName("status")]
-        public string Status { get; init; }
-
-        [JsonPropertyName("data")]
-        public Data Data { get; init; }
-    }
-
-    public class Stats
-    {
-        [JsonPropertyName("total")]
-        public int Total { get; init; }
-
-        [JsonPropertyName("totalCoins")]
-        public int TotalCoins { get; init; }
-
-        [JsonPropertyName("totalMarkets")]
-        public int TotalMarkets { get; init; }
-
-        [JsonPropertyName("totalMarketCap")]
-        public string TotalMarketCap { get; init; }
-
-        [JsonPropertyName("total24hVolume")]
-        public string Total24hVolume { get; init; }
-    }
 }
