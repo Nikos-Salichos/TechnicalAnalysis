@@ -2,55 +2,30 @@
 
 namespace TechnicalAnalysis.Domain.Contracts.Input.Cnn
 {
-    public class RootStockFearAndGreed
-    {
-        [JsonPropertyName("fear_and_greed_historical")]
-        public CnnFearAndGreedHistorical FearAndGreedHistorical { get; init; }
+    public record RootStockFearAndGreed(
+        [property: JsonPropertyName("fear_and_greed_historical")] CnnFearAndGreedHistorical FearAndGreedHistorical
+    //Pending to add more properties as needed
+    /*,
+    [property: JsonPropertyName("market_momentum_sp500")] MarketMomentumSp500 MarketMomentumSp500,
+    [property: JsonPropertyName("market_momentum_sp125")] MarketMomentumSp125 MarketMomentumSp125,
+    [property: JsonPropertyName("stock_price_strength")] StockPriceStrength StockPriceStrength,
+    [property: JsonPropertyName("stock_price_breadth")] StockPriceBreadth StockPriceBreadth,
+    [property: JsonPropertyName("put_call_options")] PutCallOptions PutCallOptions,
+    [property: JsonPropertyName("market_volatility_vix")] MarketVolatilityVix MarketVolatilityVix,
+    [property: JsonPropertyName("market_volatility_vix_50")] MarketVolatilityVix50 MarketVolatilityVix50,
+    [property: JsonPropertyName("junk_bond_demand")] JunkBondDemand JunkBondDemand,
+    [property: JsonPropertyName("safe_haven_demand")] SafeHavenDemand SafeHavenDemand
+    */
+    );
 
-        //Pending to add more
-        /* [JsonPropertyName("market_momentum_sp500")]
-         public MarketMomentumSp500 MarketMomentumSp500 { get; set; }
+    public record CnnFearAndGreedHistoricalData(
+        [property: JsonPropertyName("x")] double Timestamp,
+        [property: JsonPropertyName("y")] double Score,
+        [property: JsonPropertyName("rating")] string? Rating
+    );
 
-         [JsonPropertyName("market_momentum_sp125")]
-         public MarketMomentumSp125 MarketMomentumSp125 { get; set; }
+    public record CnnFearAndGreedHistorical(
+        [property: JsonPropertyName("data")] List<CnnFearAndGreedHistoricalData> FearAndGreedHistoricalData
+    );
 
-         [JsonPropertyName("stock_price_strength")]
-         public StockPriceStrength StockPriceStrength { get; set; }
-
-         [JsonPropertyName("stock_price_breadth")]
-         public StockPriceBreadth StockPriceBreadth { get; set; }
-
-         [JsonPropertyName("put_call_options")]
-         public PutCallOptions PutCallOptions { get; set; }
-
-         [JsonPropertyName("market_volatility_vix")]
-         public MarketVolatilityVix MarketVolatilityVix { get; set; }
-
-         [JsonPropertyName("market_volatility_vix_50")]
-         public MarketVolatilityVix50 MarketVolatilityVix50 { get; set; }
-
-         [JsonPropertyName("junk_bond_demand")]
-         public JunkBondDemand JunkBondDemand { get; set; }
-
-         [JsonPropertyName("safe_haven_demand")]
-         public SafeHavenDemand SafeHavenDemand { get; set; }*/
-    }
-
-    public class CnnFearAndGreedHistoricalData
-    {
-        [JsonPropertyName("x")]
-        public double Timestamp { get; init; }
-
-        [JsonPropertyName("y")]
-        public double Score { get; init; }
-
-        [JsonPropertyName("rating")]
-        public string? Rating { get; init; }
-    }
-
-    public class CnnFearAndGreedHistorical
-    {
-        [JsonPropertyName("data")]
-        public List<CnnFearAndGreedHistoricalData> FearAndGreedHistoricalData { get; init; } = [];
-    }
 }
