@@ -251,7 +251,7 @@ namespace TechnicalAnalysis.Application.Services
                     continue;
                 }
 
-                if ((fractalTrend.Signals.Count > 0 && fractalTrend.Signals[fractalTrend.Signals.Count - 1].Sell == 1)
+                if ((fractalTrend.Signals.Count > 0 && fractalTrend.Signals[^1].Sell == 1)
                     || fractalTrend.Signals.Count == 0)
                 {
                     if ((candlestick.PriceTrend is Trend.Up && candlestick1.PriceTrend is not Trend.Up)
@@ -266,7 +266,7 @@ namespace TechnicalAnalysis.Application.Services
                     }
                 }
 
-                if ((fractalTrend.Signals.Count > 0 && fractalTrend.Signals[fractalTrend.Signals.Count - 1].Buy == 1)
+                if ((fractalTrend.Signals.Count > 0 && fractalTrend.Signals[^1].Buy == 1)
                     || fractalTrend.Signals.Count == 0)
                 {
                     if ((candlestick.PriceTrend is Trend.Down && candlestick1.PriceTrend is not Trend.Down)
