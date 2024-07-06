@@ -2,54 +2,27 @@
 
 namespace TechnicalAnalysis.Domain.Contracts.Input.CoinMarketCap
 {
-    public class CoinMarketCapAssetContract
-    {
-        [JsonPropertyName("data")]
-        public List<Data> Data { get; init; }
+    public record CoinMarketCapAssetContract(
+        [property: JsonPropertyName("data")] List<Data> Data,
+        [property: JsonPropertyName("status")] Status Status
+    );
 
-        [JsonPropertyName("status")]
-        public Status Status { get; init; }
-    }
+    public record Data(
+        [property: JsonPropertyName("id")] int Id,
+        [property: JsonPropertyName("name")] string? Name,
+        [property: JsonPropertyName("symbol")] string? Symbol,
+        [property: JsonPropertyName("slug")] string? Slug,
+        [property: JsonPropertyName("num_market_pairs")] int NumMarketPairs,
+        [property: JsonPropertyName("last_updated")] DateTime LastUpdated,
+        [property: JsonPropertyName("date_added")] DateTime DateAdded
+    );
 
-    public class Data
-    {
-        [JsonPropertyName("id")]
-        public int Id { get; init; }
+    public record Status(
+        [property: JsonPropertyName("timestamp")] DateTime Timestamp,
+        [property: JsonPropertyName("error_code")] int ErrorCode,
+        [property: JsonPropertyName("error_message")] string? ErrorMessage,
+        [property: JsonPropertyName("elapsed")] int Elapsed,
+        [property: JsonPropertyName("credit_count")] int CreditCount
+    );
 
-        [JsonPropertyName("name")]
-        public string? Name { get; init; }
-
-        [JsonPropertyName("symbol")]
-        public string? Symbol { get; init; }
-
-        [JsonPropertyName("slug")]
-        public string? Slug { get; init; }
-
-        [JsonPropertyName("num_market_pairs")]
-        public int NumMarketPairs { get; init; }
-
-        [JsonPropertyName("last_updated")]
-        public DateTime LastUpdated { get; init; }
-
-        [JsonPropertyName("date_added")]
-        public DateTime DateAdded { get; init; }
-    }
-
-    public class Status
-    {
-        [JsonPropertyName("timestamp")]
-        public DateTime Timestamp { get; init; }
-
-        [JsonPropertyName("error_code")]
-        public int ErrorCode { get; init; }
-
-        [JsonPropertyName("error_message")]
-        public string? ErrorMessage { get; init; }
-
-        [JsonPropertyName("elapsed")]
-        public int Elapsed { get; init; }
-
-        [JsonPropertyName("credit_count")]
-        public int CreditCount { get; init; }
-    }
 }
