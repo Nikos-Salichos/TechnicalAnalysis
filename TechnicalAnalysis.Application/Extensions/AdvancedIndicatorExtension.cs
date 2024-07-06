@@ -346,7 +346,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BearFractal
                                                               && f.WindowPeriod == 2))
                 {
-                    if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick?.PrimaryId)
+                    if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick.PrimaryId)
                     {
                         currentBearFractalCandlestick = candlestick3;
                     }
@@ -358,27 +358,27 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (candlestick.HighPrice > currentBearFractalCandlestick?.HighPrice
-                    && candlestick?.LowPrice > currentBullFractalCandlestick?.LowPrice)
+                if (candlestick.HighPrice > currentBearFractalCandlestick.HighPrice
+                    && candlestick.LowPrice > currentBullFractalCandlestick.LowPrice)
                 {
                     candlestick.PriceTrend = Trend.Up;
                     continue;
                 }
 
-                if (candlestick?.LowPrice < currentBullFractalCandlestick?.LowPrice
-                    && candlestick?.HighPrice < currentBearFractalCandlestick?.HighPrice)
+                if (candlestick.LowPrice < currentBullFractalCandlestick.LowPrice
+                    && candlestick.HighPrice < currentBearFractalCandlestick.HighPrice)
                 {
                     candlestick.PriceTrend = Trend.Down;
                 }
 
-                if (candlestick?.LowPrice > currentBullFractalCandlestick?.LowPrice
-                   && candlestick?.HighPrice < currentBearFractalCandlestick?.HighPrice)
+                if (candlestick.LowPrice > currentBullFractalCandlestick.LowPrice
+                   && candlestick.HighPrice < currentBearFractalCandlestick.HighPrice)
                 {
                     candlestick.PriceTrend = Trend.Sideways;
                 }
 
-                if (candlestick?.LowPrice < currentBullFractalCandlestick?.LowPrice
-                    && candlestick?.HighPrice > currentBearFractalCandlestick?.HighPrice)
+                if (candlestick.LowPrice < currentBullFractalCandlestick.LowPrice
+                    && candlestick.HighPrice > currentBearFractalCandlestick.HighPrice)
                 {
                     candlestick.PriceTrend = Trend.Sideways;
                 }
@@ -569,7 +569,7 @@ namespace TechnicalAnalysis.Application.Extensions
                                                 )*/
                 )
                 {
-                    var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
+                    var candlestick1 = i >= 1 ? pair.Candlesticks[i - 1] : null;
                     var firstEnhancedScan = candlestick1?.EnhancedScans.FirstOrDefault();
 
                     if (firstEnhancedScan?.EnhancedScanIsLong == true)
