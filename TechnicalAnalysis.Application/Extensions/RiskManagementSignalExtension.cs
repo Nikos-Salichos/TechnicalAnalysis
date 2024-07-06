@@ -94,7 +94,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
                 {
-                    Position position = new Position
+                    Position position = new()
                     {
                         OpenPositionDate = candlestick.OpenDate,
                         EntryPositionPrice = candlestick.OpenPrice,
@@ -116,7 +116,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         && openPosition
                         && candlestick1.ClosePrice <= pricePercentageBelowEntry)
                     {
-                        Position position = new Position
+                        Position position = new()
                         {
                             OpenPositionDate = candlestick.OpenDate,
                             EntryPositionPrice = candlestick.ClosePrice,
@@ -180,7 +180,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
                 {
-                    Position position = new Position
+                    Position position = new()
                     {
                         OpenPositionDate = candlestick.OpenDate,
                         EntryPositionPrice = candlestick.ClosePrice,
@@ -203,7 +203,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         && openPosition
                         && candlestick.ClosePrice <= pricePercentageBelowEntry)
                     {
-                        Position position = new Position
+                        Position position = new()
                         {
                             OpenPositionDate = candlestick.OpenDate,
                             EntryPositionPrice = candlestick.ClosePrice,
@@ -278,7 +278,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true && !openPosition)
                 {
-                    Position position = new Position
+                    Position position = new()
                     {
                         OpenPositionDate = candlestick.OpenDate,
                         EntryPositionPrice = candlestick.ClosePrice,
@@ -301,7 +301,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         && openPosition
                         && candlestick.ClosePrice <= pricePercentageBelowEntry)
                     {
-                        Position position = new Position
+                        Position position = new()
                         {
                             OpenPositionDate = candlestick.OpenDate,
                             EntryPositionPrice = candlestick.ClosePrice,
