@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Domain.Entities
 {
     public class Pair : BaseEntity
     {
-        public string Symbol { get; init; }
+        public string? Symbol { get; init; }
         public long BaseAssetId { get; init; }
         public long QuoteAssetId { get; init; }
         public DataProvider Provider { get; init; }
