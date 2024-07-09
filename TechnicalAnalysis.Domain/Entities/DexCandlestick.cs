@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Domain.Entities
 {
     public class DexCandlestick : BaseEntity
     {
-        public string PoolContract { get; init; }
+        public string? PoolContract { get; init; }
         public long PoolId { get; init; }
         public decimal? OpenPrice { get; init; }
         public decimal? HighPrice { get; init; }
