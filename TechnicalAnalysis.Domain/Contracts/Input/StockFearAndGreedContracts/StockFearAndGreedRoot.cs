@@ -2,12 +2,23 @@
 
 namespace TechnicalAnalysis.Domain.Contracts.Input.StockFearAndGreedContracts
 {
-    public class StockFearAndGreedRoot
-    {
-        [JsonPropertyName("fgi")]
-        public StockFearAndGreedData StockFearAndGreedData { get; init; }
+    public record StockFearAndGreedRoot(
+        [property: JsonPropertyName("fgi")] StockFearAndGreedData StockFearAndGreedData,
+        [property: JsonPropertyName("lastUpdated")] StockFearAndGreedLastUpdated StockFearAndGreedLastUpdated
+    );
 
-        [JsonPropertyName("lastUpdated")]
-        public StockFearAndGreedLastUpdated StockFearAndGreedLastUpdated { get; set; }
-    }
+    public record StockFearAndGreedLastUpdated(
+        [property: JsonPropertyName("epochUnixSeconds")] int EpochUnixSeconds,
+        [property: JsonPropertyName("humanDate")] string? HumanDate
+    );
+
+    public record StockFearAndGreedData(
+        [property: JsonPropertyName("now")] Now Now
+    );
+
+    public record Now(
+        [property: JsonPropertyName("value")] int Value,
+        [property: JsonPropertyName("valueText")] string ValueText
+    );
+
 }
