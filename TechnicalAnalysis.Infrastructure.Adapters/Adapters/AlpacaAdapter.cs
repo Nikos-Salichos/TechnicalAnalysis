@@ -127,8 +127,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "KEYS",    // Keysight Technologies
                     "SIEGY",   // Siemens
                     "CEVA",    // CEVA
-                    "RMBS",    // Rambus
-                
+                    "RMBS",    // Rambus                
                     // Equipment & Components
                     "ASMIY",   // ASM International
                     "ASML",    // ASML
@@ -141,8 +140,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "AMAT",    // Applied Materials
                     "TOELY",   // Tokyo Electron
                     "NINOY",   // Nikon
-                    "BESI.AS", // Besi
-                
+                    "BESI.AS", // Besi                
                     // IDM (Integrated Device Manufacturer)
                     "INTC",    // Intel
                     "MU",      // Micron
@@ -160,8 +158,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "RNECY",   // Renesas
                     "MRAAY",   // Murata
                     "SSNLF",   // Samsung
-                    "HXSCL",   // SK hynix
-                
+                    "HXSCL",   // SK hynix                
                     // Fabless Design
                     "NVDA",    // Nvidia
                     "AAPL",    // Apple
@@ -174,8 +171,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "GOOGL",   // Alphabet (Google) Class A
                     "MRVL",    // Marvell
                     "META",    // Meta (Facebook)
-                    "CRUS",    // Cirrus Logic
-                
+                    "CRUS",    // Cirrus Logic                
                     // Foundries
                     "TSM",     // TSMC
                     "UMC",     // UMC
