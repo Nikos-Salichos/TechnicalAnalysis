@@ -20,7 +20,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var datetime2 = DateTime.Parse(datetimeStr2);
 
             // Act
-            var result = DatetimeExtension.EqualsYearMonthDayHourMinute(datetime1, datetime2);
+            var result = datetime1.EqualsYearMonthDayHourMinute(datetime2);
 
             // Assert
             result.Should().Be(expectedResult);
