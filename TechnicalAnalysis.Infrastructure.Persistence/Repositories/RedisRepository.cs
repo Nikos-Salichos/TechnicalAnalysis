@@ -10,8 +10,13 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
     {
         private static string NormalizeRecordId(string recordId) => recordId.ToUpperInvariant();
 
-        public async Task SetRecordAsync<T>(string recordId, T data, TimeSpan? absoluteExpireTime = null, TimeSpan? slidingExpireTime = null)
+        public async Task SetRecordAsync<T>(string? recordId, T data, TimeSpan? absoluteExpireTime = null, TimeSpan? slidingExpireTime = null)
         {
+            if (string.IsNullOrWhiteSpace(recordId))
+            {
+                return;
+            }
+
             var distributedCacheEntryOptions = GetDistributedCacheEntryOptions(absoluteExpireTime, slidingExpireTime);
 
             await using var compressedStream = new MemoryStream();
