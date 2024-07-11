@@ -51,7 +51,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             if (apiResponse.HasError)
             {
-                logger.LogError("{apiResponse.IsError}", apiResponse.HasError);
+                logger.LogError("{ApiResponseIsError}", apiResponse.HasError);
                 return false;
             }
 
