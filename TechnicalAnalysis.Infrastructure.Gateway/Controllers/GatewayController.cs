@@ -91,7 +91,7 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
             }
 
             await using var jsonStream = await response.Content.ReadAsStreamAsync();
-            var deserializedResponse = JsonSerializer.Deserialize<T>(jsonStream, _jsonSerializerOptions);
+            var deserializedResponse = await JsonSerializer.DeserializeAsync<T>(jsonStream, _jsonSerializerOptions);
 
             return deserializedResponse ?? default;
         }
