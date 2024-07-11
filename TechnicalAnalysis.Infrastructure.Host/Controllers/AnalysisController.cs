@@ -27,12 +27,12 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             [FromQuery] Timeframe timeframe = Timeframe.Daily)
         {
             var request = new DataProviderTimeframeRequest(dataProvider, timeframe);
-            logger.LogInformation("dataProviderTimeframeRequest {@dataProviderTimeframeRequest}", request);
+            logger.LogInformation("DataProviderTimeframeRequest {@dataProviderTimeframeRequest}", request);
 
             var validationResult = _dataProviderTimeframeRequest.Validate(request);
             if (!validationResult.IsValid)
             {
-                logger.LogError("validationResult {@validationResult}", validationResult);
+                logger.LogError("ValidationResult {@validationResult}", validationResult);
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage);
                 return Task.FromResult<IActionResult>(BadRequest(errors));
             }
@@ -53,7 +53,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [EnableRateLimiting("fixed-by-ip")]
         public async Task<IActionResult> GetEnhancedPairResultsAsync([FromQuery] DataProvider provider = DataProvider.All)
         {
-            logger.LogInformation("request {request}", provider);
+            logger.LogInformation("Request {request}", provider);
             var result = await analysisService.GetEnhancedPairResultsAsync(provider, HttpContext);
             return Ok(result);
         }
@@ -65,7 +65,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [EnableRateLimiting("fixed-by-ip")]
         public Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
         {
-            logger.LogInformation("request {pairNames} {timeframe}", pairNames, timeframe);
+            logger.LogInformation("Request {PairNames} {Timeframe}", pairNames, timeframe);
 
             if (pairNames.Count is 0)
             {
