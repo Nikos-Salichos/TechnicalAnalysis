@@ -46,7 +46,6 @@ namespace TechnicalAnalysis.Application.Services
             {
                 await redisRepository.SetRecordAsync(pair.Symbol, pair);
                 pairsFromCache.Add(pair);
-
             }, ExecutionDataflowBlockOptions);
 
             foreach (var pair in fetchedPairs)
