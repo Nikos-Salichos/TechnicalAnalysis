@@ -244,7 +244,7 @@ namespace TechnicalAnalysis.Application.Services
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
-                var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
+                var candlestick1 = i >= 1 ? pair.Candlesticks[i - 1] : null;
 
                 if (candlestick1 is null)
                 {
@@ -292,8 +292,7 @@ namespace TechnicalAnalysis.Application.Services
             var lastSignal = string.Empty;
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
-                var candlestick = pair.Candlesticks[i];
-                var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
+                var candlestick1 = i >= 1 ? pair.Candlesticks[i - 1] : null;
 
                 if (candlestick1 == null)
                 {
@@ -311,6 +310,7 @@ namespace TechnicalAnalysis.Application.Services
                 {
                     lastSignal = "sell";
                     //We invest contrarian
+                    var candlestick = pair.Candlesticks[i];
                     var signalIndicator = new Signal
                     {
                         OpenedAt = candlestick.OpenDate.ToString("yyyy-MM-dd HH:mm:ss"),
