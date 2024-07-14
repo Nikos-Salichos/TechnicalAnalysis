@@ -164,7 +164,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "AAPL",    // Apple
                     "CSCO",    // Cisco
                     "AVGO",    // Broadcom
-                    "QCOM",    // Qualcomm (duplicate)
                     "MPWR",    // Monolithic Power Systems
                     "AMD",     // AMD
                     "GOOG",    // Alphabet (Google) Class C
