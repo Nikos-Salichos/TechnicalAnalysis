@@ -65,5 +65,30 @@ namespace TechnicalAnalysis.Tests.UnitTests
                 Assert.Equal(expectedLowestRsi.Value, dynamicRsi.Oversold);
             }
         }
+
+        [Fact]
+        public void CalculateRsiExtreme_NoLookbackPeriod_NoValuesInDynamicRsi()
+        {
+            // Arrange
+            var candlesticks = new List<CandlestickExtended>();
+
+            var candlestickExtended = new CandlestickExtended
+            {
+                PrimaryId = 1
+            };
+
+            candlesticks.Add(candlestickExtended);
+
+            // Act
+            BasicIndicatorExtension.CalculateRsiExtreme(candlesticks);
+
+            // Assert
+
+            foreach (var candlestick in candlesticks)
+            {
+                Assert.Empty(candlestick.DynamicRsis);
+            }
+        }
+
     }
 }
