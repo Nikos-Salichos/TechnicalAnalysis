@@ -1740,7 +1740,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var candlestick = candlesticks[currentIndex];
-            var candlestick1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1] : null;
+            var candlestick1 = currentIndex >= 1 ? candlesticks[currentIndex - 1] : null;
             var candlestick2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2] : null;
             var candlestick3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3] : null;
             var candlestick4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4] : null;
