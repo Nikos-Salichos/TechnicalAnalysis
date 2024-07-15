@@ -74,16 +74,43 @@ namespace TechnicalAnalysis.Application.Extensions
             CalculateFractalLowestHigh(pair);
             CalculateHighestHigh(pair);
             CalculateLowestLow(pair);
-            CalculateStatisticsFromAllTimeHighLow(pair);
-
             CalculateHighestClose(pair);
+            CalculateStatisticsFromAllTimeHighLow(pair);
 
             CalculateHistoricalVolatility(pair);
             CalculateAverageRange(pair);
             CalculateVerticalHorizontalFilter(pair);
             CalculateOnBalanceVolumeOscilator(pair, quotes, candlestickLookup);
             CalculatePsychologicalLine(pair);
+
+            CalculateRsiExtreme(pair.Candlesticks);
         }
+
+        public static void CalculateRsiExtreme(List<CandlestickExtended> candlesticks)
+        {
+            const int lookbackPeriod = 30;
+
+            for (int i = 0; i < candlesticks.Count; i++)
+            {
+                int start = Math.Max(0, i - lookbackPeriod + 1);
+                var chunk = candlesticks.Skip(start).Take(lookbackPeriod);
+                var rsiValues = chunk.Select(c => c.Rsis[0].Value).ToList();
+
+                double? highestRsi = rsiValues.Max();
+                double? lowestRsi = rsiValues.Min();
+
+                candlesticks[i].DynamicRsis.Add(new DynamicRsi(candlesticks[i].PrimaryId)
+                {
+                    Period = Constants.RsiPeriod,
+                    Overbought = highestRsi.Value,
+                    Oversold = lowestRsi.Value,
+                    Value = candlesticks[i].Rsis[0].Value,
+                    NumberOfRsiLowerThanPreviousRsis = rsiValues.Count(rsi => rsi < candlesticks[i].Rsis[0].Value)
+                });
+            }
+        }
+
+
 
         private static void CalculateBollingerBands(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
