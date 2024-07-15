@@ -92,24 +92,40 @@ namespace TechnicalAnalysis.Application.Extensions
 
             for (int i = 0; i < candlesticks.Count; i++)
             {
+                // Determine the starting index for the lookback period
                 int start = Math.Max(0, i - lookbackPeriod + 1);
+
+                // Get the chunk of candlesticks for the current lookback period
                 var chunk = candlesticks.Skip(start).Take(lookbackPeriod);
-                var rsiValues = chunk.Select(c => c.Rsis[0].Value).ToList();
 
-                double? highestRsi = rsiValues.Max();
-                double? lowestRsi = rsiValues.Min();
+                var rsiValues = chunk
+                     .Where(c => c.Rsis?.Count > 0 && c.Rsis[0]?.Value != null)
+                     .Select(c => c.Rsis[0].Value)
+                     .ToList();
 
+                if (rsiValues.Count is 0)
+                {
+                    continue;
+                }
+
+                // Find the highest and lowest RSI values within the lookback period
+                var highestRsi = rsiValues.Max();
+                var lowestRsi = rsiValues.Min();
+
+                // Count the number of RSI values that are lower than the current RSI value
+                int numberOfRsiLowerThanCurrent = rsiValues.Count(rsi => rsi < candlesticks[i].Rsis[0].Value);
+
+                // Add a new DynamicRsi object to the current candlestick's DynamicRsis collection
                 candlesticks[i].DynamicRsis.Add(new DynamicRsi(candlesticks[i].PrimaryId)
                 {
                     Period = Constants.RsiPeriod,
                     Overbought = highestRsi.Value,
                     Oversold = lowestRsi.Value,
                     Value = candlesticks[i].Rsis[0].Value,
-                    NumberOfRsiLowerThanPreviousRsis = rsiValues.Count(rsi => rsi < candlesticks[i].Rsis[0].Value)
+                    NumberOfRsiLowerThanPreviousRsis = numberOfRsiLowerThanCurrent
                 });
             }
         }
-
 
 
         private static void CalculateBollingerBands(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
