@@ -22,6 +22,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public List<DonchianChannel> DonchianChannels { get; init; } = [];
         public List<KeltnerChannel> KeltnerChannels { get; init; } = [];
         public List<Rsi> Rsis { get; init; } = [];
+        public List<DynamicRsi> DynamicRsis { get; init; } = [];
         public List<Stochastic> Stochastics { get; init; } = [];
         public List<Adx> Adxs { get; init; } = [];
         public List<Aroon> Aroons { get; init; } = [];
