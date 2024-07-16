@@ -63,6 +63,5 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
             });
         }
-
     }
 }
