@@ -20,7 +20,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             try
             {
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                    => await _httpClient.GetAsync($"https://api.alternative.me/fng/?limit={numberOfDates}", HttpCompletionOption.ResponseHeadersRead));
+                    => await _httpClient.GetAsync($"https://api.alternative.me/fng/?limit={numberOfDates}", HttpCompletionOption.ResponseHeadersRead, ctx));
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
