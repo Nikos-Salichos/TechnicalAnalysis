@@ -92,7 +92,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 try
                 {
                     using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                        => await _httpClient.PostAsJsonAsync(endpoint, body));
+                        => await _httpClient.PostAsJsonAsync(endpoint, body, ctx));
 
                     logger.LogInformation("Method {Method}, dexEndpoint {DexEndpoint}, " +
                         "httpResponseMessage StatusCode {StatusCode}",
