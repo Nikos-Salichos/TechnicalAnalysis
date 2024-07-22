@@ -132,7 +132,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var openPositions = positions.Where(p => p.OpenPosition).ToList();
                 if (openPositions.Count > 0)
                 {
-                    var candlestick3 = i - 2 >= 0 ? pair.Candlesticks[i - 2] : null;
+                    var candlestick3 = i >= 2 ? pair.Candlesticks[i - 2] : null;
                     if (candlestick3 is not null)
                     {
                         var latestFractal = candlestick3.Fractals.FirstOrDefault();
@@ -220,7 +220,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var openPositions = positions.Where(p => p.OpenPosition).ToList();
                 if (openPositions.Count > 0)
                 {
-                    var candlestick3 = i - 2 >= 0 ? pair.Candlesticks[i - 2] : null;
+                    var candlestick3 = i >= 2 ? pair.Candlesticks[i - 2] : null;
                     if (candlestick3 is not null)
                     {
                         var latestFractal = candlestick3.Fractals.FirstOrDefault();
@@ -319,7 +319,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (openPositions.Count > 0)
                 {
-                    var candlestick3 = i - 2 >= 0 ? pair.Candlesticks[i - 2] : null;
+                    var candlestick3 = i >= 2 ? pair.Candlesticks[i - 2] : null;
                     if (candlestick3 is not null)
                     {
                         var latestFractal = candlestick3.Fractals.FirstOrDefault();
