@@ -23,7 +23,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 { "brk.b", "nyse" },
             }.ToFrozenDictionary();
 
-            List<Stock> stocks = new();
+            List<Stock> stocks = [];
 
             foreach (var stockExchange in stockExchanges)
             {
