@@ -24,7 +24,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead, ctx));
 
-                logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
+                logger.LogInformation("SymbolsPairsPath {BaseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
                     coinPaprikaSetting.CurrentValue.Endpoint, httpResponseMessage);
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)

@@ -63,7 +63,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 }
 
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                    => await _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead));
+                    => await _httpClient.GetAsync(binanceCandlestickPath, HttpCompletionOption.ResponseHeadersRead, ctx));
 
                 logger.LogInformation("binanceCandlestickPath {BinanceCandlestickPath}, httpResponseMessage StatusCode {StatusCode} ",
                     binanceCandlestickPath, httpResponseMessage.StatusCode);

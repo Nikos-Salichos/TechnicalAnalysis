@@ -25,7 +25,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Host", rapidApiSetting.CurrentValue.StockFearAndGreedHost);
 
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                    => await _httpClient.GetAsync(rapidApiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
+                    => await _httpClient.GetAsync(rapidApiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead, ctx));
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
