@@ -113,17 +113,19 @@ namespace TechnicalAnalysis.Application.Extensions
                 var lowestRsi = rsiValues.Min();
 
                 // Count the number of RSI values that are lower than the current RSI value
-                int numberOfRsiLowerThanCurrent = rsiValues.Count(rsi => rsi < candlesticks[i].Rsis[0].Value);
-
-                // Add a new DynamicRsi object to the current candlestick's DynamicRsis collection
-                candlesticks[i].DynamicRsis.Add(new DynamicRsi(candlesticks[i].PrimaryId)
+                if (candlesticks[i].Rsis?.Count > 0)
                 {
-                    Period = Constants.RsiPeriod,
-                    Overbought = highestRsi.Value,
-                    Oversold = lowestRsi.Value,
-                    Value = candlesticks[i].Rsis[0].Value,
-                    NumberOfRsiLowerThanPreviousRsis = numberOfRsiLowerThanCurrent
-                });
+                    int numberOfRsiLowerThanCurrent = rsiValues.Count(rsi => rsi < candlesticks[i].Rsis[0].Value);
+                    // Add a new DynamicRsi object to the current candlestick's DynamicRsis collection
+                    candlesticks[i].DynamicRsis.Add(new DynamicRsi(candlesticks[i].PrimaryId)
+                    {
+                        Period = Constants.RsiPeriod,
+                        Overbought = highestRsi.Value,
+                        Oversold = lowestRsi.Value,
+                        Value = candlesticks[i].Rsis[0].Value,
+                        NumberOfRsiLowerThanPreviousRsis = numberOfRsiLowerThanCurrent
+                    });
+                }
             }
         }
 
