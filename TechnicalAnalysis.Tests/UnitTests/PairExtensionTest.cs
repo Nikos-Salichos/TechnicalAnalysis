@@ -129,6 +129,5 @@ namespace TechnicalAnalysis.Tests.UnitTests
                 }
             );
         }
-
     }
 }

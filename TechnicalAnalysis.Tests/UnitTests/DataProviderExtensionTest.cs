@@ -74,13 +74,13 @@ namespace TechnicalAnalysis.Tests.UnitTests
             // Arrange
             var provider = new ProviderSynchronization
             {
-                CandlestickSyncInfos = new List<ProviderCandlestickSyncInfo>
-            {
+                CandlestickSyncInfos =
+            [
                 new() {
                     LastCandlestickSync = DateTime.UtcNow.Date.AddDays(-1),
                     Timeframe = Timeframe.Daily
                 }
-            }
+            ]
             };
 
             // Act

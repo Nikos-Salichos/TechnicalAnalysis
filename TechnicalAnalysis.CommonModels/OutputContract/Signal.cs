@@ -2,7 +2,7 @@
 
 namespace TechnicalAnalysis.CommonModels.OutputContract
 {
-    public class Signal
+    public record Signal
     {
         [JsonPropertyName("BUY")]
         public int Buy { get; set; }
@@ -12,6 +12,7 @@ namespace TechnicalAnalysis.CommonModels.OutputContract
 
         [JsonPropertyName("OPENED_AT")]
         public string? OpenedAt { get; set; }
+
         public decimal? EntryPrice { get; init; }
     }
 }

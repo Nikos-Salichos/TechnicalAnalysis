@@ -34,7 +34,6 @@ namespace TechnicalAnalysis.Infrastructure.Host.Serilog
                     })
                     .ReadFrom.Configuration(context.Configuration);
             });
-
         }
     }
 }

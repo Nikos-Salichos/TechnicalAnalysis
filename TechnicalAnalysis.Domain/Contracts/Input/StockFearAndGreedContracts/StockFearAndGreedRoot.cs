@@ -20,5 +20,4 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.StockFearAndGreedContracts
         [property: JsonPropertyName("value")] int Value,
         [property: JsonPropertyName("valueText")] string ValueText
     );
-
 }

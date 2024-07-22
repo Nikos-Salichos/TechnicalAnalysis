@@ -80,6 +80,5 @@ namespace TechnicalAnalysis.Tests.UnitTests
             // Assert
             dateRanges.Count.Should().Be(countOfDateRanges);
         }
-
     }
 }

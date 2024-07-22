@@ -70,7 +70,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public decimal? DaysFromAllTimeHigh { get; set; }
 
         public decimal? InternalBarStrength
-            => HighPrice - LowPrice == 0
+            => HighPrice == LowPrice
                     ? null
                     : (ClosePrice - LowPrice) / (HighPrice - LowPrice);
 

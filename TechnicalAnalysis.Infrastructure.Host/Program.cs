@@ -111,10 +111,7 @@ app.UseMetricServer(); //Starting the metrics exporter, will expose "/metrics"
 
 app.UseSwagger();
 
-app.UseSwaggerUI(options =>
-{
-    options.DisplayRequestDuration();
-});
+app.UseSwaggerUI(options => options.DisplayRequestDuration());
 
 app.UseExceptionHandler();
 
@@ -137,7 +134,7 @@ if (builder.Environment.EnvironmentName != "IntegrationTest")
 {
     app.UseHangfireDashboard("/hangfire", new DashboardOptions()
     {
-        Authorization = new[] { new DashboardNoAuthorizationFilter() }
+        Authorization = [new DashboardNoAuthorizationFilter()]
     });
 
     //Note: Swagger will not run before jobs finish

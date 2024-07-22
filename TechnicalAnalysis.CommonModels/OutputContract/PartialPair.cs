@@ -2,7 +2,7 @@
 
 namespace TechnicalAnalysis.CommonModels.OutputContract
 {
-    public class PartialPair
+    public record PartialPair
     {
         [JsonPropertyName("symbol")]
         public string? Symbol { get; init; }

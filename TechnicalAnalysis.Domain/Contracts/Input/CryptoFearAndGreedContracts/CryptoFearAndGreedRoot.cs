@@ -11,5 +11,4 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.CryptoFearAndGreedContracts
         [property: JsonPropertyName("value_classification")] string? ValueClassification,
         [property: JsonPropertyName("timestamp")] string? Timestamp
     );
-
 }

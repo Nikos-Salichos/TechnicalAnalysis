@@ -169,11 +169,11 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var pairs = new List<BinancePair>
     {
         new() {
-            BinanceCandlesticks = new List<BinanceCandlestick>
-            {
+            BinanceCandlesticks =
+            [
                 new() { OpenTime = new(2023, 1, 1), CloseTime = new(2023, 1, 1, 23, 59, 59) },
                 new() { OpenTime = new(2023, 1, 4), CloseTime = new(2023, 1, 4, 23, 59, 59) }
-            }
+            ]
         }
     };
 

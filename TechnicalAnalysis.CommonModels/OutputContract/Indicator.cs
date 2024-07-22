@@ -2,10 +2,11 @@
 
 namespace TechnicalAnalysis.CommonModels.OutputContract
 {
-    public class Indicator
+    public record Indicator
     {
         [JsonPropertyName("name")]
         public string? Name { get; init; }
+
         public string? PairName { get; init; }
 
         [JsonPropertyName("signals")]

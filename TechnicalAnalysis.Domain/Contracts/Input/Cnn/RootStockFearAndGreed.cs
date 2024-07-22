@@ -27,5 +27,4 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.Cnn
     public record CnnFearAndGreedHistorical(
         [property: JsonPropertyName("data")] List<CnnFearAndGreedHistoricalData> FearAndGreedHistoricalData
     );
-
 }

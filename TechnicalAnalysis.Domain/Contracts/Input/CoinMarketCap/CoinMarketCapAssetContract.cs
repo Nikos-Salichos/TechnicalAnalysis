@@ -24,5 +24,4 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.CoinMarketCap
         [property: JsonPropertyName("elapsed")] int Elapsed,
         [property: JsonPropertyName("credit_count")] int CreditCount
     );
-
 }

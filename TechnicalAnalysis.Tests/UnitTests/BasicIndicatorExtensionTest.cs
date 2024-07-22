@@ -54,7 +54,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
             for (int i = 0; i < candlesticks.Count; i++)
             {
                 int start = Math.Max(0, i - lookbackPeriod + 1);
-                var chunk = candlesticks.Skip(start).Take(lookbackPeriod).ToList();
+                var chunk = candlesticks.Skip(start).Take(lookbackPeriod);
                 var rsiValues = chunk.Select(c => c.Rsis[0].Value).ToList();
 
                 double? expectedHighestRsi = rsiValues.Max();
@@ -89,6 +89,5 @@ namespace TechnicalAnalysis.Tests.UnitTests
                 Assert.Empty(candlestick.DynamicRsis);
             }
         }
-
     }
 }

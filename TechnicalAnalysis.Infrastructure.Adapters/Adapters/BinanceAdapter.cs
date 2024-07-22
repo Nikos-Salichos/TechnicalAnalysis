@@ -64,7 +64,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
         private async Task SyncAssets(List<BinanceSymbol> tradeablePairs)
         {
-            List<BinanceAsset> newAssets = new();
+            List<BinanceAsset> newAssets = [];
             foreach (var item in tradeablePairs)
             {
                 newAssets.Add(new BinanceAsset { Id = 0, Asset = item.BaseAsset });

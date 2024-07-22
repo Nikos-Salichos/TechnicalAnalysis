@@ -25,5 +25,4 @@ namespace TechnicalAnalysis.Domain.Contracts.Input.CoinRanking
         [property: JsonPropertyName("totalMarketCap")] string TotalMarketCap,
         [property: JsonPropertyName("total24hVolume")] string Total24hVolume
     );
-
 }

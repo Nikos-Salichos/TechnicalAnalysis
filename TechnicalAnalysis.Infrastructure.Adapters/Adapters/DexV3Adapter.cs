@@ -95,7 +95,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 .Where(t => t.Symbol != null)
                 .Select(t => t.Symbol!));
 
-            List<Asset> newAssets = new();
+            List<Asset> newAssets = [];
 
             foreach (var pool in pools)
             {

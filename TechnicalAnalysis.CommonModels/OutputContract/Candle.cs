@@ -3,7 +3,7 @@ using TechnicalAnalysis.CommonModels.Indicators.Advanced;
 
 namespace TechnicalAnalysis.CommonModels.OutputContract
 {
-    public class Candle
+    public record Candle
     {
         [JsonPropertyName("OPEN")]
         public decimal? Open { get; init; }
