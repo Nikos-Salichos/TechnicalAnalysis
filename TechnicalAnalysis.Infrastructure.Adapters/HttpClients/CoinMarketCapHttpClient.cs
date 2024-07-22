@@ -38,7 +38,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 uriBuilder.Query = queryString.ToString();
 
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                    => await _httpClient.GetAsync(uriBuilder.ToString(), HttpCompletionOption.ResponseHeadersRead));
+                    => await _httpClient.GetAsync(uriBuilder.ToString(), HttpCompletionOption.ResponseHeadersRead, ctx));
 
                 logger.LogInformation("SymbolsPairsPath {BaseUrl}, httpResponseMessage '{@HttpResponseMessage}' ",
                     coinMarketCapSettings.CurrentValue.ListingsLatestEndpoint, httpResponseMessage);
