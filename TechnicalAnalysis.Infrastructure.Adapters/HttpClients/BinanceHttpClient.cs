@@ -22,7 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             try
             {
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                 => await _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead));
+                 => await _httpClient.GetAsync(binanceSettings.CurrentValue.SymbolsPairsPath, HttpCompletionOption.ResponseHeadersRead, ctx));
 
                 logger.LogInformation("SymbolsPairsPath {BinanceSettingsCurrentValueSymbolsPairsPath}, httpResponseMessage '{@HttpResponseMessage}' ",
                 binanceSettings.CurrentValue.SymbolsPairsPath, httpResponseMessage);
