@@ -44,7 +44,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "RACE", "MU", "DJCO", "SYK", "PM", "ADP", "WAT", "PEP", "MKC", "FIS",
                     "WTW", "CRH", "WBA", "WSO", "ASML", "ADBE", "REGN", "FTNT", "ODFL", "CPRT", "ACN",
                     "LOW", "MO", "SJW","TGT","PPG", "SPGI", "BLK", "TMO", "UNP", "DHR", "IDXX", "RMV",
-                    "EL", "PAYC","ORLY","ROP"
+                    "EL", "PAYC","ORLY","ROP", "ANET", "LLY",
                 ];
 
             List<string> dividendAristocrats =
