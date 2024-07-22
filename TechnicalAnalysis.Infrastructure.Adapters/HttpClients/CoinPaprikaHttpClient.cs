@@ -22,7 +22,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             try
             {
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                    => await _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead));
+                    => await _httpClient.GetAsync(coinPaprikaSetting.CurrentValue.Endpoint, HttpCompletionOption.ResponseHeadersRead, ctx));
 
                 logger.LogInformation("SymbolsPairsPath {baseUrl}, httpResponseMessage '{@httpResponseMessage}' ",
                     coinPaprikaSetting.CurrentValue.Endpoint, httpResponseMessage);
