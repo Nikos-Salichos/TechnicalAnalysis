@@ -23,7 +23,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             try
             {
                 using var httpResponseMessage = await _resiliencePipeline.ExecuteAsync(async (ctx)
-                    => await _httpClient.GetAsync(apiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead));
+                    => await _httpClient.GetAsync(apiSetting.CurrentValue.StockFearAndGreedUri, HttpCompletionOption.ResponseHeadersRead, ctx));
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
