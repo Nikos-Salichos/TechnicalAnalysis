@@ -28,7 +28,7 @@ namespace TechnicalAnalysis.Domain.Utilities
                                     "Exception: {ExceptionMessage} {ExceptionData}, " +
                                     "Context: {Context}",
                                     args.AttemptNumber, retries, args.RetryDelay.TotalSeconds,
-                                    args.Outcome.Exception.Message, args.Outcome.Exception.Data,
+                                    args.Outcome.Exception?.Message, args.Outcome.Exception.Data,
                                     options);
                     return default;
                 }
