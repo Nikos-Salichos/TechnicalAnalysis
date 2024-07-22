@@ -471,8 +471,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
 
                 //TODO Enable it debug specific candlestick
-                if (candlestick.CloseDate.Date == new DateTime(2024, 04, 23).Date
-                    && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
+                if (candlestick.CloseDate.Date == new DateTime(2024, 07, 20).Date
+                    && string.Equals(pair.Symbol, "JEPI", StringComparison.InvariantCultureIgnoreCase))
                 {
                 }
 
@@ -481,8 +481,33 @@ namespace TechnicalAnalysis.Application.Extensions
                     // continue;
                 }
 
-                CryptoFearAndGreedConditions(pair, cryptoFearAndGreedDataPerDatetime, candlestick);
-                EtfAndStocksFearAndGreedConditions(pair, stockFearAndGreedDataPerDatetime, candlestick);
+                if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
+                    && cryptoFearAndGreedIndex is not null && pair.Provider
+                    is DataProvider.Binance
+                    or DataProvider.Uniswap
+                    or DataProvider.Pancakeswap)
+                {
+                    var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType is ValueClassificationType.ExtremeFear
+                          or ValueClassificationType.Fear;
+
+                    if (!greedAndFearCondition)
+                    {
+                        continue;
+                    }
+                }
+
+                if (stockFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var stockFearAndGreedIndex)
+                     && stockFearAndGreedIndex is not null && pair.Provider
+                     is DataProvider.Alpaca)
+                {
+                    var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType is ValueClassificationType.ExtremeFear
+                          or ValueClassificationType.Fear;
+
+                    if (!greedAndFearCondition)
+                    {
+                        continue;
+                    }
+                }
 
                 bool[] conditions =
                 [
@@ -565,42 +590,6 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void EtfAndStocksFearAndGreedConditions(PairExtended pair, Dictionary<DateTime, FearAndGreedModel> stockFearAndGreedDataPerDatetime, CandlestickExtended candlestick)
-        {
-            if (stockFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var stockFearAndGreedIndex)
-                                 && stockFearAndGreedIndex is not null && pair.Provider
-                                 is DataProvider.Alpaca)
-            {
-                var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType is ValueClassificationType.ExtremeFear
-                      or ValueClassificationType.Fear
-                      or ValueClassificationType.Neutral;
-
-                if (!greedAndFearCondition)
-                {
-                    continue;
-                }
-            }
-        }
-
-        private static void CryptoFearAndGreedConditions(PairExtended pair, Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime, CandlestickExtended candlestick)
-        {
-            if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
-                                && cryptoFearAndGreedIndex is not null && pair.Provider
-                                is DataProvider.Binance
-                                or DataProvider.Uniswap
-                                or DataProvider.Pancakeswap)
-            {
-                var greedAndFearCondition = cryptoFearAndGreedIndex.ValueClassificationType is ValueClassificationType.ExtremeFear
-                      or ValueClassificationType.Fear
-                      or ValueClassificationType.Neutral;
-
-                if (!greedAndFearCondition)
-                {
-                    continue;
-                }
-            }
-        }
-
         private static void CalculateEnchancedShort(PairExtended pair,
             Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime,
             Dictionary<DateTime, FearAndGreedModel> stockFearAndGreedDataPerDatetime)
@@ -610,6 +599,12 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
+
+                //TODO Enable it debug specific candlestick
+                if (candlestick.CloseDate.Date == new DateTime(2024, 07, 20).Date
+                    && string.Equals(pair.Symbol, "JEPI", StringComparison.InvariantCultureIgnoreCase))
+                {
+                }
 
                 if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
                     && cryptoFearAndGreedIndex is not null && pair.Provider
