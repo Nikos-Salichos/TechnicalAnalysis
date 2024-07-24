@@ -30,7 +30,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 nameof(pair.QuoteAssetContract), pair.QuoteAssetContract,
                 nameof(pair.QuoteAssetName), pair.QuoteAssetName);
 
-            pair.Candlesticks = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
+            pair.Candlesticks = [.. pair.Candlesticks.OrderBy(c => c.CloseDate)];
 
             var quotes = pair
                 .Candlesticks
