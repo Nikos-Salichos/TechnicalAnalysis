@@ -400,7 +400,6 @@ namespace TechnicalAnalysis.Application.Extensions
                         AroonDown = indicatorResult.AroonDown,
                         Oscillator = indicatorResult.Oscillator,
                         Period = 25,
-
                     });
                 }
             }
