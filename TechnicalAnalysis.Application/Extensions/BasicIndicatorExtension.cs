@@ -129,7 +129,6 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-
         private static void CalculateBollingerBands(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
             foreach (var bollingerBandResult in quotes.Use(CandlePart.Close).GetBollingerBands())
