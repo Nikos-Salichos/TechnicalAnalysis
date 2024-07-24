@@ -671,7 +671,7 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = 0; i < candlesticksWithBearFractals.Count; i++)
             {
                 var candlestick = candlesticksWithBearFractals[i];
-                var candlestick1 = i - 1 >= 0 ? candlesticksWithBearFractals[i - 1] : null;
+                var candlestick1 = i >= 1 ? candlesticksWithBearFractals[i - 1] : null;
 
                 if (candlestick1 is null)
                 {
