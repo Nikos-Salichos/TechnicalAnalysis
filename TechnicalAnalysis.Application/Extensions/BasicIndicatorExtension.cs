@@ -709,7 +709,7 @@ namespace TechnicalAnalysis.Application.Extensions
             for (int i = 0; i < candlesticksWithBullFractals.Count; i++)
             {
                 var candlestick = candlesticksWithBullFractals[i];
-                var candlestick1 = i - 1 >= 0 ? candlesticksWithBullFractals[i - 1] : null;
+                var candlestick1 = i >= 1 ? candlesticksWithBullFractals[i - 1] : null;
 
                 if (candlestick1 is null)
                 {
