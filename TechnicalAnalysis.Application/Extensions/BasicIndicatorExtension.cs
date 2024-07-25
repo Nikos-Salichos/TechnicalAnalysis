@@ -108,13 +108,13 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                // Find the highest and lowest RSI values within the lookback period
-                var highestRsi = rsiValues.Max();
-                var lowestRsi = rsiValues.Min();
-
                 // Count the number of RSI values that are lower than the current RSI value
                 if (candlesticks[i].Rsis?.Count > 0)
                 {
+                    // Find the highest and lowest RSI values within the lookback period
+                    var lowestRsi = rsiValues.Min();
+                    var highestRsi = rsiValues.Max();
+
                     int numberOfRsiLowerThanCurrent = rsiValues.Count(rsi => rsi < candlesticks[i].Rsis[0].Value);
                     // Add a new DynamicRsi object to the current candlestick's DynamicRsis collection
                     candlesticks[i].DynamicRsis.Add(new DynamicRsi(candlesticks[i].PrimaryId)
