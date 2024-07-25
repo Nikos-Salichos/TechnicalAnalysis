@@ -7,7 +7,7 @@ namespace TechnicalAnalysis.Application.Extensions
     {
         public static List<Position> AverageDownStrategyCloseOneByOne(this PairExtended pair)
         {
-            List<Position> positions = new();
+            List<Position> positions = [];
 
             _ = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
             bool openPosition = false;
