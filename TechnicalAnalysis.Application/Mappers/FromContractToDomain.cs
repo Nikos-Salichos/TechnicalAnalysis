@@ -1,5 +1,6 @@
 ﻿using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Builders;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 using TechnicalAnalysis.Domain.Contracts.Input.Cnn;
@@ -18,7 +19,8 @@ namespace TechnicalAnalysis.Application.Mappers
             => new()
             {
                 PrimaryId = binanceAsset.Id,
-                Symbol = binanceAsset.Asset
+                Symbol = binanceAsset.Asset,
+                ProductType = ProductType.CryptoRegardlessLayer
             };
 
         public static List<Asset> ToDomain(this List<BinanceAsset> binanceAssets)
