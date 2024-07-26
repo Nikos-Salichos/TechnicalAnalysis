@@ -786,7 +786,7 @@ namespace TechnicalAnalysis.Application.Services
         public async Task<List<AssetRanking>> GetLayerOneAssetsAsync()
         {
             var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
-            return fetchedAssets.Where(a => a.AssetType is ProductType.Layer1).OrderByDescending(a => a.CreatedDate).ToList();
+            return fetchedAssets.Where(a => a.ProductType is ProductType.Layer1).OrderByDescending(a => a.CreatedDate).ToList();
         }
 
         public async Task<List<CandlestickExtended>> GetCustomCandlesticksAnalysisAsync(List<CustomCandlestickData> customCandlestickData)
