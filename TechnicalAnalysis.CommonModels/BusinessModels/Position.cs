@@ -19,9 +19,6 @@
         public decimal? ClosedProfitOrLoss
             => ClosePositionPrice - EntryPositionPrice;
 
-        public Position()
-        {
-            Id = Interlocked.Increment(ref _counter);
-        }
+        public Position() => Id = Interlocked.Increment(ref _counter);
     }
 }
