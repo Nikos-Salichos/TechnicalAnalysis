@@ -7,7 +7,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
     {
         public string? Symbol { get; init; }
         public DateTime CreatedDate { get; } = DateTime.UtcNow;
-        public ProductType AssetType { get; init; }
+        public ProductType ProductType { get; init; }
 
         public bool Equals(Asset? other)
         {
