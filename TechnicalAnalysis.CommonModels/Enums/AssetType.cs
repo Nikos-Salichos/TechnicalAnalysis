@@ -5,7 +5,8 @@
         Unknown = 0,
         Layer1 = 1,
         Layer2 = 2,
-        CryptoUnknownLayer = 3,
+        CryptoRegardlessLayer = 3,
         StockOrETF = 4,
+        Fiat = 5,
     }
 }
