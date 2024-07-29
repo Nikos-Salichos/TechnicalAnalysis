@@ -1,9 +1,16 @@
-﻿namespace TechnicalAnalysis.Domain.Settings
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TechnicalAnalysis.Domain.Settings
 {
     public class RapidApiSetting
     {
-        public string? StockFearAndGreedUri { get; init; }
-        public string? StockFearAndGreedHost { get; init; }
-        public string? StockFearAndGreedApiKey { get; init; }
+        [Required]
+        public string StockFearAndGreedUri { get; init; }
+
+        [Required]
+        public string StockFearAndGreedHost { get; init; }
+
+        [Required]
+        public string StockFearAndGreedApiKey { get; init; }
     }
 }
