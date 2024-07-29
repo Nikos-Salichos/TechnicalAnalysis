@@ -1,7 +1,10 @@
-﻿namespace TechnicalAnalysis.Domain.Settings
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TechnicalAnalysis.Domain.Settings
 {
     public class CnnApiSetting
     {
-        public string? StockFearAndGreedUri { get; init; }
+        [Required]
+        public string StockFearAndGreedUri { get; init; }
     }
 }
