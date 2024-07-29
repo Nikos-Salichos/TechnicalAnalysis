@@ -1,9 +1,16 @@
-﻿namespace TechnicalAnalysis.Domain.Settings
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TechnicalAnalysis.Domain.Settings
 {
     public class BinanceSetting
     {
-        public string? ApiKey { get; init; }
-        public string? SymbolsPairsPath { get; init; }
-        public string? CandlestickPath { get; init; }
+        [Required]
+        public string ApiKey { get; init; }
+
+        [Required]
+        public string SymbolsPairsPath { get; init; }
+
+        [Required]
+        public string CandlestickPath { get; init; }
     }
 }
