@@ -47,7 +47,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Name = data.Name,
                         Symbol = data.Symbol,
                         CreatedDate = data.DateAdded,
-                        AssetType = ProductType.Layer1,
+                        ProductType = ProductType.Layer1,
                         DataProvider = DataProvider.CoinMarketCap
                     });
                 }
