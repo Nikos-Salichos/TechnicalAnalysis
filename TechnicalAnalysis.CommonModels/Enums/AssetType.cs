@@ -6,7 +6,8 @@
         Layer1 = 1,
         Layer2 = 2,
         CryptoRegardlessLayer = 3,
-        StockOrETF = 4,
-        Fiat = 5,
+        Stock = 4,
+        ETF = 5,
+        Fiat = 6,
     }
 }
