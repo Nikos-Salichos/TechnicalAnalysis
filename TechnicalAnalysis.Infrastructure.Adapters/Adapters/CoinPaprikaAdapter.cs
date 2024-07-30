@@ -47,7 +47,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Name = asset.Name,
                         Symbol = asset.Symbol,
                         CreatedDate = (asset.CreatedAt == DateTime.MinValue) ? DateTime.UtcNow : asset.CreatedAt,
-                        AssetType = ProductType.Layer1,
+                        ProductType = ProductType.Layer1,
                         DataProvider = DataProvider.CoinPaprika,
                     });
                 }
