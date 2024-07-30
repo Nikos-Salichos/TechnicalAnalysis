@@ -102,13 +102,13 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                 if (!existingSymbols.Contains(pool.Token0.Symbol))
                 {
                     existingSymbols.Add(pool.Token0.Symbol);
-                    newAssets.Add(new Asset { Symbol = pool.Token0.Symbol });
+                    newAssets.Add(new Asset { Symbol = pool.Token0.Symbol, ProductType = ProductType.CryptoRegardlessLayer });
                 }
 
                 if (!existingSymbols.Contains(pool.Token1.Symbol))
                 {
                     existingSymbols.Add(pool.Token1.Symbol);
-                    newAssets.Add(new Asset { Symbol = pool.Token1.Symbol });
+                    newAssets.Add(new Asset { Symbol = pool.Token1.Symbol, ProductType = ProductType.CryptoRegardlessLayer });
                 }
             }
 
