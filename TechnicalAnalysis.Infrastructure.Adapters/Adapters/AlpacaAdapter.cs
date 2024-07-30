@@ -18,6 +18,14 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
     public class AlpacaAdapter(ILogger<AlpacaAdapter> logger, IMediator mediator, IAlpacaHttpClient alpacaHttpClient) : IAdapter
     {
+        static readonly List<string> etfTickers =
+            [
+               "vt", "vti", "VTV", "PFF", "SPHD", "XLRE", "EWH", "MCHI", "EWS", "FEZ",
+               "IWM", "SPY", "DIA", "DAX", "VGK", "QQQ", "IVV", "VUG", "VB", "VNQ",
+               "XLE", "XLF", "BND", "vea", "VWO", "GLD", "VXUS", "VO", "JEPI", "SPYV",
+               "VOT", "VDE", "voo", "ITOT", "MEDP", "ELF", "URTH"
+            ];
+
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
             var alpacaProvider = exchanges.Find(p => p.ProviderPairAssetSyncInfo.DataProvider == provider);
@@ -180,14 +188,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                     "SSNLF"    // Samsung (duplicate)
                 ];
 
-            List<string> etfTickers =
-                [
-                    "vt", "vti", "VTV", "PFF", "SPHD", "XLRE", "EWH", "MCHI", "EWS", "FEZ",
-                    "IWM", "SPY", "DIA", "DAX", "VGK", "QQQ", "IVV", "VUG", "VB", "VNQ",
-                    "XLE", "XLF", "BND", "vea", "VWO", "GLD", "VXUS", "VO", "JEPI", "SPYV",
-                    "VOT", "VDE", "voo", "ITOT", "MEDP", "ELF",
-                ];
-
             List<string> stocksWithHighProfitMargin =
                 [
                     "FANG", "TSM", "TRI", "WPC", "AER", "UTHR", "PSA", "KSPI", "MA",
@@ -254,8 +254,17 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             {
                 if (!existingAssetNames.Contains(stockSymbol, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    Asset newAsset = new() { Symbol = stockSymbol };
-                    newAssets.Add(newAsset);
+                    if (etfTickers.Contains(stockSymbol, StringComparer.InvariantCultureIgnoreCase))
+                    {
+                        Asset newAsset = new() { Symbol = stockSymbol, ProductType = ProductType.ETF };
+                        newAssets.Add(newAsset);
+                    }
+                    else
+                    {
+                        Asset newAsset = new() { Symbol = stockSymbol, ProductType = ProductType.Stock };
+                        newAssets.Add(newAsset);
+                    }
+
                 }
             }
 
@@ -295,7 +304,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Symbol = baseAsset.Symbol,
                         IsActive = true,
                         CreatedAt = DateTime.UtcNow,
-                        ProductType = ProductType.StockOrETF
                     };
                     newPairs.Add(newPair);
                 }
