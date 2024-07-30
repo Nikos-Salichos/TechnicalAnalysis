@@ -59,7 +59,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                         Name = newCoin.Name,
                         Symbol = newCoin.Symbol,
                         CreatedDate = DateTime.UnixEpoch.AddSeconds(newCoin.ListedAt),
-                        AssetType = ProductType.Layer1,
+                        ProductType = ProductType.Layer1,
                         DataProvider = DataProvider.CoinMarketCap
                     });
                 }
