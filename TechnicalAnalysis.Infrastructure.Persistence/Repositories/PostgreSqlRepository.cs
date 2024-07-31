@@ -34,28 +34,24 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         }
 
         public async Task<IResult<List<FearAndGreedModel>, string>> GetStockFearAndGreedIndexAsync()
-        {
-            return await ExecutionTimeLogger.LogExecutionTime(async () =>
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassificationType\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
+            => await ExecutionTimeLogger.LogExecutionTime(async () =>
+               {
+                   await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                   const string query = "SELECT \"PrimaryId\", \"Value\", \"ValueClassificationType\", \"DateTime\" FROM \"StockFearAndGreedIndex\"";
 
-                var assets = await dbConnection.QueryAsync<FearAndGreedModel>(query);
+                   var assets = await dbConnection.QueryAsync<FearAndGreedModel>(query);
 
-                return Result<List<FearAndGreedModel>, string>.Success(assets.ToList());
-            }, logger);
-        }
+                   return Result<List<FearAndGreedModel>, string>.Success(assets.ToList());
+               }, logger);
 
         public async Task<IResult<List<Asset>, string>> GetAssetsAsync()
-        {
-            return await ExecutionTimeLogger.LogExecutionTime(async () =>
-            {
-                await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
-                const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol, \"AssetType\" AS AssetType FROM \"Assets\"";
-                var assets = await dbConnection.QueryAsync<Asset>(query);
-                return Result<List<Asset>, string>.Success(assets.ToList());
-            }, logger);
-        }
+            => await ExecutionTimeLogger.LogExecutionTime(async () =>
+              {
+                  await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
+                  const string query = "SELECT \"Id\" AS PrimaryId, \"Symbol\" AS Symbol, \"ProductType\" AS ProductType FROM \"Assets\"";
+                  var assets = await dbConnection.QueryAsync<Asset>(query);
+                  return Result<List<Asset>, string>.Success(assets.ToList());
+              }, logger);
 
         public async Task<IResult<List<AssetRanking>, string>> GetCoinPaprikaAssetsAsync()
         {
@@ -66,7 +62,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
                 "\"Name\" AS Name, " +
                 "\"Symbol\" AS Symbol, " +
                 "\"CreatedDate\" AS CreatedDate, " +
-                "\"AssetType\" AS AssetType, " +
+                "\"ProductType\" AS ProductType, " +
                 "\"Provider\" AS DataProvider " +
                 "FROM \"CoinPaprikaAssets\"";
                 var assets = await dbConnection.QueryAsync<AssetRanking>(query);
@@ -240,14 +236,14 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
-            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\", \"AssetType\") FROM STDIN BINARY");
+            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"Assets\" (\"Symbol\", \"CreatedDate\", \"ProductType\") FROM STDIN BINARY");
 
             foreach (var asset in assets)
             {
                 await writer.StartRowAsync();
                 await WriteParameter(writer, asset.Symbol);
                 await WriteParameter(writer, asset.CreatedDate);
-                await WriteParameter(writer, (long)asset.AssetType);
+                await WriteParameter(writer, (long)asset.ProductType);
             }
 
             await writer.CompleteAsync();
@@ -257,14 +253,14 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
         {
             await using var dbConnection = new NpgsqlConnection(_connectionStringKey);
             await dbConnection.OpenAsync();
-            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"CoinPaprikaAssets\" (\"Name\", \"Symbol\", \"CreatedDate\", \"AssetType\", \"Provider\") FROM STDIN BINARY");
+            await using var writer = await dbConnection.BeginBinaryImportAsync("COPY \"CoinPaprikaAssets\" (\"Name\", \"Symbol\", \"CreatedDate\", \"ProductType\", \"Provider\") FROM STDIN BINARY");
             foreach (var asset in assets)
             {
                 await writer.StartRowAsync();
                 await WriteParameter(writer, asset.Name);
                 await WriteParameter(writer, asset.Symbol);
                 await WriteParameter(writer, asset.CreatedDate);
-                await WriteParameter(writer, (long)asset.AssetType);
+                await WriteParameter(writer, (long)asset.ProductType);
                 await WriteParameter(writer, (long)asset.DataProvider);
             }
 
