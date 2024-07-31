@@ -50,7 +50,7 @@ CREATE TABLE public."Assets" (
     "Id" bigint NOT NULL,
     "Symbol" text,
     "CreatedDate" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    "AssetType" bigint
+    "ProductType" bigint
 );
 
 
@@ -71,7 +71,7 @@ CREATE TABLE public."CoinPaprikaAssets" (
     "Name" text,
     "Symbol" text,
     "CreatedDate" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    "AssetType" bigint,
+    "ProductType" bigint,
     "Provider" bigint NOT NULL
 );
 
