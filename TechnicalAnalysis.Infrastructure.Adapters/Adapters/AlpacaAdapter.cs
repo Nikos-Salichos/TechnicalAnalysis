@@ -58,6 +58,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             List<string> dividendAristocrats =
                 [
                     "O",         // Realty Income Corp.
+                    "STAG",      // STAG Industrial
+                    "ADC",       // Agree Realty Corporation
                     "BEN",       // Franklin Resources, Inc.
                     "AMCR",      // Amcor Plc
                     "TROW",      // T. Rowe Price Group Inc.
