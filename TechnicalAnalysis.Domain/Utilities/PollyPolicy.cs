@@ -35,7 +35,7 @@ namespace TechnicalAnalysis.Domain.Utilities
             };
 
             return new ResiliencePipelineBuilder().AddRetry(retryStrategyOptions)
-                                                  .AddTimeout(TimeSpan.FromSeconds(5)).Build();
+                                                  .AddTimeout(TimeSpan.FromMinutes(1)).Build();
         }
     }
 }
