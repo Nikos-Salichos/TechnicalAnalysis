@@ -80,7 +80,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<IStockFearAndGreedHttpClient, StockFearAndGreedHttpClient>();
             services.AddSingleton<ICnnStockFearAndGreedHttpClient, CnnStockFearAndGreedHttpClient>();
 
-            services.AddOptions<MailSettings>().Bind(configuration.GetSection(nameof(MailSettings)));
+            services.AddOptions<MailSettings>().Bind(configuration.GetSection(nameof(MailSettings))).ValidateDataAnnotations();
             services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMq"));
 
             services.AddSingleton<IMailer, Mailer>();
