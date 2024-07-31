@@ -25,7 +25,6 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public long? NumberOfTrades { get; init; }
         public decimal? AllTimeHighPrice { get; set; }
         public decimal? AllTimeLowPrice { get; set; }
-        public ProductType ProductType { get; init; }
         public List<CandlestickExtended> Candlesticks { get; set; } = [];
 
         public bool Equals(PairExtended? other)
