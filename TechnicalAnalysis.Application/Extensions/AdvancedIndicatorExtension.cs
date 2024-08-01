@@ -274,7 +274,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2))
                 {
-                    if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick?.PrimaryId)
+                    if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick.PrimaryId)
                     {
                         secondPreviousBearFractalCandlestick = previousBearFractalCandlestick;
                         previousBearFractalCandlestick = currentBearFractalCandlestick;
