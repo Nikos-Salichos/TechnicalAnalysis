@@ -298,7 +298,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
 
                 if (currentBullFractalCandlestick.LowPrice < previousBullFractalCandlestick.LowPrice
-                    && currentBearFractalCandlestick.HighPrice < previousBearFractalCandlestick?.HighPrice)
+                    && currentBearFractalCandlestick.HighPrice < previousBearFractalCandlestick.HighPrice)
                 {
                     candlestick.FractalTrend = Trend.Down;
                     continue;
