@@ -45,6 +45,7 @@ namespace TechnicalAnalysis.Application.Services
                 .Select(pair => new EnhancedPairResult
                 {
                     Symbol = pair.Symbol,
+                    ProductType = pair.ProductType,
                     EnhancedScans = pair.Candlesticks
                         //  .Where(f => f.EnhancedScans.Exists(e => e.EnhancedScanIsLong || e.EnhancedScanIsShort))
                         .SelectMany(c => c.EnhancedScans, (candlestick, enhancedScan) => new EnhancedScanGroup
