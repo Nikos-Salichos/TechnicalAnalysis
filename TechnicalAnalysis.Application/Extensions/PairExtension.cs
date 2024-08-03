@@ -36,6 +36,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                     pair.BaseAssetId = asset0Id.PrimaryId;
                     pair.BaseAssetName = asset0Id.Symbol;
+                    pair.ProductType = asset0Id.ProductType;
                 }
                 if (asset1Id != null)
                 {
