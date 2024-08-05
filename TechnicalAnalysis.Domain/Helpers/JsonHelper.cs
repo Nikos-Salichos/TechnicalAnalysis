@@ -9,7 +9,7 @@ namespace TechnicalAnalysis.Domain.Helpers
         {
             WriteIndented = true,
             PropertyNameCaseInsensitive = true,
-            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
             //  DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
         };
 
