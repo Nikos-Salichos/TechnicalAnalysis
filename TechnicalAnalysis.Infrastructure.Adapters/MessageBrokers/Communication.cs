@@ -2,6 +2,7 @@
 using MimeKit;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 using TechnicalAnalysis.Domain.Messages;
@@ -10,10 +11,24 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
 {
     public class Communication(IMailer mailService, IConfiguration configuration) : ICommunication
     {
+        public static JsonSerializerOptions CreateJsonSerializerOptions()
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNameCaseInsensitive = true,
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                // DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+            };
+
+            options.Converters.Add(new JsonStringEnumConverter());
+            return options;
+        }
+
         public async Task CreateAttachmentSendMessage<T>(List<T> data, string fileName)
         {
             List<MimePart> mailInformation = [];
-            CreateAttachment(fileName, ".json", mailInformation, data.ToList());
+            CreateAttachment(fileName, ".json", mailInformation, data.ToList(), CreateJsonSerializerOptions());
             await SendMessage(mailInformation);
         }
 
