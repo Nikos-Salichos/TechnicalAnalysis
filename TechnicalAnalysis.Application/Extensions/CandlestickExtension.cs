@@ -7,8 +7,10 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class CandlestickExtension
     {
-        public static void ParseCandlestickData(BinanceCandlestick candlestick, object cell, PropertyInfo property)
+        public static void ParseCandlestickData(BinanceCandlestick candlestick, object? cell, PropertyInfo property)
         {
+            cell ??= string.Empty;
+
             if (property.PropertyType == typeof(decimal) || property.PropertyType == typeof(decimal?))
             {
                 if (decimal.TryParse(cell.ToString()?.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
