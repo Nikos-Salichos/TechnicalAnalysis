@@ -208,7 +208,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                             // Loop through the array elements in the row.
                             int i = 0;
-                            foreach (object cell in row)
+                            foreach (var cell in row)
                             {
                                 // Check if i is within the bounds of the properties array.
                                 if (i >= properties.Length)
