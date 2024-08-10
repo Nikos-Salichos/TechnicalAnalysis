@@ -52,13 +52,14 @@ namespace TechnicalAnalysis.Tests.UnitTests
             // Arrange
             var provider = new ProviderSynchronization
             {
-                CandlestickSyncInfos = new List<ProviderCandlestickSyncInfo>
-            {
-                new() {
-                    LastCandlestickSync = DateTime.UtcNow.Date,
-                    Timeframe = Timeframe.Daily
-                }
-            }
+                CandlestickSyncInfos =
+                [
+                    new ProviderCandlestickSyncInfo
+                    {
+                        LastCandlestickSync = DateTime.UtcNow.Date,
+                        Timeframe = Timeframe.Daily
+                    }
+                ]
             };
 
             // Act
