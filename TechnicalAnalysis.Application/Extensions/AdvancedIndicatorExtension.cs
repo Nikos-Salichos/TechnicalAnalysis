@@ -1662,21 +1662,21 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var highPrice = candlesticks[currentIndex].HighPrice;
-            var highprice1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].HighPrice : null;
-            var highprice2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].HighPrice : null;
-            var highprice3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].HighPrice : null;
-            var highprice4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].HighPrice : null;
+            var highPrice1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].HighPrice : null;
+            var highPrice2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].HighPrice : null;
+            var highPrice3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].HighPrice : null;
+            var highPrice4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].HighPrice : null;
 
-            if (highPrice == null || highprice1 == null || highprice2 == null || highprice3 == null || highprice4 == null)
+            if (highPrice == null || highPrice1 == null || highPrice2 == null || highPrice3 == null || highPrice4 == null)
             {
                 return false;
             }
 
             return candlestickHighestPrice == highPrice
-                || candlestickHighestPrice == highprice1
-                || candlestickHighestPrice == highprice2
-                || candlestickHighestPrice == highprice3
-                || candlestickHighestPrice == highprice4;
+                || candlestickHighestPrice == highPrice1
+                || candlestickHighestPrice == highPrice2
+                || candlestickHighestPrice == highPrice3
+                || candlestickHighestPrice == highPrice4;
         }
 
         private static bool GetFractalBearCondition(List<CandlestickExtended> candlesticks, int currentIndex)
