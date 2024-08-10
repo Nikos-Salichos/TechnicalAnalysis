@@ -14,8 +14,6 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
     public class AnalysisController(ISyncService syncService, IAnalysisService analysisService, ILogger<AnalysisController> logger,
          IValidator<DataProviderTimeframeRequest> dataProviderTimeframeRequest) : ControllerBase
     {
-        private readonly IValidator<DataProviderTimeframeRequest> _dataProviderTimeframeRequest = dataProviderTimeframeRequest;
-
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -29,7 +27,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             var request = new DataProviderTimeframeRequest(dataProvider, timeframe);
             logger.LogInformation("DataProviderTimeframeRequest {@dataProviderTimeframeRequest}", request);
 
-            var validationResult = _dataProviderTimeframeRequest.Validate(request);
+            var validationResult = dataProviderTimeframeRequest.Validate(request);
             if (!validationResult.IsValid)
             {
                 logger.LogError("ValidationResult {@validationResult}", validationResult);
