@@ -725,7 +725,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                 }
 
-                bool hasVertialHorizontalFilterRange = verticalHorizontalFilter?.Value <= Constants.VerticalHorizontalFilterRangeLimit;
+                bool hasVerticalHorizontalFilterRange = verticalHorizontalFilter?.Value <= Constants.VerticalHorizontalFilterRangeLimit;
                 bool hasAdxRange = currentCandlestick?.Adxs?.FirstOrDefault()?.PlusDi <= 25
                     && currentCandlestick?.Adxs?.FirstOrDefault()?.MinusDi <= 25
                     && currentCandlestick?.Adxs?.FirstOrDefault()?.Value <= 25;
@@ -742,7 +742,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 bool hasBollingerBandsRange = currentCandlestick?.ClosePrice <= currentCandlestick?.BollingerBands?.FirstOrDefault()?.UpperBand
                     && currentCandlestick?.ClosePrice >= currentCandlestick?.BollingerBands?.FirstOrDefault()?.LowerBand;
 
-                if (hasVertialHorizontalFilterRange && hasRsiRange)
+                if (hasVerticalHorizontalFilterRange && hasRsiRange)
                 {
                     count++;
 
