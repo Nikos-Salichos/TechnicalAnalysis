@@ -34,6 +34,21 @@ namespace TechnicalAnalysis.Tests.UnitTests
         }
 
         [Fact]
+        public void ParseCandlestickData_SetsDecimalProperty_WithEmptyString()
+        {
+            // Arrange
+            var candlestick = new BinanceCandlestick();
+            var cell = string.Empty;
+            var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.OpenPrice));
+
+            // Act
+            CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
+
+            // Assert
+            Assert.Null(candlestick.OpenPrice);
+        }
+
+        [Fact]
         public void ParseCandlestickData_SetsDateTimeProperty_CorrectlyFromUnixTime()
         {
             var candlestick = new BinanceCandlestick();
