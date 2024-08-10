@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
         }
 
         [Fact]
-        public void ParseCandlestickData_SetsDecimalProperty_WithNullValue()
+        public void ParseCandlestickData_ReturnsNull_WithNullValue()
         {
             // Arrange
             var candlestick = new BinanceCandlestick();
@@ -34,7 +34,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
         }
 
         [Fact]
-        public void ParseCandlestickData_SetsDecimalProperty_WithEmptyString()
+        public void ParseCandlestickData_ReturnsNull_WithEmptyString()
         {
             // Arrange
             var candlestick = new BinanceCandlestick();
@@ -42,6 +42,21 @@ namespace TechnicalAnalysis.Tests.UnitTests
             var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.OpenPrice));
 
             // Act
+            CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
+
+            // Assert
+            Assert.Null(candlestick.OpenPrice);
+        }
+
+        [Fact]
+        public void ParseCandlestickData_ReturnsNull_WithInvalidDecimal()
+        {
+            // Arrange
+            var candlestick = new BinanceCandlestick();
+            var cell = "InvalidDecimal"; 
+            var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.OpenPrice));
+
+            // Act & Assert
             CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
 
             // Assert
