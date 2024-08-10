@@ -1661,18 +1661,18 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            var highprice = candlesticks[currentIndex].HighPrice;
+            var highPrice = candlesticks[currentIndex].HighPrice;
             var highprice1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].HighPrice : null;
             var highprice2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].HighPrice : null;
             var highprice3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].HighPrice : null;
             var highprice4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].HighPrice : null;
 
-            if (highprice == null || highprice1 == null || highprice2 == null || highprice3 == null || highprice4 == null)
+            if (highPrice == null || highprice1 == null || highprice2 == null || highprice3 == null || highprice4 == null)
             {
                 return false;
             }
 
-            return candlestickHighestPrice == highprice
+            return candlestickHighestPrice == highPrice
                 || candlestickHighestPrice == highprice1
                 || candlestickHighestPrice == highprice2
                 || candlestickHighestPrice == highprice3
