@@ -940,22 +940,22 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            var highestHighVixFix = candlesticks[currentIndex].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5);
+            var highestHighVixFix = candlesticks[currentIndex].Highests.Find(c => c is { PriceType: PriceType.VixFix, Period: 5 });
 
             var highestHighVixFix1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count
-                ? candlesticks[currentIndex - 1].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 1].Highests.Find(c => c is { PriceType: PriceType.VixFix, Period: 5 })
                 : null;
 
             var highestHighVixFix2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count
-                ? candlesticks[currentIndex - 2].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 2].Highests.Find(c => c is { PriceType: PriceType.VixFix, Period: 5 })
                 : null;
 
             var highestHighVixFix3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count
-                ? candlesticks[currentIndex - 3].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 3].Highests.Find(c => c is { PriceType: PriceType.VixFix, Period: 5 })
                 : null;
 
             var highestHighVixFix4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count
-                ? candlesticks[currentIndex - 4].Highests.Find(c => c.PriceType == PriceType.VixFix && c.Period == 5)
+                ? candlesticks[currentIndex - 4].Highests.Find(c => c is { PriceType: PriceType.VixFix, Period: 5 })
                 : null;
 
             return candlesticks[currentIndex].VixFixes.FirstOrDefault()?.Value <= highestHighVixFix?.Value
