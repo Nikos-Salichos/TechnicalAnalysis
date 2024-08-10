@@ -19,15 +19,18 @@ namespace TechnicalAnalysis.Tests.UnitTests
         }
 
         [Fact]
-        public void ParseCandlestickData_SetsDecimalProperty_Nullable()
+        public void ParseCandlestickData_SetsDecimalProperty_WithNullValue()
         {
+            // Arrange
             var candlestick = new BinanceCandlestick();
-            var cell = "12345.6789";
+            string? cell = null;
             var property = typeof(BinanceCandlestick).GetProperty(nameof(BinanceCandlestick.OpenPrice));
 
+            // Act
             CandlestickExtension.ParseCandlestickData(candlestick, cell, property);
 
-            Assert.Equal(12345.6789m, candlestick.OpenPrice);
+            // Assert
+            Assert.Null(candlestick.OpenPrice);
         }
 
         [Fact]
