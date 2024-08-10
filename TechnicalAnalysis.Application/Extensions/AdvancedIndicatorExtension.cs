@@ -71,9 +71,9 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             const int period = 5;
 
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
-                int startIndex = Math.Max(i - (period - 1), 0);
+                var startIndex = Math.Max(i - (period - 1), 0);
                 var group = pair.Candlesticks.GetRange(startIndex, Math.Min(period, i - startIndex + 1));
                 var vixFixHighestHigh = group.Max(candlestickGroup => candlestickGroup.VixFixes.FirstOrDefault()?.Value ?? 0);
 
@@ -91,11 +91,11 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             var latestOrderedCandlestick = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
 
-            int count = 0;
-            for (int i = 1; i < latestOrderedCandlestick.Count; i++)
+            var count = 0;
+            for (var i = 1; i < latestOrderedCandlestick.Count; i++)
             {
-                CandlestickExtended previousCandlestick = latestOrderedCandlestick[i - 1];
-                CandlestickExtended currentCandlestick = latestOrderedCandlestick[i];
+                var previousCandlestick = latestOrderedCandlestick[i - 1];
+                var currentCandlestick = latestOrderedCandlestick[i];
 
                 if (currentCandlestick.ClosePrice <= currentCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint &&
                     previousCandlestick.ClosePrice <= previousCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint)
@@ -115,14 +115,14 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculatePriceFunnel(PairExtended pair)
         {
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
-                CandlestickExtended initialCandlestick = pair.Candlesticks[i];
-                int count = 0;
+                var initialCandlestick = pair.Candlesticks[i];
+                var count = 0;
 
-                for (int j = i + 1; j < pair.Candlesticks.Count; j++)
+                for (var j = i + 1; j < pair.Candlesticks.Count; j++)
                 {
-                    CandlestickExtended funnelCandlestick = pair.Candlesticks[j];
+                    var funnelCandlestick = pair.Candlesticks[j];
 
                     if (funnelCandlestick.HighPrice <= initialCandlestick.HighPrice &&
                         funnelCandlestick.LowPrice >= initialCandlestick.LowPrice)
@@ -146,9 +146,9 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateBollingerBandsFunnel(PairExtended pair)
         {
-            int count = 0;
+            var count = 0;
 
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
@@ -177,14 +177,14 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFlagNestedCandlesticksRange(PairExtended pair)
         {
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
-                CandlestickExtended initialCandlestick = pair.Candlesticks[i];
-                int count = 0;
+                var initialCandlestick = pair.Candlesticks[i];
+                var count = 0;
 
-                for (int j = i + 1; j < pair.Candlesticks.Count; j++)
+                for (var j = i + 1; j < pair.Candlesticks.Count; j++)
                 {
-                    CandlestickExtended nestedCandlestick = pair.Candlesticks[j];
+                    var nestedCandlestick = pair.Candlesticks[j];
 
                     if (nestedCandlestick.HighPrice <= initialCandlestick.HighPrice &&
                         nestedCandlestick.LowPrice >= initialCandlestick.LowPrice)
@@ -207,19 +207,19 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFlagNestedCandlesticksBody(PairExtended pair)
         {
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
-                CandlestickExtended initialCandlestick = pair.Candlesticks[i];
-                int count = 0;
+                var initialCandlestick = pair.Candlesticks[i];
+                var count = 0;
 
                 //For testing purposes
                 if (initialCandlestick.CloseDate.Date == new DateTime(2023, 12, 13).Date && pair.BaseAssetName == "ADA")
                 {
                 }
 
-                for (int j = i + 1; j < pair.Candlesticks.Count; j++)
+                for (var j = i + 1; j < pair.Candlesticks.Count; j++)
                 {
-                    CandlestickExtended nestedCandlestick = pair.Candlesticks[j];
+                    var nestedCandlestick = pair.Candlesticks[j];
 
                     if (nestedCandlestick.ClosePrice <= initialCandlestick.HighPrice &&
                         nestedCandlestick.OpenPrice <= initialCandlestick.HighPrice &&
@@ -252,7 +252,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CandlestickExtended? previousBearFractalCandlestick = null;
             CandlestickExtended? secondPreviousBearFractalCandlestick = null;
 
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
                 var candlestick3 = i - 2 >= 0 ? pair.Candlesticks[i - 2] : null;
@@ -324,7 +324,7 @@ namespace TechnicalAnalysis.Application.Extensions
             CandlestickExtended? currentBullFractalCandlestick = null;
             CandlestickExtended? currentBearFractalCandlestick = null;
 
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
                 var candlestick3 = i - 2 >= 0 ? pair.Candlesticks[i - 2] : null;
@@ -388,7 +388,7 @@ namespace TechnicalAnalysis.Application.Extensions
         private static void CalculateResistanceBreakout(PairExtended pair)
         {
             const int initialInvestment = 1000;
-            for (int i = 0; i < pair?.Candlesticks.Count; i++)
+            for (var i = 0; i < pair?.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
@@ -422,13 +422,13 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             if (pair?.Candlesticks.Count > 0)
             {
-                for (int i = 1; i < pair.Candlesticks.Count; i++)
+                for (var i = 1; i < pair.Candlesticks.Count; i++)
                 {
                     var signalCandlestick = pair.Candlesticks[i];
 
                     if (signalCandlestick.ResistanceBreakouts.Count > 0)
                     {
-                        for (int j = i; j < pair.Candlesticks.Count; j++)
+                        for (var j = i; j < pair.Candlesticks.Count; j++)
                         {
                             var candlestick = pair.Candlesticks[j];
 
@@ -466,7 +466,7 @@ namespace TechnicalAnalysis.Application.Extensions
             Dictionary<DateTime, FearAndGreedModel> cryptoFearAndGreedDataPerDatetime,
             Dictionary<DateTime, FearAndGreedModel> stockFearAndGreedDataPerDatetime)
         {
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
 
@@ -538,8 +538,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     //  conditions = [.. conditions, consesutiveCandlesticksBelowSma];
                 }
 
-                int trueConditionsCount = conditions.Count(condition => condition);
-                double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
+                var trueConditionsCount = conditions.Count(condition => condition);
+                var percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
                 const int threshold = 90;
 
@@ -596,7 +596,7 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             decimal? candlestickHighestPrice = -1;
 
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
 
@@ -664,8 +664,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     GetPriceEnhancedShortTrend(pair.Candlesticks, i),
                 ];
 
-                int trueConditionsCount = conditions.Count(condition => condition);
-                double percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
+                var trueConditionsCount = conditions.Count(condition => condition);
+                var percentageTrueConditions = (double)trueConditionsCount / conditions.Length * 100;
 
                 const int threshold = 90;
 
@@ -708,10 +708,10 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateVerticalHorizontalFilterRange(PairExtended pair)
         {
-            int count = 0;
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            var count = 0;
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
-                CandlestickExtended currentCandlestick = pair.Candlesticks[i];
+                var currentCandlestick = pair.Candlesticks[i];
 
                 var verticalHorizontalFilter = currentCandlestick.VerticalHorizontalFilters?.FirstOrDefault();
                 if (verticalHorizontalFilter?.Value is 0)
@@ -725,22 +725,22 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                 }
 
-                bool hasVerticalHorizontalFilterRange = verticalHorizontalFilter?.Value <= Constants.VerticalHorizontalFilterRangeLimit;
-                bool hasAdxRange = currentCandlestick?.Adxs?.FirstOrDefault()?.PlusDi <= 25
-                    && currentCandlestick?.Adxs?.FirstOrDefault()?.MinusDi <= 25
-                    && currentCandlestick?.Adxs?.FirstOrDefault()?.Value <= 25;
+                var hasVerticalHorizontalFilterRange = verticalHorizontalFilter?.Value <= Constants.VerticalHorizontalFilterRangeLimit;
+                var hasAdxRange = currentCandlestick?.Adxs?.FirstOrDefault()?.PlusDi <= 25
+                                  && currentCandlestick?.Adxs?.FirstOrDefault()?.MinusDi <= 25
+                                  && currentCandlestick?.Adxs?.FirstOrDefault()?.Value <= 25;
 
-                bool hasStochasticRange = currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD <= 80
-                    && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK <= 25
-                    && currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD >= 20
-                    && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK >= 20;
+                var hasStochasticRange = currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD <= 80
+                                         && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK <= 25
+                                         && currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD >= 20
+                                         && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK >= 20;
 
-                bool hasRsiRange = currentCandlestick?.Rsis?.FirstOrDefault()?.Value is <= 70 and
+                var hasRsiRange = currentCandlestick?.Rsis?.FirstOrDefault()?.Value is <= 70 and
                     >= 30;
 
                 //TODO Calculate vix fix under a specific level <-- new strategy, just added it here as note
-                bool hasBollingerBandsRange = currentCandlestick?.ClosePrice <= currentCandlestick?.BollingerBands?.FirstOrDefault()?.UpperBand
-                    && currentCandlestick?.ClosePrice >= currentCandlestick?.BollingerBands?.FirstOrDefault()?.LowerBand;
+                var hasBollingerBandsRange = currentCandlestick?.ClosePrice <= currentCandlestick?.BollingerBands?.FirstOrDefault()?.UpperBand
+                                             && currentCandlestick?.ClosePrice >= currentCandlestick?.BollingerBands?.FirstOrDefault()?.LowerBand;
 
                 if (hasVerticalHorizontalFilterRange && hasRsiRange)
                 {
@@ -771,26 +771,26 @@ namespace TechnicalAnalysis.Application.Extensions
             var candlestick1 = candlesticks[currentIndex - 1];
             var candlestick2 = candlesticks[currentIndex - 2];
 
-            bool isCurrentCandlestickBullish = currentCandlestick.ClosePrice > candlestick1.OpenPrice;
-            bool isCandlestick1Bullish = candlestick1.ClosePrice > candlestick1.OpenPrice;
-            bool isCandlestick2Bullish = candlestick2.ClosePrice > candlestick2.OpenPrice;
+            var isCurrentCandlestickBullish = currentCandlestick.ClosePrice > candlestick1.OpenPrice;
+            var isCandlestick1Bullish = candlestick1.ClosePrice > candlestick1.OpenPrice;
+            var isCandlestick2Bullish = candlestick2.ClosePrice > candlestick2.OpenPrice;
 
-            bool areThreeLatestCandlesticksBullish = isCurrentCandlestickBullish && isCandlestick1Bullish && isCandlestick2Bullish;
+            var areThreeLatestCandlesticksBullish = isCurrentCandlestickBullish && isCandlestick1Bullish && isCandlestick2Bullish;
 
-            bool isHigherHighCurrent = currentCandlestick.HighPrice > candlestick1.HighPrice;
-            bool isHigherHighPrevious = candlestick1.HighPrice > candlestick2.HighPrice;
+            var isHigherHighCurrent = currentCandlestick.HighPrice > candlestick1.HighPrice;
+            var isHigherHighPrevious = candlestick1.HighPrice > candlestick2.HighPrice;
 
-            bool isHigherLowCurrent = currentCandlestick.LowPrice > candlestick1.LowPrice;
-            bool isHigherLowPrevious = candlestick1.LowPrice > candlestick2.LowPrice;
+            var isHigherLowCurrent = currentCandlestick.LowPrice > candlestick1.LowPrice;
+            var isHigherLowPrevious = candlestick1.LowPrice > candlestick2.LowPrice;
 
-            bool isValidWhiteSoldiersPattern = isHigherHighCurrent && isHigherHighPrevious && isHigherLowCurrent && isHigherLowPrevious;
+            var isValidWhiteSoldiersPattern = isHigherHighCurrent && isHigherHighPrevious && isHigherLowCurrent && isHigherLowPrevious;
 
             return areThreeLatestCandlesticksBullish && isValidWhiteSoldiersPattern;
         }
 
         private static void CalculateCandlestickPatterns(PairExtended pair)
         {
-            for (int i = 0; i < pair.Candlesticks.Count; i++)
+            for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
@@ -798,7 +798,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 CalculateTypicalPriceReversal(candlestick, candlestick1, candlestick2);
                 CalculateDragonflyDoji(candlestick);
-                CalculateHammer(candlestick);
+                CalculateHammer(candlestick, candlestick1);
                 CalculateMarubozu(candlestick);
                 CalculateInvertedHammer(candlestick);
                 CalculateSpinningTop(candlestick);
@@ -825,14 +825,20 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateMarubozu(CandlestickExtended candlestick)
+        private static void CalculateMarubozu(CandlestickExtended currentCandle, CandlestickExtended previousCandleStick)
         {
-            if (candlestick.Body >= candlestick.Range * 0.9m)
+            if (currentCandle.Body > currentCandle.Range * 0.9m)
             {
-                candlestick.Marubozus.Add(
-                    new Marubozu(candlestick.PrimaryId) { IsMarubozu = true });
+                var orderOfSignal = previousCandleStick.Marubozus.FirstOrDefault()?.OrderOfSignal ?? 0;
+
+                currentCandle.Marubozus.Add(new Marubozu(currentCandle.PrimaryId)
+                {
+                    IsMarubozu = true,
+                    OrderOfSignal = orderOfSignal + 1
+                });
             }
         }
+
 
         private static void CalculateHammer(CandlestickExtended candlestick)
         {
@@ -862,20 +868,26 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateSpinningTop(CandlestickExtended candlestick)
+        private static void CalculateSpinningTop(CandlestickExtended candlestick, CandlestickExtended previousCandleStick)
         {
-            if (
-                candlestick.Range >= 2 * candlestick.Body
-                && candlestick.OpenPrice <= candlestick.TenPercentHigherThanMidRangeInPriceUnit
-                && candlestick.ClosePrice <= candlestick.TenPercentHigherThanMidRangeInPriceUnit
-                && candlestick.OpenPrice >= candlestick.TenPercentLowerThanMidRangeInPriceUnit
-                && candlestick.ClosePrice >= candlestick.TenPercentLowerThanMidRangeInPriceUnit
-                )
+            var isSpinningTop = candlestick.Range >= 2 * candlestick.Body &&
+                                candlestick.OpenPrice >= candlestick.TenPercentLowerThanMidRangeInPriceUnit &&
+                                candlestick.OpenPrice <= candlestick.TenPercentHigherThanMidRangeInPriceUnit &&
+                                candlestick.ClosePrice >= candlestick.TenPercentLowerThanMidRangeInPriceUnit &&
+                                candlestick.ClosePrice <= candlestick.TenPercentHigherThanMidRangeInPriceUnit;
+
+            if (isSpinningTop)
             {
-                candlestick.SpinningTops.Add(
-                    new SpinningTop(candlestick.PrimaryId) { IsSpinningTop = true });
+                var orderOfSignal = previousCandleStick.SpinningTops.FirstOrDefault()?.OrderOfSignal ?? 0;
+
+                candlestick.SpinningTops.Add(new SpinningTop(candlestick.PrimaryId)
+                {
+                    IsSpinningTop = true,
+                    OrderOfSignal = orderOfSignal + 1
+                });
             }
         }
+
 
         // https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
         private static void CalculateTypicalPriceReversal(CandlestickExtended candlestick, CandlestickExtended? candlestick1, CandlestickExtended? candlestick2)
@@ -1126,11 +1138,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(bollingerBand.LowerBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand1.LowerBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand2.LowerBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand3.LowerBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand4.LowerBand.ToString(), out decimal _))
+            if (!decimal.TryParse(bollingerBand.LowerBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand1.LowerBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand2.LowerBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand3.LowerBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand4.LowerBand.ToString(), out var _))
             {
                 return false;
             }
@@ -1160,11 +1172,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(keltnerChannel.LowerBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel1.LowerBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel2.LowerBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel3.LowerBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel4.LowerBand.ToString(), out decimal _))
+            if (!decimal.TryParse(keltnerChannel.LowerBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel1.LowerBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel2.LowerBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel3.LowerBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel4.LowerBand.ToString(), out var _))
             {
                 return false;
             }
@@ -1362,8 +1374,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            decimal minVolume = Math.Min((decimal)volume1, Math.Min((decimal)volume2, Math.Min((decimal)volume3, (decimal)volume4)));
-            decimal maxVolume = Math.Max((decimal)volume1, Math.Max((decimal)volume2, Math.Max((decimal)volume3, (decimal)volume4)));
+            var minVolume = Math.Min((decimal)volume1, Math.Min((decimal)volume2, Math.Min((decimal)volume3, (decimal)volume4)));
+            var maxVolume = Math.Max((decimal)volume1, Math.Max((decimal)volume2, Math.Max((decimal)volume3, (decimal)volume4)));
 
             return volume <= minVolume || volume >= maxVolume;
         }
@@ -1508,11 +1520,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(bollingerBand.UpperBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand1.UpperBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand2.UpperBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand3.UpperBand.ToString(), out decimal _)
-                || !decimal.TryParse(bollingerBand4.UpperBand.ToString(), out decimal _))
+            if (!decimal.TryParse(bollingerBand.UpperBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand1.UpperBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand2.UpperBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand3.UpperBand.ToString(), out var _)
+                || !decimal.TryParse(bollingerBand4.UpperBand.ToString(), out var _))
             {
                 return false;
             }
@@ -1542,11 +1554,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(keltnerChannel.UpperBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel1.UpperBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel2.UpperBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel3.UpperBand.ToString(), out decimal _)
-             || !decimal.TryParse(keltnerChannel4.UpperBand.ToString(), out decimal _))
+            if (!decimal.TryParse(keltnerChannel.UpperBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel1.UpperBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel2.UpperBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel3.UpperBand.ToString(), out var _)
+             || !decimal.TryParse(keltnerChannel4.UpperBand.ToString(), out var _))
             {
                 return false;
             }
