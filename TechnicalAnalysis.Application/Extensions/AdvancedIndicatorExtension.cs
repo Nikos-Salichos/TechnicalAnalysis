@@ -738,7 +738,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 bool hasRsiRange = currentCandlestick?.Rsis?.FirstOrDefault()?.Value is <= 70 and
                     >= 30;
 
-                //TODO Calculate vixfix under a specific level <-- new strategy, just added it here as note
+                //TODO Calculate vix fix under a specific level <-- new strategy, just added it here as note
                 bool hasBollingerBandsRange = currentCandlestick?.ClosePrice <= currentCandlestick?.BollingerBands?.FirstOrDefault()?.UpperBand
                     && currentCandlestick?.ClosePrice >= currentCandlestick?.BollingerBands?.FirstOrDefault()?.LowerBand;
 
