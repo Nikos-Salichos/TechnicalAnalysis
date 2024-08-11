@@ -1552,11 +1552,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(keltnerChannel.UpperBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel1.UpperBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel2.UpperBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel3.UpperBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel4.UpperBand.ToString(), out var _))
+            if (!decimal.TryParse(keltnerChannel.UpperBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel1.UpperBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel2.UpperBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel3.UpperBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel4.UpperBand.ToString(), out _))
             {
                 return false;
             }
