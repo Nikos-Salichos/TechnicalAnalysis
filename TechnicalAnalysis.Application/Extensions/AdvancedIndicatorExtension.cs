@@ -1586,11 +1586,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return (candlesticks[currentIndex]?.HighPrice != null && donchianChannel.UpperBand is not null && candlesticks[currentIndex].HighPrice >= (decimal)donchianChannel.UpperBand)
-                || (candlesticks[currentIndex - 1]?.HighPrice is not null && donchianChannel1.UpperBand != null && candlesticks[currentIndex - 1].HighPrice >= (decimal)donchianChannel1.UpperBand)
-                || (candlesticks[currentIndex - 2]?.HighPrice is not null && donchianChannel2.UpperBand != null && candlesticks[currentIndex - 2].HighPrice >= (decimal)donchianChannel2.UpperBand)
-                || (candlesticks[currentIndex - 3]?.HighPrice != null && donchianChannel3.UpperBand is not null && candlesticks[currentIndex - 3].HighPrice >= (decimal)donchianChannel3.UpperBand)
-                || (candlesticks[currentIndex - 4]?.HighPrice != null && donchianChannel4.UpperBand is not null && candlesticks[currentIndex - 4].HighPrice >= (decimal)donchianChannel4.UpperBand);
+            return (candlesticks[currentIndex].HighPrice is not null && donchianChannel.UpperBand is not null && candlesticks[currentIndex].HighPrice >= (decimal)donchianChannel.UpperBand)
+                || (candlesticks[currentIndex - 1].HighPrice is not null && donchianChannel1.UpperBand is not null && candlesticks[currentIndex - 1].HighPrice >= (decimal)donchianChannel1.UpperBand)
+                || (candlesticks[currentIndex - 2].HighPrice is not null && donchianChannel2.UpperBand is not null && candlesticks[currentIndex - 2].HighPrice >= (decimal)donchianChannel2.UpperBand)
+                || (candlesticks[currentIndex - 3].HighPrice is not null && donchianChannel3.UpperBand is not null && candlesticks[currentIndex - 3].HighPrice >= (decimal)donchianChannel3.UpperBand)
+                || (candlesticks[currentIndex - 4].HighPrice is not null && donchianChannel4.UpperBand is not null && candlesticks[currentIndex - 4].HighPrice >= (decimal)donchianChannel4.UpperBand);
         }
 
         private static bool GetOverboughtAroonConditions(List<CandlestickExtended> candlesticks, int currentIndex)
