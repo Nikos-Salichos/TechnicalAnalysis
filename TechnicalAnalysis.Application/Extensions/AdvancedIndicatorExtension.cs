@@ -1136,11 +1136,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(bollingerBand.LowerBand.ToString(), out var _)
-                || !decimal.TryParse(bollingerBand1.LowerBand.ToString(), out var _)
-                || !decimal.TryParse(bollingerBand2.LowerBand.ToString(), out var _)
-                || !decimal.TryParse(bollingerBand3.LowerBand.ToString(), out var _)
-                || !decimal.TryParse(bollingerBand4.LowerBand.ToString(), out var _))
+            if (!decimal.TryParse(bollingerBand.LowerBand.ToString(), out _)
+                || !decimal.TryParse(bollingerBand1.LowerBand.ToString(), out _)
+                || !decimal.TryParse(bollingerBand2.LowerBand.ToString(), out _)
+                || !decimal.TryParse(bollingerBand3.LowerBand.ToString(), out _)
+                || !decimal.TryParse(bollingerBand4.LowerBand.ToString(), out _))
             {
                 return false;
             }
