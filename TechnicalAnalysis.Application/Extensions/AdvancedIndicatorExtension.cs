@@ -1044,9 +1044,9 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlestick2.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick3.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick4.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
+            return candlestick2.Fractals.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 })?.Value.HasValue == true ||
+                   candlestick3.Fractals.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 })?.Value.HasValue == true ||
+                   candlestick4.Fractals.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 })?.Value.HasValue == true;
         }
 
         private static bool GetOversoldRsiConditions(List<CandlestickExtended> candlesticks, int currentIndex)
