@@ -796,10 +796,10 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 CalculateTypicalPriceReversal(candlestick, candlestick1, candlestick2);
                 CalculateDragonflyDoji(candlestick);
-                CalculateHammer(candlestick, candlestick1);
-                CalculateMarubozu(candlestick);
+                CalculateHammer(candlestick);
+                CalculateMarubozu(candlestick, candlestick1);
                 CalculateInvertedHammer(candlestick);
-                CalculateSpinningTop(candlestick);
+                CalculateSpinningTop(candlestick, candlestick1);
             }
         }
 
