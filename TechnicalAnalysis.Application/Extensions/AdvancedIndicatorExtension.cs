@@ -1079,10 +1079,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var stochastic = candlesticks[currentIndex].Stochastics.FirstOrDefault();
-            var stochastic1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Stochastics?.FirstOrDefault() : null;
-            var stochastic2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Stochastics?.FirstOrDefault() : null;
-            var stochastic3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Stochastics?.FirstOrDefault() : null;
-            var stochastic4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Stochastics?.FirstOrDefault() : null;
+            var stochastic1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Stochastics.FirstOrDefault() : null;
+            var stochastic2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Stochastics.FirstOrDefault() : null;
+            var stochastic3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Stochastics.FirstOrDefault() : null;
+            var stochastic4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Stochastics.FirstOrDefault() : null;
 
             return stochastic?.OscillatorK <= Constants.StochasticOversold ||
                 stochastic1?.OscillatorK <= Constants.StochasticOversold ||
@@ -1104,10 +1104,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var adx = candlesticks[currentIndex].Adxs.FirstOrDefault();
-            var adx1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Adxs?.FirstOrDefault() : null;
-            var adx2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Adxs?.FirstOrDefault() : null;
-            var adx3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Adxs?.FirstOrDefault() : null;
-            var adx4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Adxs?.FirstOrDefault() : null;
+            var adx1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Adxs.FirstOrDefault() : null;
+            var adx2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Adxs.FirstOrDefault() : null;
+            var adx3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Adxs.FirstOrDefault() : null;
+            var adx4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Adxs.FirstOrDefault() : null;
 
             return adx?.PlusDi <= Constants.AdxOversold ||
                 adx1?.PlusDi <= Constants.AdxOversold ||
@@ -1172,11 +1172,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(keltnerChannel.LowerBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel1.LowerBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel2.LowerBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel3.LowerBand.ToString(), out var _)
-             || !decimal.TryParse(keltnerChannel4.LowerBand.ToString(), out var _))
+            if (!decimal.TryParse(keltnerChannel.LowerBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel1.LowerBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel2.LowerBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel3.LowerBand.ToString(), out _)
+             || !decimal.TryParse(keltnerChannel4.LowerBand.ToString(), out _))
             {
                 return false;
             }
@@ -1486,10 +1486,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var adx = candlesticks[currentIndex].Adxs.FirstOrDefault();
-            var adx1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Adxs?.FirstOrDefault() : null;
-            var adx2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Adxs?.FirstOrDefault() : null;
-            var adx3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Adxs?.FirstOrDefault() : null;
-            var adx4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Adxs?.FirstOrDefault() : null;
+            var adx1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Adxs.FirstOrDefault() : null;
+            var adx2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Adxs.FirstOrDefault() : null;
+            var adx3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Adxs.FirstOrDefault() : null;
+            var adx4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Adxs.FirstOrDefault() : null;
 
             return adx?.PlusDi >= Constants.AdxOverbought ||
                 adx1?.PlusDi >= Constants.AdxOverbought ||
