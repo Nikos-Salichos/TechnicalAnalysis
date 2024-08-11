@@ -262,7 +262,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2))
+                if (candlestick3.Fractals.Exists(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 }))
                 {
                     if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
                     {
@@ -272,7 +272,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                if (candlestick3.Fractals.Exists(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2))
+                if (candlestick3.Fractals.Exists(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 }))
                 {
                     if (currentBearFractalCandlestick is null || candlestick3.PrimaryId > currentBearFractalCandlestick.PrimaryId)
                     {
