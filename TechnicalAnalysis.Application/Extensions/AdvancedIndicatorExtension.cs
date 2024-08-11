@@ -153,11 +153,11 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick = pair.Candlesticks[i];
                 var candlestick1 = i - 1 >= 0 ? pair.Candlesticks[i - 1] : null;
 
-                if (candlestick1?.BollingerBands?.FirstOrDefault()?.BandWidth >= candlestick?.BollingerBands?.FirstOrDefault()?.BandWidth
-                    && candlestick1.BollingerBands?.FirstOrDefault()?.UpperBand - candlestick1.BollingerBands?.FirstOrDefault()?.LowerBand
-                    >= candlestick.BollingerBands?.FirstOrDefault()?.UpperBand - candlestick.BollingerBands?.FirstOrDefault()?.LowerBand
-                    && candlestick.Adxs?.FirstOrDefault()?.PlusDi <= 25
-                    && candlestick.Adxs?.FirstOrDefault()?.MinusDi <= 25)
+                if (candlestick1?.BollingerBands.FirstOrDefault()?.BandWidth >= candlestick.BollingerBands.FirstOrDefault()?.BandWidth
+                    && candlestick1.BollingerBands.FirstOrDefault()?.UpperBand - candlestick1.BollingerBands.FirstOrDefault()?.LowerBand
+                    >= candlestick.BollingerBands.FirstOrDefault()?.UpperBand - candlestick.BollingerBands.FirstOrDefault()?.LowerBand
+                    && candlestick.Adxs.FirstOrDefault()?.PlusDi <= 25
+                    && candlestick.Adxs.FirstOrDefault()?.MinusDi <= 25)
                 {
                     count++;
 
