@@ -336,7 +336,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (candlestick3.Fractals.Exists(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 }))
                 {
-                    if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
+                    if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick.PrimaryId)
                     {
                         currentBullFractalCandlestick = candlestick3;
                     }
