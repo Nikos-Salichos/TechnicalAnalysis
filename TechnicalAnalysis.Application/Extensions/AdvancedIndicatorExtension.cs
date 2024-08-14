@@ -311,8 +311,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                if (currentBullFractalCandlestick?.LowPrice <= previousBullFractalCandlestick?.LowPrice
-                    && currentBearFractalCandlestick?.HighPrice >= previousBearFractalCandlestick?.HighPrice)
+                if (currentBullFractalCandlestick.LowPrice <= previousBullFractalCandlestick.LowPrice
+                    && currentBearFractalCandlestick.HighPrice >= previousBearFractalCandlestick.HighPrice)
                 {
                     candlestick.FractalTrend = Trend.Sideways;
                 }
