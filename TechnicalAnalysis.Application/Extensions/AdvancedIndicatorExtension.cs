@@ -327,7 +327,7 @@ namespace TechnicalAnalysis.Application.Extensions
             for (var i = 0; i < pair.Candlesticks.Count; i++)
             {
                 var candlestick = pair.Candlesticks[i];
-                var candlestick3 = i - 2 >= 0 ? pair.Candlesticks[i - 2] : null;
+                var candlestick3 = i >= 2 ? pair.Candlesticks[i - 2] : null;
 
                 if (candlestick3 is null)
                 {
