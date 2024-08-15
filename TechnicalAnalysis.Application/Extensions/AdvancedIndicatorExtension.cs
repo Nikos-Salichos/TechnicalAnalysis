@@ -1360,10 +1360,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var volume = candlesticks[currentIndex].Volume;
-            var volume1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Volume : null;
-            var volume2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Volume : null;
-            var volume3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Volume : null;
-            var volume4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Volume : null;
+            var volume1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].Volume : null;
+            var volume2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].Volume : null;
+            var volume3 = currentIndex >= 3 ? candlesticks[currentIndex - 3].Volume : null;
+            var volume4 = currentIndex >= 4 ? candlesticks[currentIndex - 4].Volume : null;
 
             if (volume == null || volume1 == null || volume2 == null || volume3 == null || volume4 == null)
             {
