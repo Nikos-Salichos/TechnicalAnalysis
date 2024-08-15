@@ -1404,10 +1404,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var roc = candlesticks[currentIndex].RateOfChanges.FirstOrDefault();
-            var roc1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].RateOfChanges.FirstOrDefault() : null;
-            var roc2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].RateOfChanges.FirstOrDefault() : null;
-            var roc3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].RateOfChanges.FirstOrDefault() : null;
-            var roc4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].RateOfChanges.FirstOrDefault() : null;
+            var roc1 = currentIndex >= 1 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].RateOfChanges.FirstOrDefault() : null;
+            var roc2 = currentIndex >= 2 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].RateOfChanges.FirstOrDefault() : null;
+            var roc3 = currentIndex >= 3 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].RateOfChanges.FirstOrDefault() : null;
+            var roc4 = currentIndex >= 4 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].RateOfChanges.FirstOrDefault() : null;
 
             return roc?.Value <= Constants.RateOfChangeOversold ||
                 roc1?.Value <= Constants.RateOfChangeOversold ||
