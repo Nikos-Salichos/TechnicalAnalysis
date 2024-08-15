@@ -1540,10 +1540,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var keltnerChannel = candlesticks[currentIndex].KeltnerChannels.FirstOrDefault();
-            var keltnerChannel1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].KeltnerChannels.FirstOrDefault() : null;
-            var keltnerChannel2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].KeltnerChannels.FirstOrDefault() : null;
-            var keltnerChannel3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].KeltnerChannels.FirstOrDefault() : null;
-            var keltnerChannel4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].KeltnerChannels.FirstOrDefault() : null;
+            var keltnerChannel1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].KeltnerChannels.FirstOrDefault() : null;
+            var keltnerChannel2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].KeltnerChannels.FirstOrDefault() : null;
+            var keltnerChannel3 = currentIndex >= 3 ? candlesticks[currentIndex - 3].KeltnerChannels.FirstOrDefault() : null;
+            var keltnerChannel4 = currentIndex >= 4 ? candlesticks[currentIndex - 4].KeltnerChannels.FirstOrDefault() : null;
 
             if (keltnerChannel == null || keltnerChannel1 == null || keltnerChannel2 == null || keltnerChannel3 == null || keltnerChannel4 == null)
             {
