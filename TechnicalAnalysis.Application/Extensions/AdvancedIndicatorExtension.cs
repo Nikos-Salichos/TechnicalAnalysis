@@ -1482,10 +1482,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var adx = candlesticks[currentIndex].Adxs.FirstOrDefault();
-            var adx1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].Adxs.FirstOrDefault() : null;
-            var adx2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].Adxs.FirstOrDefault() : null;
-            var adx3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].Adxs.FirstOrDefault() : null;
-            var adx4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].Adxs.FirstOrDefault() : null;
+            var adx1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].Adxs.FirstOrDefault() : null;
+            var adx2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].Adxs.FirstOrDefault() : null;
+            var adx3 = currentIndex >= 3 ? candlesticks[currentIndex - 3].Adxs.FirstOrDefault() : null;
+            var adx4 = currentIndex >= 4 ? candlesticks[currentIndex - 4].Adxs.FirstOrDefault() : null;
 
             return adx?.PlusDi >= Constants.AdxOverbought ||
                 adx1?.PlusDi >= Constants.AdxOverbought ||
