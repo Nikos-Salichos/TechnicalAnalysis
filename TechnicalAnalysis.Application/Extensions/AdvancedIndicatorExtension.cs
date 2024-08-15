@@ -827,7 +827,7 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             if (currentCandle.Body > currentCandle.Range * 0.9m)
             {
-                var orderOfSignal = previousCandleStick.Marubozus.FirstOrDefault()?.OrderOfSignal ?? 0;
+                var orderOfSignal = previousCandleStick?.Marubozus.FirstOrDefault()?.OrderOfSignal ?? 0;
 
                 currentCandle.Marubozus.Add(new Marubozu(currentCandle.PrimaryId)
                 {
@@ -876,7 +876,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             if (isSpinningTop)
             {
-                var orderOfSignal = previousCandleStick.SpinningTops.FirstOrDefault()?.OrderOfSignal ?? 0;
+                var orderOfSignal = previousCandleStick?.SpinningTops.FirstOrDefault()?.OrderOfSignal ?? 0;
 
                 candlestick.SpinningTops.Add(new SpinningTop(candlestick.PrimaryId)
                 {
@@ -890,8 +890,7 @@ namespace TechnicalAnalysis.Application.Extensions
         // https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
         private static void CalculateTypicalPriceReversal(CandlestickExtended candlestick, CandlestickExtended? candlestick1, CandlestickExtended? candlestick2)
         {
-            if (
-                 candlestick1?.TypicalPrice <= candlestick2?.LowPrice &&
+            if (candlestick1?.TypicalPrice <= candlestick2?.LowPrice &&
                  candlestick1.Body >= candlestick1.Range * 0.5m &&
                  candlestick1.ClosePrice <= candlestick1.OpenPrice &&
                  candlestick.Body >= candlestick.Range * 0.5m &&
@@ -899,8 +898,7 @@ namespace TechnicalAnalysis.Application.Extensions
                  candlestick1.TypicalPrice <= candlestick.HighPrice &&
                  candlestick1.TypicalPrice >= candlestick.LowPrice &&
                  candlestick.TypicalPrice <= candlestick1.HighPrice &&
-                 candlestick.TypicalPrice >= candlestick1.LowPrice
-                )
+                 candlestick.TypicalPrice >= candlestick1.LowPrice)
             {
                 candlestick.TypicalPriceReversals.Add(new TypicalPriceReversal(candlestick.PrimaryId)
                 {
@@ -1337,10 +1335,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var value = candlesticks[currentIndex].OnBalanceVolumes.FirstOrDefault()?.Value;
-            var value1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].OnBalanceVolumes.FirstOrDefault()?.Value : null;
-            var value2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].OnBalanceVolumes.FirstOrDefault()?.Value : null;
-            var value3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].OnBalanceVolumes.FirstOrDefault()?.Value : null;
-            var value4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var value1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var value2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var value3 = currentIndex >= 3 ? candlesticks[currentIndex - 3].OnBalanceVolumes.FirstOrDefault()?.Value : null;
+            var value4 = currentIndex >= 4 ? candlesticks[currentIndex - 4].OnBalanceVolumes.FirstOrDefault()?.Value : null;
 
             if (value == null || value1 == null || value2 == null || value3 == null || value4 == null)
             {
