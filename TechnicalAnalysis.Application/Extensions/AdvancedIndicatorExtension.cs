@@ -1502,10 +1502,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var bollingerBand = candlesticks[currentIndex].BollingerBands.FirstOrDefault();
-            var bollingerBand1 = currentIndex - 1 >= 0 ? candlesticks[currentIndex - 1].BollingerBands.FirstOrDefault() : null;
-            var bollingerBand2 = currentIndex - 2 >= 0 ? candlesticks[currentIndex - 2].BollingerBands.FirstOrDefault() : null;
-            var bollingerBand3 = currentIndex - 3 >= 0 ? candlesticks[currentIndex - 3].BollingerBands.FirstOrDefault() : null;
-            var bollingerBand4 = currentIndex - 4 >= 0 ? candlesticks[currentIndex - 4].BollingerBands.FirstOrDefault() : null;
+            var bollingerBand1 = currentIndex >= 1 ? candlesticks[currentIndex - 1].BollingerBands.FirstOrDefault() : null;
+            var bollingerBand2 = currentIndex >= 2 ? candlesticks[currentIndex - 2].BollingerBands.FirstOrDefault() : null;
+            var bollingerBand3 = currentIndex >= 3 ? candlesticks[currentIndex - 3].BollingerBands.FirstOrDefault() : null;
+            var bollingerBand4 = currentIndex >= 4 ? candlesticks[currentIndex - 4].BollingerBands.FirstOrDefault() : null;
 
             if (bollingerBand == null
                 || bollingerBand1 == null
