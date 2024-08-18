@@ -253,7 +253,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                   .WithOpenPrice(tokenDayData.Open?.ReduceDigitsToFitDecimalLength())
                                   .WithHighPrice(tokenDayData.High?.ReduceDigitsToFitDecimalLength())
                                   .WithLowPrice(tokenDayData.Low?.ReduceDigitsToFitDecimalLength())
-                                  .WithClosePrice(tokenDayData?.Close?.ReduceDigitsToFitDecimalLength())
+                                  .WithClosePrice(tokenDayData.Close?.ReduceDigitsToFitDecimalLength())
                                   .WithOpenDate(openDate)
                                   .WithCloseDate(closeDate)
                                   .WithTimeframe(Timeframe.Daily)
