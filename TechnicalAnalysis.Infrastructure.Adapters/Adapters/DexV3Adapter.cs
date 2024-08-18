@@ -250,7 +250,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                         var candlestick = candlestickBuilder.WithPoolOrPairId(fetchedPoolFound.PrimaryId)
                                   .WithPoolOrPairName(pool.PoolId)
-                                  .WithOpenPrice(tokenDayData?.Open?.ReduceDigitsToFitDecimalLength())
+                                  .WithOpenPrice(tokenDayData.Open?.ReduceDigitsToFitDecimalLength())
                                   .WithHighPrice(tokenDayData?.High?.ReduceDigitsToFitDecimalLength())
                                   .WithLowPrice(tokenDayData?.Low?.ReduceDigitsToFitDecimalLength())
                                   .WithClosePrice(tokenDayData?.Close?.ReduceDigitsToFitDecimalLength())
