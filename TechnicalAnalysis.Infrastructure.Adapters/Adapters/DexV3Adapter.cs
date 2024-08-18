@@ -252,7 +252,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
                                   .WithPoolOrPairName(pool.PoolId)
                                   .WithOpenPrice(tokenDayData.Open?.ReduceDigitsToFitDecimalLength())
                                   .WithHighPrice(tokenDayData.High?.ReduceDigitsToFitDecimalLength())
-                                  .WithLowPrice(tokenDayData?.Low?.ReduceDigitsToFitDecimalLength())
+                                  .WithLowPrice(tokenDayData.Low?.ReduceDigitsToFitDecimalLength())
                                   .WithClosePrice(tokenDayData?.Close?.ReduceDigitsToFitDecimalLength())
                                   .WithOpenDate(openDate)
                                   .WithCloseDate(closeDate)
