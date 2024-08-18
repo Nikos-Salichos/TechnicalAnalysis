@@ -95,12 +95,17 @@ namespace TechnicalAnalysis.Application.Mappers
             => fearAndGreedHistoricalData.ConvertAll(c => c.ToDomain());
 
         public static FearAndGreedModel ToDomain(this CryptoFearAndGreedData cryptoFearAndGreedData)
-         => new()
-         {
-             DateTime = DateTimeOffset.FromUnixTimeSeconds(cryptoFearAndGreedData.Timestamp.ToLong()).UtcDateTime.Date,
-             Value = cryptoFearAndGreedData.Value,
-             ValueClassificationType = cryptoFearAndGreedData.ValueClassification.ToValueClassificationType()
-         };
+        {
+            if (cryptoFearAndGreedData is { ValueClassification: not null, Timestamp: not null })
+            {
+                return new FearAndGreedModel
+                {
+                    DateTime = DateTimeOffset.FromUnixTimeSeconds(cryptoFearAndGreedData.Timestamp.ToLong()).UtcDateTime.Date,
+                    Value = cryptoFearAndGreedData.Value,
+                    ValueClassificationType = cryptoFearAndGreedData.ValueClassification.ToValueClassificationType()
+                };
+            }
+        }
 
         public static List<FearAndGreedModel> ToDomain(this List<CryptoFearAndGreedData> fearAndGreedHistoricalData)
             => fearAndGreedHistoricalData.ConvertAll(c => c.ToDomain());
