@@ -109,7 +109,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
 
                 // Count the number of RSI values that are lower than the current RSI value
-                if (candlesticks[i].Rsis?.Count > 0)
+                if (candlesticks[i].Rsis.Count > 0)
                 {
                     // Find the highest and lowest RSI values within the lookback period
                     var lowestRsi = rsiValues.Min();
@@ -131,7 +131,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateBollingerBands(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var bollingerBandResult in quotes.Use(CandlePart.Close).GetBollingerBands())
+            foreach (var bollingerBandResult in quotes.Use().GetBollingerBands())
             {
                 if (decimal.TryParse(bollingerBandResult.LowerBand.ToString(), out decimal lowerBandValue)
                     && candlestickLookup.TryGetValue(bollingerBandResult.Date, out var candlestick))
