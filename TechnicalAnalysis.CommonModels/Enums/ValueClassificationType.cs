@@ -2,7 +2,7 @@
 {
     public enum ValueClassificationType
     {
-        Unknown = 0,
+        None = 0,
         ExtremeFear = 1,
         Fear = 2,
         Neutral = 3,
