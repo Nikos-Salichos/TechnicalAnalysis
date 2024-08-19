@@ -126,8 +126,13 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        public static ValueClassificationType ToValueClassificationType(this string valueClassification)
+        public static ValueClassificationType ToValueClassificationType(this string? valueClassification)
         {
+            if (string.IsNullOrWhiteSpace(valueClassification))
+            {
+                return ValueClassificationType.Unknown;
+            }
+
             valueClassification = new string(valueClassification
                                        .Where(c => !char.IsWhiteSpace(c))
                                        .ToArray())
