@@ -661,7 +661,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFractalLowestHigh(PairExtended pair)
         {
-            var candlesticksWithBearFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2) is not null)
+            var candlesticksWithBearFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 }) is not null)
                                                                 .OrderBy(c => c.OpenDate)
                                                                 .ToList();
 
@@ -676,8 +676,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                var fractalBear = candlestick.Fractals?.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2);
-                var fractalBear1 = candlestick1.Fractals?.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2);
+                var fractalBear = candlestick.Fractals?.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
+                var fractalBear1 = candlestick1.Fractals?.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
 
                 if (fractalBear?.Value <= fractalBear1?.Value)
                 {
@@ -714,8 +714,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                var FractalBull = candlestick.Fractals?.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2);
-                var FractalBull1 = candlestick1.Fractals?.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2);
+                var FractalBull = candlestick.Fractals?.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 });
+                var FractalBull1 = candlestick1.Fractals?.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 });
 
                 if (FractalBull?.Value <= FractalBull1?.Value)
                 {
@@ -870,12 +870,12 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculatePsychologicalLine(PairExtended pair)
         {
-            const int period = 5;
+            const int psychologicalLinePeriod = 5;
             foreach (var candlestickWithIndex in pair.Candlesticks.Select((candlestick, index) => new { candlestick, index }))
             {
-                if (candlestickWithIndex.index >= period - 1)
+                if (candlestickWithIndex.index >= psychologicalLinePeriod - 1)
                 {
-                    int startIndex = Math.Max(candlestickWithIndex.index - period + 1, 0);
+                    int startIndex = Math.Max(candlestickWithIndex.index - psychologicalLinePeriod + 1, 0);
 
                     int risingPeriodsCount = pair.Candlesticks
                             .Skip(startIndex)
@@ -883,12 +883,12 @@ namespace TechnicalAnalysis.Application.Extensions
                             .Where((cs, i) => i + startIndex > 0 && cs.ClosePrice > pair.Candlesticks[i + startIndex - 1].ClosePrice)
                             .Count();
 
-                    var psyValue = (decimal)risingPeriodsCount / period * 100;
+                    var psyValue = (decimal)risingPeriodsCount / psychologicalLinePeriod * 100;
 
                     candlestickWithIndex.candlestick.PsychologicalLines.Add
                         (new PsychologicalLine(candlestickWithIndex.candlestick.PrimaryId)
                         {
-                            Period = period,
+                            Period = psychologicalLinePeriod,
                             Value = (double)psyValue
                         });
                 }
@@ -898,11 +898,9 @@ namespace TechnicalAnalysis.Application.Extensions
 
             void CalculateLowestLowPsychologicalLine()
             {
-                const int period = 5;
-
                 for (int i = 0; i < pair.Candlesticks.Count; i++)
                 {
-                    int startIndex = Math.Max(i - (period - 1), 0);
+                    int startIndex = Math.Max(i - (psychologicalLinePeriod - 1), 0);
 
                     var lowest = pair
                         .Candlesticks
@@ -914,7 +912,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         pair.Candlesticks[i].Lowests.Add(new Lowest(pair.Candlesticks[i].PrimaryId)
                         {
-                            Period = period,
+                            Period = psychologicalLinePeriod,
                             Value = (decimal)lowest,
                             PriceType = PriceType.PsychologicalLine
                         });
