@@ -1,4 +1,5 @@
-﻿using TechnicalAnalysis.Application.Extensions;
+﻿using System.Globalization;
+using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Builders;
@@ -87,7 +88,7 @@ namespace TechnicalAnalysis.Application.Mappers
            => new()
            {
                DateTime = DateTimeOffset.FromUnixTimeMilliseconds((long)fearAndGreedHistoricalData.Timestamp).UtcDateTime.Date,
-               Value = fearAndGreedHistoricalData.Score.ToString(),
+               Value = fearAndGreedHistoricalData.Score.ToString(CultureInfo.InvariantCulture),
                ValueClassificationType = fearAndGreedHistoricalData.Rating.ToValueClassificationType()
            };
 
@@ -95,17 +96,12 @@ namespace TechnicalAnalysis.Application.Mappers
             => fearAndGreedHistoricalData.ConvertAll(c => c.ToDomain());
 
         public static FearAndGreedModel ToDomain(this CryptoFearAndGreedData cryptoFearAndGreedData)
-        {
-            if (cryptoFearAndGreedData is { ValueClassification: not null, Timestamp: not null })
+            => new()
             {
-                return new FearAndGreedModel
-                {
-                    DateTime = DateTimeOffset.FromUnixTimeSeconds(cryptoFearAndGreedData.Timestamp.ToLong()).UtcDateTime.Date,
-                    Value = cryptoFearAndGreedData.Value,
-                    ValueClassificationType = cryptoFearAndGreedData.ValueClassification.ToValueClassificationType()
-                };
-            }
-        }
+                DateTime = DateTimeOffset.FromUnixTimeSeconds(cryptoFearAndGreedData.Timestamp.ToLong()).UtcDateTime.Date,
+                Value = cryptoFearAndGreedData.Value,
+                ValueClassificationType = cryptoFearAndGreedData.ValueClassification.ToValueClassificationType()
+            };
 
         public static List<FearAndGreedModel> ToDomain(this List<CryptoFearAndGreedData> fearAndGreedHistoricalData)
             => fearAndGreedHistoricalData.ConvertAll(c => c.ToDomain());
