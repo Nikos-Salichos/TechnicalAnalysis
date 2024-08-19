@@ -4,7 +4,7 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class NumberExtension
     {
-        public static long? ReduceDigitsToFitLongLength(this string stringWithComma)
+        public static long? ReduceDigitsToFitLongLength(this string? stringWithComma)
         {
             if (string.IsNullOrWhiteSpace(stringWithComma))
             {
@@ -31,7 +31,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        public static decimal? ReduceDigitsToFitDecimalLength(this string stringWithComma)
+        public static decimal? ReduceDigitsToFitDecimalLength(this string? stringWithComma)
         {
             if (string.IsNullOrWhiteSpace(stringWithComma))
             {
@@ -54,16 +54,14 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        public static long ToLong(this string value)
+        public static long ToLong(this string? value)
         {
             if (long.TryParse(value, out long result))
             {
                 return result;
             }
-            else
-            {
-                throw new ArgumentException("Invalid long format", nameof(value));
-            }
+
+            throw new ArgumentException("Invalid long format", nameof(value));
         }
     }
 }
