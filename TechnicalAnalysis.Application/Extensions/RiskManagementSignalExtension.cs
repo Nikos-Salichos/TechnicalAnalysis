@@ -64,8 +64,8 @@ namespace TechnicalAnalysis.Application.Extensions
                             continue;
                         }
                         var percentage = candlestick1.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
-                        var thresholdValue = position?.EntryPositionPrice * percentage * 2;
-                        var pricePercentageAboveEntry = position?.EntryPositionPrice + thresholdValue;
+                        var thresholdValue = position.EntryPositionPrice * percentage * 2;
+                        var pricePercentageAboveEntry = position.EntryPositionPrice + thresholdValue;
                         if (candlestick1.ClosePrice > pricePercentageAboveEntry)
                         {
                             position.ClosePositionPrice = candlestick.OpenPrice;
@@ -388,8 +388,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (positionFound?.OpenPosition == true && candlestick1.AverageTrueRanges.Count is not 0)
                 {
                     var percentage = candlestick1.AverageTrueRanges.FirstOrDefault()?.AverageTrueRangePercent / 100m;
-                    var thresholdValue = positionFound?.EntryPositionPrice * percentage * 2;
-                    var pricePercentageBelowEntry = positionFound?.EntryPositionPrice - thresholdValue;
+                    var thresholdValue = positionFound.EntryPositionPrice * percentage * 2;
+                    var pricePercentageBelowEntry = positionFound.EntryPositionPrice - thresholdValue;
                     if (candlestick1.EnhancedScans.FirstOrDefault()?.EnhancedScanIsLong is true
                         && openPosition
                         && candlestick1.ClosePrice <= pricePercentageBelowEntry)
