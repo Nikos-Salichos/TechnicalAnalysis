@@ -174,6 +174,10 @@ namespace TechnicalAnalysis.Tests.UnitTests
         [InlineData(" NEUTRAL ", ValueClassificationType.Neutral)]
         [InlineData(" GREED ", ValueClassificationType.Greed)]
         [InlineData(" EXTREME GREED ", ValueClassificationType.ExtremeGreed)]
+        [InlineData("EXTREMEHAPPINESS", ValueClassificationType.None)]
+        [InlineData("SADNESS", ValueClassificationType.None)]
+        [InlineData("ANGRY", ValueClassificationType.None)]
+        [InlineData("JOY", ValueClassificationType.None)]
         public void ToValueClassificationType_ReturnsCorrectValueClassificationType_ForValidInputs(string valueClassification,
             ValueClassificationType expectedType)
         {
@@ -182,19 +186,17 @@ namespace TechnicalAnalysis.Tests.UnitTests
         }
 
         [Theory]
-        [InlineData("EXTREMEHAPPINESS")]
-        [InlineData("SADNESS")]
-        [InlineData("ANGRY")]
-        [InlineData("JOY")]
         [InlineData("")]
         [InlineData("  ")]
         public void ToValueClassificationType_ThrowsArgumentException_ForInvalidInputs(string valueClassification)
         {
             var exception = Assert.Throws<ArgumentException>(() => valueClassification.ToValueClassificationType());
-            Assert.Equal($"Invalid valueClassification: {new string(value: valueClassification
-                .Where(c => !char.IsWhiteSpace(c))
-                .ToArray()).ToUpperInvariant()}", exception.Message);
+
+            string expectedMessage = $"Invalid valueClassification: {valueClassification}";
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
+
 
         [Fact]
         public void FillMissingDatesInDays_AddsMissingDates_Correctly()
