@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 && provider.ProviderPairAssetSyncInfo.LastPairSync.Date == currentDate;
         }
 
-        public static bool IsProviderCandlesticksSyncedToday(this ProviderSynchronization provider, Timeframe timeframe)
+        public static bool IsProviderCandlesticksSyncedToday(this ProviderSynchronization? provider, Timeframe timeframe)
         {
             if (provider is null)
             {
