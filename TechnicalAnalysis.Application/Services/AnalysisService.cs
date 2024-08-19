@@ -699,7 +699,10 @@ namespace TechnicalAnalysis.Application.Services
                             cryptoMarketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStatistic;
                         }
 
-                        dailyStatistic.PairsWithEnhancedScan.Add(pair.Symbol);
+                        if (pair.Symbol != null)
+                        {
+                            dailyStatistic.PairsWithEnhancedScan.Add(pair.Symbol);
+                        }
                     }
                 }
 
@@ -753,7 +756,10 @@ namespace TechnicalAnalysis.Application.Services
                             etfStockMarketStatistic.DailyStatistics[candlestick.CloseDate] = dailyStatistic;
                         }
 
-                        dailyStatistic.PairsWithEnhancedScan.Add(pair.Symbol);
+                        if (pair.Symbol != null)
+                        {
+                            dailyStatistic.PairsWithEnhancedScan.Add(pair.Symbol);
+                        }
                     }
                 }
 
