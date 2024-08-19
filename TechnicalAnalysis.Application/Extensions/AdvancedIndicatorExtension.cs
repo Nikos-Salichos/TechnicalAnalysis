@@ -264,7 +264,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
                 if (candlestick3.Fractals.Exists(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 }))
                 {
-                    if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick?.PrimaryId)
+                    if (currentBullFractalCandlestick is null || candlestick3.PrimaryId > currentBullFractalCandlestick.PrimaryId)
                     {
                         secondPreviousBullFractalCandlestick = previousBullFractalCandlestick;
                         previousBullFractalCandlestick = currentBullFractalCandlestick;
@@ -413,7 +413,10 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
             }
 
-            CalculateResistanceBreakoutTakeProfitStopLoss(pair);
+            if (pair != null)
+            {
+                CalculateResistanceBreakoutTakeProfitStopLoss(pair);
+            }
         }
 
         private static void CalculateResistanceBreakoutTakeProfitStopLoss(PairExtended pair)
@@ -604,8 +607,8 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                 }
 
-                if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex)
-                    && cryptoFearAndGreedIndex is not null && pair.Provider
+                if (cryptoFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var cryptoFearAndGreedIndex) 
+                    && pair.Provider
                     is DataProvider.Binance
                     or DataProvider.Uniswap
                     or DataProvider.Pancakeswap)
@@ -619,9 +622,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                if (stockFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var stockFearAndGreedIndex)
-                    && stockFearAndGreedIndex is not null && pair.Provider
-                    is DataProvider.Alpaca)
+                if (stockFearAndGreedDataPerDatetime.TryGetValue(candlestick.CloseDate.Date, out var stockFearAndGreedIndex) 
+                    && pair.Provider is DataProvider.Alpaca)
                 {
                     var greedAndFearCondition = stockFearAndGreedIndex.ValueClassificationType is ValueClassificationType.Greed
                           or ValueClassificationType.ExtremeGreed;
@@ -795,18 +797,17 @@ namespace TechnicalAnalysis.Application.Extensions
                 var candlestick2 = i - 2 >= 0 ? pair.Candlesticks[i - 2] : null;
 
                 CalculateTypicalPriceReversal(candlestick, candlestick1, candlestick2);
-                CalculateDragonflyDoji(candlestick);
-                CalculateHammer(candlestick);
+                CalculateDragonflyDoji(candlestick, candlestick1);
+                CalculateHammer(candlestick, candlestick1);
                 CalculateMarubozu(candlestick, candlestick1);
-                CalculateInvertedHammer(candlestick);
+                CalculateInvertedHammer(candlestick, candlestick1);
                 CalculateSpinningTop(candlestick, candlestick1);
             }
         }
 
-        private static void CalculateDragonflyDoji(CandlestickExtended candlestick)
+        private static void CalculateDragonflyDoji(CandlestickExtended candlestick, CandlestickExtended previousCandleStick)
         {
-            if (
-                candlestick.Range >= 2 * candlestick.Body
+            if (candlestick.Range >= 2 * candlestick.Body
                 && candlestick.ClosePrice >= candlestick.HighPrice - (candlestick.Range * 0.5m)
                 && candlestick.OpenPrice >= candlestick.HighPrice - (candlestick.Range * 0.5m)
                 && candlestick.BodyToRangeRatio <= Constants.BodyOneToTenOfRangeRatio
@@ -815,10 +816,12 @@ namespace TechnicalAnalysis.Application.Extensions
                 //TODO test with range >= atr * Multiplier
                 )
             {
-                candlestick.DragonFlyDojis.Add(
-                    new DragonFlyDoji(candlestick.PrimaryId)
+                var orderOfSignal = previousCandleStick.DragonFlyDojis.FirstOrDefault()?.OrderOfSignal ?? 0;
+
+                candlestick.DragonFlyDojis.Add(new DragonFlyDoji(candlestick.PrimaryId)
                     {
-                        IsDragonFlyDoji = true
+                        IsDragonFlyDoji = true,
+                        OrderOfSignal = orderOfSignal + 1
                     });
             }
         }
@@ -827,7 +830,7 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             if (currentCandle.Body > currentCandle.Range * 0.9m)
             {
-                var orderOfSignal = previousCandleStick?.Marubozus.FirstOrDefault()?.OrderOfSignal ?? 0;
+                var orderOfSignal = previousCandleStick.Marubozus.FirstOrDefault()?.OrderOfSignal ?? 0;
 
                 currentCandle.Marubozus.Add(new Marubozu(currentCandle.PrimaryId)
                 {
@@ -838,21 +841,25 @@ namespace TechnicalAnalysis.Application.Extensions
         }
 
 
-        private static void CalculateHammer(CandlestickExtended candlestick)
+        private static void CalculateHammer(CandlestickExtended candlestick, CandlestickExtended previousCandlesticks)
         {
-            if (
-                candlestick.Range > 0 // To avoid divide by zero
+            if (candlestick.Range > 0 // To avoid divide by zero
                 && candlestick.Range >= 2 * candlestick.Body
                 && (candlestick.ClosePrice - candlestick.LowPrice) / candlestick.Range > 0.5m
-                && (candlestick.OpenPrice - candlestick.LowPrice) / candlestick.Range > 0.5m
-                )
+                && (candlestick.OpenPrice - candlestick.LowPrice) / candlestick.Range > 0.5m)
             {
+                var orderOfSignal = previousCandlesticks.Hammers.FirstOrDefault()?.OrderOfSignal ?? 0;
+
                 candlestick.Hammers.Add(
-                    new Hammer(candlestick.PrimaryId) { IsHammer = true });
+                    new Hammer(candlestick.PrimaryId)
+                    {
+                        IsHammer = true,
+                        OrderOfSignal = orderOfSignal + 1
+                    });
             }
         }
 
-        private static void CalculateInvertedHammer(CandlestickExtended candlestick)
+        private static void CalculateInvertedHammer(CandlestickExtended candlestick, CandlestickExtended previousCandlesticks)
         {
             if (candlestick.Range > 0 // To avoid divide by zero
                  && candlestick.Range >= 2 * candlestick.Body
@@ -861,8 +868,14 @@ namespace TechnicalAnalysis.Application.Extensions
                  && candlestick.OpenPrice <= candlestick.BottomTwentyPercentOfRangeInPriceUnit
                  && candlestick.ClosePrice <= candlestick.BottomTwentyPercentOfRangeInPriceUnit)
             {
+                var orderOfSignal = previousCandlesticks.Hammers.FirstOrDefault()?.OrderOfSignal ?? 0;
+
                 candlestick.InvertedHammers.Add(
-                    new InvertedHammer(candlestick.PrimaryId) { IsInvertedHammer = true });
+                    new InvertedHammer(candlestick.PrimaryId)
+                    {
+                        IsInvertedHammer = true,
+                        OrderOfSignal = orderOfSignal + 1
+                    });
             }
         }
 
@@ -900,9 +913,11 @@ namespace TechnicalAnalysis.Application.Extensions
                  candlestick.TypicalPrice <= candlestick1.HighPrice &&
                  candlestick.TypicalPrice >= candlestick1.LowPrice)
             {
+                var orderOfSignal = candlestick1.TypicalPriceReversals.FirstOrDefault()?.OrderOfSignal ?? 0;
+
                 candlestick.TypicalPriceReversals.Add(new TypicalPriceReversal(candlestick.PrimaryId)
                 {
-                    OrderOfSignal = 1,
+                    OrderOfSignal = orderOfSignal + 1,
                     TypicalPriceReversalIsBuy = true,
                     TypicalPriceReversalIsSell = false
                 });
