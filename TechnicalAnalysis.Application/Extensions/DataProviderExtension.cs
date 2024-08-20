@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Application.Extensions
 {
     public static class DataProviderExtension
     {
-        public static bool IsProviderAssetPairsSyncedToday(this ProviderSynchronization provider)
+        public static bool IsProviderAssetPairsSyncedToday(this ProviderSynchronization? provider)
         {
             if (provider is null)
             {
