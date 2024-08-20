@@ -412,7 +412,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                     var closeLongSignal = candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsShort;
 
-                    if (candlestick.ClosePrice < candlestick1.ClosePrice.Value && closeLongSignal is true)
+                    if (candlestick.ClosePrice < candlestick1.ClosePrice && closeLongSignal is true)
                     {
                         foreach (var position in openPositions)
                         {
