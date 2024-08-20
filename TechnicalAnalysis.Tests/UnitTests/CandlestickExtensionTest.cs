@@ -142,6 +142,9 @@ namespace TechnicalAnalysis.Tests.UnitTests
         [InlineData("1D", Timeframe.Daily)]
         [InlineData("1W", Timeframe.Weekly)]
         [InlineData("1H", Timeframe.OneHour)]
+        [InlineData("2d", Timeframe.None)]
+        [InlineData("1m", Timeframe.None)]
+        [InlineData("daily", Timeframe.None)]
         public void ToTimeFrame_ReturnsCorrectTimeframe_ForValidPeriods(string period, Timeframe expectedTimeframe)
         {
             var result = period.ToTimeFrame();
@@ -149,13 +152,14 @@ namespace TechnicalAnalysis.Tests.UnitTests
         }
 
         [Theory]
-        [InlineData("2d")]
-        [InlineData("1m")]
-        [InlineData("daily")]
+        [InlineData("")]
+        [InlineData("   ")]
         public void ToTimeFrame_ThrowsArgumentException_ForInvalidPeriods(string period)
         {
             var exception = Assert.Throws<ArgumentException>(() => period.ToTimeFrame());
-            Assert.Equal($"Invalid period: {period}", exception.Message);
+            string expectedMessage = $"Invalid period: {period}";
+
+            Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Theory]
