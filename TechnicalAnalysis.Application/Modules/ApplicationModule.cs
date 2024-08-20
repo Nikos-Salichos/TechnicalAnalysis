@@ -28,7 +28,7 @@ namespace TechnicalAnalysis.Application.Modules
 
             services.AddSingleton<ISyncService, SyncService>();
 
-            services.AddMediatR(mrsg => mrsg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+            services.AddMediatR(mediatRServiceConfiguration => mediatRServiceConfiguration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddSingleton<IValidator<DataProviderTimeframeRequest>, DataProviderTimeframeValidator>();
         }
