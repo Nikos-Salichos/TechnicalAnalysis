@@ -37,7 +37,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
         public void IsProviderCandlesticksSyncedToday_WithNullProvider_ReturnsFalse()
         {
             // Arrange
-            ProviderSynchronization provider = null;
+            ProviderSynchronization? provider = null;
 
             // Act
             var result = provider.IsProviderCandlesticksSyncedToday(Timeframe.Daily);
