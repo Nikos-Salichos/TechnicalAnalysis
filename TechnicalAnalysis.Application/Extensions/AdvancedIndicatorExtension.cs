@@ -726,14 +726,14 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
 
                 var hasVerticalHorizontalFilterRange = verticalHorizontalFilter?.Value <= Constants.VerticalHorizontalFilterRangeLimit;
-                var hasAdxRange = currentCandlestick?.Adxs?.FirstOrDefault()?.PlusDi <= 25
-                                  && currentCandlestick?.Adxs?.FirstOrDefault()?.MinusDi <= 25
-                                  && currentCandlestick?.Adxs?.FirstOrDefault()?.Value <= 25;
+                var hasAdxRange = currentCandlestick.Adxs.FirstOrDefault()?.PlusDi <= 25
+                                  && currentCandlestick.Adxs.FirstOrDefault()?.MinusDi <= 25
+                                  && currentCandlestick.Adxs.FirstOrDefault()?.Value <= 25;
 
-                var hasStochasticRange = currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD <= 80
-                                         && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK <= 25
-                                         && currentCandlestick?.Stochastics?.FirstOrDefault()?.SignalD >= 20
-                                         && currentCandlestick?.Stochastics?.FirstOrDefault()?.OscillatorK >= 20;
+                var hasStochasticRange = currentCandlestick.Stochastics.FirstOrDefault()?.SignalD <= 80
+                                         && currentCandlestick.Stochastics.FirstOrDefault()?.OscillatorK <= 25
+                                         && currentCandlestick.Stochastics.FirstOrDefault()?.SignalD >= 20
+                                         && currentCandlestick.Stochastics.FirstOrDefault()?.OscillatorK >= 20;
 
                 var hasRsiRange = currentCandlestick?.Rsis?.FirstOrDefault()?.Value is <= 70 and
                     >= 30;
@@ -746,12 +746,15 @@ namespace TechnicalAnalysis.Application.Extensions
                 {
                     count++;
 
-                    var verticalHorizontalFilterRange = new VerticalHorizontalFilterRange(currentCandlestick.PrimaryId)
+                    if (currentCandlestick != null)
                     {
-                        NumberOfCandlesticksInRange = count,
-                        RangeLimit = Constants.VerticalHorizontalFilterRangeLimit
-                    };
-                    currentCandlestick.VerticalHorizontalFilterRanges.Add(verticalHorizontalFilterRange);
+                        var verticalHorizontalFilterRange = new VerticalHorizontalFilterRange(currentCandlestick.PrimaryId)
+                        {
+                            NumberOfCandlesticksInRange = count,
+                            RangeLimit = Constants.VerticalHorizontalFilterRangeLimit
+                        };
+                        currentCandlestick.VerticalHorizontalFilterRanges.Add(verticalHorizontalFilterRange);
+                    }
                 }
                 else
                 {
@@ -1149,15 +1152,6 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(bollingerBand.LowerBand.ToString(), out _)
-                || !decimal.TryParse(bollingerBand1.LowerBand.ToString(), out _)
-                || !decimal.TryParse(bollingerBand2.LowerBand.ToString(), out _)
-                || !decimal.TryParse(bollingerBand3.LowerBand.ToString(), out _)
-                || !decimal.TryParse(bollingerBand4.LowerBand.ToString(), out _))
-            {
-                return false;
-            }
-
             return candlesticks[currentIndex].LowPrice <= bollingerBand.LowerBand
                 || candlesticks[currentIndex - 1].LowPrice <= bollingerBand1.LowerBand
                 || candlesticks[currentIndex - 2].LowPrice <= bollingerBand2.LowerBand
@@ -1183,20 +1177,20 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(keltnerChannel.LowerBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel1.LowerBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel2.LowerBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel3.LowerBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel4.LowerBand.ToString(), out _))
+            if (!decimal.TryParse(keltnerChannel.LowerBand.ToString(), out var kelterChannelLowerBand)
+             || !decimal.TryParse(keltnerChannel1.LowerBand.ToString(), out var kelterChannelLowerBand1)
+             || !decimal.TryParse(keltnerChannel2.LowerBand.ToString(), out var kelterChannelLowerBand2)
+             || !decimal.TryParse(keltnerChannel3.LowerBand.ToString(), out var kelterChannelLowerBand3)
+             || !decimal.TryParse(keltnerChannel4.LowerBand.ToString(), out var kelterChannelLowerBand4))
             {
                 return false;
             }
 
-            return candlesticks[currentIndex].LowPrice <= (decimal)keltnerChannel.LowerBand
-                || candlesticks[currentIndex - 1].LowPrice <= (decimal)keltnerChannel1.LowerBand
-                || candlesticks[currentIndex - 2].LowPrice <= (decimal)keltnerChannel2.LowerBand
-                || candlesticks[currentIndex - 3].LowPrice <= (decimal)keltnerChannel3.LowerBand
-                || candlesticks[currentIndex - 4].LowPrice <= (decimal)keltnerChannel4.LowerBand;
+            return candlesticks[currentIndex].LowPrice <= kelterChannelLowerBand
+                || candlesticks[currentIndex - 1].LowPrice <= kelterChannelLowerBand1
+                || candlesticks[currentIndex - 2].LowPrice <= kelterChannelLowerBand2
+                || candlesticks[currentIndex - 3].LowPrice <= kelterChannelLowerBand3
+                || candlesticks[currentIndex - 4].LowPrice <= kelterChannelLowerBand4;
         }
 
         private static bool GetOversoldDonchianConditions(List<CandlestickExtended> candlesticks, int currentIndex)
@@ -1565,20 +1559,20 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            if (!decimal.TryParse(keltnerChannel.UpperBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel1.UpperBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel2.UpperBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel3.UpperBand.ToString(), out _)
-             || !decimal.TryParse(keltnerChannel4.UpperBand.ToString(), out _))
+            if (!decimal.TryParse(keltnerChannel.UpperBand.ToString(), out var keltnerChannelUpperBand)
+             || !decimal.TryParse(keltnerChannel1.UpperBand.ToString(), out var keltnerChannelUpperBand1)
+             || !decimal.TryParse(keltnerChannel2.UpperBand.ToString(), out var keltnerChannelUpperBand2)
+             || !decimal.TryParse(keltnerChannel3.UpperBand.ToString(), out var keltnerChannelUpperBand3)
+             || !decimal.TryParse(keltnerChannel4.UpperBand.ToString(), out var keltnerChannelUpperBand4))
             {
                 return false;
             }
-
-            return candlesticks[currentIndex].HighPrice >= (decimal)keltnerChannel.UpperBand
-                || candlesticks[currentIndex - 1].HighPrice >= (decimal)keltnerChannel1.UpperBand
-                || candlesticks[currentIndex - 2].HighPrice >= (decimal)keltnerChannel2.UpperBand
-                || candlesticks[currentIndex - 3].HighPrice >= (decimal)keltnerChannel3.UpperBand
-                || candlesticks[currentIndex - 4].HighPrice >= (decimal)keltnerChannel4.UpperBand;
+            
+            return candlesticks[currentIndex].HighPrice >= keltnerChannelUpperBand
+                || candlesticks[currentIndex - 1].HighPrice >= keltnerChannelUpperBand1
+                || candlesticks[currentIndex - 2].HighPrice >= keltnerChannelUpperBand2
+                || candlesticks[currentIndex - 3].HighPrice >= keltnerChannelUpperBand3
+                || candlesticks[currentIndex - 4].HighPrice >= keltnerChannelUpperBand4;
         }
 
         private static bool GetOverboughtDonchianConditions(List<CandlestickExtended> candlesticks, int currentIndex)
