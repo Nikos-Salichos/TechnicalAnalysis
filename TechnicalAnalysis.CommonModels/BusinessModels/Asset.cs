@@ -5,9 +5,9 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
     public sealed class Asset : BaseEntity, IEquatable<Asset>
     {
-        public string? Symbol { get; init; }
+        public required string? Symbol { get; init; }
         public DateTime CreatedDate { get; } = DateTime.UtcNow;
-        public ProductType ProductType { get; init; }
+        public required ProductType ProductType { get; init; }
 
         public bool Equals(Asset? other)
         {
