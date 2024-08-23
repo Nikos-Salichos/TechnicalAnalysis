@@ -4,8 +4,8 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
 {
     public class Stock : BaseEntity
     {
-        public string? Symbol { get; init; }
-        public string? Exchange { get; init; }
+        public required string? Symbol { get; init; }
+        public required string? Exchange { get; init; }
         public decimal FairValuePrice { get; set; }
         public decimal UnderValuePercentage { get; set; }
         public decimal MinForecast { get; set; }
