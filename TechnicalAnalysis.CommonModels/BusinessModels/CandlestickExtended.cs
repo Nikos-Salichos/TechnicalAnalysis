@@ -60,7 +60,7 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
         public List<PsychologicalLine> PsychologicalLines { get; init; } = [];
         public Trend FractalTrend { get; set; }
         public Trend PriceTrend { get; set; }
-        public IDictionary<string, double> CorrelationPerPair { get; init; } = new Dictionary<string, double>();
+        public Dictionary<string, double> CorrelationPerPair { get; init; } = new();
         public long? NumberOfTrades { get; set; }
         public long? Liquidity { get; set; }
         public decimal? Fees { get; set; }
@@ -95,10 +95,10 @@ namespace TechnicalAnalysis.CommonModels.BusinessModels
                     : Body / Range;
 
         public decimal? TopTwentyPercentOfRangeInPriceUnit
-            => HighPrice - (Range / 5);
+            => HighPrice - Range / 5;
 
         public decimal? BottomTwentyPercentOfRangeInPriceUnit
-            => LowPrice + (Range / 5);
+            => LowPrice + Range / 5;
 
         public decimal? MidRangeInPriceUnit
             => (HighPrice + LowPrice) / 2;
