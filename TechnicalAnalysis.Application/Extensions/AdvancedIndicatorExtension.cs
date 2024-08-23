@@ -91,7 +91,8 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             var latestOrderedCandlestick = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
 
-            var count = 0;
+            var aboveCandlestickCount = 0;
+            var belowCandlestickCount = 0;
             for (var i = 1; i < latestOrderedCandlestick.Count; i++)
             {
                 var previousCandlestick = latestOrderedCandlestick[i - 1];
@@ -100,15 +101,25 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (currentCandlestick.ClosePrice <= currentCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint &&
                     previousCandlestick.ClosePrice <= previousCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint)
                 {
-                    count++;
+                    aboveCandlestickCount++;
                     currentCandlestick.CloseRelativeToPivots.Add(new CloseRelativeToPivot(currentCandlestick.PrimaryId)
                     {
-                        NumberOfConsecutiveCandlestickBelowPivot = count,
+                        NumberOfConsecutiveCandlestickBelowPivot = aboveCandlestickCount
+                    });
+                }
+                else if (currentCandlestick.ClosePrice >= currentCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint &&
+                         previousCandlestick.ClosePrice >= previousCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint)
+                {
+                    belowCandlestickCount++;
+                    currentCandlestick.CloseRelativeToPivots.Add(new CloseRelativeToPivot(currentCandlestick.PrimaryId)
+                    {
+                        NumberOfConsecutiveCandlestickAbovePivot = belowCandlestickCount
                     });
                 }
                 else
                 {
-                    count = 0;
+                    aboveCandlestickCount = 0;
+                    belowCandlestickCount = 0;
                 }
             }
         }
@@ -212,7 +223,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var initialCandlestick = pair.Candlesticks[i];
                 var count = 0;
 
-                //For testing purposes
+                //TODO For testing purposes
                 if (initialCandlestick.CloseDate.Date == new DateTime(2023, 12, 13).Date && pair.BaseAssetName == "ADA")
                 {
                 }
@@ -808,7 +819,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateDragonflyDoji(CandlestickExtended candlestick, CandlestickExtended previousCandleStick)
+        private static void CalculateDragonflyDoji(CandlestickExtended candlestick, CandlestickExtended? previousCandleStick)
         {
             if (candlestick.Range >= 2 * candlestick.Body
                 && candlestick.ClosePrice >= candlestick.HighPrice - (candlestick.Range * 0.5m)
@@ -829,7 +840,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateMarubozu(CandlestickExtended currentCandle, CandlestickExtended previousCandleStick)
+        private static void CalculateMarubozu(CandlestickExtended currentCandle, CandlestickExtended? previousCandleStick)
         {
             if (currentCandle.Body > currentCandle.Range * 0.9m)
             {
@@ -844,7 +855,7 @@ namespace TechnicalAnalysis.Application.Extensions
         }
 
 
-        private static void CalculateHammer(CandlestickExtended candlestick, CandlestickExtended previousCandlesticks)
+        private static void CalculateHammer(CandlestickExtended candlestick, CandlestickExtended? previousCandlesticks)
         {
             if (candlestick.Range > 0 // To avoid divide by zero
                 && candlestick.Range >= 2 * candlestick.Body
@@ -862,7 +873,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateInvertedHammer(CandlestickExtended candlestick, CandlestickExtended previousCandlesticks)
+        private static void CalculateInvertedHammer(CandlestickExtended candlestick, CandlestickExtended? previousCandlesticks)
         {
             if (candlestick.Range > 0 // To avoid divide by zero
                  && candlestick.Range >= 2 * candlestick.Body
@@ -882,7 +893,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateSpinningTop(CandlestickExtended candlestick, CandlestickExtended previousCandleStick)
+        private static void CalculateSpinningTop(CandlestickExtended candlestick, CandlestickExtended? previousCandleStick)
         {
             var isSpinningTop = candlestick.Range >= 2 * candlestick.Body &&
                                 candlestick.OpenPrice >= candlestick.TenPercentLowerThanMidRangeInPriceUnit &&
