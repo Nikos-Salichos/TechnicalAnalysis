@@ -96,7 +96,7 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
             return deserializedResponse ?? default;
         }
 
-        private static string ToQueryString(object requestData)
+        private static string ToQueryString(object? requestData)
         {
             if (requestData is null)
             {
@@ -111,7 +111,7 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
                 if (value is not null)
                 {
                     string escapedName = Uri.EscapeDataString(property.Name);
-                    string escapedValue = Uri.EscapeDataString(value.ToString());
+                    string escapedValue = Uri.EscapeDataString(value.ToString() ?? string.Empty);
                     queryStringComponents.Add($"{escapedName}={escapedValue}");
                 }
             }
