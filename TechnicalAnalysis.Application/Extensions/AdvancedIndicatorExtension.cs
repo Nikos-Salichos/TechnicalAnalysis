@@ -27,10 +27,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 nameof(pair.QuoteAssetName), pair.QuoteAssetName);
 
             pair.Candlesticks = pair.Candlesticks
-                .Where(candlestick => candlestick.OpenPrice.HasValue
-                    && candlestick.HighPrice.HasValue
-                    && candlestick.ClosePrice.HasValue
-                    && candlestick.LowPrice.HasValue)
+                .Where(candlestick => candlestick is { OpenPrice: not null, HighPrice: not null } and { ClosePrice: not null, LowPrice: not null })
                 .OrderBy(candlestick => candlestick.CloseDate)
                 .ToList();
 
@@ -55,7 +52,7 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             foreach (var candlestick in pair.Candlesticks)
             {
-                var highestClose = candlestick.Highests.Find(c => c.PriceType == PriceType.Close && c.Period == 22);
+                var highestClose = candlestick.Highests.Find(c => c is { PriceType: PriceType.Close, Period: 22 });
 
                 if (highestClose is null || highestClose.Value is 0)
                 {
@@ -946,10 +943,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var lowestLow = candlesticks[currentIndex].Lowests.FirstOrDefault();
-            var lowestLow1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
+            var lowestLow1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
+            var lowestLow2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
+            var lowestLow3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
+            var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
 
             return candlesticks[currentIndex].LowPrice <= lowestLow?.Value
                 || candlesticks[currentIndex - 1].LowPrice <= lowestLow1?.Value
@@ -1725,9 +1722,9 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlestick2.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick3.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick4.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
+            return candlestick2.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 })?.Value.HasValue == true ||
+                   candlestick3.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 })?.Value.HasValue == true ||
+                   candlestick4.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 })?.Value.HasValue == true;
         }
 
         private static bool GetFractalEnhancedShortTrend(List<CandlestickExtended> candlesticks, int currentIndex)
