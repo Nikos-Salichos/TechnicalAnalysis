@@ -1,5 +1,6 @@
 ﻿using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 
 namespace TechnicalAnalysis.Tests.UnitTests
@@ -18,12 +19,12 @@ namespace TechnicalAnalysis.Tests.UnitTests
         {
             // Arrange
             var binanceAssets = new List<Asset> {
-            new() { PrimaryId = 1, Symbol = "USDT" } ,
-            new() { PrimaryId = 2, Symbol = "USDC" },
-            new() { PrimaryId = 3, Symbol = "DAI" },
-            new() { PrimaryId = 4, Symbol = "BUSD" },
-            new() { PrimaryId = 100, Symbol = "ETH" },
-            new() { PrimaryId = 30, Symbol = "ADA" },
+            new() { PrimaryId = 1, Symbol = "USDT", ProductType = ProductType.CryptoRegardlessLayer},
+            new() { PrimaryId = 2, Symbol = "USDC" , ProductType = ProductType.CryptoRegardlessLayer},
+            new() { PrimaryId = 3, Symbol = "DAI" , ProductType = ProductType.CryptoRegardlessLayer},
+            new() { PrimaryId = 4, Symbol = "BUSD" , ProductType = ProductType.CryptoRegardlessLayer},
+            new() { PrimaryId = 100, Symbol = "ETH" , ProductType = ProductType.CryptoRegardlessLayer},
+            new() { PrimaryId = 30, Symbol = "ADA" , ProductType = ProductType.CryptoRegardlessLayer},
             };
 
             var binancePair = new List<PairExtended> {
@@ -54,14 +55,14 @@ namespace TechnicalAnalysis.Tests.UnitTests
             {
                 new() { Pair = "BTCUSDT", BinanceCandlesticks =
                     [
-                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
-                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" }
+                    new BinanceCandlestick { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
+                    new BinanceCandlestick { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" }
                     ]
             },
                 new() { Pair = "ETHUSDT", BinanceCandlesticks =
                     [
-                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
-                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" }
+                    new BinanceCandlestick { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
+                    new BinanceCandlestick { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" }
                     ]
                 }
             };
@@ -103,7 +104,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
             {
                 Pair = "BTCUSDT", BinanceCandlesticks =
                     [
-                    new() { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
+                    new BinanceCandlestick { OpenTime = fixedDatetime, CloseTime = fixedDatetime, Period = "1h" },
                     ]
                },
             };
@@ -112,7 +113,7 @@ namespace TechnicalAnalysis.Tests.UnitTests
             {
                 Pair = "BTCUSDT", BinanceCandlesticks =
                     [
-                    new() { OpenTime = newFixedDatetime, CloseTime = newFixedDatetime, Period = "1h" }
+                    new BinanceCandlestick { OpenTime = newFixedDatetime, CloseTime = newFixedDatetime, Period = "1h" }
                     ]
                 }
             };
