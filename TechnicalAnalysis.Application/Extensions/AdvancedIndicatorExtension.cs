@@ -938,7 +938,7 @@ namespace TechnicalAnalysis.Application.Extensions
             var lowestLow1 = currentIndex >= 1 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
             var lowestLow2 = currentIndex >= 2 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
             var lowestLow3 = currentIndex >= 3 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
+            var lowestLow4 = currentIndex >= 4 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
 
             return candlesticks[currentIndex].LowPrice <= lowestLow?.Value
                 || candlesticks[currentIndex - 1].LowPrice <= lowestLow1?.Value
