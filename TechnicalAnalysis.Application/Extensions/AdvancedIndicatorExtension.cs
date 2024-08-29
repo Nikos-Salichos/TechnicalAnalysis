@@ -964,7 +964,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 ? candlesticks[currentIndex - 2].Highests.Find(c => c is { PriceType: PriceType.VixFix, Period: 5 })
                 : null;
 
-            var highestHighVixFix3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count
+            var highestHighVixFix3 = currentIndex >= 3 && currentIndex - 3 < candlesticks.Count
                 ? candlesticks[currentIndex - 3].Highests.Find(c => c is { PriceType: PriceType.VixFix, Period: 5 })
                 : null;
 
