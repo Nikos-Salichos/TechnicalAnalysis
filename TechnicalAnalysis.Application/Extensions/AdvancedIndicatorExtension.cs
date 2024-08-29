@@ -27,10 +27,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 nameof(pair.QuoteAssetName), pair.QuoteAssetName);
 
             pair.Candlesticks = pair.Candlesticks
-                .Where(candlestick => candlestick.OpenPrice.HasValue
-                    && candlestick.HighPrice.HasValue
-                    && candlestick.ClosePrice.HasValue
-                    && candlestick.LowPrice.HasValue)
+                .Where(candlestick => candlestick is { OpenPrice: not null, HighPrice: not null } and { ClosePrice: not null, LowPrice: not null })
                 .OrderBy(candlestick => candlestick.CloseDate)
                 .ToList();
 
@@ -55,7 +52,7 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             foreach (var candlestick in pair.Candlesticks)
             {
-                var highestClose = candlestick.Highests.Find(c => c.PriceType == PriceType.Close && c.Period == 22);
+                var highestClose = candlestick.Highests.Find(c => c is { PriceType: PriceType.Close, Period: 22 });
 
                 if (highestClose is null || highestClose.Value is 0)
                 {
@@ -91,7 +88,8 @@ namespace TechnicalAnalysis.Application.Extensions
         {
             var latestOrderedCandlestick = pair.Candlesticks.OrderBy(c => c.CloseDate).ToList();
 
-            var count = 0;
+            var aboveCandlestickCount = 0;
+            var belowCandlestickCount = 0;
             for (var i = 1; i < latestOrderedCandlestick.Count; i++)
             {
                 var previousCandlestick = latestOrderedCandlestick[i - 1];
@@ -100,15 +98,25 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (currentCandlestick.ClosePrice <= currentCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint &&
                     previousCandlestick.ClosePrice <= previousCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint)
                 {
-                    count++;
+                    aboveCandlestickCount++;
                     currentCandlestick.CloseRelativeToPivots.Add(new CloseRelativeToPivot(currentCandlestick.PrimaryId)
                     {
-                        NumberOfConsecutiveCandlestickBelowPivot = count,
+                        NumberOfConsecutiveCandlestickBelowPivot = aboveCandlestickCount
+                    });
+                }
+                else if (currentCandlestick.ClosePrice >= currentCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint &&
+                         previousCandlestick.ClosePrice >= previousCandlestick.StandardPivotPoints.FirstOrDefault()?.PivotPoint)
+                {
+                    belowCandlestickCount++;
+                    currentCandlestick.CloseRelativeToPivots.Add(new CloseRelativeToPivot(currentCandlestick.PrimaryId)
+                    {
+                        NumberOfConsecutiveCandlestickAbovePivot = belowCandlestickCount
                     });
                 }
                 else
                 {
-                    count = 0;
+                    aboveCandlestickCount = 0;
+                    belowCandlestickCount = 0;
                 }
             }
         }
@@ -212,7 +220,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 var initialCandlestick = pair.Candlesticks[i];
                 var count = 0;
 
-                //For testing purposes
+                //TODO For testing purposes
                 if (initialCandlestick.CloseDate.Date == new DateTime(2023, 12, 13).Date && pair.BaseAssetName == "ADA")
                 {
                 }
@@ -808,7 +816,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateDragonflyDoji(CandlestickExtended candlestick, CandlestickExtended previousCandleStick)
+        private static void CalculateDragonflyDoji(CandlestickExtended candlestick, CandlestickExtended? previousCandleStick)
         {
             if (candlestick.Range >= 2 * candlestick.Body
                 && candlestick.ClosePrice >= candlestick.HighPrice - (candlestick.Range * 0.5m)
@@ -829,7 +837,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateMarubozu(CandlestickExtended currentCandle, CandlestickExtended previousCandleStick)
+        private static void CalculateMarubozu(CandlestickExtended currentCandle, CandlestickExtended? previousCandleStick)
         {
             if (currentCandle.Body > currentCandle.Range * 0.9m)
             {
@@ -844,7 +852,7 @@ namespace TechnicalAnalysis.Application.Extensions
         }
 
 
-        private static void CalculateHammer(CandlestickExtended candlestick, CandlestickExtended previousCandlesticks)
+        private static void CalculateHammer(CandlestickExtended candlestick, CandlestickExtended? previousCandlesticks)
         {
             if (candlestick.Range > 0 // To avoid divide by zero
                 && candlestick.Range >= 2 * candlestick.Body
@@ -862,7 +870,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateInvertedHammer(CandlestickExtended candlestick, CandlestickExtended previousCandlesticks)
+        private static void CalculateInvertedHammer(CandlestickExtended candlestick, CandlestickExtended? previousCandlesticks)
         {
             if (candlestick.Range > 0 // To avoid divide by zero
                  && candlestick.Range >= 2 * candlestick.Body
@@ -882,7 +890,7 @@ namespace TechnicalAnalysis.Application.Extensions
             }
         }
 
-        private static void CalculateSpinningTop(CandlestickExtended candlestick, CandlestickExtended previousCandleStick)
+        private static void CalculateSpinningTop(CandlestickExtended candlestick, CandlestickExtended? previousCandleStick)
         {
             var isSpinningTop = candlestick.Range >= 2 * candlestick.Body &&
                                 candlestick.OpenPrice >= candlestick.TenPercentLowerThanMidRangeInPriceUnit &&
@@ -935,10 +943,10 @@ namespace TechnicalAnalysis.Application.Extensions
             }
 
             var lowestLow = candlesticks[currentIndex].Lowests.FirstOrDefault();
-            var lowestLow1 = currentIndex >= 1 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow2 = currentIndex >= 2 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow3 = currentIndex >= 3 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
-            var lowestLow4 = currentIndex >= 4 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c.PriceType == PriceType.Low && c.Period == 5) : null;
+            var lowestLow1 = currentIndex - 1 >= 0 && currentIndex - 1 < candlesticks.Count ? candlesticks[currentIndex - 1].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
+            var lowestLow2 = currentIndex - 2 >= 0 && currentIndex - 2 < candlesticks.Count ? candlesticks[currentIndex - 2].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
+            var lowestLow3 = currentIndex - 3 >= 0 && currentIndex - 3 < candlesticks.Count ? candlesticks[currentIndex - 3].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
+            var lowestLow4 = currentIndex - 4 >= 0 && currentIndex - 4 < candlesticks.Count ? candlesticks[currentIndex - 4].Lowests.Find(c => c is { PriceType: PriceType.Low, Period: 5 }) : null;
 
             return candlesticks[currentIndex].LowPrice <= lowestLow?.Value
                 || candlesticks[currentIndex - 1].LowPrice <= lowestLow1?.Value
@@ -1714,9 +1722,9 @@ namespace TechnicalAnalysis.Application.Extensions
                 return false;
             }
 
-            return candlestick2.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick3.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true ||
-                   candlestick4.Fractals.Find(f => f.FractalType == FractalType.BearFractal && f.WindowPeriod == 2)?.Value.HasValue == true;
+            return candlestick2.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 })?.Value.HasValue == true ||
+                   candlestick3.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 })?.Value.HasValue == true ||
+                   candlestick4.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 })?.Value.HasValue == true;
         }
 
         private static bool GetFractalEnhancedShortTrend(List<CandlestickExtended> candlesticks, int currentIndex)
