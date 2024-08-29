@@ -916,7 +916,7 @@ namespace TechnicalAnalysis.Application.Extensions
                  candlestick.TypicalPrice <= candlestick1.HighPrice &&
                  candlestick.TypicalPrice >= candlestick1.LowPrice)
             {
-                var orderOfSignal = candlestick1?.TypicalPriceReversals.FirstOrDefault()?.OrderOfSignal ?? 0;
+                var orderOfSignal = candlestick1.TypicalPriceReversals.FirstOrDefault()?.OrderOfSignal ?? 0;
 
                 candlestick.TypicalPriceReversals.Add(new TypicalPriceReversal(candlestick.PrimaryId)
                 {
