@@ -81,7 +81,7 @@ namespace TechnicalAnalysis.Application.Services
 
             var pairs = await inner.GetEnhancedPairResultsAsync(provider, httpContext);
 
-            await redisRepository.SetRecordAsync(provider.ToString(), pairs, null, null);
+            await redisRepository.SetRecordAsync(provider.ToString(), pairs);
             await communication.CreateAttachmentSendMessage(pairs, fileName);
             rabbitMqService.PublishMessage(pairs);
 
