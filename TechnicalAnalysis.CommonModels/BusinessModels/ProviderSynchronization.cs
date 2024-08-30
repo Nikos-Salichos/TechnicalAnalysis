@@ -2,7 +2,7 @@
 {
     public sealed class ProviderSynchronization
     {
-        public ProviderPairAssetSyncInfo ProviderPairAssetSyncInfo { get; init; } = new ProviderPairAssetSyncInfo();
+        public ProviderPairAssetSyncInfo ProviderPairAssetSyncInfo { get; init; } = new();
         public List<ProviderCandlestickSyncInfo> CandlestickSyncInfos { get; init; } = [];
     }
 }
