@@ -36,10 +36,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 .Candlesticks
                 .Where(candlestick =>
                 candlestick.OpenPrice.HasValue
-                && candlestick.HighPrice.HasValue
-                && candlestick.ClosePrice.HasValue
-                && candlestick.LowPrice.HasValue
-                && candlestick.Volume.HasValue)
+                && candlestick is { HighPrice: not null, ClosePrice: not null } and { LowPrice: not null, Volume: not null })
                 .Select(candlestick => new Quote
                 {
                     Open = candlestick.OpenPrice.Value,
@@ -700,7 +697,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFractalLowestLow(PairExtended pair)
         {
-            var candlesticksWithBullFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.Find(f => f.FractalType == FractalType.BullFractal && f.WindowPeriod == 2) is not null)
+            var candlesticksWithBullFractals = pair.Candlesticks.Where(c => c.Fractals.Count > 0 && c.Fractals.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 }) is not null)
                                                                 .OrderBy(c => c.OpenDate).ToList();
 
             int count = 0;
@@ -714,10 +711,10 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                var FractalBull = candlestick.Fractals?.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 });
-                var FractalBull1 = candlestick1.Fractals?.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 });
+                var fractalBull = candlestick.Fractals.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 });
+                var fractalBullPrevious = candlestick1.Fractals.Find(f => f is { FractalType: FractalType.BullFractal, WindowPeriod: 2 });
 
-                if (FractalBull?.Value <= FractalBull1?.Value)
+                if (fractalBull?.Value <= fractalBullPrevious?.Value)
                 {
                     count++;
                     var candlestickInPair = pair.Candlesticks.Find(c => c.OpenDate == candlestick.OpenDate);
@@ -818,7 +815,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 var candlestick = pair.Candlesticks[counter];
                 double valueAtIndex = vhfValues.ElementAtOrDefault(counter);
-                candlestick?.VerticalHorizontalFilters.Add(new VerticalHorizontalFilter(candlestick.PrimaryId)
+                candlestick.VerticalHorizontalFilters.Add(new VerticalHorizontalFilter(candlestick.PrimaryId)
                 {
                     Period = period,
                     Value = valueAtIndex
@@ -833,7 +830,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    candlestick?.OnBalanceVolumes.Add(
+                    candlestick.OnBalanceVolumes.Add(
                         new OnBalanceVolume(candlestick.PrimaryId)
                         {
                             Value = indicatorResult.Obv
