@@ -8,9 +8,8 @@ public class MarketStatistic
     {
         var keysToRemove = new List<DateTime>();
 
-        foreach (var kvp in DailyStatistics)
+        foreach (var (key, dailyStats) in DailyStatistics)
         {
-            var dailyStats = kvp.Value;
             double percentage = dailyStats.PairsWithEnhancedScan.Count / (double)dailyStats.NumberOfPairs * 100;
 
             if (percentage >= thresholdPercentage)
@@ -19,7 +18,7 @@ public class MarketStatistic
             }
             else
             {
-                keysToRemove.Add(kvp.Key);
+                keysToRemove.Add(key);
             }
         }
 
