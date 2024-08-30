@@ -86,7 +86,6 @@ namespace TechnicalAnalysis.Application.Services
         {
             var fetchedPairs = await FormatAssetsPairsCandlesticks();
             var selectedPairs = fetchedPairs.Where(p => pairNames.Contains(p.Symbol, StringComparer.InvariantCultureIgnoreCase)).ToList();
-
             if (selectedPairs.Count == 0)
             {
                 return [];
@@ -584,6 +583,7 @@ namespace TechnicalAnalysis.Application.Services
             {
                 foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.Exists(e => e.EnhancedScanIsLong)))
                 {
+                    //TODO Debug only
                     if (candlestick.CloseDate.Date == new DateTime(2023, 01, 03).Date
                         && string.Equals(pair.Symbol, "AAPL", StringComparison.InvariantCultureIgnoreCase))
                     {
