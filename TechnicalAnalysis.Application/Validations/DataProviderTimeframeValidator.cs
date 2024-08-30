@@ -12,7 +12,7 @@ namespace TechnicalAnalysis.Application.Validations
                 .Custom((value, context) =>
                 {
                     bool isDailyTimeframe = value.Timeframe == Timeframe.Daily;
-                    bool isBinanceWithWeekly = value.DataProvider == DataProvider.Binance && value.Timeframe == Timeframe.Weekly;
+                    bool isBinanceWithWeekly = value is { DataProvider: DataProvider.Binance, Timeframe: Timeframe.Weekly };
 
                     if (!isDailyTimeframe && !isBinanceWithWeekly)
                     {
