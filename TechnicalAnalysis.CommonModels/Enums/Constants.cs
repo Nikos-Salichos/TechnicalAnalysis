@@ -28,6 +28,7 @@
         public const int FractalsPeriod = 2;
         public const int BollingerBandsPeriod = 20;
         public const int BollingerBandsStdPeriod = 2;
+        public const int DonchianChannelPeriod = 20;
 
         public const int DecimalPlacesRound = 20;
         public const double StockThresholdPercentage = 0;
