@@ -217,7 +217,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         Centerline = donchianChannelResult.Centerline,
                         UpperBand = donchianChannelResult.UpperBand,
                         LowerBand = donchianChannelResult.LowerBand,
-                        Period = 20,
+                        Period = Constants.DonchianChannelPeriod,
                         Width = donchianChannelResult.Width
                     };
                     candlestick.DonchianChannels.Add(donchian);
@@ -311,13 +311,10 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (previousRsiValue.HasValue)
                 {
-                    if (previousRsiValue.Value < 50 && rsi.Value >= 50)
+                    if ((previousRsiValue.Value < 50 && rsi.Value >= 50) 
+                        || (previousRsiValue.Value >= 50 && rsi.Value < 50))
                     {
-                        rsi.RsiChangedDirectionFromPreviousCandlestick = true;
-                    }
-                    if (previousRsiValue.Value >= 50 && rsi.Value < 50)
-                    {
-                        rsi.RsiChangedDirectionFromPreviousCandlestick = true;
+                        rsi.RsiChangedTrendFromPreviousCandlestick = true;
                     }
 
                     if (previousRsiValue.Value > rsi.Value)
@@ -325,7 +322,8 @@ namespace TechnicalAnalysis.Application.Extensions
                         consecutiveLowerRsiCount++;
                         consecutiveHigherRsiCount = 0;
                     }
-                    else if (previousRsiValue.Value < rsi.Value)
+                    
+                    if (previousRsiValue.Value < rsi.Value)
                     {
                         consecutiveHigherRsiCount++;
                         consecutiveLowerRsiCount = 0;
