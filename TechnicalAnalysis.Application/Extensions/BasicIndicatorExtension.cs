@@ -672,7 +672,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 }
 
                 var fractalBear = candlestick.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
-                var fractalBear1 = candlestick1.Fractals?.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
+                var fractalBear1 = candlestick1.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
 
                 if (fractalBear?.Value <= fractalBear1?.Value)
                 {
