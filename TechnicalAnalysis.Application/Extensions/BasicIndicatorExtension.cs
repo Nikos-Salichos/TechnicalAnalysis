@@ -549,7 +549,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    candlestick?.AverageTrueRanges.Add(new AverageTrueRange(candlestick.PrimaryId)
+                    candlestick.AverageTrueRanges.Add(new AverageTrueRange(candlestick.PrimaryId)
                     {
                         AverageTrueRangePercent = (decimal?)indicatorResult.Atrp,
                         AverageTrueRangeValue = (decimal?)indicatorResult.Atr,
