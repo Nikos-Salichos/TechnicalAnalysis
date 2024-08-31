@@ -137,8 +137,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
-                            Period = 20,
-                            StandardDeviation = 2,
+                            Period = Constants.BollingerBandsPeriod,
+                            StandardDeviation = Constants.BollingerBandsStdPeriod,
                             MiddleBand = (decimal?)bollingerBandResult.Sma,
                             UpperBand = (decimal?)bollingerBandResult.UpperBand,
                             LowerBand = (decimal?)bollingerBandResult.LowerBand,
