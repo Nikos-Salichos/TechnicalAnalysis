@@ -421,7 +421,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFractals(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var indicatorResult in quotes.GetFractal(2))
+            foreach (var indicatorResult in quotes.GetFractal())
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
@@ -430,7 +430,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         var bullFractal = new Fractal(candlestick.PrimaryId)
                         {
                             FractalType = FractalType.BullFractal,
-                            WindowPeriod = 2,
+                            WindowPeriod = Constants.FractalsPeriod,
                             Value = indicatorResult.FractalBull
                         };
                         candlestick.Fractals.Add(bullFractal);
@@ -441,7 +441,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         var bearFractal = new Fractal(candlestick.PrimaryId)
                         {
                             FractalType = FractalType.BearFractal,
-                            WindowPeriod = 2,
+                            WindowPeriod = Constants.FractalsPeriod,
                             Value = indicatorResult.FractalBear
                         };
                         candlestick.Fractals.Add(bearFractal);
@@ -471,7 +471,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateStandardDeviation(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var indicatorResult in quotes.GetStdDev(20))
+            foreach (var indicatorResult in quotes.GetStdDev(Constants.StandardDeviationPeriod))
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
