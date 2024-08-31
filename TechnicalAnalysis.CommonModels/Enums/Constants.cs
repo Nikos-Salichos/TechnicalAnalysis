@@ -24,6 +24,8 @@
         public const int RateOfChangePeriod = 7;
         public const double VerticalHorizontalFilterRangeLimit = 0.40;
         public const int SimpleMovingAveragePeriod = 7;
+        public const int StandardDeviationPeriod = 20;
+        public const int FractalsPeriod = 2;
 
         public const int DecimalPlacesRound = 20;
         public const double StockThresholdPercentage = 0;
