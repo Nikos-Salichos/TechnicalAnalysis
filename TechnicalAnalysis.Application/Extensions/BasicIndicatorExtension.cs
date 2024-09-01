@@ -137,8 +137,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
-                            Period = 20,
-                            StandardDeviation = 2,
+                            Period = Constants.BollingerBandsPeriod,
+                            StandardDeviation = Constants.BollingerBandsStdPeriod,
                             MiddleBand = (decimal?)bollingerBandResult.Sma,
                             UpperBand = (decimal?)bollingerBandResult.UpperBand,
                             LowerBand = (decimal?)bollingerBandResult.LowerBand,
@@ -151,8 +151,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
-                            Period = 20,
-                            StandardDeviation = 2,
+                            Period = Constants.BollingerBandsPeriod,
+                            StandardDeviation = Constants.BollingerBandsStdPeriod,
                             MiddleBand = (decimal?)bollingerBandResult.Sma,
                             UpperBand = (decimal?)bollingerBandResult.UpperBand,
                             LowerBand = (decimal?)bollingerBandResult.LowerBand,
@@ -165,8 +165,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
-                            Period = 20,
-                            StandardDeviation = 2,
+                            Period = Constants.BollingerBandsPeriod,
+                            StandardDeviation = Constants.BollingerBandsStdPeriod,
                             MiddleBand = (decimal?)bollingerBandResult.Sma,
                             UpperBand = (decimal?)bollingerBandResult.UpperBand,
                             LowerBand = (decimal?)bollingerBandResult.LowerBand,
@@ -179,8 +179,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         candlestick.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
-                            Period = 20,
-                            StandardDeviation = 2,
+                            Period = Constants.BollingerBandsPeriod,
+                            StandardDeviation = Constants.BollingerBandsStdPeriod,
                             MiddleBand = (decimal?)bollingerBandResult.Sma,
                             UpperBand = (decimal?)bollingerBandResult.UpperBand,
                             LowerBand = (decimal?)bollingerBandResult.LowerBand,
@@ -193,8 +193,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     {
                         candlestick?.BollingerBands.Add(new BollingerBand(candlestick.PrimaryId)
                         {
-                            Period = 20,
-                            StandardDeviation = 2,
+                            Period = Constants.BollingerBandsPeriod,
+                            StandardDeviation = Constants.BollingerBandsStdPeriod,
                             MiddleBand = (decimal?)bollingerBandResult.Sma,
                             UpperBand = (decimal?)bollingerBandResult.UpperBand,
                             LowerBand = (decimal?)bollingerBandResult.LowerBand,
@@ -217,7 +217,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         Centerline = donchianChannelResult.Centerline,
                         UpperBand = donchianChannelResult.UpperBand,
                         LowerBand = donchianChannelResult.LowerBand,
-                        Period = 20,
+                        Period = Constants.DonchianChannelPeriod,
                         Width = donchianChannelResult.Width
                     };
                     candlestick.DonchianChannels.Add(donchian);
@@ -311,13 +311,10 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (previousRsiValue.HasValue)
                 {
-                    if (previousRsiValue.Value < 50 && rsi.Value >= 50)
+                    if ((previousRsiValue.Value < 50 && rsi.Value >= 50) 
+                        || (previousRsiValue.Value >= 50 && rsi.Value < 50))
                     {
-                        rsi.RsiChangedDirectionFromPreviousCandlestick = true;
-                    }
-                    if (previousRsiValue.Value >= 50 && rsi.Value < 50)
-                    {
-                        rsi.RsiChangedDirectionFromPreviousCandlestick = true;
+                        rsi.RsiChangedTrendFromPreviousCandlestick = true;
                     }
 
                     if (previousRsiValue.Value > rsi.Value)
@@ -325,7 +322,8 @@ namespace TechnicalAnalysis.Application.Extensions
                         consecutiveLowerRsiCount++;
                         consecutiveHigherRsiCount = 0;
                     }
-                    else if (previousRsiValue.Value < rsi.Value)
+                    
+                    if (previousRsiValue.Value < rsi.Value)
                     {
                         consecutiveHigherRsiCount++;
                         consecutiveLowerRsiCount = 0;
@@ -421,7 +419,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateFractals(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var indicatorResult in quotes.GetFractal(2))
+            foreach (var indicatorResult in quotes.GetFractal())
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
@@ -430,7 +428,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         var bullFractal = new Fractal(candlestick.PrimaryId)
                         {
                             FractalType = FractalType.BullFractal,
-                            WindowPeriod = 2,
+                            WindowPeriod = Constants.FractalsPeriod,
                             Value = indicatorResult.FractalBull
                         };
                         candlestick.Fractals.Add(bullFractal);
@@ -441,7 +439,7 @@ namespace TechnicalAnalysis.Application.Extensions
                         var bearFractal = new Fractal(candlestick.PrimaryId)
                         {
                             FractalType = FractalType.BearFractal,
-                            WindowPeriod = 2,
+                            WindowPeriod = Constants.FractalsPeriod,
                             Value = indicatorResult.FractalBear
                         };
                         candlestick.Fractals.Add(bearFractal);
@@ -471,7 +469,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateStandardDeviation(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var indicatorResult in quotes.GetStdDev(20))
+            foreach (var indicatorResult in quotes.GetStdDev(Constants.StandardDeviationPeriod))
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
@@ -551,7 +549,7 @@ namespace TechnicalAnalysis.Application.Extensions
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
-                    candlestick?.AverageTrueRanges.Add(new AverageTrueRange(candlestick.PrimaryId)
+                    candlestick.AverageTrueRanges.Add(new AverageTrueRange(candlestick.PrimaryId)
                     {
                         AverageTrueRangePercent = (decimal?)indicatorResult.Atrp,
                         AverageTrueRangeValue = (decimal?)indicatorResult.Atr,
@@ -673,8 +671,8 @@ namespace TechnicalAnalysis.Application.Extensions
                     continue;
                 }
 
-                var fractalBear = candlestick.Fractals?.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
-                var fractalBear1 = candlestick1.Fractals?.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
+                var fractalBear = candlestick.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
+                var fractalBear1 = candlestick1.Fractals.Find(f => f is { FractalType: FractalType.BearFractal, WindowPeriod: 2 });
 
                 if (fractalBear?.Value <= fractalBear1?.Value)
                 {
