@@ -52,7 +52,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
         }
 
-        public async Task<IResult<object[][], string>> GetBinanceCandlesticks(IDictionary<string, string>? queryParams = null)
+        public async Task<IResult<object[][], string>> GetBinanceCandlesticks(Dictionary<string, string>? queryParams = null)
         {
             try
             {
