@@ -30,7 +30,11 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             mail.Sender = new MailboxAddress(mailData.DisplayName ?? _settings.DisplayName, mailData.From ?? _settings.From);
 
             AddMailAddresses(mail.To, mailData.To);
-            AddMailAddresses(mail.ReplyTo, [mailData.ReplyTo], mailData.ReplyToName);
+            if (mailData.ReplyTo != null)
+            {
+                AddMailAddresses(mail.ReplyTo, [mailData.ReplyTo], mailData.ReplyToName);
+            }
+
             AddMailAddresses(mail.Bcc, mailData.Bcc);
             AddMailAddresses(mail.Cc, mailData.Cc);
 
@@ -53,7 +57,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             return mail;
         }
 
-        private static void AddMailAddresses(InternetAddressList addressList, IEnumerable<string> addresses, string? displayName = null)
+        private static void AddMailAddresses(InternetAddressList addressList, List<string>? addresses, string? displayName = null)
         {
             if (addresses == null)
             {
@@ -64,7 +68,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
             {
                 if (MailboxAddress.TryParse(address.Trim(), out var mailboxAddress))
                 {
-                    addressList.Add(string.IsNullOrEmpty(displayName) ? mailboxAddress : new MailboxAddress(displayName, mailboxAddress.Address));
+                    addressList.Add(string.IsNullOrEmpty(displayName) 
+                        ? mailboxAddress 
+                        : new MailboxAddress(displayName, mailboxAddress.Address));
                 }
             }
         }
