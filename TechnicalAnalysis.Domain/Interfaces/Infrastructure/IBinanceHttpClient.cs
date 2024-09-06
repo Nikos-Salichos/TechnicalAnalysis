@@ -6,6 +6,6 @@ namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
     public interface IBinanceHttpClient
     {
         Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs();
-        Task<IResult<object[][], string>> GetBinanceCandlesticks(IDictionary<string, string>? queryParams = null);
+        Task<IResult<object[][], string>> GetBinanceCandlesticks(Dictionary<string, string>? queryParams = null);
     }
 }

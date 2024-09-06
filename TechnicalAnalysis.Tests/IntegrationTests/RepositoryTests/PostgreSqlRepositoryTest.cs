@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using TechnicalAnalysis.CommonModels.BusinessModels;
+using TechnicalAnalysis.CommonModels.Enums;
 using TechnicalAnalysis.Tests.IntegrationTests.BaseClasses;
 
 namespace TechnicalAnalysis.Tests.IntegrationTests.RepositoryTests
@@ -11,7 +12,7 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.RepositoryTests
         {
             List<Asset> assets =
             [
-                new() { Symbol = "TestContainersAsset" },
+                new Asset { Symbol = "TestContainersAsset", ProductType = ProductType.Unknown},
             ];
 
             await PostgreSqlRepository.InsertAssetsAsync(assets);
@@ -27,8 +28,8 @@ namespace TechnicalAnalysis.Tests.IntegrationTests.RepositoryTests
         {
             List<Asset> assets =
             [
-                new() { Symbol = "BTC"},
-                new() { Symbol = "BTC"},
+                new Asset { Symbol = "BTC", ProductType = ProductType.CryptoRegardlessLayer},
+                new Asset { Symbol = "BTC", ProductType = ProductType.CryptoRegardlessLayer},
             ];
 
             var exception = await Assert.ThrowsAsync<Npgsql.PostgresException>(() => PostgreSqlRepository.InsertAssetsAsync(assets));

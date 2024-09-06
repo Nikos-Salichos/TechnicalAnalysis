@@ -24,7 +24,11 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Modules
             {
                 var options = new ConfigurationOptions
                 {
-                    EndPoints = { configuration["ConnectionStrings:RedisDockerCompose"] },
+                    EndPoints =
+                    {
+                        configuration["ConnectionStrings:RedisDockerCompose"] 
+                        ?? throw new InvalidOperationException("ConnectionStrings:RedisDockerCompose is null")
+                    },
                     AbortOnConnectFail = false,
                     ConnectTimeout = 5,
                     ConnectRetry = 10,

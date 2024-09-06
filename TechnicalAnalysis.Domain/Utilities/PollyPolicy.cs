@@ -22,7 +22,7 @@ namespace TechnicalAnalysis.Domain.Utilities
                     var optionsProperty = typeof(ResilienceProperties)
                         .GetProperty("Options", bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
-                    var options = optionsProperty?.GetValue(args.Context.Properties) as IDictionary<string, object>;
+                    var options = optionsProperty?.GetValue(args.Context.Properties) as Dictionary<string, object>;
 
                     logger.LogError("Retry attempt {AttemptNumber} of {Retries}. Delaying for {RetryDelay} seconds. " +
                                     "Exception: {ExceptionMessage} {ExceptionData}, " +

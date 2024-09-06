@@ -399,7 +399,7 @@ namespace TechnicalAnalysis.Infrastructure.Persistence.Repositories
             return Result<string, string>.Success(string.Empty);
         }
 
-        private static async Task WriteParameter(NpgsqlBinaryImporter writer, object value)
+        private static async Task WriteParameter(NpgsqlBinaryImporter writer, object? value)
         {
             if (value is null or DBNull)
             {

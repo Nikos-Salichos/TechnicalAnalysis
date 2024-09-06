@@ -96,7 +96,7 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
             return deserializedResponse ?? default;
         }
 
-        private static string ToQueryString(object requestData)
+        private static string ToQueryString(object? requestData)
         {
             if (requestData is null)
             {
