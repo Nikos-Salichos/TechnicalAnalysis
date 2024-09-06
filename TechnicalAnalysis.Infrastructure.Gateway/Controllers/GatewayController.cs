@@ -111,7 +111,7 @@ namespace TechnicalAnalysis.Infrastructure.Gateway.Controllers
                 if (value is not null)
                 {
                     string escapedName = Uri.EscapeDataString(property.Name);
-                    string escapedValue = Uri.EscapeDataString(value.ToString());
+                    string escapedValue = Uri.EscapeDataString(value.ToString() ?? string.Empty);
                     queryStringComponents.Add($"{escapedName}={escapedValue}");
                 }
             }
