@@ -92,8 +92,8 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
             var binancePairs = tradeableBinancePairs.ConvertAll(tradeablePair => new PairExtended
             {
                 Symbol = $"{tradeablePair.BaseAsset}-{tradeablePair.QuoteAsset}",
-                BaseAssetId = assetDictionary.TryGetValue(tradeablePair.BaseAsset, out long baseAssetId) ? baseAssetId : 0,
-                QuoteAssetId = assetDictionary.TryGetValue(tradeablePair.QuoteAsset, out long quoteAssetId) ? quoteAssetId : 0,
+                BaseAssetId = assetDictionary.TryGetValue(tradeablePair.BaseAsset, out var baseAssetId) ? baseAssetId : 0,
+                QuoteAssetId = assetDictionary.TryGetValue(tradeablePair.QuoteAsset, out var quoteAssetId) ? quoteAssetId : 0,
                 Provider = DataProvider.Binance,
                 AllCandles = false,
                 IsActive = true,
