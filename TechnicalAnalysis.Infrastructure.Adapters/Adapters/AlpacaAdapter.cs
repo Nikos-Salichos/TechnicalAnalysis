@@ -1,7 +1,6 @@
 ﻿using Alpaca.Markets;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Collections.Immutable;
 using TechnicalAnalysis.Application.Extensions;
 using TechnicalAnalysis.Application.Mediatr.Commands.Insert;
 using TechnicalAnalysis.Application.Mediatr.Commands.Update;
@@ -369,30 +368,33 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
                 foreach (var dateRange in DatetimeExtension.GetDailyDateRanges(fromDatetime, toDatetime))
                 {
-                    var stockData = await alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
-                    if (stockData.HasError)
+                    if (fetchedPair.BaseAssetName != null)
                     {
-                        return false;
-                    }
-
-                    foreach (var kvp in stockData.SuccessValue.Items)
-                    {
-                        foreach (var bar in kvp.Value)
+                        var stockData = await alpacaHttpClient.GetAlpacaData(fetchedPair.BaseAssetName, dateRange.Item1, dateRange.Item2, BarTimeFrame.Day);
+                        if (stockData.HasError)
                         {
-                            var candlestick = new CandlestickBuilder()
-                                .WithPoolOrPairId(fetchedPair.PrimaryId)
-                                .WithPoolOrPairName(kvp.Key)
-                                .WithCloseDate(bar.TimeUtc)
-                                .WithOpenDate(bar.TimeUtc.Date)
-                                .WithOpenPrice(bar.Open)
-                                .WithHighPrice(bar.High)
-                                .WithLowPrice(bar.Low)
-                                .WithClosePrice(bar.Close)
-                                .WithTimeframe(Timeframe.Daily)
-                                .WithVolume(bar.Volume)
-                                .Build();
+                            return false;
+                        }
 
-                            newCandlesticks.Add(candlestick);
+                        foreach (var kvp in stockData.SuccessValue.Items)
+                        {
+                            foreach (var bar in kvp.Value)
+                            {
+                                var candlestick = new CandlestickBuilder()
+                                    .WithPoolOrPairId(fetchedPair.PrimaryId)
+                                    .WithPoolOrPairName(kvp.Key)
+                                    .WithCloseDate(bar.TimeUtc)
+                                    .WithOpenDate(bar.TimeUtc.Date)
+                                    .WithOpenPrice(bar.Open)
+                                    .WithHighPrice(bar.High)
+                                    .WithLowPrice(bar.Low)
+                                    .WithClosePrice(bar.Close)
+                                    .WithTimeframe(Timeframe.Daily)
+                                    .WithVolume(bar.Volume)
+                                    .Build();
+
+                                newCandlesticks.Add(candlestick);
+                            }
                         }
                     }
                 }
