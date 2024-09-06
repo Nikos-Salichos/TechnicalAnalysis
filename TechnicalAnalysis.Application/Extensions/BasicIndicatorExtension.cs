@@ -504,7 +504,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
         private static void CalculateStandardPivotPoints(FrozenSet<Quote> quotes, ImmutableDictionary<DateTime, CandlestickExtended> candlestickLookup)
         {
-            foreach (var indicatorResult in quotes.GetPivotPoints(PeriodSize.Day, PivotPointType.Standard))
+            foreach (var indicatorResult in quotes.GetPivotPoints(PeriodSize.Day))
             {
                 if (candlestickLookup.TryGetValue(indicatorResult.Date, out var candlestick))
                 {
