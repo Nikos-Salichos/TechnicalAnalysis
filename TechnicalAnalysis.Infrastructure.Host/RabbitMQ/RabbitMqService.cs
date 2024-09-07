@@ -15,7 +15,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
         private const string Queue = "taQueue";
         private const string DeadLetterQueue = "taQueue.dlq";
         private const string ExchangeName = "taExchange";
-        private const string _deadLetterExchange = "taExchange.dlq";
+        private const string DeadLetterExchange = "taExchange.dlq";
         private const string _routingKey = "taKey";
         private const string _deadLetterRoutingKey = "taKey.dlq";
 
@@ -34,14 +34,14 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
 
             if (_isFirstTime)
             {
-                channel.ExchangeDeclare(_deadLetterExchange, "direct", true, false);
+                channel.ExchangeDeclare(DeadLetterExchange, "direct", true, false);
                 channel.QueueDeclare(DeadLetterQueue, durable: true, exclusive: false, autoDelete: false);
-                channel.QueueBind(DeadLetterQueue, _deadLetterExchange, _deadLetterRoutingKey);
+                channel.QueueBind(DeadLetterQueue, DeadLetterExchange, _deadLetterRoutingKey);
 
                 // Configure primary queue with dead-letter exchange
                 var arguments = new Dictionary<string, object>
                     {
-                        { "x-dead-letter-exchange", _deadLetterExchange },
+                        { "x-dead-letter-exchange", DeadLetterExchange },
                         { "x-dead-letter-routing-key", _deadLetterRoutingKey }
                     };
 
