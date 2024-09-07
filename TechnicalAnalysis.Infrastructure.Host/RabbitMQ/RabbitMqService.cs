@@ -12,7 +12,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
     public class RabbitMqService(IOptionsMonitor<RabbitMqSetting> rabbitMqSetting) : IRabbitMqService
     {
         private bool _isFirstTime = true;
-        private const string _queue = "taQueue";
+        private const string Queue = "taQueue";
         private const string _deadLetterQueue = "taQueue.dlq";
         private const string _exchangeName = "taExchange";
         private const string _deadLetterExchange = "taExchange.dlq";
@@ -46,8 +46,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
                     };
 
                 channel.ExchangeDeclare(_exchangeName, "direct", true, false);
-                channel.QueueDeclare(_queue, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
-                channel.QueueBind(_queue, _exchangeName, _routingKey);
+                channel.QueueDeclare(Queue, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
+                channel.QueueBind(Queue, _exchangeName, _routingKey);
 
                 _isFirstTime = false;
             }
@@ -81,7 +81,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
                 }
             };
 
-            channel.BasicConsume(queue: _queue, autoAck: true, consumer: consumer);
+            channel.BasicConsume(queue: Queue, autoAck: true, consumer: consumer);
 
             // Wait for some time or an event indicating that enough messages have been received.
             await Task.Delay(TimeSpan.FromSeconds(5));
