@@ -14,7 +14,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
         private bool _isFirstTime = true;
         private const string Queue = "taQueue";
         private const string DeadLetterQueue = "taQueue.dlq";
-        private const string _exchangeName = "taExchange";
+        private const string ExchangeName = "taExchange";
         private const string _deadLetterExchange = "taExchange.dlq";
         private const string _routingKey = "taKey";
         private const string _deadLetterRoutingKey = "taKey.dlq";
@@ -45,9 +45,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
                         { "x-dead-letter-routing-key", _deadLetterRoutingKey }
                     };
 
-                channel.ExchangeDeclare(_exchangeName, "direct", true, false);
+                channel.ExchangeDeclare(ExchangeName, "direct", true, false);
                 channel.QueueDeclare(Queue, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
-                channel.QueueBind(Queue, _exchangeName, _routingKey);
+                channel.QueueBind(Queue, ExchangeName, _routingKey);
 
                 _isFirstTime = false;
             }
@@ -58,7 +58,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
 
-            channel.BasicPublish(exchange: _exchangeName, routingKey: _routingKey, basicProperties: properties, body: body);
+            channel.BasicPublish(exchange: ExchangeName, routingKey: _routingKey, basicProperties: properties, body: body);
         }
 
         public async Task<List<T>> ConsumeMessageAsync<T>()
