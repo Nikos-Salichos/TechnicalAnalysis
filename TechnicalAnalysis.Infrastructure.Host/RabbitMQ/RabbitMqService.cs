@@ -11,7 +11,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
 {
     public class RabbitMqService(IOptionsMonitor<RabbitMqSetting> rabbitMqSetting) : IRabbitMqService
     {
-        private bool isFirstTime = true;
+        private bool _isFirstTime = true;
         private const string _queue = "taQueue";
         private const string _deadLetterQueue = "taQueue.dlq";
         private const string _exchangeName = "taExchange";
@@ -32,7 +32,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
             var connection = connectionFactory.CreateConnection();
             using var channel = connection.CreateModel();
 
-            if (isFirstTime)
+            if (_isFirstTime)
             {
                 channel.ExchangeDeclare(_deadLetterExchange, "direct", true, false);
                 channel.QueueDeclare(_deadLetterQueue, durable: true, exclusive: false, autoDelete: false);
@@ -49,7 +49,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
                 channel.QueueDeclare(_queue, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
                 channel.QueueBind(_queue, _exchangeName, _routingKey);
 
-                isFirstTime = false;
+                _isFirstTime = false;
             }
 
             var json = JsonSerializer.Serialize(message, JsonHelper.JsonSerializerOptions);
