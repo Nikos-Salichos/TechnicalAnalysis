@@ -4,8 +4,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
     public class ApiKeyMiddleware(RequestDelegate next, IConfiguration configuration)
     {
-        private const string APIKeyHeaderName = "ApiKey";
-        private readonly string _hangfireDashboardPath = "/hangfire";
+        private const string ApiKeyHeaderName = "ApiKey";
+        private const string _hangfireDashboardPath = "/hangfire";
 
         public async Task InvokeAsync(HttpContext context)
         {
@@ -16,7 +16,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
                 return;
             }
 
-            if (!context.Request.Headers.TryGetValue(APIKeyHeaderName, out var extractedApiKey))
+            if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
             {
                 await UnauthorizedResponse(context, "Api Key was not provided.");
                 return;
