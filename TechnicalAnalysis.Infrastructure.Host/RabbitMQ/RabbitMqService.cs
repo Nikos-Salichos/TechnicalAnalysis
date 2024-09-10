@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
         private const string RoutingKey = "taKey";
         private const string DeadLetterRoutingKey = "taKey.dlq";
 
-        private readonly ConnectionFactory connectionFactory = new()
+        private readonly ConnectionFactory _connectionFactory = new()
         {
             HostName = rabbitMqSetting.CurrentValue.Hostname,
             Port = rabbitMqSetting.CurrentValue.Port,
@@ -29,7 +29,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
 
         public void PublishMessage<T>(T message)
         {
-            var connection = connectionFactory.CreateConnection();
+            var connection = _connectionFactory.CreateConnection();
             using var channel = connection.CreateModel();
 
             if (_isFirstTime)
@@ -63,7 +63,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
 
         public async Task<List<T>> ConsumeMessageAsync<T>()
         {
-            using var connection = connectionFactory.CreateConnection();
+            using var connection = _connectionFactory.CreateConnection();
             using var channel = connection.CreateModel();
 
             var consumer = new EventingBasicConsumer(channel);
