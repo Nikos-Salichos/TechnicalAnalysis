@@ -103,24 +103,27 @@ namespace TechnicalAnalysis.Application.Services
                 var positionsCloseAll = selectedPair.AverageDownStrategyCloseAllBasedInFractalBreak();
                 var positionsCloseAllBasedOnEnhancedReversalSignal = selectedPair.AverageDownStrategyCloseAllBasedOnEnhancedReversalSignal();
 
-                var indicatorReports = new List<Indicator>
+                if (selectedPair.Symbol != null)
                 {
-                    CalculateEnhancedScanLongSignal(positionsCloseOneByOne, "EnhancedScan_CloseOneByOne", selectedPair.Symbol),
-                    CalculateEnhancedScanLongSignal(positionsCloseAll, "EnhancedScan_CloseAll", selectedPair.Symbol),
-                    CalculateEnhancedScanLongSignal(positionsCloseAllBasedOnEnhancedReversalSignal, "EnhancedScan_CloseAll_BasedOnReverseSignal", selectedPair.Symbol),
-                    CalculateEnhancedScanAllSignals(selectedPair),
-                    PrintFractalTrend(selectedPair),
-                    PrintLowestHighFractalSignals(selectedPair),
-                    PrintFlagNestedBodySignals(selectedPair),
-                    PrintFlagNestedRangeSignals(selectedPair),
-                    PrintFunnelSignals(selectedPair),
-                    PrintAllKindOfRanges(selectedPair),
-                    PrintResistanceBreakoutSignals(selectedPair),
-                    CalculateCandlestickCloseBelowPivotPrice(selectedPair),
-                    CalculateEnhancedScanShortSignal(selectedPair)
-                };
+                    var indicatorReports = new List<Indicator>
+                    {
+                        CalculateEnhancedScanLongSignal(positionsCloseOneByOne, "EnhancedScan_CloseOneByOne", selectedPair.Symbol),
+                        CalculateEnhancedScanLongSignal(positionsCloseAll, "EnhancedScan_CloseAll", selectedPair.Symbol),
+                        CalculateEnhancedScanLongSignal(positionsCloseAllBasedOnEnhancedReversalSignal, "EnhancedScan_CloseAll_BasedOnReverseSignal", selectedPair.Symbol),
+                        CalculateEnhancedScanAllSignals(selectedPair),
+                        PrintFractalTrend(selectedPair),
+                        PrintLowestHighFractalSignals(selectedPair),
+                        PrintFlagNestedBodySignals(selectedPair),
+                        PrintFlagNestedRangeSignals(selectedPair),
+                        PrintFunnelSignals(selectedPair),
+                        PrintAllKindOfRanges(selectedPair),
+                        PrintResistanceBreakoutSignals(selectedPair),
+                        CalculateCandlestickCloseBelowPivotPrice(selectedPair),
+                        CalculateEnhancedScanShortSignal(selectedPair)
+                    };
 
-                indicatorReportsPerPair.Add(selectedPair, indicatorReports);
+                    indicatorReportsPerPair.Add(selectedPair, indicatorReports);
+                }
             }
 
             var baseDirectory = GetBaseDirectory();

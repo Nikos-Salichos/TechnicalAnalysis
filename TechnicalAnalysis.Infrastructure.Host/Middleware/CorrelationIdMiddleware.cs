@@ -5,7 +5,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
 {
     public class CorrelationIdMiddleware(RequestDelegate next)
     {
-        private const string _correlationIdHeader = "X-Correlation-Id";
+        private const string CorrelationIdHeader = "X-Correlation-Id";
 
         public async Task Invoke(HttpContext context)
         {
@@ -21,7 +21,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
         private static string GetCorrelationId(HttpContext context)
         {
             // Try to get the correlation ID from the request headers.
-            if (context.Request.Headers.TryGetValue(_correlationIdHeader, out var correlationIdValue)
+            if (context.Request.Headers.TryGetValue(CorrelationIdHeader, out var correlationIdValue)
                 && !StringValues.IsNullOrEmpty(correlationIdValue))
             {
                 return correlationIdValue.ToString();
@@ -30,7 +30,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
             {
                 // If the header is not present or the value is empty, generate a new correlation ID.
                 var newCorrelationId = Guid.NewGuid().ToString();
-                context.Items[_correlationIdHeader] = newCorrelationId;
+                context.Items[CorrelationIdHeader] = newCorrelationId;
                 return newCorrelationId;
             }
         }
@@ -39,7 +39,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Middleware
         {
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers.TryAdd(_correlationIdHeader, new[] { correlationId.ToString() });
+                context.Response.Headers.TryAdd(CorrelationIdHeader, new[] { correlationId.ToString() });
                 return Task.CompletedTask;
             });
         }

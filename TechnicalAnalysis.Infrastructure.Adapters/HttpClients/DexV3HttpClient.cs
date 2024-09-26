@@ -21,52 +21,54 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
         public Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
         {
-            const string query = @"
-                          query($numberOfPools: Int!, $numberOfData: Int! ) {
-                              pools(first: $numberOfPools, orderBy: txCount, orderDirection: desc) {
-                                  id
-                                  feeTier
-                                  liquidity
-                                  totalValueLockedUSD
-                                  volumeUSD
-                                  feesUSD
-                                  txCount
-                                  poolDayData(first:  $numberOfData, skip: 1, orderBy: date, orderDirection: desc) {
-                                      id
-                                      date
-                                      feesUSD
-                                      liquidity
-                                      tvlUSD
-                                      volumeUSD
-                                      txCount
-                                  }
-                                  token0 {
-                                      id
-                                      symbol
-                                      name
-                                      tokenDayData(first:  $numberOfData, skip: 1, orderBy: date, orderDirection: desc) {
-                                          open
-                                          high
-                                          low
-                                          close
-                                          date
-                                      }
-                                  }
-                                  token1 {
-                                      id
-                                      symbol
-                                      name
-                                      tokenDayData(first:  $numberOfData, skip: 1, orderBy: date, orderDirection: desc) {
-                                          open
-                                          high
-                                          low
-                                          close
-                                          date
-                                      }
-                                  }
-                              }
-                          }
-                      ";
+            const string query = """
+                                 
+                                                           query($numberOfPools: Int!, $numberOfData: Int! ) {
+                                                               pools(first: $numberOfPools, orderBy: txCount, orderDirection: desc) {
+                                                                   id
+                                                                   feeTier
+                                                                   liquidity
+                                                                   totalValueLockedUSD
+                                                                   volumeUSD
+                                                                   feesUSD
+                                                                   txCount
+                                                                   poolDayData(first:  $numberOfData, skip: 1, orderBy: date, orderDirection: desc) {
+                                                                       id
+                                                                       date
+                                                                       feesUSD
+                                                                       liquidity
+                                                                       tvlUSD
+                                                                       volumeUSD
+                                                                       txCount
+                                                                   }
+                                                                   token0 {
+                                                                       id
+                                                                       symbol
+                                                                       name
+                                                                       tokenDayData(first:  $numberOfData, skip: 1, orderBy: date, orderDirection: desc) {
+                                                                           open
+                                                                           high
+                                                                           low
+                                                                           close
+                                                                           date
+                                                                       }
+                                                                   }
+                                                                   token1 {
+                                                                       id
+                                                                       symbol
+                                                                       name
+                                                                       tokenDayData(first:  $numberOfData, skip: 1, orderBy: date, orderDirection: desc) {
+                                                                           open
+                                                                           high
+                                                                           low
+                                                                           close
+                                                                           date
+                                                                       }
+                                                                   }
+                                                               }
+                                                           }
+                                                       
+                                 """;
 
             var requestBody = new
             {
