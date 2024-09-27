@@ -2,6 +2,6 @@
 {
     public enum PivotPoint
     {
-        Classic = 0
+        Classic = 1
     }
 }
