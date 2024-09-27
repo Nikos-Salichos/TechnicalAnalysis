@@ -122,7 +122,6 @@ namespace TechnicalAnalysis.Application.Extensions
             };
         }
 
-
         public static ValueClassificationType ToValueClassificationType(this string? valueClassification)
         {
             if (string.IsNullOrWhiteSpace(valueClassification))
@@ -145,6 +144,5 @@ namespace TechnicalAnalysis.Application.Extensions
                 _ => ValueClassificationType.None
             };
         }
-
     }
 }
