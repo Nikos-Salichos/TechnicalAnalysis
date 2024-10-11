@@ -14,6 +14,7 @@
         CoinMarketCap = 9,
         CoinRanking = 10,
         RapidApiStockFearAndGreedProvider = 11,
-        CnnApiStockFearAndGreedProvider = 12
+        CnnApiStockFearAndGreedProvider = 12,
+        FredApiProvider = 13
     }
 }
