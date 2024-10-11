@@ -26,6 +26,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
             services.AddSingleton<CoinRankingAdapter>();
             services.AddSingleton<StockFearAndGreedAdapter>();
             services.AddSingleton<CnnFearAndGreedAdapter>();
+            services.AddSingleton<FredApiAdapter>();
 
             services.AddSingleton<Func<DataProvider, IAdapter>>(serviceProvider => provider =>
             {
@@ -41,6 +42,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
                     DataProvider.CoinRanking => serviceProvider.GetRequiredService<CoinRankingAdapter>(),
                     DataProvider.RapidApiStockFearAndGreedProvider => serviceProvider.GetRequiredService<StockFearAndGreedAdapter>(),
                     DataProvider.CnnApiStockFearAndGreedProvider => serviceProvider.GetRequiredService<CnnFearAndGreedAdapter>(),
+                    DataProvider.FredApiProvider => serviceProvider.GetRequiredService<FredApiAdapter>(),
                     _ => throw new ArgumentOutOfRangeException(nameof(provider), $"Exchange {provider} not found")
                 };
             });
@@ -69,16 +71,17 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Modules
                 });
 
             services.AddSingleton<IPollyPolicy, PollyPolicy>();
-            services.AddSingleton<IBinanceHttpClient, BinanceHttpClient>();
-            services.AddSingleton<IDexV3HttpClient, DexV3HttpClient>();
-            services.AddSingleton<IAlpacaHttpClient, AlpacaHttpClient>();
-            services.AddSingleton<IWallStreetZenClient, WallStreetZenHttpClient>();
-            services.AddSingleton<ICryptoFearAndGreedHttpClient, CryptoFearAndGreedHttpClient>();
-            services.AddSingleton<ICoinPaprikaHttpClient, CoinPaprikaHttpClient>();
-            services.AddSingleton<ICoinMarketCapHttpClient, CoinMarketCapHttpClient>();
-            services.AddSingleton<ICoinRankingHttpClient, CoinRankingHttpClient>();
-            services.AddSingleton<IStockFearAndGreedHttpClient, StockFearAndGreedHttpClient>();
-            services.AddSingleton<ICnnStockFearAndGreedHttpClient, CnnStockFearAndGreedHttpClient>();
+            services.AddSingleton<IBinanceClient, BinanceHttpClient>();
+            services.AddSingleton<IDexV3Client, DexV3Client>();
+            services.AddSingleton<IAlpacaClient, AlpacaClient>();
+            services.AddSingleton<IWallStreetZenClient, WallStreetZenClient>();
+            services.AddSingleton<ICryptoFearAndGreedClient, CryptoFearAndGreedClient>();
+            services.AddSingleton<ICoinPaprikaClient, CoinPaprikaClient>();
+            services.AddSingleton<ICoinMarketCapClient, CoinMarketCapClient>();
+            services.AddSingleton<ICoinRankingClient, CoinRankingClient>();
+            services.AddSingleton<IStockFearAndGreedClient, StockFearAndGreedClient>();
+            services.AddSingleton<ICnnStockFearAndGreedClient, CnnStockFearAndGreedClient>();
+            services.AddSingleton<IFredApiClient, FredApiClient>();
 
             services.AddOptions<MailSettings>().Bind(configuration.GetSection(nameof(MailSettings))).ValidateDataAnnotations();
             services.AddOptions<RabbitMqSetting>().Bind(configuration.GetSection("RabbitMq"));
