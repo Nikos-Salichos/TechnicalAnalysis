@@ -78,6 +78,11 @@ namespace TechnicalAnalysis.Application.Services
                     adaptersToSync.Add(GetAndSyncAdapter(DataProvider.CnnApiStockFearAndGreedProvider, timeframe, exchanges));
                 }
 
+                if (provider is DataProvider.FredApiProvider or DataProvider.All)
+                {
+                    adaptersToSync.Add(GetAndSyncAdapter(DataProvider.FredApiProvider, timeframe, exchanges));
+                }
+
                 if (adaptersToSync.Count > 0)
                 {
                     await Task.WhenAll(adaptersToSync);
