@@ -15,7 +15,7 @@ using PairExtended = TechnicalAnalysis.CommonModels.BusinessModels.PairExtended;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class AlpacaAdapter(ILogger<AlpacaAdapter> logger, IMediator mediator, IAlpacaHttpClient alpacaHttpClient) : IAdapter
+    public class AlpacaAdapter(ILogger<AlpacaAdapter> logger, IMediator mediator, IAlpacaClient alpacaHttpClient) : IAdapter
     {
         static readonly List<string> etfTickers =
             [
