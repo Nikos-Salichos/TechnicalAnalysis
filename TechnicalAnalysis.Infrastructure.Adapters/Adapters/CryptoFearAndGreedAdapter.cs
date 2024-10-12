@@ -11,7 +11,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class CryptoFearAndGreedAdapter(ICryptoFearAndGreedHttpClient cryptoFearAndGreedHttpClient, IMediator mediator,
+    public class CryptoFearAndGreedAdapter(ICryptoFearAndGreedClient cryptoFearAndGreedHttpClient, IMediator mediator,
         ILogger<CryptoFearAndGreedAdapter> logger) : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
