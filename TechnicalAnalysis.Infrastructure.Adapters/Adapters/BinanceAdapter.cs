@@ -16,7 +16,7 @@ using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class BinanceAdapter(IBinanceHttpClient binanceHttpClient, IMediator mediator, ILogger<BinanceAdapter> logger) : IAdapter
+    public class BinanceAdapter(IBinanceClient binanceHttpClient, IMediator mediator, ILogger<BinanceAdapter> logger) : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
