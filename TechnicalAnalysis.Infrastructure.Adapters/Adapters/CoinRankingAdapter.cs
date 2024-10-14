@@ -11,7 +11,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    internal sealed class CoinRankingAdapter(ICoinRankingHttpClient coinRankingHttpClient, IMediator mediator, ILogger<CoinRankingAdapter> logger)
+    internal sealed class CoinRankingAdapter(ICoinRankingClient coinRankingHttpClient, IMediator mediator, ILogger<CoinRankingAdapter> logger)
     : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
