@@ -10,7 +10,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class CoinPaprikaAdapter(ICoinPaprikaHttpClient coinPaprikaClient, IMediator mediator, ILogger<CoinPaprikaAdapter> logger) : IAdapter
+    public class CoinPaprikaAdapter(ICoinPaprikaClient coinPaprikaClient, IMediator mediator, ILogger<CoinPaprikaAdapter> logger) : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
