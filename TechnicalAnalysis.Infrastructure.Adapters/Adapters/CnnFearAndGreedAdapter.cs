@@ -11,7 +11,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class CnnFearAndGreedAdapter(ICnnStockFearAndGreedHttpClient httpClient, IMediator mediator,
+    public class CnnFearAndGreedAdapter(ICnnStockFearAndGreedClient httpClient, IMediator mediator,
         ILogger<CnnFearAndGreedAdapter> logger) : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
