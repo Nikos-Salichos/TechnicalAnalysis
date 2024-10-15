@@ -426,7 +426,8 @@ INSERT INTO public."Providers" ("Id", "Name") VALUES
   (9, 'CoinMarketCap'),
   (10, 'CoinRanking'),
   (11, 'RapidApiCryptoFearAndGreedIndex'),
-  (12, 'CnnApiCryptoFearAndGreedIndex');
+  (12, 'CnnApiCryptoFearAndGreedIndex'),
+  (13, 'FredApiProvider');
 
 
 --
