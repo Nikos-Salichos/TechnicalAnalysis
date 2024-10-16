@@ -8,7 +8,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class StockFearAndGreedAdapter(IStockFearAndGreedHttpClient stockFearAndGreedHttpClient, IMediator mediator) : IAdapter
+    public class StockFearAndGreedAdapter(IStockFearAndGreedClient stockFearAndGreedHttpClient, IMediator mediator) : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
         {
