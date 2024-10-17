@@ -12,12 +12,12 @@ using TechnicalAnalysis.Domain.Utilities;
 namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 {
     public class FredApiClient(IOptionsMonitor<FredApiSetting> fredApiSettings, IHttpClientFactory httpClientFactory,
-        ILogger<FredApiClient> logger, IPollyPolicy pollyPolicy) : IFredApiHttpClient
+        ILogger<FredApiClient> logger, IPollyPolicy pollyPolicy) : IFredApiClient
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public async Task<IResult<List<FredVixContract>, string>> SyncVix()
+        public async Task<IResult<FredVixContract, string>> SyncVix()
         {
             try
             {
@@ -30,25 +30,25 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
                     logger.LogError("{HttpResponseMessageStatusCode}", httpResponseMessage.StatusCode);
-                    return Result<List<FredVixContract>, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                    return Result<FredVixContract, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
                 }
 
                 using var content = httpResponseMessage.Content;
                 await using var jsonStream = await content.ReadAsStreamAsync();
 
-                var deserializedData = await JsonSerializer.DeserializeAsync<List<FredVixContract>>(jsonStream, JsonHelper.JsonSerializerOptions);
+                var deserializedData = await JsonSerializer.DeserializeAsync<FredVixContract>(jsonStream, JsonHelper.JsonSerializerOptions);
                 if (deserializedData is not null)
                 {
-                    return Result<List<FredVixContract>, string>.Success(deserializedData);
+                    return Result<FredVixContract, string>.Success(deserializedData);
                 }
 
                 logger.LogError("Deserialization Failed");
-                return Result<List<FredVixContract>, string>.Fail($"{nameof(SyncVix)} Deserialization Failed");
+                return Result<FredVixContract, string>.Fail($"{nameof(SyncVix)} Deserialization Failed");
             }
             catch (Exception exception)
             {
                 logger.LogError("Method {Method}, Exception {Exception} ", nameof(SyncVix), exception);
-                return Result<List<FredVixContract>, string>.Fail(exception.Message);
+                return Result<FredVixContract, string>.Fail(exception.Message);
             }
         }
     }
