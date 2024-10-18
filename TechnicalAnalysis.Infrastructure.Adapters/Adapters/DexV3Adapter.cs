@@ -15,7 +15,7 @@ using DataProvider = TechnicalAnalysis.CommonModels.Enums.DataProvider;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    public class DexV3Adapter(IDexV3HttpClient dexV3HttpClient, ILogger<DexV3Adapter> logger,
+    public class DexV3Adapter(IDexV3Client dexV3HttpClient, ILogger<DexV3Adapter> logger,
          IMediator mediator) : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
