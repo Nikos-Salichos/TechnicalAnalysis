@@ -34,8 +34,8 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
 
             if (pairNames.Count is 0)
             {
-                logger.LogError("No pair names provided by the user {@pairNames}", pairNames);
-                return Task.FromResult<IActionResult>(BadRequest($"No pair names provided by the user {pairNames}"));
+                logger.LogError("No pair names provided by the user");
+                return Task.FromResult<IActionResult>(BadRequest("No pair names provided by the user"));
             }
 
             return GetIndicatorsByPairNameAsync(analysisService, pairNames, timeframe);
