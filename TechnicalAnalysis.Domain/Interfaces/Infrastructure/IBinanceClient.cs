@@ -1,11 +1,12 @@
 ﻿using TechnicalAnalysis.Domain.Contracts.Input.Binance;
 using TechnicalAnalysis.Domain.Interfaces.Utilities;
+using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface IBinanceClient
     {
-        Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs();
-        Task<IResult<object[][], string>> GetBinanceCandlesticks(Dictionary<string, string>? queryParams = null);
+        Task<Result<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs();
+        Task<Result<object[][], string>> GetBinanceCandlesticks(Dictionary<string, string>? queryParams = null);
     }
 }
