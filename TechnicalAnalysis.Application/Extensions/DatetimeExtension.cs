@@ -2,14 +2,12 @@
 {
     public static class DatetimeExtension
     {
-        public static bool EqualsYearMonthDayHourMinute(this DateTime dt1, DateTime dt2)
-        {
-            return dt1.Year == dt2.Year &&
-                   dt1.Month == dt2.Month &&
-                   dt1.Day == dt2.Day &&
-                   dt1.Hour == dt2.Hour &&
-                   dt1.Minute == dt2.Minute;
-        }
+        public static bool EqualsYearMonthDayHourMinute(this DateTime dt1, DateTime dt2) 
+            => dt1.Year == dt2.Year &&
+               dt1.Month == dt2.Month &&
+               dt1.Day == dt2.Day &&
+               dt1.Hour == dt2.Hour &&
+               dt1.Minute == dt2.Minute;
 
         public static List<(DateTime, DateTime)> GetDailyDateRanges(DateTime startDate, DateTime endDate)
         {
