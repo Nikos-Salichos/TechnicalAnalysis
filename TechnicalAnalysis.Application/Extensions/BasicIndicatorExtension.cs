@@ -34,10 +34,10 @@ namespace TechnicalAnalysis.Application.Extensions
 
             var quotes = pair
                 .Candlesticks
-                .Where(candlestick =>
+                .Where(static candlestick =>
                 candlestick.OpenPrice.HasValue
                 && candlestick is { HighPrice: not null, ClosePrice: not null } and { LowPrice: not null, Volume: not null })
-                .Select(candlestick => new Quote
+                .Select(static candlestick => new Quote
                 {
                     Open = candlestick.OpenPrice.Value,
                     High = candlestick.HighPrice.Value,
