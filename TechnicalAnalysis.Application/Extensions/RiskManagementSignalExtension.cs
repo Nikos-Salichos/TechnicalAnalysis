@@ -53,7 +53,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                var openPositions = positions.Where(p => p.OpenPosition).ToList();
+                var openPositions = positions.Where(static p => p.OpenPosition).ToList();
 
                 if (openPositions.Count > 0)
                 {
@@ -129,7 +129,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                var openPositions = positions.Where(p => p.OpenPosition).ToList();
+                var openPositions = positions.Where(static p => p.OpenPosition).ToList();
                 if (openPositions.Count > 0)
                 {
                     var candlestick3 = i >= 2 ? pair.Candlesticks[i - 2] : null;
@@ -217,7 +217,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                var openPositions = positions.Where(p => p.OpenPosition).ToList();
+                var openPositions = positions.Where(static p => p.OpenPosition).ToList();
                 if (openPositions.Count > 0)
                 {
                     var candlestick3 = i >= 2 ? pair.Candlesticks[i - 2] : null;
@@ -315,7 +315,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                var openPositions = positions.Where(p => p.OpenPosition).ToList();
+                var openPositions = positions.Where(static p => p.OpenPosition).ToList();
 
                 if (openPositions.Count > 0)
                 {
@@ -407,7 +407,7 @@ namespace TechnicalAnalysis.Application.Extensions
                     }
                 }
 
-                var openPositions = positions.Where(p => p.OpenPosition).ToList();
+                var openPositions = positions.Where(static p => p.OpenPosition).ToList();
                 if (openPositions.Count > 0)
                 {
                     var closeLongSignal = candlestick.EnhancedScans.FirstOrDefault()?.EnhancedScanIsShort;
