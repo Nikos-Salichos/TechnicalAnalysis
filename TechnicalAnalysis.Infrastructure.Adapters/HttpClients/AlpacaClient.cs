@@ -14,7 +14,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
     {
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public async Task<IResult<IMultiPage<IBar>, string>> GetAlpacaData(string pairName, DateTime fromDateTime, DateTime toDateTime, BarTimeFrame barTimeFrame)
+        public async Task<Result<IMultiPage<IBar>, string>> GetAlpacaData(string pairName, DateTime fromDateTime, DateTime toDateTime, BarTimeFrame barTimeFrame)
         {
             try
             {
@@ -34,7 +34,9 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 var alpacaStockData = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest), resilienceContext);
 
-                return Result<IMultiPage<IBar>, string>.Success(alpacaStockData);
+               // return Result<IMultiPage<IBar>, string>.Success(alpacaStockData);
+
+                return Result.Success(alpacaStockData);
             }
             catch (Exception exception)
             {
