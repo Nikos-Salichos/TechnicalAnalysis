@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public async Task<IResult<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
+        public async Task<Result<BinanceExchangeInfoResponse, string>> GetBinanceAssetsAndPairs()
         {
             try
             {
@@ -52,7 +52,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
             }
         }
 
-        public async Task<IResult<object[][], string>> GetBinanceCandlesticks(Dictionary<string, string>? queryParams = null)
+        public async Task<Result<object[][], string>> GetBinanceCandlesticks(Dictionary<string, string>? queryParams = null)
         {
             try
             {
