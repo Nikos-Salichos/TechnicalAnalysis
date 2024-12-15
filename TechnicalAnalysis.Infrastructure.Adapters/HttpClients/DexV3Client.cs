@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public Task<IResult<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
+        public Task<Result<DexV3ApiResponse, string>> GetMostActivePoolsAsync(int numberOfPools, int numberOfData, DataProvider provider)
         {
             const string query = """
                                  
@@ -89,7 +89,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
             return FetchDataAsync(dexEndpoint, requestBody);
 
-            async Task<IResult<DexV3ApiResponse, string>> FetchDataAsync(string endpoint, object body)
+            async Task<Result<DexV3ApiResponse, string>> FetchDataAsync(string endpoint, object body)
             {
                 try
                 {
