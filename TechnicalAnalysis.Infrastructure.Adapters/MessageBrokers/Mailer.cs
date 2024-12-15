@@ -64,7 +64,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.MessageBrokers
                 return;
             }
 
-            foreach (var address in addresses.Where(x => !string.IsNullOrWhiteSpace(x)))
+            foreach (var address in addresses.Where(static x => !string.IsNullOrWhiteSpace(x)))
             {
                 if (MailboxAddress.TryParse(address.Trim(), out var mailboxAddress))
                 {
