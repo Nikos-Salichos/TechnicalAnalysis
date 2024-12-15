@@ -18,7 +18,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("cnn");
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public async Task<IResult<RootStockFearAndGreed, string>> GetCnnStockFearAndGreedIndex()
+        public async Task<Result<RootStockFearAndGreed, string>> GetCnnStockFearAndGreedIndex()
         {
             try
             {
