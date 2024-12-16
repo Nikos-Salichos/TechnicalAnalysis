@@ -46,7 +46,7 @@ namespace TechnicalAnalysis.Application.Extensions
 
             if (decimal.TryParse(stringWithoutComma, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal decimalNumber))
             {
-                return decimalNumber;
+                return Math.Round(decimalNumber, 6);
             }
             else
             {
