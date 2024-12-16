@@ -9,7 +9,7 @@ namespace TechnicalAnalysis.Application.Validations
         public DataProviderTimeframeValidator()
         {
             RuleFor(x => x)
-                .Custom((value, context) =>
+                .Custom(static (value, context) =>
                 {
                     bool isDailyTimeframe = value.Timeframe == Timeframe.Daily;
                     bool isBinanceWithWeekly = value is { DataProvider: DataProvider.Binance, Timeframe: Timeframe.Weekly };
