@@ -828,9 +828,11 @@ namespace TechnicalAnalysis.Application.Services
             return pair.Candlesticks;
         }
 
-        public async Task<List<PairExtended>> GetPairsAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null)
+        public async Task<List<PairExtended>> GetPairsByDataProviderAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
+
+            await CalculateTechnicalIndicators(pairs);
 
             return pairs.Where(pair => dataProviders.Contains(pair.Provider)).ToList();
         }
@@ -838,6 +840,8 @@ namespace TechnicalAnalysis.Application.Services
         public async Task<List<PairExtended>> GetPairByIdsAsync(List<long> ids, HttpContext? httpContext = null)
         {
             var pairs = await FormatAssetsPairsCandlesticks();
+
+            await CalculateTechnicalIndicators(pairs);
 
             return pairs.Where(pair => ids.Contains(pair.PrimaryId)).ToList();
         }
