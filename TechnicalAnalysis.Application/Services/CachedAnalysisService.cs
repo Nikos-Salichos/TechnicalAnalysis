@@ -101,8 +101,8 @@ namespace TechnicalAnalysis.Application.Services
         public Task<List<CandlestickExtended>> GetCustomCandlesticksAnalysisAsync(List<CustomCandlestickData> customCandlestickData)
             => inner.GetCustomCandlesticksAnalysisAsync(customCandlestickData);
 
-        public Task<List<PairExtended>> GetPairsAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null)
-            => inner.GetPairsAsync(dataProviders);
+        public Task<List<PairExtended>> GetPairsByDataProviderAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null)
+            => inner.GetPairsByDataProviderAsync(dataProviders);
 
         public Task<List<PairExtended>> GetPairByIdsAsync(List<long> ids, HttpContext? httpContext = null)
             => inner.GetPairByIdsAsync(ids);
