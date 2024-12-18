@@ -11,7 +11,7 @@ namespace TechnicalAnalysis.Domain.Interfaces.Application
         Task<List<PairExtended>> GetIndicatorsByPairNamesAsync(List<string> pairNames, Timeframe timeframe, HttpContext? httpContext = null);
         Task<List<AssetRanking>> GetLayerOneAssetsAsync();
         Task<List<CandlestickExtended>> GetCustomCandlesticksAnalysisAsync(List<CustomCandlestickData> customCandlestickData);
-        Task<List<PairExtended>> GetPairsAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null);
+        Task<List<PairExtended>> GetPairsByDataProviderAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null);
         Task<List<PairExtended>> GetPairByIdsAsync(List<long> ids, HttpContext? httpContext = null);
     }
 }
