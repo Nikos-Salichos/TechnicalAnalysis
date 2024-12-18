@@ -34,8 +34,6 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
                 var alpacaStockData = await _resiliencePipeline.ExecuteAsync(async (ctx)
                     => await alpacaDataClient.GetHistoricalBarsAsync(historicalBarsRequest), resilienceContext);
 
-               // return Result<IMultiPage<IBar>, string>.Success(alpacaStockData);
-
                 return Result.Success(alpacaStockData);
             }
             catch (Exception exception)
