@@ -29,8 +29,10 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
 
                 if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    logger.LogError("{HttpResponseMessageStatusCode}", httpResponseMessage.StatusCode);
-                    return Result<BinanceExchangeInfoResponse, string>.Fail(httpResponseMessage.StatusCode + "" + httpResponseMessage.Content);
+                    var errorMessage = httpResponseMessage.StatusCode + "" + httpResponseMessage.Content;
+                    logger.LogError("Error message: {errorMessage}", errorMessage);
+
+                    return Result<BinanceExchangeInfoResponse, string>.Fail(errorMessage);
                 }
 
                 using var content = httpResponseMessage.Content;
