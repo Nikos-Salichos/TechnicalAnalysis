@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Alpaca.Markets;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
@@ -26,6 +27,20 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+        [HttpGet("Pairs")]
+        [EnableRateLimiting("fixed-by-ip")]
+        public async Task<IActionResult> GetPairs([FromQuery] List<DataProvider> dataProviders)
+        {
+            logger.LogInformation("Request GetPairs {dataProviders}", dataProviders);
+
+            var pairs = await analysisService.GetPairsByDataProviderAsync(dataProviders, HttpContext);
+
+            return Ok(pairs);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("IndicatorsByPairName")]
         [EnableRateLimiting("fixed-by-ip")]
         public Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
@@ -45,6 +60,17 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
                 await analysisService.GetIndicatorsByPairNamesAsync(pairNames, timeframe, HttpContext);
                 return NoContent();
             }
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+        [HttpPost("PairsByIds")]
+        [EnableRateLimiting("fixed-by-ip")]
+        public async Task<IActionResult> GetPairByIdsAsync([FromQuery] List<long> pairIds)
+        {
+            var result = await analysisService.GetPairByIdsAsync(pairIds);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

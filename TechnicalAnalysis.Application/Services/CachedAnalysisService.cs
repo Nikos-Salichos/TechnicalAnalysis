@@ -70,7 +70,7 @@ namespace TechnicalAnalysis.Application.Services
                 if (cachedPairs?.Count > 0)
                 {
                     await communication.CreateAttachmentSendMessage(cachedPairs, fileName);
-                    rabbitMqService.PublishMessage(cachedPairs);
+                    await rabbitMqService.PublishMessage(cachedPairs);
 
                     // Example how to consume message
                     // var message = await rabbitMqService.ConsumeMessageAsync<List<PairExtended>>();
@@ -83,7 +83,7 @@ namespace TechnicalAnalysis.Application.Services
 
             await redisRepository.SetRecordAsync(provider.ToString(), pairs);
             await communication.CreateAttachmentSendMessage(pairs, fileName);
-            rabbitMqService.PublishMessage(pairs);
+            await rabbitMqService.PublishMessage(pairs);
 
             return pairs;
         }
@@ -100,5 +100,11 @@ namespace TechnicalAnalysis.Application.Services
 
         public Task<List<CandlestickExtended>> GetCustomCandlesticksAnalysisAsync(List<CustomCandlestickData> customCandlestickData)
             => inner.GetCustomCandlesticksAnalysisAsync(customCandlestickData);
+
+        public Task<List<PairExtended>> GetPairsByDataProviderAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null)
+            => inner.GetPairsByDataProviderAsync(dataProviders);
+
+        public Task<List<PairExtended>> GetPairByIdsAsync(List<long> ids, HttpContext? httpContext = null)
+            => inner.GetPairByIdsAsync(ids);
     }
 }

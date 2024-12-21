@@ -1,10 +1,10 @@
 ﻿using TechnicalAnalysis.Domain.Contracts.Input.FredApiContracts;
-using TechnicalAnalysis.Domain.Interfaces.Utilities;
+using TechnicalAnalysis.Domain.Utilities;
 
 namespace TechnicalAnalysis.Domain.Interfaces.Infrastructure
 {
     public interface IFredApiClient
     {
-        Task<IResult<FredVixContract, string>> SyncVix();
+        Task<Result<FredVixContract, string>> SyncVix();
     }
 }

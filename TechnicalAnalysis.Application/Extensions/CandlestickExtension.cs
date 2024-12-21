@@ -44,7 +44,7 @@ namespace TechnicalAnalysis.Application.Extensions
             var missingDates = new List<DateTime>();
             var missingSymbols = new List<BinancePair>();
 
-            foreach (var pair in pairs.Where(s => s.IsActive))
+            foreach (var pair in pairs.Where(static s => s.IsActive))
             {
                 var candles = pair.BinanceCandlesticks.OrderBy(c => c.OpenTime);
                 BinanceCandlestick? previousCandle = null;

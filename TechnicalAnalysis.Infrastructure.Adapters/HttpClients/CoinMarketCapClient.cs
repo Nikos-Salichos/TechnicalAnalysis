@@ -19,7 +19,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public async Task<IResult<CoinMarketCapAssetContract, string>> SyncAssets()
+        public async Task<Result<CoinMarketCapAssetContract, string>> SyncAssets()
         {
             try
             {

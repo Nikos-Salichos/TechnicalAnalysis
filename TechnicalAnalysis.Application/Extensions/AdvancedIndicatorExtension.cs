@@ -27,7 +27,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 nameof(pair.QuoteAssetName), pair.QuoteAssetName);
 
             pair.Candlesticks = pair.Candlesticks
-                .Where(candlestick => candlestick is { OpenPrice: not null, HighPrice: not null } and { ClosePrice: not null, LowPrice: not null })
+                .Where(static candlestick => candlestick is { OpenPrice: not null, HighPrice: not null } and { ClosePrice: not null, LowPrice: not null })
                 .OrderBy(candlestick => candlestick.CloseDate)
                 .ToList();
 
@@ -164,8 +164,7 @@ namespace TechnicalAnalysis.Application.Extensions
                 if (candlestick1?.BollingerBands.FirstOrDefault()?.BandWidth >= candlestick.BollingerBands.FirstOrDefault()?.BandWidth
                     && candlestick1.BollingerBands.FirstOrDefault()?.UpperBand - candlestick1.BollingerBands.FirstOrDefault()?.LowerBand
                     >= candlestick.BollingerBands.FirstOrDefault()?.UpperBand - candlestick.BollingerBands.FirstOrDefault()?.LowerBand
-                    && candlestick.Adxs.FirstOrDefault()?.PlusDi <= 25
-                    && candlestick.Adxs.FirstOrDefault()?.MinusDi <= 25)
+                    && candlestick.Adxs.FirstOrDefault()?.PlusDi <= 25 && candlestick.Adxs.FirstOrDefault()?.MinusDi <= 25)
                 {
                     count++;
 

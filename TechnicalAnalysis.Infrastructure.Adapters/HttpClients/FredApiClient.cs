@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public async Task<IResult<FredVixContract, string>> SyncVix()
+        public async Task<Result<FredVixContract, string>> SyncVix()
         {
             try
             {

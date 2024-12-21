@@ -13,6 +13,7 @@ using TechnicalAnalysis.Domain.Helpers;
 using TechnicalAnalysis.Domain.Interfaces.Application;
 using TechnicalAnalysis.Domain.Utilities;
 using Indicator = TechnicalAnalysis.CommonModels.OutputContract.Indicator;
+using System.Linq;
 
 namespace TechnicalAnalysis.Application.Services
 {
@@ -25,10 +26,10 @@ namespace TechnicalAnalysis.Application.Services
 
             pairs = provider switch
             {
-                DataProvider.Binance => pairs.Where(p => p.Provider == DataProvider.Binance).ToList(),
-                DataProvider.Uniswap => pairs.Where(p => p.Provider == DataProvider.Uniswap).ToList(),
-                DataProvider.Pancakeswap => pairs.Where(p => p.Provider == DataProvider.Pancakeswap).ToList(),
-                DataProvider.Alpaca => pairs.Where(p => p.Provider == DataProvider.Alpaca).ToList(),
+                DataProvider.Binance => pairs.Where(static p => p.Provider == DataProvider.Binance).ToList(),
+                DataProvider.Uniswap => pairs.Where(static p => p.Provider == DataProvider.Uniswap).ToList(),
+                DataProvider.Pancakeswap => pairs.Where(static p => p.Provider == DataProvider.Pancakeswap).ToList(),
+                DataProvider.Alpaca => pairs.Where(static p => p.Provider == DataProvider.Alpaca).ToList(),
                 _ => pairs
             };
 
@@ -193,7 +194,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var indicator = new Indicator { Name = "EnhancedShortSignal" };
 
-            foreach (var candlestick in pair.Candlesticks.Where(c => c.EnhancedScans.FirstOrDefault()?.OrderOfShortSignal == 1))
+            foreach (var candlestick in pair.Candlesticks.Where(static c => c.EnhancedScans.FirstOrDefault()?.OrderOfShortSignal == 1))
             {
                 var signalIndicator = new Signal
                 {
@@ -210,7 +211,7 @@ namespace TechnicalAnalysis.Application.Services
         {
             var closeBelowPivotPrice = new Indicator { Name = "closeBelowPivotPrice" };
 
-            foreach (var candlestick in pair.Candlesticks.Where(c => c.CloseRelativeToPivots.FirstOrDefault()?.NumberOfConsecutiveCandlestickBelowPivot >= 3))
+            foreach (var candlestick in pair.Candlesticks.Where(static c => c.CloseRelativeToPivots.FirstOrDefault()?.NumberOfConsecutiveCandlestickBelowPivot >= 3))
             {
                 var signalIndicator = new Signal
                 {
@@ -796,7 +797,8 @@ namespace TechnicalAnalysis.Application.Services
         public async Task<List<AssetRanking>> GetLayerOneAssetsAsync()
         {
             var fetchedAssets = await mediator.Send(new GetAssetsRankingQuery());
-            return fetchedAssets.Where(a => a.ProductType is ProductType.Layer1).OrderByDescending(a => a.CreatedDate).ToList();
+            return fetchedAssets.Where(a => a.ProductType is ProductType.Layer1).OrderByDescending(a => a.CreatedDate)
+                                .ToList();
         }
 
         public async Task<List<CandlestickExtended>> GetCustomCandlesticksAnalysisAsync(List<CustomCandlestickData> customCandlestickData)
@@ -824,6 +826,24 @@ namespace TechnicalAnalysis.Application.Services
 
             await CalculateTechnicalIndicators(pairs);
             return pair.Candlesticks;
+        }
+
+        public async Task<List<PairExtended>> GetPairsByDataProviderAsync(List<DataProvider> dataProviders, HttpContext? httpContext = null)
+        {
+            var pairs = await FormatAssetsPairsCandlesticks();
+
+            await CalculateTechnicalIndicators(pairs);
+
+            return pairs.Where(pair => dataProviders.Contains(pair.Provider)).ToList();
+        }
+
+        public async Task<List<PairExtended>> GetPairByIdsAsync(List<long> ids, HttpContext? httpContext = null)
+        {
+            var pairs = await FormatAssetsPairsCandlesticks();
+
+            await CalculateTechnicalIndicators(pairs);
+
+            return pairs.Where(pair => ids.Contains(pair.PrimaryId)).ToList();
         }
     }
 }

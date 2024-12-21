@@ -17,7 +17,7 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.HttpClients
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("default");
         private readonly ResiliencePipeline _resiliencePipeline = pollyPolicy.CreatePolicies(retries: 3);
 
-        public async Task<IResult<StockFearAndGreedRoot, string>> GetStockFearAndGreedIndex()
+        public async Task<Result<StockFearAndGreedRoot, string>> GetStockFearAndGreedIndex()
         {
             try
             {

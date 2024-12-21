@@ -10,7 +10,7 @@ using TechnicalAnalysis.Domain.Interfaces.Infrastructure;
 
 namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 {
-    internal sealed class CoinMarketCapAdapter(ICoinMarketCapClient coinMarketCapHttpClient, IMediator mediator, ILogger<CoinMarketCapAdapter> logger)
+    public sealed class CoinMarketCapAdapter(ICoinMarketCapClient coinMarketCapHttpClient, IMediator mediator, ILogger<CoinMarketCapAdapter> logger)
         : IAdapter
     {
         public async Task<bool> Sync(DataProvider provider, Timeframe timeframe, List<ProviderSynchronization> exchanges)
