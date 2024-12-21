@@ -51,11 +51,21 @@ namespace TechnicalAnalysis.Infrastructure.Adapters.Adapters
 
             var domainFearAndGreed = response.SuccessValue.ToDomain();
 
-            var distinctItems = domainFearAndGreed.Where(item => item.DateTime.Date != DateTime.UtcNow.Date)
-                                                       .GroupBy(item => item.DateTime.Date)
-                                                       .Select(group => group.First())
-                                                       .ToList();
+            // Step 1: Get existing dates from cryptoFearAndGreedIndexData
+            var existingDates = cryptoFearAndGreedIndexData
+                .Select(item => item.DateTime.Date)
+                .Distinct()
+                .ToHashSet();
 
+            // Step 2: Filter distinct items ensuring uniqueness and exclude today's data
+            var distinctItems = domainFearAndGreed
+                .Where(item => item.DateTime.Date != DateTime.UtcNow.Date)  // Exclude today's date
+                .GroupBy(item => item.DateTime.Date)
+                .Select(group => group.First())
+                .Where(item => !existingDates.Contains(item.DateTime.Date)) // Exclude dates that already exist in DB data
+                .ToList();
+
+            // Insert only unique items
             await mediator.Send(new InsertCryptoFearAndGreedIndexCommand(distinctItems));
 
             alternativeMeCryptoAndFearProvider.ProviderPairAssetSyncInfo.UpdateProviderInfo();
