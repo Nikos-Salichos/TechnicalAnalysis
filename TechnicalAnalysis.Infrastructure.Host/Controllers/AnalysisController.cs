@@ -1,5 +1,4 @@
-﻿using Alpaca.Markets;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using TechnicalAnalysis.CommonModels.BusinessModels;
 using TechnicalAnalysis.CommonModels.Enums;
@@ -24,6 +23,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
             return Ok(result);
         }
 
+        //TODO add paging
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
@@ -31,7 +31,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [EnableRateLimiting("fixed-by-ip")]
         public async Task<IActionResult> GetPairs([FromQuery] List<DataProvider> dataProviders)
         {
-            logger.LogInformation("Request GetPairs {dataProviders}", dataProviders);
+            logger.LogInformation("Request GetPairs {DataProviders}", dataProviders);
 
             var pairs = await analysisService.GetPairsByDataProviderAsync(dataProviders, HttpContext);
 
@@ -43,7 +43,7 @@ namespace TechnicalAnalysis.Infrastructure.Host.Controllers
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         [HttpGet("IndicatorsByPairName")]
         [EnableRateLimiting("fixed-by-ip")]
-        public Task<IActionResult> GetIndicatorsByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
+        public Task<IActionResult> GetIndicatorsBacktestByPairNameAsync([FromQuery] List<string> pairNames, [FromQuery] Timeframe timeframe)
         {
             logger.LogInformation("Request {PairNames} {Timeframe}", pairNames, timeframe);
 
