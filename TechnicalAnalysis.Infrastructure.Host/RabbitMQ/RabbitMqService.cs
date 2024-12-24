@@ -27,16 +27,16 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
             Password = rabbitMqSetting.CurrentValue.Password,
         };
 
-        public void PublishMessage<T>(T message)
+        public async Task PublishMessage<T>(T message)
         {
-            var connection = _connectionFactory.CreateConnection();
-            using var channel = connection.CreateModel();
+            var connection = await _connectionFactory.CreateConnectionAsync();
+            await using var channel = await connection.CreateChannelAsync();
 
             if (_isFirstTime)
             {
-                channel.ExchangeDeclare(DeadLetterExchange, "direct", true, false);
-                channel.QueueDeclare(DeadLetterQueue, durable: true, exclusive: false, autoDelete: false);
-                channel.QueueBind(DeadLetterQueue, DeadLetterExchange, DeadLetterRoutingKey);
+                await channel.ExchangeDeclareAsync(DeadLetterExchange, "direct", true, false);
+                await channel.QueueDeclareAsync(DeadLetterQueue, durable: true, exclusive: false, autoDelete: false);
+                await channel.QueueBindAsync(DeadLetterQueue, DeadLetterExchange, DeadLetterRoutingKey);
 
                 // Configure primary queue with dead-letter exchange
                 var arguments = new Dictionary<string, object>
@@ -45,9 +45,9 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
                         { "x-dead-letter-routing-key", DeadLetterRoutingKey }
                     };
 
-                channel.ExchangeDeclare(ExchangeName, "direct", true, false);
-                channel.QueueDeclare(Queue, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
-                channel.QueueBind(Queue, ExchangeName, RoutingKey);
+                await channel.ExchangeDeclareAsync(ExchangeName, "direct", true, false);
+                await channel.QueueDeclareAsync(Queue, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
+                await channel.QueueBindAsync(Queue, ExchangeName, RoutingKey);
 
                 _isFirstTime = false;
             }
@@ -55,21 +55,23 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
             var json = JsonSerializer.Serialize(message, JsonHelper.JsonSerializerOptions);
             var body = Encoding.UTF8.GetBytes(json);
 
-            var properties = channel.CreateBasicProperties();
-            properties.Persistent = true;
+            var properties = new BasicProperties
+            {
+                Persistent = true
+            };
 
-            channel.BasicPublish(exchange: ExchangeName, routingKey: RoutingKey, basicProperties: properties, body: body);
+            await channel.BasicPublishAsync(exchange: ExchangeName, routingKey: RoutingKey, mandatory: false, basicProperties: properties, body: body);
         }
 
         public async Task<List<T>> ConsumeMessageAsync<T>()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            using var channel = connection.CreateModel();
+            await using var connection = await _connectionFactory.CreateConnectionAsync();
+            await using var channel = await connection.CreateChannelAsync();
 
-            var consumer = new EventingBasicConsumer(channel);
+            var consumer = new AsyncEventingBasicConsumer(channel);
             var receivedMessages = new List<T>();
 
-            consumer.Received += (model, ea) =>
+            consumer.ReceivedAsync += (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
@@ -79,9 +81,11 @@ namespace TechnicalAnalysis.Infrastructure.Host.RabbitMQ
                 {
                     receivedMessages.Add(deserializedMessage);
                 }
+
+                return Task.CompletedTask;
             };
 
-            channel.BasicConsume(queue: Queue, autoAck: true, consumer: consumer);
+            await channel.BasicConsumeAsync(queue: Queue, autoAck: true, consumer: consumer);
 
             // Wait for some time or an event indicating that enough messages have been received.
             await Task.Delay(TimeSpan.FromSeconds(5));
